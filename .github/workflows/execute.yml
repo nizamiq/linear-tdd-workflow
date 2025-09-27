@@ -1,0 +1,230 @@
+name: Execute Fix Packs
+
+on:
+  workflow_dispatch:
+    inputs:
+      task_id:
+        description: 'Linear task ID to execute'
+        required: false
+      fix_pack_type:
+        description: 'Type of Fix Pack to execute'
+        required: false
+        type: choice
+        options:
+          - auto
+          - lint_format
+          - dead_code
+          - documentation
+          - simple_refactor
+          - dependency_update
+          - logging
+          - test_scaffold
+
+  repository_dispatch:
+    types: [execute_fix_pack]
+
+env:
+  NODE_VERSION: '18'
+  MAX_LOC: 300
+  MIN_COVERAGE: 80
+  MIN_MUTATION: 30
+
+jobs:
+  validate:
+    name: Validate Fix Pack
+    runs-on: ubuntu-latest
+    outputs:
+      is_valid: ${{ steps.validate.outputs.is_valid }}
+      task_id: ${{ steps.validate.outputs.task_id }}
+      fix_type: ${{ steps.validate.outputs.fix_type }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Validate Fix Pack
+        id: validate
+        run: |
+          task_id="${{ github.event.inputs.task_id || github.event.client_payload.task_id }}"
+          fix_type="${{ github.event.inputs.fix_pack_type || github.event.client_payload.fix_type }}"
+
+          # Validate this is an approved Fix Pack
+          if [[ ! "$fix_type" =~ ^(lint_format|dead_code|documentation|simple_refactor|dependency_update|logging|test_scaffold|auto)$ ]]; then
+            echo "❌ Invalid Fix Pack type: $fix_type"
+            echo "is_valid=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+          echo "is_valid=true" >> $GITHUB_OUTPUT
+          echo "task_id=$task_id" >> $GITHUB_OUTPUT
+          echo "fix_type=$fix_type" >> $GITHUB_OUTPUT
+
+  execute:
+    name: Execute Fix Pack
+    needs: validate
+    if: needs.validate.outputs.is_valid == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Create feature branch
+        run: |
+          task_id="${{ needs.validate.outputs.task_id }}"
+          branch_name="fix/${task_id}-${RANDOM}"
+          git checkout -b $branch_name
+          echo "BRANCH_NAME=$branch_name" >> $GITHUB_ENV
+
+      # RED Phase - Write failing test
+      - name: '[RED] Write failing test'
+        run: |
+          npm run execute:fixpack -- \
+            --phase red \
+            --task-id "${{ needs.validate.outputs.task_id }}" \
+            --type "${{ needs.validate.outputs.fix_type }}"
+
+          # Verify test fails
+          npm test 2>&1 | tee test-output.log || true
+          if ! grep -q "FAIL" test-output.log; then
+            echo "❌ Test should fail in RED phase"
+            exit 1
+          fi
+
+          git add .
+          git commit -m "[RED] Add failing test for ${{ needs.validate.outputs.task_id }}"
+
+      # GREEN Phase - Implement fix
+      - name: '[GREEN] Implement fix'
+        run: |
+          npm run execute:fixpack -- \
+            --phase green \
+            --task-id "${{ needs.validate.outputs.task_id }}" \
+            --type "${{ needs.validate.outputs.fix_type }}"
+
+          # Verify test passes
+          npm test
+          if [ $? -ne 0 ]; then
+            echo "❌ Tests must pass in GREEN phase"
+            exit 1
+          fi
+
+          git add .
+          git commit -m "[GREEN] Implement fix for ${{ needs.validate.outputs.task_id }}"
+
+      # REFACTOR Phase - Improve code quality
+      - name: '[REFACTOR] Refactor code'
+        run: |
+          npm run execute:fixpack -- \
+            --phase refactor \
+            --task-id "${{ needs.validate.outputs.task_id }}" \
+            --type "${{ needs.validate.outputs.fix_type }}"
+
+          # Ensure tests still pass
+          npm test
+
+          git add .
+          git commit -m "[REFACTOR] Improve implementation for ${{ needs.validate.outputs.task_id }}"
+
+      - name: Calculate diff coverage
+        id: coverage
+        run: |
+          # Get coverage for changed files
+          git diff origin/develop --name-only | grep -E '\.(js|ts)$' > changed-files.txt
+          npm run test:unit -- --coverage --collectCoverageFrom=$(cat changed-files.txt | tr '\n' ',')
+
+          coverage=$(jq '.total.lines.pct' coverage/coverage-summary.json)
+          echo "coverage=$coverage" >> $GITHUB_OUTPUT
+
+          if (( $(echo "$coverage < $MIN_COVERAGE" | bc -l) )); then
+            echo "❌ Coverage below threshold: $coverage < $MIN_COVERAGE"
+            exit 1
+          fi
+
+      - name: Run mutation testing
+        id: mutation
+        run: |
+          # Run mutation testing on changed files
+          npm run test:mutation -- --files $(cat changed-files.txt | tr '\n' ',')
+
+          mutation_score=$(jq '.mutation.score' stryker-report.json)
+          echo "mutation=$mutation_score" >> $GITHUB_OUTPUT
+
+          if (( $(echo "$mutation_score < $MIN_MUTATION" | bc -l) )); then
+            echo "⚠️ Mutation score below target: $mutation_score < $MIN_MUTATION"
+          fi
+
+      - name: Verify LOC limit
+        run: |
+          loc=$(git diff origin/develop --stat | tail -1 | awk '{print $4}')
+          if [ "$loc" -gt "$MAX_LOC" ]; then
+            echo "❌ Changes exceed LOC limit: $loc > $MAX_LOC"
+            exit 1
+          fi
+
+      - name: Push changes
+        run: |
+          git push origin $BRANCH_NAME
+
+      - name: Create Pull Request
+        id: pr
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ env.BRANCH_NAME }}
+          base: develop
+          title: '[EXECUTOR] ${{ needs.validate.outputs.task_id }}: Fix Pack Implementation'
+          body: |
+            ## Description
+            Automated Fix Pack implementation for Linear task ${{ needs.validate.outputs.task_id }}
+
+            ## Type of Change
+            - [x] Fix Pack: ${{ needs.validate.outputs.fix_type }}
+            - [x] Test-Driven Development followed
+
+            ## Testing
+            - ✅ Test written first ([RED])
+            - ✅ Implementation complete ([GREEN])
+            - ✅ Code refactored ([REFACTOR])
+            - ✅ All tests passing
+            - ✅ Diff coverage: ${{ steps.coverage.outputs.coverage }}%
+            - ✅ Mutation score: ${{ steps.mutation.outputs.mutation }}%
+
+            ## Metrics
+            - Lines changed: ${{ env.LOC }}
+            - Test coverage: ${{ steps.coverage.outputs.coverage }}%
+            - Mutation score: ${{ steps.mutation.outputs.mutation }}%
+
+            Fixes #${{ needs.validate.outputs.task_id }}
+
+            ---
+            *Generated by EXECUTOR agent*
+          labels: |
+            fix-pack
+            ai-generated
+            tdd
+
+      - name: Update Linear task
+        run: |
+          npm run linear:update -- \
+            --task-id "${{ needs.validate.outputs.task_id }}" \
+            --status "In Review" \
+            --pr-url "${{ steps.pr.outputs.pull-request-url }}"
+        env:
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}

@@ -1,0 +1,234 @@
+{
+  "project": {
+    "name": "Linear TDD Workflow System",
+    "version": "1.2.0",
+    "type": "multi-agent-framework",
+    "phase": "0-foundation",
+    "languages": ["typescript", "javascript", "python"]
+  },
+  "agents": {
+    "enabled": true,
+    "roster": {
+      "auditor": {
+        "active": true,
+        "priority": 1,
+        "sla": {
+          "firstScan": 720,
+          "incrementalScan": 180
+        }
+      },
+      "executor": {
+        "active": true,
+        "priority": 2,
+        "constraints": {
+          "maxLOC": 300,
+          "minCoverage": 80,
+          "minMutation": 30
+        }
+      },
+      "guardian": {
+        "active": true,
+        "priority": 0,
+        "sla": {
+          "detection": 300,
+          "recovery": 600
+        }
+      },
+      "strategist": {
+        "active": true,
+        "priority": 1,
+        "limits": {
+          "maxConcurrent": 5,
+          "contextSwitches": 3
+        }
+      },
+      "scholar": {
+        "active": true,
+        "priority": 3,
+        "schedule": "0 2 * * 0"
+      }
+    }
+  },
+  "workflow": {
+    "tdd": {
+      "enforced": true,
+      "stages": ["red", "green", "refactor"],
+      "coverage": {
+        "diff": 80,
+        "overall": 90
+      }
+    },
+    "fixPacks": {
+      "enabled": true,
+      "types": [
+        "lint_format",
+        "dead_code",
+        "documentation",
+        "simple_refactor",
+        "dependency_update",
+        "logging",
+        "test_scaffold"
+      ],
+      "limits": {
+        "maxLOC": 300,
+        "maxFiles": 10,
+        "maxComplexity": 10
+      }
+    },
+    "fil": {
+      "classification": true,
+      "levels": {
+        "FIL-0": "auto",
+        "FIL-1": "auto",
+        "FIL-2": "tech_lead",
+        "FIL-3": "tech_lead,product_owner"
+      }
+    }
+  },
+  "integrations": {
+    "github": {
+      "enabled": true,
+      "org": "${GITHUB_ORG}",
+      "branchProtection": true,
+      "requiredChecks": [
+        "tests",
+        "coverage",
+        "lint",
+        "security"
+      ]
+    },
+    "linear": {
+      "enabled": true,
+      "teamId": "${LINEAR_TEAM_ID}",
+      "projectId": "${LINEAR_PROJECT_ID}",
+      "sync": "realtime",
+      "autoCreate": true
+    },
+    "cicd": {
+      "platform": "github_actions",
+      "pipelines": {
+        "test": "on_push",
+        "build": "on_pr",
+        "deploy": "on_merge"
+      }
+    }
+  },
+  "quality": {
+    "gates": {
+      "coverage": {
+        "minimum": 80,
+        "target": 90,
+        "enforcement": "strict"
+      },
+      "complexity": {
+        "maximum": 10,
+        "target": 5
+      },
+      "duplication": {
+        "maximum": 5,
+        "target": 2
+      },
+      "security": {
+        "critical": 0,
+        "high": 0,
+        "medium": 5
+      }
+    },
+    "mutation": {
+      "enabled": true,
+      "framework": "stryker",
+      "threshold": 30,
+      "timeout": 300
+    }
+  },
+  "resource": {
+    "limits": {
+      "memory": "4GB",
+      "cpu": 2,
+      "timeout": 1800,
+      "concurrent": {
+        "repos": 3,
+        "tasks": 10
+      }
+    },
+    "budget": {
+      "monthly": 10000,
+      "perRepo": 2500,
+      "perFix": {
+        "median": 3,
+        "p95": 5
+      },
+      "alerts": {
+        "warning": 0.8,
+        "critical": 0.95
+      }
+    }
+  },
+  "monitoring": {
+    "metrics": {
+      "enabled": true,
+      "provider": "opentelemetry",
+      "export": "prometheus"
+    },
+    "logging": {
+      "level": "info",
+      "format": "json",
+      "retention": 30
+    },
+    "alerting": {
+      "channels": ["slack", "email", "linear"],
+      "rules": {
+        "pipelineDown": {
+          "threshold": 600,
+          "severity": "critical"
+        },
+        "highFailureRate": {
+          "threshold": 0.2,
+          "severity": "warning"
+        },
+        "budgetExceeded": {
+          "threshold": 0.9,
+          "severity": "info"
+        }
+      }
+    }
+  },
+  "security": {
+    "scanning": {
+      "enabled": true,
+      "tools": ["codeql", "semgrep"],
+      "schedule": "on_pr"
+    },
+    "secrets": {
+      "provider": "hashicorp_vault",
+      "rotation": 30,
+      "scanning": true
+    },
+    "rbac": {
+      "model": "github_teams",
+      "inheritance": true,
+      "audit": true
+    }
+  },
+  "compliance": {
+    "audit": {
+      "enabled": true,
+      "retention": 90,
+      "export": ["json", "csv"],
+      "storage": "immutable"
+    },
+    "standards": {
+      "slsa": true,
+      "soc2": true,
+      "gdpr": true
+    }
+  },
+  "features": {
+    "autoFix": true,
+    "tddEnforcement": true,
+    "gitflow": true,
+    "patternLearning": true,
+    "autoRebase": true,
+    "smartPrioritization": true
+  }
+}

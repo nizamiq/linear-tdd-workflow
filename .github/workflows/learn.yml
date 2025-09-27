@@ -1,0 +1,122 @@
+name: Pattern Learning
+
+on:
+  schedule:
+    - cron: '0 2 * * 0'  # Weekly on Sunday at 2 AM UTC
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '18'
+  MIN_CONFIDENCE: 0.8
+  MIN_SAMPLE_SIZE: 10
+
+jobs:
+  extract:
+    name: Extract Patterns
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for pattern analysis
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Collect successful fixes
+        id: collect
+        run: |
+          # Get successful PRs from last 7 days
+          npm run pattern:extract -- \
+            --time-range 7d \
+            --min-success-rate 0.9 \
+            --output patterns.json
+
+          pattern_count=$(jq '.patterns | length' patterns.json)
+          echo "pattern_count=$pattern_count" >> $GITHUB_OUTPUT
+
+      - name: Validate patterns
+        id: validate
+        run: |
+          npm run pattern:validate -- \
+            --input patterns.json \
+            --min-confidence $MIN_CONFIDENCE \
+            --min-samples $MIN_SAMPLE_SIZE \
+            --output validated-patterns.json
+
+          validated_count=$(jq '.validated | length' validated-patterns.json)
+          echo "validated_count=$validated_count" >> $GITHUB_OUTPUT
+
+      - name: Update knowledge base
+        if: steps.validate.outputs.validated_count > 0
+        run: |
+          # Update the pattern database
+          npm run scholar:update -- \
+            --patterns validated-patterns.json \
+            --knowledge-base .claude/knowledge/patterns.json
+
+      - name: Generate insights report
+        run: |
+          cat > pattern-insights.md << EOF
+          # Pattern Learning Report
+
+          ## Summary
+          - Patterns Extracted: ${{ steps.collect.outputs.pattern_count }}
+          - Patterns Validated: ${{ steps.validate.outputs.validated_count }}
+          - Success Rate: $(jq -r '.overall_success_rate' patterns.json)%
+
+          ## Top Patterns
+          $(jq -r '.patterns[:5] | .[] | "- **\(.name)**: \(.description) (confidence: \(.confidence))"' validated-patterns.json)
+
+          ## Efficiency Gains
+          $(jq -r '.efficiency_metrics | to_entries | .[] | "- \(.key): \(.value)%"' patterns.json)
+
+          ## Recommendations
+          $(npm run scholar:recommend -- --format markdown)
+
+          ---
+          *Generated on $(date -u +"%Y-%m-%d %H:%M:%S UTC")*
+          EOF
+
+      - name: Create Linear task for pattern review
+        if: steps.validate.outputs.validated_count > 0
+        run: |
+          npm run linear:create-issues -- \
+            --title "[SCHOLAR] Review validated patterns - Week $(date +%U)" \
+            --description "$(cat pattern-insights.md)" \
+            --labels "patterns,learning,scholar"
+        env:
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          LINEAR_TEAM_ID: ${{ secrets.LINEAR_TEAM_ID }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: pattern-learning-${{ github.run_id }}
+          path: |
+            patterns.json
+            validated-patterns.json
+            pattern-insights.md
+          retention-days: 90
+
+      - name: Notify agents
+        run: |
+          # Broadcast new patterns to all agents
+          curl -X POST ${{ secrets.AGENT_BROADCAST_URL }} \
+            -H "Authorization: Bearer ${{ secrets.AGENT_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "event": "patterns_updated",
+              "data": {
+                "count": ${{ steps.validate.outputs.validated_count }},
+                "timestamp": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+              }
+            }'

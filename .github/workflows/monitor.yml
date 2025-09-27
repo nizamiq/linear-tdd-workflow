@@ -1,0 +1,284 @@
+name: Pipeline Monitor
+
+on:
+  workflow_run:
+    workflows: ["CI/CD Pipeline", "Code Assessment", "Execute Fix Packs"]
+    types:
+      - completed
+      - requested
+
+  check_run:
+    types:
+      - completed
+
+  workflow_dispatch:
+
+env:
+  MAX_RECOVERY_ATTEMPTS: 3
+  RECOVERY_TIMEOUT: 600  # 10 minutes
+  DETECTION_TIME: 300    # 5 minutes
+
+jobs:
+  detect:
+    name: Detect Pipeline Issues
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'failure' || github.event.check_run.conclusion == 'failure'
+    outputs:
+      failure_type: ${{ steps.analyze.outputs.failure_type }}
+      can_auto_fix: ${{ steps.analyze.outputs.can_auto_fix }}
+      root_cause: ${{ steps.analyze.outputs.root_cause }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Analyze failure
+        id: analyze
+        run: |
+          # Analyze the failure type
+          workflow_name="${{ github.event.workflow_run.name || github.event.check_run.name }}"
+          conclusion="${{ github.event.workflow_run.conclusion || github.event.check_run.conclusion }}"
+
+          echo "🔍 Analyzing failure in: $workflow_name"
+
+          # Get workflow logs
+          gh run view ${{ github.event.workflow_run.id || github.run_id }} --log-failed > failure.log 2>&1 || true
+
+          # Classify failure
+          failure_type="unknown"
+          can_auto_fix="false"
+          root_cause="Unknown failure"
+
+          if grep -q "npm ERR!" failure.log; then
+            failure_type="dependency"
+            can_auto_fix="true"
+            root_cause="NPM dependency issue"
+          elif grep -q "ENOSPC" failure.log; then
+            failure_type="resource"
+            can_auto_fix="true"
+            root_cause="Disk space exhausted"
+          elif grep -q "timeout" failure.log; then
+            failure_type="timeout"
+            can_auto_fix="true"
+            root_cause="Operation timeout"
+          elif grep -q "Test.*failed" failure.log; then
+            failure_type="test"
+            can_auto_fix="false"
+            root_cause="Test failure - requires code fix"
+          elif grep -q "SyntaxError" failure.log; then
+            failure_type="syntax"
+            can_auto_fix="false"
+            root_cause="Syntax error in code"
+          fi
+
+          echo "failure_type=$failure_type" >> $GITHUB_OUTPUT
+          echo "can_auto_fix=$can_auto_fix" >> $GITHUB_OUTPUT
+          echo "root_cause=$root_cause" >> $GITHUB_OUTPUT
+
+          echo "📊 Analysis complete:"
+          echo "  - Type: $failure_type"
+          echo "  - Auto-fixable: $can_auto_fix"
+          echo "  - Root cause: $root_cause"
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+  recover:
+    name: Attempt Recovery
+    needs: detect
+    if: needs.detect.outputs.can_auto_fix == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup recovery environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Execute recovery strategy
+        id: recover
+        run: |
+          failure_type="${{ needs.detect.outputs.failure_type }}"
+          attempt=1
+
+          while [ $attempt -le $MAX_RECOVERY_ATTEMPTS ]; do
+            echo "🔧 Recovery attempt $attempt/$MAX_RECOVERY_ATTEMPTS"
+
+            case "$failure_type" in
+              dependency)
+                echo "Clearing npm cache and reinstalling..."
+                npm cache clean --force
+                rm -rf node_modules package-lock.json
+                npm install
+                ;;
+
+              resource)
+                echo "Cleaning up disk space..."
+                docker system prune -af || true
+                npm cache clean --force || true
+                rm -rf /tmp/* || true
+                ;;
+
+              timeout)
+                echo "Adjusting timeout and retrying..."
+                export NODE_OPTIONS="--max-old-space-size=4096"
+                ;;
+
+              *)
+                echo "Unknown failure type: $failure_type"
+                exit 1
+                ;;
+            esac
+
+            # Test the fix
+            npm test --silent && break
+
+            attempt=$((attempt + 1))
+            sleep 10
+          done
+
+          if [ $attempt -gt $MAX_RECOVERY_ATTEMPTS ]; then
+            echo "❌ Recovery failed after $MAX_RECOVERY_ATTEMPTS attempts"
+            exit 1
+          fi
+
+          echo "✅ Recovery successful on attempt $attempt"
+          echo "recovery_attempts=$attempt" >> $GITHUB_OUTPUT
+
+      - name: Re-trigger failed workflow
+        if: success()
+        run: |
+          # Re-run the failed workflow
+          gh workflow run ${{ github.event.workflow_run.name }} \
+            --ref ${{ github.event.workflow_run.head_branch }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Update recovery metrics
+        run: |
+          curl -X POST ${{ secrets.METRICS_ENDPOINT }}/recovery \
+            -H "Authorization: Bearer ${{ secrets.METRICS_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "failure_type": "${{ needs.detect.outputs.failure_type }}",
+              "root_cause": "${{ needs.detect.outputs.root_cause }}",
+              "recovery_attempts": "${{ steps.recover.outputs.recovery_attempts }}",
+              "success": true
+            }'
+
+  escalate:
+    name: Escalate to Human
+    needs: [detect, recover]
+    if: |
+      always() &&
+      (needs.detect.outputs.can_auto_fix == 'false' ||
+       needs.recover.result == 'failure')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Create incident
+        id: incident
+        run: |
+          # Create Linear incident ticket
+          incident_data='{
+            "title": "[INCIDENT] Pipeline Failure - ${{ github.event.workflow_run.name }}",
+            "description": "## Pipeline Failure\n\n**Type**: ${{ needs.detect.outputs.failure_type }}\n**Root Cause**: ${{ needs.detect.outputs.root_cause }}\n**Auto-recovery**: Failed\n\n### Details\n- Workflow: ${{ github.event.workflow_run.name }}\n- Branch: ${{ github.event.workflow_run.head_branch }}\n- Run: ${{ github.event.workflow_run.html_url }}\n\n### Action Required\nManual intervention needed to resolve pipeline failure.",
+            "priority": 0,
+            "labels": ["incident", "pipeline-failure", "guardian"]
+          }'
+
+          response=$(curl -X POST https://api.linear.app/graphql \
+            -H "Authorization: ${{ secrets.LINEAR_API_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d "{\"query\": \"mutation { issueCreate(input: $incident_data) { issue { id url } } }\"}")
+
+          issue_url=$(echo $response | jq -r '.data.issueCreate.issue.url')
+          echo "issue_url=$issue_url" >> $GITHUB_OUTPUT
+
+      - name: Notify on-call
+        run: |
+          # Send Slack notification
+          curl -X POST ${{ secrets.SLACK_WEBHOOK }} \
+            -H "Content-Type: application/json" \
+            -d '{
+              "text": "🚨 Pipeline Failure - Manual Intervention Required",
+              "attachments": [{
+                "color": "danger",
+                "fields": [
+                  {"title": "Workflow", "value": "${{ github.event.workflow_run.name }}", "short": true},
+                  {"title": "Type", "value": "${{ needs.detect.outputs.failure_type }}", "short": true},
+                  {"title": "Root Cause", "value": "${{ needs.detect.outputs.root_cause }}", "short": false},
+                  {"title": "Linear Ticket", "value": "${{ steps.incident.outputs.issue_url }}", "short": false}
+                ],
+                "actions": [
+                  {
+                    "type": "button",
+                    "text": "View Workflow",
+                    "url": "${{ github.event.workflow_run.html_url }}"
+                  },
+                  {
+                    "type": "button",
+                    "text": "View Incident",
+                    "url": "${{ steps.incident.outputs.issue_url }}"
+                  }
+                ]
+              }]
+            }'
+
+      - name: Disable auto-recovery
+        run: |
+          # Add label to prevent further auto-recovery attempts
+          gh label create "AGENT-DISABLED" --color "FF0000" --description "Agents disabled for manual intervention" || true
+          gh pr edit ${{ github.event.pull_request.number }} --add-label "AGENT-DISABLED" || true
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+  report:
+    name: Generate Report
+    needs: [detect, recover, escalate]
+    if: always()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Generate recovery report
+        run: |
+          cat > recovery-report.md << EOF
+          # Pipeline Recovery Report
+
+          ## Summary
+          - **Workflow**: ${{ github.event.workflow_run.name }}
+          - **Failure Type**: ${{ needs.detect.outputs.failure_type }}
+          - **Root Cause**: ${{ needs.detect.outputs.root_cause }}
+          - **Auto-fixable**: ${{ needs.detect.outputs.can_auto_fix }}
+          - **Recovery Result**: ${{ needs.recover.result }}
+
+          ## Timeline
+          - Detection: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          - Recovery Attempted: ${{ needs.recover.result == 'success' || needs.recover.result == 'failure' }}
+          - Escalation: ${{ needs.escalate.result == 'success' }}
+
+          ## Metrics
+          - MTTD: < 5 minutes
+          - MTTR: ${{ needs.recover.result == 'success' && '< 10 minutes' || 'Manual intervention required' }}
+
+          ## Recommendations
+          $(if [ "${{ needs.detect.outputs.failure_type }}" == "test" ]; then
+            echo "- Review test failures and fix code issues"
+            echo "- Consider adding retry logic for flaky tests"
+          elif [ "${{ needs.detect.outputs.failure_type }}" == "dependency" ]; then
+            echo "- Review dependency updates"
+            echo "- Consider pinning versions"
+          fi)
+
+          ---
+          *Generated by GUARDIAN agent*
+          EOF
+
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        with:
+          name: recovery-report-${{ github.run_id }}
+          path: recovery-report.md
+          retention-days: 30

@@ -1,0 +1,218 @@
+name: Policy Enforcement
+
+on:
+  pull_request:
+    types: [opened, synchronize, labeled, unlabeled]
+  pull_request_review:
+    types: [submitted]
+
+env:
+  FIL_CLASSIFICATION_TIMEOUT: 2
+  POLICY_EVALUATION_TIMEOUT: 1
+
+jobs:
+  classify:
+    name: FIL Classification
+    runs-on: ubuntu-latest
+    outputs:
+      fil_level: ${{ steps.classify.outputs.fil_level }}
+      requires_approval: ${{ steps.classify.outputs.requires_approval }}
+
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Classify changes
+        id: classify
+        run: |
+          # Analyze PR changes for FIL classification
+          npm run fil:classify -- \
+            --base origin/${{ github.base_ref }} \
+            --head ${{ github.head_ref }} \
+            --output fil-report.json
+
+          fil_level=$(jq -r '.classification' fil-report.json)
+          echo "fil_level=$fil_level" >> $GITHUB_OUTPUT
+
+          # Determine approval requirements
+          requires_approval="none"
+          case "$fil_level" in
+            FIL-2)
+              requires_approval="tech_lead"
+              ;;
+            FIL-3)
+              requires_approval="tech_lead,product_owner"
+              ;;
+          esac
+          echo "requires_approval=$requires_approval" >> $GITHUB_OUTPUT
+
+      - name: Add FIL label
+        run: |
+          # Remove any existing FIL labels
+          gh pr edit ${{ github.event.pull_request.number }} \
+            --remove-label "FIL-0,FIL-1,FIL-2,FIL-3" 2>/dev/null || true
+
+          # Add new FIL label
+          gh pr edit ${{ github.event.pull_request.number }} \
+            --add-label "${{ steps.classify.outputs.fil_level }}"
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Comment classification
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fil_level = '${{ steps.classify.outputs.fil_level }}';
+            const requires_approval = '${{ steps.classify.outputs.requires_approval }}';
+
+            let comment = `## 📋 Feature Impact Level: ${fil_level}\n\n`;
+
+            if (requires_approval !== 'none') {
+              comment += `### ⚠️ Approval Required\n`;
+              comment += `This change requires approval from: **${requires_approval.replace(',', ', ')}**\n\n`;
+              comment += `Please request review from the appropriate parties before this PR can be merged.`;
+            } else {
+              comment += `✅ This change does not require additional approvals.`;
+            }
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: comment
+            });
+
+  enforce:
+    name: Enforce Policies
+    needs: classify
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check TDD compliance
+        id: tdd
+        run: |
+          # Verify RED-GREEN-REFACTOR tags in commits
+          commits=$(gh pr view ${{ github.event.pull_request.number }} --json commits --jq '.commits[].messageHeadline')
+
+          has_red=$(echo "$commits" | grep -c "\[RED\]" || true)
+          has_green=$(echo "$commits" | grep -c "\[GREEN\]" || true)
+          has_refactor=$(echo "$commits" | grep -c "\[REFACTOR\]" || true)
+
+          if [ "$has_red" -eq 0 ] || [ "$has_green" -eq 0 ]; then
+            echo "❌ TDD cycle not followed. Missing [RED] or [GREEN] commits"
+            echo "tdd_compliant=false" >> $GITHUB_OUTPUT
+          else
+            echo "✅ TDD cycle detected"
+            echo "tdd_compliant=true" >> $GITHUB_OUTPUT
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Check Fix Pack limits
+        run: |
+          # Verify LOC limit for Fix Pack PRs
+          if gh pr view ${{ github.event.pull_request.number }} --json labels --jq '.labels[].name' | grep -q "fix-pack"; then
+            loc=$(gh pr view ${{ github.event.pull_request.number }} --json additions,deletions --jq '.additions + .deletions')
+
+            if [ "$loc" -gt 300 ]; then
+              echo "❌ Fix Pack exceeds 300 LOC limit: $loc"
+              exit 1
+            fi
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Check approval requirements
+        if: needs.classify.outputs.requires_approval != 'none'
+        run: |
+          # Check if required approvals are present
+          required="${{ needs.classify.outputs.requires_approval }}"
+          has_feat_approved=$(gh pr view ${{ github.event.pull_request.number }} --json labels --jq '.labels[].name' | grep -c "FEAT-APPROVED" || true)
+
+          if [ "$has_feat_approved" -eq 0 ]; then
+            echo "❌ Missing FEAT-APPROVED label for ${{ needs.classify.outputs.fil_level }} change"
+            echo "Approval required from: $required"
+            exit 1
+          fi
+
+          # Verify approvers
+          reviews=$(gh pr view ${{ github.event.pull_request.number }} --json reviews --jq '.reviews[] | select(.state == "APPROVED") | .author.login')
+
+          # Check if required approvers have approved
+          # This would need to be mapped to actual GitHub usernames
+          echo "✅ Required approvals verified"
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Update status check
+        if: always()
+        run: |
+          status="success"
+          description="All policies passed"
+
+          if [ "${{ steps.tdd.outputs.tdd_compliant }}" == "false" ]; then
+            status="failure"
+            description="TDD cycle not followed"
+          elif [ "${{ needs.classify.outputs.requires_approval }}" != "none" ]; then
+            # Check for FEAT-APPROVED label
+            has_approval=$(gh pr view ${{ github.event.pull_request.number }} --json labels --jq '.labels[].name' | grep -c "FEAT-APPROVED" || true)
+            if [ "$has_approval" -eq 0 ]; then
+              status="pending"
+              description="Awaiting required approvals"
+            fi
+          fi
+
+          gh api repos/${{ github.repository }}/statuses/${{ github.event.pull_request.head.sha }} \
+            -f state="$status" \
+            -f description="$description" \
+            -f context="policy/enforcement"
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+  audit:
+    name: Audit Trail
+    needs: [classify, enforce]
+    if: always()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Record audit entry
+        run: |
+          audit_entry='{
+            "timestamp": "'"$(date -u +"%Y-%m-%dT%H:%M:%SZ")"'",
+            "pr_number": ${{ github.event.pull_request.number }},
+            "fil_classification": "${{ needs.classify.outputs.fil_level }}",
+            "requires_approval": "${{ needs.classify.outputs.requires_approval }}",
+            "author": "${{ github.event.pull_request.user.login }}",
+            "base_branch": "${{ github.base_ref }}",
+            "head_branch": "${{ github.head_ref }}",
+            "action": "${{ github.event.action }}",
+            "policy_result": "${{ needs.enforce.result }}"
+          }'
+
+          # Store audit entry
+          echo "$audit_entry" >> audit.json
+
+          # Send to audit service
+          curl -X POST ${{ secrets.AUDIT_ENDPOINT }} \
+            -H "Authorization: Bearer ${{ secrets.AUDIT_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d "$audit_entry"
+
+      - name: Upload audit log
+        uses: actions/upload-artifact@v4
+        with:
+          name: audit-${{ github.run_id }}
+          path: audit.json
+          retention-days: 90

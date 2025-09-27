@@ -1,0 +1,218 @@
+{
+  "mcpServers": {
+    "sequential-thinking": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
+      "env": {},
+      "description": "Advanced problem-solving and reasoning for complex refactoring decisions",
+      "operations": {
+        "think": {
+          "description": "Analyze complex problems step-by-step",
+          "timeout": 30000
+        },
+        "reason": {
+          "description": "Logical reasoning about code structures",
+          "timeout": 30000
+        },
+        "solve": {
+          "description": "Generate solutions for identified problems",
+          "timeout": 30000
+        }
+      }
+    },
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@context7/mcp-server"],
+      "env": {},
+      "description": "Code search and understanding across large codebases",
+      "operations": {
+        "search": {
+          "description": "Search for patterns and code across repositories",
+          "timeout": 5000
+        },
+        "analyze": {
+          "description": "Analyze code structure and dependencies",
+          "timeout": 5000
+        },
+        "explain": {
+          "description": "Generate explanations for complex code",
+          "timeout": 5000
+        }
+      }
+    },
+    "kubernetes": {
+      "command": "kubectl",
+      "args": ["mcp", "server"],
+      "env": {
+        "KUBECONFIG": "${KUBECONFIG}"
+      },
+      "description": "Kubernetes cluster operations for deployment and scaling",
+      "operations": {
+        "deploy": {
+          "description": "Deploy applications to Kubernetes",
+          "timeout": 10000
+        },
+        "scale": {
+          "description": "Scale deployments up or down",
+          "timeout": 10000
+        },
+        "monitor": {
+          "description": "Monitor deployment health and metrics",
+          "timeout": 10000
+        }
+      }
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "playwright", "mcp"],
+      "env": {},
+      "description": "End-to-end testing and browser automation",
+      "operations": {
+        "test": {
+          "description": "Run E2E test suites",
+          "timeout": 60000
+        },
+        "screenshot": {
+          "description": "Capture screenshots for visual validation",
+          "timeout": 10000
+        },
+        "trace": {
+          "description": "Record test execution traces",
+          "timeout": 60000
+        }
+      }
+    },
+    "linear": {
+      "command": "linear-mcp",
+      "args": ["--api-key", "${LINEAR_API_KEY}"],
+      "env": {
+        "LINEAR_API_KEY": "${LINEAR_API_KEY}"
+      },
+      "description": "Linear.app integration for task management",
+      "operations": {
+        "create": {
+          "description": "Create new Linear issues",
+          "timeout": 2000
+        },
+        "update": {
+          "description": "Update issue status and fields",
+          "timeout": 2000
+        },
+        "transition": {
+          "description": "Move issues through workflow states",
+          "timeout": 2000
+        },
+        "query": {
+          "description": "Search and filter issues",
+          "timeout": 2000
+        }
+      }
+    },
+    "time": {
+      "command": "time-server",
+      "args": [],
+      "env": {},
+      "description": "Time scheduling and cron job management",
+      "operations": {
+        "schedule": {
+          "description": "Schedule recurring tasks",
+          "timeout": 1000
+        },
+        "cron": {
+          "description": "Manage cron expressions",
+          "timeout": 1000
+        },
+        "timer": {
+          "description": "Set one-time timers",
+          "timeout": 1000
+        }
+      }
+    }
+  },
+  "configuration": {
+    "maxConcurrentServers": 5,
+    "defaultTimeout": 30000,
+    "retryPolicy": {
+      "maxAttempts": 3,
+      "backoffMultiplier": 2,
+      "initialDelay": 1000
+    },
+    "resourceLimits": {
+      "maxMemory": "512MB",
+      "maxCpu": "0.5",
+      "maxConnections": 10
+    }
+  },
+  "tools": {
+    "mappings": {
+      "code_search": "context7.search",
+      "analyze_complexity": "sequential-thinking.analyze",
+      "detect_patterns": "context7.analyze",
+      "create_linear_task": "linear.create",
+      "update_linear": "linear.update",
+      "run_tests": "playwright.test",
+      "deploy_application": "kubernetes.deploy",
+      "schedule_task": "time.schedule"
+    },
+    "permissions": {
+      "auditor": [
+        "context7.search",
+        "context7.analyze",
+        "sequential-thinking.analyze",
+        "linear.create"
+      ],
+      "executor": [
+        "playwright.test",
+        "linear.update"
+      ],
+      "guardian": [
+        "playwright.test",
+        "kubernetes.monitor"
+      ],
+      "strategist": [
+        "linear.query",
+        "linear.update",
+        "time.schedule"
+      ],
+      "scholar": [
+        "context7.analyze",
+        "sequential-thinking.reason",
+        "time.cron"
+      ]
+    }
+  },
+  "security": {
+    "authentication": {
+      "method": "api_key",
+      "rotation": "30d"
+    },
+    "encryption": {
+      "inTransit": true,
+      "atRest": true,
+      "algorithm": "AES-256-GCM"
+    },
+    "audit": {
+      "logAllCalls": true,
+      "retention": "90d",
+      "sensitive": ["api_key", "token", "password"]
+    }
+  },
+  "monitoring": {
+    "metrics": [
+      "call_count",
+      "latency",
+      "error_rate",
+      "timeout_rate"
+    ],
+    "healthChecks": {
+      "interval": 60000,
+      "timeout": 5000,
+      "failureThreshold": 3
+    },
+    "tracing": {
+      "enabled": true,
+      "sampler": "always",
+      "exporter": "otlp"
+    }
+  }
+}
