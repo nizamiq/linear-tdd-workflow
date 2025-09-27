@@ -1,0 +1,99 @@
+{
+  "name": "linear-tdd-workflow",
+  "version": "0.1.0",
+  "description": "Linear TDD Workflow System - Autonomous Clean Code Development with Test-Driven Excellence",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "jest --coverage --verbose",
+    "test:watch": "jest --watch",
+    "test:unit": "jest --testPathPattern=tests/unit --coverage",
+    "test:integration": "jest --testPathPattern=tests/integration --coverage",
+    "test:e2e": "jest --testPathPattern=tests/e2e --runInBand",
+    "test:ci": "jest --coverage --ci --reporters=default --reporters=jest-junit",
+    "build": "tsc",
+    "lint": "eslint . --ext .js,.ts --fix",
+    "lint:check": "eslint . --ext .js,.ts",
+    "format": "prettier --write \"**/*.{js,ts,json,md}\"",
+    "format:check": "prettier --check \"**/*.{js,ts,json,md}\"",
+    "typecheck": "tsc --noEmit",
+    "precommit": "npm run lint:check && npm run format:check && npm run test:unit",
+    "setup": "npm install && npm run create:env",
+    "create:env": "node scripts/create-env.js",
+    "assess": "node scripts/assess-code-quality.js",
+    "plan": "node scripts/generate-action-plan.js",
+    "execute": "node scripts/execute-improvements.js",
+    "linear:sync": "node scripts/linear-sync.js",
+    "linear:create-issues": "node scripts/create-linear-issues.js",
+    "linear:update": "node scripts/update-linear-progress.js"
+  },
+  "keywords": [
+    "tdd",
+    "test-driven-development",
+    "clean-code",
+    "linear",
+    "gitflow",
+    "ci-cd"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.11.30",
+    "@typescript-eslint/eslint-plugin": "^7.3.1",
+    "@typescript-eslint/parser": "^7.3.1",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-jest": "^27.9.0",
+    "jest": "^29.7.0",
+    "jest-junit": "^16.0.0",
+    "prettier": "^3.2.5",
+    "ts-jest": "^29.1.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.2"
+  },
+  "dependencies": {
+    "@linear/sdk": "^28.0.0",
+    "dotenv": "^16.4.5",
+    "winston": "^3.13.0",
+    "zod": "^3.22.4"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "roots": [
+      "<rootDir>/src",
+      "<rootDir>/tests"
+    ],
+    "testMatch": [
+      "**/__tests__/**/*.+(ts|tsx|js)",
+      "**/?(*.)+(spec|test).+(ts|tsx|js)"
+    ],
+    "transform": {
+      "^.+\\.(ts|tsx)$": "ts-jest"
+    },
+    "collectCoverageFrom": [
+      "src/**/*.{js,ts}",
+      "!src/**/*.d.ts",
+      "!src/**/index.{js,ts}"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 80,
+        "functions": 80,
+        "lines": 80,
+        "statements": 80
+      }
+    },
+    "coverageReporters": [
+      "text",
+      "lcov",
+      "html"
+    ],
+    "moduleNameMapper": {
+      "^@/(.*)$": "<rootDir>/src/$1"
+    }
+  }
+}

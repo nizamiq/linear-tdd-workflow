@@ -1,0 +1,70 @@
+name: Pre-commit Checks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  pre-commit:
+    name: Pre-commit Validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify branch naming
+        run: |
+          branch_name="${GITHUB_HEAD_REF}"
+          if ! echo "$branch_name" | grep -E '^(feature|release|hotfix|support)/.+$'; then
+            echo "Branch name '$branch_name' does not follow GitFlow convention"
+            echo "Expected format: feature/*, release/*, hotfix/*, or support/*"
+            exit 1
+          fi
+
+      - name: Check commit messages
+        run: |
+          commits=$(git log --format=%s origin/${{ github.base_ref }}..HEAD)
+          while IFS= read -r commit; do
+            if ! echo "$commit" | grep -E '^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\(.+\))?: .+$'; then
+              echo "Commit message does not follow Conventional Commits specification:"
+              echo "$commit"
+              echo "Expected format: <type>(<scope>): <subject>"
+              exit 1
+            fi
+          done <<< "$commits"
+
+      - name: Verify test coverage
+        run: |
+          npm run test:unit -- --coverage --coverageReporters=json-summary
+          coverage=$(node -p "require('./coverage/coverage-summary.json').total.lines.pct")
+          threshold=80
+          if (( $(echo "$coverage < $threshold" | bc -l) )); then
+            echo "Test coverage ($coverage%) is below threshold ($threshold%)"
+            exit 1
+          fi
+
+      - name: Check for console.log statements
+        run: |
+          if grep -r "console.log" --include="*.ts" --include="*.js" src/; then
+            echo "Found console.log statements in source code"
+            exit 1
+          fi
+
+      - name: Validate TODO comments
+        run: |
+          if grep -r "TODO" --include="*.ts" --include="*.js" src/; then
+            echo "Warning: Found TODO comments in source code"
+            grep -rn "TODO" --include="*.ts" --include="*.js" src/
+          fi
