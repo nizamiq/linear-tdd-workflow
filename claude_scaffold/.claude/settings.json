@@ -1,0 +1,50 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run lint)",
+      "Bash(npm run test:*)",
+      "Bash(git status)",
+      "Bash(git add .)",
+      "Bash(git commit -m *)",
+      "Read(./**/*.{js,ts,py,md,json,yaml,yml})",
+      "Write(./**/*.{js,ts,py,md,json,yaml,yml})",
+      "Glob(./**/*.{js,ts,py})"
+    ],
+    "deny": [
+      "Bash(curl:*)",
+      "Bash(wget:*)",
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./secrets/**)",
+      "Read(./config/credentials.*)",
+      "Write(./.env*)",
+      "Write(./secrets/**)"
+    ]
+  },
+  "env": {
+    "CLAUDE_CODE_ENABLE_TELEMETRY": "1",
+    "WORKFLOW_MODE": "agentic",
+    "AGENT_COORDINATION": "enabled"
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpJsonServers": [
+    "linear",
+    "github",
+    "memory",
+    "filesystem"
+  ],
+  "disabledMcpJsonServers": [
+    "browser"
+  ],
+  "hooks": {
+    "PreToolUse": {
+      "Bash": "echo '[WORKFLOW] Executing: $CLAUDE_COMMAND'"
+    },
+    "PostToolUse": {
+      "Write": "echo '[WORKFLOW] File modified: $CLAUDE_FILE'"
+    }
+  },
+  "model": "claude-3-5-sonnet-20241022",
+  "outputStyle": "Explanatory",
+  "cleanupPeriodDays": 30
+}
