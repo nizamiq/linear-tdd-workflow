@@ -14,7 +14,28 @@
 const fs = require('fs').promises;
 const path = require('path');
 const yaml = require('js-yaml');
-const chalk = require('chalk');
+
+// Native console styling to replace chalk
+const colors = {
+  gray: (text) => `\x1b[90m${text}\x1b[0m`,
+  red: (text) => `\x1b[31m${text}\x1b[0m`,
+  green: (text) => `\x1b[32m${text}\x1b[0m`,
+  yellow: (text) => `\x1b[33m${text}\x1b[0m`,
+  blue: (text) => `\x1b[34m${text}\x1b[0m`,
+  cyan: (text) => `\x1b[36m${text}\x1b[0m`,
+  magenta: (text) => `\x1b[35m${text}\x1b[0m`,
+  bold: Object.assign(
+    (text) => `\x1b[1m${text}\x1b[0m`,
+    {
+      cyan: (text) => `\x1b[1m\x1b[36m${text}\x1b[0m`,
+      green: (text) => `\x1b[1m\x1b[32m${text}\x1b[0m`,
+      yellow: (text) => `\x1b[1m\x1b[33m${text}\x1b[0m`,
+      blue: (text) => `\x1b[1m\x1b[34m${text}\x1b[0m`,
+      red: (text) => `\x1b[1m\x1b[31m${text}\x1b[0m`,
+      magenta: (text) => `\x1b[1m\x1b[35m${text}\x1b[0m`
+    }
+  )
+};
 
 class AgentStatusMonitor {
   constructor() {
@@ -25,7 +46,7 @@ class AgentStatusMonitor {
    * Display comprehensive agent status dashboard
    */
   async displayStatus() {
-    console.log(chalk.bold('\n🤖 Linear TDD Workflow - Agent Status Dashboard\n'));
+    console.log(colors.bold('\n🤖 Linear TDD Workflow - Agent Status Dashboard\n'));
 
     // 1. Load all agent configurations
     const agents = await this.loadAllAgents();
@@ -70,7 +91,7 @@ class AgentStatusMonitor {
 
       return agents;
     } catch (error) {
-      console.error(chalk.red(`Failed to load agents: ${error.message}`));
+      console.error(colors.red(`Failed to load agents: ${error.message}`));
       return new Map();
     }
   }
@@ -79,7 +100,7 @@ class AgentStatusMonitor {
    * Display core 5 agents status
    */
   async displayCoreAgents(agents) {
-    console.log(chalk.bold.blue('📊 Core Agents (MUST-HAVE)\n'));
+    console.log(colors.bold.blue('📊 Core Agents (MUST-HAVE)\n'));
 
     const coreAgents = ['auditor', 'executor', 'guardian', 'strategist', 'scholar'];
 
@@ -88,7 +109,7 @@ class AgentStatusMonitor {
       if (agent) {
         await this.displayAgentStatus(agent, true);
       } else {
-        console.log(chalk.red(`❌ ${agentName.toUpperCase()}: NOT CONFIGURED`));
+        console.log(colors.red(`❌ ${agentName.toUpperCase()}: NOT CONFIGURED`));
       }
     }
   }
@@ -97,7 +118,7 @@ class AgentStatusMonitor {
    * Display specialized agents status
    */
   async displaySpecializedAgents(agents) {
-    console.log(chalk.bold.cyan('\n🔧 Specialized Agents (PARALLELIZABLE)\n'));
+    console.log(colors.bold.cyan('\n🔧 Specialized Agents (PARALLELIZABLE)\n'));
 
     const specializedAgents = Array.from(agents.keys())
       .filter(name => !['auditor', 'executor', 'guardian', 'strategist', 'scholar'].includes(name));
@@ -114,7 +135,7 @@ class AgentStatusMonitor {
     };
 
     for (const [domain, agentList] of Object.entries(domains)) {
-      console.log(chalk.bold(`  ${domain}:`));
+      console.log(colors.bold(`  ${domain}:`));
 
       for (const agentName of agentList) {
         const agent = agents.get(agentName);
@@ -142,7 +163,7 @@ class AgentStatusMonitor {
     const slaStatus = this.checkSLACompliance(agent);
 
     console.log(
-      `${icon} ${chalk.bold(name)} ` +
+      `${icon} ${colors.bold(name)} ` +
       `${hasConfig} Config ${hasFIL} FIL ${hasConcurrency} Concurrency ` +
       `${slaStatus.icon} SLA`
     );
@@ -184,7 +205,7 @@ class AgentStatusMonitor {
    * Display system health overview
    */
   async displaySystemHealth(agents) {
-    console.log(chalk.bold.green('\n🏥 System Health Overview\n'));
+    console.log(colors.bold.green('\n🏥 System Health Overview\n'));
 
     const coreAgentsConfigured = ['auditor', 'executor', 'guardian', 'strategist', 'scholar']
       .filter(name => agents.has(name)).length;
@@ -210,7 +231,7 @@ class AgentStatusMonitor {
    * Display performance metrics
    */
   async displayPerformanceMetrics() {
-    console.log(chalk.bold.yellow('\n📈 Performance Metrics (Last 24h)\n'));
+    console.log(colors.bold.yellow('\n📈 Performance Metrics (Last 24h)\n'));
 
     // Mock metrics - would come from actual monitoring
     const metrics = {
@@ -224,7 +245,7 @@ class AgentStatusMonitor {
     };
 
     for (const [metric, value] of Object.entries(metrics)) {
-      const color = value.includes('✅') ? chalk.green : chalk.yellow;
+      const color = value.includes('✅') ? colors.green : colors.yellow;
       console.log(`  ${color(metric.padEnd(20))}: ${value}`);
     }
   }
@@ -233,7 +254,7 @@ class AgentStatusMonitor {
    * Display concurrency and lock status
    */
   async displayConcurrencyStatus() {
-    console.log(chalk.bold.magenta('\n🔐 Concurrency & Locks Status\n'));
+    console.log(colors.bold.magenta('\n🔐 Concurrency & Locks Status\n'));
 
     // Mock concurrency data
     const concurrencyData = {
@@ -269,10 +290,10 @@ class AgentStatusMonitor {
       .filter(name => agents.has(name)).length;
 
     if (coreCount === 5) {
-      console.log(chalk.green('✅ All core agents configured'));
+      console.log(colors.green('✅ All core agents configured'));
       return true;
     } else {
-      console.log(chalk.red(`❌ Only ${coreCount}/5 core agents configured`));
+      console.log(colors.red(`❌ Only ${coreCount}/5 core agents configured`));
       return false;
     }
   }
@@ -293,7 +314,7 @@ if (require.main === module) {
     default:
       monitor.displayStatus()
         .catch(error => {
-          console.error(chalk.red(`Status check failed: ${error.message}`));
+          console.error(colors.red(`Status check failed: ${error.message}`));
           process.exit(1);
         });
       break;

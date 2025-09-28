@@ -209,20 +209,144 @@ class ClaudeSetup {
       if (deps.jasmine) frameworks.push('jasmine');
     }
 
-    // Check for Python test frameworks
+    // Enhanced Python test framework detection
     if (this.projectInfo.languages.includes('python')) {
-      if (await this.hasFiles(['**/test_*.py', '**/*_test.py'])) {
-        frameworks.push('pytest');
-      }
-      if (await this.hasFiles(['**/test*.py'])) {
-        frameworks.push('unittest');
-      }
+      const hasPytest = await this.detectPytestUsage();
+      const hasUnittest = await this.detectUnittestUsage();
+
+      if (hasPytest) frameworks.push('pytest');
+      if (hasUnittest) frameworks.push('unittest');
     }
 
     this.projectInfo.testFrameworks = frameworks;
     this.projectInfo.hasTests = frameworks.length > 0 || await this.hasTestFiles();
 
     console.log(colors.green(`🧪 Test Frameworks: ${frameworks.join(', ') || 'none detected'}`));
+  }
+
+  /**
+   * Comprehensive pytest detection for Python projects
+   */
+  async detectPytestUsage() {
+    // Check for pytest in requirements files
+    const requirementFiles = ['requirements.txt', 'requirements-dev.txt', 'dev-requirements.txt', 'test-requirements.txt'];
+    for (const reqFile of requirementFiles) {
+      if (await this.fileExists(reqFile)) {
+        try {
+          const content = await fs.readFile(reqFile, 'utf8');
+          if (content.includes('pytest')) return true;
+        } catch (error) {
+          // Continue checking other files
+        }
+      }
+    }
+
+    // Check pyproject.toml for pytest
+    if (await this.fileExists('pyproject.toml')) {
+      try {
+        const content = await fs.readFile('pyproject.toml', 'utf8');
+        if (content.includes('pytest') || content.includes('[tool.pytest')) return true;
+      } catch (error) {
+        // Continue with other checks
+      }
+    }
+
+    // Check setup.py for pytest
+    if (await this.fileExists('setup.py')) {
+      try {
+        const content = await fs.readFile('setup.py', 'utf8');
+        if (content.includes('pytest')) return true;
+      } catch (error) {
+        // Continue with other checks
+      }
+    }
+
+    // Check for pytest configuration files
+    const pytestConfigFiles = ['pytest.ini', 'pyproject.toml', 'tox.ini', 'setup.cfg'];
+    for (const configFile of pytestConfigFiles) {
+      if (await this.fileExists(configFile)) {
+        try {
+          const content = await fs.readFile(configFile, 'utf8');
+          if (content.includes('[pytest]') || content.includes('[tool.pytest')) return true;
+        } catch (error) {
+          // Continue checking
+        }
+      }
+    }
+
+    // Check for pytest-style test files
+    const pytestPatterns = [
+      '**/test_*.py',
+      '**/*_test.py',
+      '**/tests/**/*.py',
+      '**/test/**/*.py'
+    ];
+
+    for (const pattern of pytestPatterns) {
+      if (await this.hasFiles([pattern])) {
+        // Additional check: look for pytest-specific imports in test files
+        try {
+          const { glob } = require('glob');
+          const files = await glob(pattern, { cwd: this.projectRoot });
+
+          for (const file of files.slice(0, 5)) { // Check first 5 files
+            try {
+              const content = await fs.readFile(path.join(this.projectRoot, file), 'utf8');
+              if (content.includes('import pytest') ||
+                  content.includes('from pytest') ||
+                  content.includes('@pytest.') ||
+                  content.includes('pytest.')) {
+                return true;
+              }
+            } catch (error) {
+              // Continue checking other files
+            }
+          }
+        } catch (error) {
+          // If glob fails, fall back to basic file pattern check
+          return await this.hasFiles(pytestPatterns.slice(0, 2));
+        }
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Detect unittest usage in Python projects
+   */
+  async detectUnittestUsage() {
+    const unittestPatterns = [
+      '**/test*.py',
+      '**/tests/**/*.py'
+    ];
+
+    for (const pattern of unittestPatterns) {
+      if (await this.hasFiles([pattern])) {
+        try {
+          const { glob } = require('glob');
+          const files = await glob(pattern, { cwd: this.projectRoot });
+
+          for (const file of files.slice(0, 5)) { // Check first 5 files
+            try {
+              const content = await fs.readFile(path.join(this.projectRoot, file), 'utf8');
+              if (content.includes('import unittest') ||
+                  content.includes('from unittest') ||
+                  content.includes('unittest.TestCase')) {
+                return true;
+              }
+            } catch (error) {
+              // Continue checking other files
+            }
+          }
+        } catch (error) {
+          // If glob fails, fall back to basic detection
+          return await this.hasFiles(['**/test*.py']);
+        }
+      }
+    }
+
+    return false;
   }
 
   /**
@@ -371,10 +495,13 @@ class ClaudeSetup {
 
     const toInstall = [];
 
+    // Detect Python environment
+    const pythonEnv = await this.detectPythonEnvironment();
+
     // Check what's already installed (simplified)
     for (const dep of deps.required || []) {
       try {
-        execSync(`python -c "import ${dep}"`, { stdio: 'ignore' });
+        execSync(`${pythonEnv.python} -c "import ${dep}"`, { stdio: 'ignore' });
       } catch {
         toInstall.push(dep);
       }
@@ -382,17 +509,66 @@ class ClaudeSetup {
 
     if (toInstall.length > 0) {
       console.log(colors.blue(`Installing Python dependencies: ${toInstall.join(', ')}`));
+      console.log(colors.gray(`Using Python environment: ${pythonEnv.type}`));
 
       try {
         if (this.projectInfo.packageManager === 'poetry') {
           execSync(`poetry add --group dev ${toInstall.join(' ')}`, { stdio: 'inherit' });
         } else {
-          execSync(`pip install ${toInstall.join(' ')}`, { stdio: 'inherit' });
+          execSync(`${pythonEnv.pip} install ${toInstall.join(' ')}`, { stdio: 'inherit' });
         }
       } catch (error) {
         console.warn(colors.yellow(`Warning: Failed to install some Python dependencies: ${error.message}`));
+        if (error.message.includes('PEP 668') || error.message.includes('externally-managed')) {
+          console.warn(colors.yellow('Tip: Consider using a virtual environment:'));
+          console.warn(colors.gray('  python -m venv venv'));
+          console.warn(colors.gray('  source venv/bin/activate  # (or venv\\Scripts\\activate on Windows)'));
+          console.warn(colors.gray('  pip install <packages>'));
+        }
       }
     }
+  }
+
+  /**
+   * Detect Python environment (virtual env, system, etc.)
+   */
+  async detectPythonEnvironment() {
+    // Check for virtual environment
+    const venvPaths = [
+      '.venv/bin/python',
+      '.venv/Scripts/python.exe',
+      'venv/bin/python',
+      'venv/Scripts/python.exe',
+      'env/bin/python',
+      'env/Scripts/python.exe'
+    ];
+
+    for (const venvPath of venvPaths) {
+      if (await this.fileExists(venvPath)) {
+        const pipPath = venvPath.replace('python', 'pip').replace('.exe', '');
+        return {
+          type: 'virtual environment',
+          python: venvPath,
+          pip: pipPath
+        };
+      }
+    }
+
+    // Check if we're already in a virtual environment
+    if (process.env.VIRTUAL_ENV) {
+      return {
+        type: 'active virtual environment',
+        python: 'python',
+        pip: 'pip'
+      };
+    }
+
+    // Fall back to system Python
+    return {
+      type: 'system Python',
+      python: 'python',
+      pip: 'pip'
+    };
   }
 
   /**

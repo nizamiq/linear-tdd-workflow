@@ -384,7 +384,7 @@ show_next_steps() {
 
 # Final validation and summary
 validate_installation() {
-    log "Validating installation..."
+    log_info "Validating installation..."
 
     local validation_errors=0
 
@@ -421,7 +421,7 @@ validate_installation() {
 
         # Run comprehensive verification if available
         if [ -f "scripts/verify-installation.sh" ]; then
-            log "Running comprehensive verification..."
+            log_info "Running comprehensive verification..."
             if ./scripts/verify-installation.sh --quick >/dev/null 2>&1; then
                 log_success "Comprehensive verification passed"
             else
