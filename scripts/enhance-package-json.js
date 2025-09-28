@@ -258,7 +258,7 @@ function main() {
   log('info', `Enhancing package.json: ${filePath}`);
 
   // Load existing package.json
-  const packageData = loadPackageJson(filePath);
+  let packageData = loadPackageJson(filePath);
   const projectType = detectProjectType(packageData);
 
   log('info', `Project type detected: TypeScript=${projectType.hasTypeScript}, React=${projectType.hasReact}, Next=${projectType.hasNext}, Express=${projectType.hasExpress}`);
