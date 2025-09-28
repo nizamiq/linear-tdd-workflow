@@ -1,369 +1,363 @@
 # Linear TDD Workflow System
 
-## Agentic AI Coding Agent - Autonomous Clean Code Development with Test-Driven Excellence
+> **Enterprise-grade multi-agent AI framework for autonomous code quality management**
 
-[![TDD Compliant](https://img.shields.io/badge/TDD-Strict-brightgreen.svg)](docs/AI%20Coding%20Assistant%20Development%20Protocol.md)
-[![Linear Integrated](https://img.shields.io/badge/Linear-Connected-blue.svg)](docs/Linear%20Setup.md)
-[![Clean Code](https://img.shields.io/badge/Clean%20Code-Enforced-green.svg)](docs/Clean%20code%20AI%20(Linear).md)
-[![GitFlow](https://img.shields.io/badge/GitFlow-Enabled-orange.svg)](docs/gitflow.md)
-[![MCP Enabled](https://img.shields.io/badge/MCP-Integrated-purple.svg)](https://modelcontextprotocol.org)
-[![Pipeline Status](https://img.shields.io/badge/Pipeline-99.5%25-success.svg)](https://github.com)
+[![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)](CHANGELOG.md)
+[![TDD Compliant](https://img.shields.io/badge/TDD-Strict-brightgreen.svg)](docs/WORKFLOW-TDD-PROTOCOL.md)
+[![Linear Integrated](https://img.shields.io/badge/Linear-Connected-blue.svg)](docs/INTEGRATION-LINEAR.md)
+[![Clean Code](https://img.shields.io/badge/Clean%20Code-Enforced-green.svg)](docs/WORKFLOW-CLEAN-CODE-ASSESSMENT.md)
+[![Agents](https://img.shields.io/badge/Agents-20_Specialized-gold.svg)](.claude/agents/CLAUDE.md)
+[![Languages](https://img.shields.io/badge/Languages-JS%2FTS%2FPython-blue.svg)](docs/languages/)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-## 🎯 Overview
+*Last Updated: November 2024 | Version: 1.3.0*
 
-The Linear TDD Workflow System is an enterprise-grade multi-agent AI development framework that autonomously manages code quality through continuous assessment, prioritized execution, and rigorous validation. This system reduces engineering time on maintenance by 40%, achieves 50% faster MTTR, and delivers 30-35% improvement in PR cycle time.
+## What is Linear TDD Workflow System?
 
-### Problem Statement
-Engineering teams spend ~40% of their development time on code maintenance, refactoring, and technical debt management. Inconsistent code quality standards across teams lead to increased defects and slower delivery.
+An autonomous code quality management system that uses 20 specialized AI agents to continuously assess, improve, and maintain your codebase. The system enforces strict Test-Driven Development practices while reducing engineering maintenance time by 40%.
 
-### Solution Value
-- **Mean Time to Recovery (MTTR)**: ↓ 50%
-- **PR Cycle Time**: ↓ 30-35%
-- **Test Coverage on Touched Code**: ↑ 20+ percentage points
-- **Technical Debt Reduction**: Monthly reduction of hotspots
+### Key Benefits
+- **50% faster** Mean Time to Recovery (MTTR)
+- **30-35% improvement** in PR cycle time
+- **20+ percentage point increase** in test coverage
+- **Monthly reduction** of technical debt hotspots
+- **Automated enforcement** of TDD practices
 
-## 📊 Business Requirements (SMART)
+## 📋 Table of Contents
 
-### FR-01: Continuous Assessment
-- **Specific**: Analyze repositories for architecture, readability, performance, security, testing, and documentation issues
-- **Measurable**: ≥80% actionable items with file/line specificity, ≤10% false-positive rate
-- **Achievable**: AST/CFG analysis, complexity metrics, dependency graphs
-- **Relevant**: Prioritized Linear backlog with severity and effort estimates
-- **Timely**: JS/TS ≤12min p95, Python ≤15min p95 (150k LOC, 4-core)
+- [Prerequisites](#-prerequisites)
+- [Quick Start](#-quick-start-5-minutes)
+- [Core Features](#-core-features)
+- [Architecture Overview](#-architecture-overview)
+- [Available Commands](#-available-commands)
+- [Configuration](#-configuration)
+- [Documentation](#-documentation)
+- [Troubleshooting](#-troubleshooting)
+- [Contributing](#-contributing)
+- [License](#-license)
 
-### FR-02: Automated Fix Implementation (Fix Packs)
-- **Specific**: Implement XS/S improvements autonomously with atomic commits
-- **Measurable**: ≥8 accepted Fix Pack PRs/day, ≤0.3% rollback rate (7-day)
-- **Achievable**: TDD cycle enforcement, diff coverage ≥80%, mutation smoke ≥30%
-- **Relevant**: Each fix includes documentation and rollback plan
-- **Timely**: Average XS/S task ≤15min p50 compute time
+## ✅ Prerequisites
 
-### FR-03: TDD Enforcement
-- **Specific**: Every agent PR follows red-green-refactor cycle
-- **Measurable**: Diff coverage ≥80%, mutation threshold ≥30% on changed files
-- **Achievable**: CI blocks non-compliant PRs, enforces [RED]→[GREEN]→[REFACTOR]
-- **Relevant**: Green pipeline ≥95% uptime
-- **Timely**: GUARDIAN restores broken pipeline ≤10min p95
+Before you begin, ensure you have:
 
-## 🚀 Fix Pack Specifications
+- **Node.js** 18.0+ or **Python** 3.10+
+- **Git** with GitFlow extension
+- **Linear.app** account with API access
+- **GitHub** account with repository permissions
+- **Docker** (optional, for containerized agents)
 
-### Approved Fix Pack Tasks
-Fix Packs are pre-approved, low-risk improvements that agents can implement autonomously:
+## 🚀 Quick Start (5 Minutes)
 
-1. **Linting & Formatting**: Auto-fix ESLint/Prettier violations
-2. **Dead Code Removal**: Remove unused variables, functions, imports
-3. **Documentation**: Add/update JSDoc, Python docstrings, README sections
-4. **Small Pure Refactors**: Extract constants, simplify conditionals, rename variables
-5. **Dependency Updates**: Non-breaking minor/patch bumps with passing tests
-6. **Logging Normalization**: Standardize log formats and levels
-7. **Test Scaffolds**: Add missing test files with basic structure
-
-### Fix Pack Constraints
-- Maximum 300 LOC per PR
-- Diff coverage ≥80% required
-- Mutation testing ≥30% on changed files
-- Full rollback plan required
-- No breaking changes allowed
-- Human approval required for merge
-
-## 🔒 Feature Impact Level (FIL) Classification
-
-| Level | Description | Examples | Approval Required |
-|-------|-------------|----------|-------------------|
-| **FIL-0** | Chore/maintenance | Formatting, dead code removal | None |
-| **FIL-1** | Low-risk refactor | Variable rename, extract constant | None |
-| **FIL-2** | Medium impact | New utility functions, config changes | Tech Lead |
-| **FIL-3** | High impact/feature | New APIs, DB migrations, UI routes | Tech Lead + Product Owner |
-
-**Policy**: 100% of FIL-2/FIL-3 changes require `FEAT-APPROVED` label before implementation.
-
-## 🏗️ Multi-Agent Architecture
-
-### Five Specialized Agents
-
-#### 1. AUDITOR - Code Quality Assessment
-- **Purpose**: Continuous code quality scanning and issue identification
-- **Tools**: `code_search`, `analyze_complexity`, `detect_patterns`, `create_linear_task`
-- **SLA**: First scan ≤12min p95 (JS/TS), ≤15min p95 (Python)
-- **Success Metrics**: ≥80% actionable items, ≤10% false positives
-
-#### 2. EXECUTOR - Implementation Engine
-- **Purpose**: Implement approved improvements with full test coverage
-- **Tools**: `code_patch`, `run_tests`, `commit_changes`, `create_pr`
-- **Constraints**: Fix Packs only, ≤300 LOC, diff coverage ≥80%
-- **Success Metrics**: ≥8 accepted PRs/day, ≤0.3% rollback rate
-
-#### 3. GUARDIAN - Pipeline SRE
-- **Purpose**: Monitor and auto-recover CI/CD pipeline failures
-- **Tools**: `analyze_failure`, `generate_fix`, `run_local_tests`, `trigger_pipeline`
-- **SLA**: Detection ≤5min, recovery ≤10min p95
-- **Success Metrics**: Pipeline uptime ≥95%, auto-fix success ≥90%
-
-#### 4. STRATEGIST - Orchestrator
-- **Purpose**: Coordinate multi-agent activities and optimize resource allocation
-- **Tools**: `assign_task`, `update_linear`, `coordinate_agents`, `generate_report`
-- **Performance**: Resource utilization ≥75%, context switches ≤3/agent/day
-- **Success Metrics**: On-time delivery ≥90%, orchestration overhead ≤5%
-
-#### 5. SCHOLAR - Learning Engine
-- **Purpose**: Extract patterns from successful fixes and improve system efficiency
-- **Tools**: `extract_patterns`, `update_knowledge_base`, `train_agents`, `generate_insights`
-- **Targets**: ≥2 validated patterns/month, ≥25% pattern reuse by Phase 3
-- **Success Metrics**: Efficiency gains ≥10% month-over-month
-
-## 🔧 Technical Specifications
-
-### Performance SLAs
-
-| Operation | Target | Measurement |
-|-----------|--------|-------------|
-| Code Assessment (150k LOC) | ≤12min p95 | JS/TS repositories |
-| Code Assessment (150k LOC) | ≤15min p95 | Python repositories |
-| Incremental Scan | ≤3min p95 | Changed files only |
-| XS/S Task Execution | ≤15min p50 | Compute time only |
-| Pipeline Recovery | ≤10min p95 | Detection to green |
-| Linear Sync | ≤2s p95 | Update latency |
-| Control API | ≤300ms median | Response time |
-| Feature Classification | ≤2s p95 | FIL determination |
-
-### Non-Functional Requirements
-
-| Requirement | Target | Notes |
-|-------------|--------|-------|
-| **Availability** | 99.0% beta, 99.5% GA | Monthly uptime |
-| **Cost per Fix** | ≤$3 median, ≤$5 p95 | Per accepted PR |
-| **Repository Limit** | 3 concurrent (v1) | Up to 200k LOC each |
-| **Observability** | 100% instrumented | OpenTelemetry traces |
-| **Audit Retention** | 90 days | Immutable event log |
-| **Security** | Zero critical vulns | Continuous scanning |
-
-## 🛡️ RBAC & Multi-Tenancy
-
-### Permission Matrix
-
-| Role | Repository Scope | Can Read | Can Write | Can Merge | Can Admin |
-|------|-----------------|----------|-----------|-----------|-----------|
-| **Admin** | Organization | ✓ | ✓ | ✓ | ✓ |
-| **Developer** | Repository | ✓ | PR only | ✓ | - |
-| **Agent** | Repository | ✓ | PR only | - | - |
-| **Viewer** | Repository | ✓ | - | - | - |
-
-### Tenant Isolation
-- Repository-scoped data isolation
-- Linear workspace-level separation
-- GitHub team-based permissions inherited
-- Complete audit trail per tenant
-
-## 📋 TDD Policy & Gates
-
-### Red-Green-Refactor Enforcement
-Every change must progress through:
-1. **[RED]**: Write failing test first
-2. **[GREEN]**: Minimal code to pass test
-3. **[REFACTOR]**: Improve with test safety
-
-### Quality Gates
-- **Diff Coverage**: ≥80% on changed lines
-- **Mutation Testing**: ≥30% on changed files (StrykerJS/mutmut)
-- **Test Reference**: At least one test must reference changed code
-- **CI Blocking**: Non-compliant PRs automatically rejected
-
-## 🚦 Development Roadmap
-
-### Phase 0 - Foundation (Weeks 1-4)
-- Orchestrator setup
-- MCP tool integration
-- GitHub/Linear connectors
-- Evidence store
-- **DoD**: Agents can read code and create Linear tasks
-
-### Phase 1 - Assessment (Weeks 5-8)
-- AUDITOR implementation
-- JS/TS full rules
-- Python core rules
-- Incremental scanning
-- **DoD**: ≥80% actionable items, SLAs met
-
-### Phase 2 - Execution (Weeks 9-12)
-- EXECUTOR with Fix Packs
-- GUARDIAN pipeline protection
-- TDD enforcement
-- **DoD**: ≥8 PRs/day, coverage targets met
-
-### Phase 3 - Orchestration (Weeks 13-16)
-- STRATEGIST coordination
-- SCHOLAR pattern extraction
-- Auto-rebase capability
-- **DoD**: ≥25% pattern reuse, ≥80% auto-rebase success
-
-### Phase 4 - Scale (Weeks 17-20)
-- Multi-repo support (3)
-- Dashboard refinement
-- Budget throttles
-- **DoD**: Beta SLOs achieved for 30 days
-
-## 🔌 MCP Tool Integration
-
-### Available Tools
-
-| Tool | Purpose | Key Operations | SLA |
-|------|---------|----------------|-----|
-| **Sequential Thinking** | Complex problem solving | `think()`, `reason()`, `solve()` | <30s |
-| **Context7 Search** | Code understanding | `search()`, `analyze()`, `explain()` | <5s |
-| **Kubernetes** | Container orchestration | `deploy()`, `scale()`, `monitor()` | <10s |
-| **Playwright Test** | E2E test automation | `test()`, `screenshot()`, `trace()` | <60s |
-| **Linear Tasks** | Task management | `create()`, `update()`, `transition()` | <2s |
-
-## 📈 Success Metrics & KPIs
-
-### Quality Metrics
-- **Code Maintainability**: +25% improvement
-- **Test Coverage**: +20pp on touched code
-- **Cyclomatic Complexity**: <10 average
-- **Security Vulnerabilities**: 0 critical
-- **Technical Debt**: -15% monthly
-
-### Operational Metrics
-- **Pipeline Uptime**: ≥95%
-- **Auto-fix Success**: ≥90%
-- **PR Velocity**: ≥8 Fix Pack PRs/day
-- **Pattern Reuse**: ≥25% by Phase 3
-- **Rollback Rate**: ≤0.3%
-
-### Business Impact
-- **Developer Time Saved**: 40% on maintenance
-- **MTTR Reduction**: 50%
-- **PR Cycle Time**: -30-35%
-- **Developer Satisfaction**: ≥4.5/5
-
-## 🚀 Quick Start
-
-### Prerequisites
-- Node.js 18+ or Python 3.10+
-- Git with GitFlow extension
-- Linear.app account with API access
-- GitHub account with appropriate permissions
-- Docker for containerized agents
-
-### Installation
+Get up and running with the Linear TDD Workflow System:
 
 ```bash
-# Clone the repository
-git clone <repository-url>
+# 1. Clone the repository
+git clone https://github.com/your-org/linear-tdd-workflow.git
 cd linear-tdd-workflow
 
-# Initialize GitFlow
-git flow init
-
-# Set up environment
-cp .env.example .env
-# Configure your Linear API key and other settings
-
-# Install dependencies
+# 2. Install dependencies
 npm install
 
-# Run initial setup
+# 3. Set up environment variables
+cp .env.example .env
+# Edit .env with your Linear API key and settings:
+# LINEAR_API_KEY=your_key_here
+# LINEAR_TEAM_ID=a-coders
+# LINEAR_PROJECT_ID=ai-coding
+
+# 4. Initialize the system
 npm run setup
 
-# Initialize agent system
-npm run agents:init
+# 5. Run your first code assessment
+npm run assess
+
+# 6. Check Linear for automatically created tasks
 ```
 
-### Configuration
+**Next Steps:** View the [Getting Started Guide](docs/getting-started/README.md) for detailed setup instructions.
+
+## 🎯 Core Features
+
+### Test-Driven Development Enforcement
+
+Every change follows the mandatory TDD cycle:
+
+1. **[RED]** - Write a failing test first
+2. **[GREEN]** - Write minimal code to pass
+3. **[REFACTOR]** - Improve with test safety
+
+**Quality Gates:**
+- Diff coverage ≥80% on changed lines
+- Mutation testing ≥30% on changed files
+- CI automatically blocks non-compliant PRs
+
+### Fix Pack System
+
+Pre-approved, low-risk improvements that agents implement autonomously:
+
+| Fix Type | Description | Example |
+|----------|-------------|---------|
+| **Linting** | Auto-fix style violations | ESLint, Prettier, Black |
+| **Dead Code** | Remove unused code | Unused imports, variables |
+| **Documentation** | Add missing docs | JSDoc, docstrings |
+| **Refactoring** | Simplify code | Extract constants, rename |
+| **Dependencies** | Update packages | Non-breaking patches |
+| **Tests** | Add test scaffolds | Basic test structure |
+
+**Constraints:** Max 300 LOC per PR • 80% coverage required • Full rollback plan
+
+### Feature Impact Level (FIL) Classification
+
+| Level | Impact | Examples | Approval |
+|-------|--------|----------|----------|
+| **FIL-0** | None | Formatting, comments | Auto |
+| **FIL-1** | Low | Variable rename, constants | Auto |
+| **FIL-2** | Medium | New utilities, configs | Tech Lead |
+| **FIL-3** | High | APIs, migrations, UI | Tech Lead + Product |
+
+## 🏗️ Architecture Overview
+
+### 20-Agent System
+
+The system coordinates 20 specialized agents through Linear.app:
+
+```
+Linear.app (Task Management)
+         ↓
+    STRATEGIST
+   (Orchestrator)
+         ↓
+┌────────────┬─────────────┬──────────────┬────────────┐
+│  AUDITOR   │  EXECUTOR   │   GUARDIAN   │  SCHOLAR   │
+│(Assessment)│(Fix Impl.)  │(CI/CD Guard) │(Learning)  │
+└────────────┴─────────────┴──────────────┴────────────┘
+                    ↓
+        [15 Specialized Support Agents]
+```
+
+**Core Agents:**
+- **AUDITOR** - Continuous code quality assessment
+- **EXECUTOR** - Fix Pack implementation engine
+- **GUARDIAN** - Pipeline monitoring & recovery
+- **STRATEGIST** - Multi-agent orchestration
+- **SCHOLAR** - Pattern learning & optimization
+
+**Specialized Agents:** Testing (3) • Development (3) • Infrastructure (3) • Architecture (3) • Security (3)
+
+<!-- UPDATED: Simplified architecture visualization -->
+
+### Agent Invocation
 
 ```bash
-# Linear.app Configuration
-LINEAR_API_KEY=your_api_key
-LINEAR_TEAM_ID=your_team_id
-LINEAR_PROJECT_ID=your_project_id
+# Standard invocation pattern
+npm run agent:invoke <AGENT>:<COMMAND> -- [parameters]
 
-# GitHub Configuration
-GITHUB_TOKEN=your_github_token
-GITHUB_ORG=your_organization
+# Examples
+npm run agent:invoke AUDITOR:assess-code -- --scope full
+npm run agent:invoke EXECUTOR:implement-fix -- --task-id CLEAN-123
+npm run agent:invoke GUARDIAN:analyze-failure -- --auto-fix
+```
 
-# Agent Configuration
+## 💻 Available Commands
+
+### Development Commands
+
+```bash
+# Testing
+npm test                  # Run all tests with coverage
+npm test:watch           # Watch mode for TDD
+npm test:unit            # Unit tests only
+npm test -- path/to/test.spec.ts  # Run specific test
+
+# Code Quality
+npm run lint             # Lint and auto-fix
+npm run format           # Format code (Prettier)
+npm run typecheck        # TypeScript checking
+npm run precommit        # Run all checks before commit
+
+# Building
+npm run build            # Compile TypeScript
+```
+
+### Agent Operations
+
+```bash
+# Core Operations
+npm run assess           # Run code assessment
+npm run execute:fixpack  # Execute approved fixes
+npm run linear:sync      # Sync with Linear
+
+# Agent Management
+npm run agents:init      # Initialize agent system
+npm run agents:status    # Check agent status
+
+# Monitoring
+npm run monitor:pipeline # Monitor CI/CD pipeline
+npm run monitor:budget   # Check budget usage
+```
+
+## ⚙️ Configuration
+
+### Environment Variables
+
+Create a `.env` file with these required settings:
+
+```bash
+# Linear.app (Required)
+LINEAR_API_KEY=lin_api_xxxxxxxxxxxxx
+LINEAR_TEAM_ID=a-coders
+LINEAR_PROJECT_ID=ai-coding
+
+# GitHub (Required)
+GITHUB_TOKEN=ghp_xxxxxxxxxxxxx
+GITHUB_ORG=your-organization
+
+# Agent Settings (Optional - defaults shown)
 ENABLE_AUTO_FIX=true
-ENABLE_TDD_ENFORCEMENT=true
-ENABLE_GITFLOW=true
 MAX_FIX_PACK_SIZE=300
 MIN_DIFF_COVERAGE=80
 MIN_MUTATION_SCORE=30
 
-# Resource Limits
+# Resource Limits (Optional)
 MAX_CONCURRENT_REPOS=3
-REPO_SIZE_LIMIT=200000
 MONTHLY_BUDGET_LIMIT=10000
-PER_REPO_BUDGET=2500
 ```
 
-## 📖 Documentation Index
+### Performance Targets
 
-### Core Protocols
-- [AI Development Protocol](docs/AI%20Coding%20Assistant%20Development%20Protocol.md) - Complete methodology
-- [PRD](docs/PRD.md) - Product requirements document
-- [Coding Rules](docs/coding%20rules.md) - Standards and conventions
+| Operation | Target | Notes |
+|-----------|--------|-------|
+| Code Assessment | ≤12min | 150k LOC JS/TS |
+| Python Assessment | ≤15min | 150k LOC |
+| Fix Implementation | ≤15min | Average |
+| Pipeline Recovery | ≤10min | Auto-recovery |
+| Linear Sync | ≤2s | Update latency |
 
-### Agent Documentation
-- [AUDITOR Specification](.claude/agents/auditor.md)
-- [EXECUTOR Specification](.claude/agents/executor.md)
-- [GUARDIAN Specification](.claude/agents/guardian.md)
-- [STRATEGIST Specification](.claude/agents/strategist.md)
-- [SCHOLAR Specification](.claude/agents/scholar.md)
+## 📚 Documentation
 
-### Workflow Guides
-- [Agent Workflow](.claude/docs/AGENT_WORKFLOW.md)
-- [MCP Tools Guide](.claude/docs/mcp-tools.md)
-- [Agent Permissions](.claude/docs/agent-permissions.md)
+### Essential Guides
+- [Getting Started](docs/getting-started/README.md) - Complete setup guide
+- [Agent System Overview](.claude/agents/CLAUDE.md) - All 20 agents detailed
+- [AI Development Protocol](docs/ai-development-protocol.md) - TDD methodology
+- [Linear Integration](docs/linear-setup.md) - Task management setup
 
-### Linear Integration
-- [Linear Setup](docs/Linear%20Setup.md)
-- [Linear Cycle Planning](docs/Linear%20Cycle%20Planning.md)
-- [Linear AI Integration](docs/Linear%20AI.md)
+### References
+- [API Documentation](docs/api-reference/) - Complete API specs
+- [Troubleshooting Guide](docs/reference/troubleshooting.md) - Common issues
+- [FAQ](docs/reference/faq.md) - Frequently asked questions
+- [Full Documentation Index](docs/REFERENCE-MASTER.md) - All documentation
 
-## 🔒 Security & Compliance
+### Specifications
+- [Product Requirements](docs/PRD.md) - Detailed PRD v1.2
+- [Architecture Docs](docs/architecture/) - System design
+- [Workflow Specs](.claude/docs/AGENT_WORKFLOW.md) - Agent workflows
 
-### Security Measures
-- **Code Access**: Read-only by default, PR-only writes
-- **Secret Management**: HashiCorp Vault integration
-- **Audit Trail**: Immutable 90-day retention
-- **SBOM Generation**: All agent images signed with Cosign
-- **Vulnerability Scanning**: CodeQL + Semgrep continuous scanning
+## 🔧 Troubleshooting
 
-### Compliance
-- **SLSA**: Supply chain security compliance
-- **SOC2**: Audit trail and access controls
-- **GDPR**: PII detection and masking
-- **ISO 27001**: Security controls alignment
+### Common Issues
+
+<details>
+<summary><strong>Assessment taking longer than expected</strong></summary>
+
+- Check repository size (should be <200k LOC)
+- Verify incremental scanning is enabled
+- Review `npm run agents:status` output
+</details>
+
+<details>
+<summary><strong>Linear tasks not being created</strong></summary>
+
+- Verify LINEAR_API_KEY is correct
+- Check team/project IDs match your workspace
+- Ensure Linear webhook is configured
+</details>
+
+<details>
+<summary><strong>Tests failing with coverage errors</strong></summary>
+
+- Run `npm test:unit` to isolate unit tests
+- Check diff coverage with `npm run coverage:diff`
+- Ensure test files match `*.spec.ts` pattern
+</details>
+
+<details>
+<summary><strong>Agent invocation errors</strong></summary>
+
+- Verify agent name is uppercase (e.g., AUDITOR)
+- Check command exists in `.claude/agents/<agent>.md`
+- Review logs in `logs/agent-operations.log`
+</details>
+
+For more issues, see the [complete troubleshooting guide](docs/reference/troubleshooting.md).
+
+## 📚 Documentation
+
+### For Claude Code AI Navigation
+
+**Critical References for AI Agents:**
+- [Agent System Reference](.claude/agents/CLAUDE.md) - Complete agent specifications and MCP tool matrix
+- [Agent Selection Guide](.claude/agents/AGENT-SELECTION-GUIDE.md) - Decision trees for choosing the right agent
+- [Linear Operations Guide](.claude/agents/LINEAR-OPERATIONS-GUIDE.md) - Who manages Linear tasks
+- [Project Instructions](CLAUDE.md) - Essential commands and workflows
+
+**Core Documentation:**
+- [TDD Protocol](docs/WORKFLOW-TDD-PROTOCOL.md) - Test-Driven Development requirements
+- [Clean Code Assessment](docs/WORKFLOW-CLEAN-CODE-ASSESSMENT.md) - Quality standards
+- [Linear Integration](docs/INTEGRATION-LINEAR.md) - Task management setup
+- [GitFlow Integration](docs/INTEGRATION-GITFLOW.md) - Branching strategy
+
+**Reference Guides:**
+- [Documentation Index](docs/REFERENCE-MASTER.md) - Complete documentation map
+- [Reference Master](docs/REFERENCE-MASTER.md) - Comprehensive reference
+- [Architecture Guide](docs/ARCHITECTURE-AGENTS.md) - System architecture
+
+**Recent Updates:**
+- [Agent Optimization Report](docs/AGENT-OPTIMIZATION-REPORT.md) - Latest agent improvements
+- [Consolidation Summary](docs/CONSOLIDATION-SUMMARY.md) - Documentation consolidation
 
 ## 🤝 Contributing
 
-### TDD Workflow
-1. Create feature branch from `develop`
-2. Write failing test first ([RED])
-3. Implement minimal code ([GREEN])
-4. Refactor with test safety ([REFACTOR])
-5. Ensure diff coverage ≥80%
-6. Submit PR with full documentation
+We follow strict TDD practices. All contributions must:
 
-### PR Requirements
-- All CI checks passing
-- Test coverage maintained/improved
-- Documentation updated
-- Linear ticket linked
-- FIL classification complete
-- Required approvals obtained
+1. **Start with a failing test** (RED phase)
+2. **Implement minimal code** to pass (GREEN phase)
+3. **Refactor** with test coverage (REFACTOR phase)
+4. **Maintain 80% diff coverage** on changes
+5. **Pass all quality gates** before merge
 
-## 📞 Support
+### Development Workflow
 
-- **Documentation**: Review [docs index](#documentation-index)
-- **Issues**: Submit via Linear.app integration
-- **Security**: Report to security@example.com
-- **Community**: Join our Slack workspace
+```bash
+# 1. Create feature branch
+git checkout -b feature/your-feature develop
+
+# 2. Write failing test first
+npm test:watch
+
+# 3. Implement feature with TDD
+# ... code ...
+
+# 4. Run pre-commit checks
+npm run precommit
+
+# 5. Push and create PR
+git push origin feature/your-feature
+```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
 ## 📄 License
 
-[Specify your license here]
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
-Built with Claude Code AI and integrated with Linear.app for maximum development efficiency. Special thanks to the Model Context Protocol community for enabling advanced tool integrations.
+Built with [Claude Code AI](https://claude.ai/code) and integrated with [Linear.app](https://linear.app) for maximum development efficiency. Special thanks to the [Model Context Protocol](https://modelcontextprotocol.org) community for enabling advanced tool integrations.
+
+---
+
+<p align="center">
+  <strong>Questions?</strong> Check the <a href="docs/reference/faq.md">FAQ</a> •
+  <strong>Issues?</strong> See <a href="docs/reference/troubleshooting.md">Troubleshooting</a> •
+  <strong>Updates?</strong> View <a href="CHANGELOG.md">Changelog</a>
+</p>

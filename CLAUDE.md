@@ -1,521 +1,212 @@
-# CLAUDE.md - Agent Workflow Specification
+# CLAUDE.md
 
-## Repository Metadata
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-**Project**: Linear TDD Workflow System
-**Version**: 1.2
-**Status**: Active Development - Phase 0
-**Owner**: Engineering Excellence Team
-**Last Updated**: 2024
+## Project Context
 
-## Purpose
+**Linear TDD Workflow System** - Multi-agent autonomous code quality management system that enforces strict Test-Driven Development.
 
-This document provides machine-readable workflow specifications for the autonomous multi-agent system that manages code quality through continuous assessment, prioritized execution, and rigorous TDD validation. It serves as the authoritative guide for all agent operations within this repository.
+Linear Configuration:
+- Team: `a-coders`
+- Project: `ai-coding`
 
-## Core Objectives
+## Essential Commands
 
-1. **Reduce engineering maintenance time by 40%**
-2. **Achieve 50% faster MTTR (Mean Time to Recovery)**
-3. **Improve PR cycle time by 30-35%**
-4. **Increase test coverage on touched code by 20+ percentage points**
-5. **Reduce technical debt hotspots monthly**
+### Testing
+```bash
+# Run all tests with coverage
+npm test
 
-## Guardrails & Constraints
+# Run single test file
+npm test -- path/to/test.spec.ts
 
-### Mandatory Guardrails
+# Run tests matching pattern
+npm test -- --testNamePattern="should validate"
 
-1. **TDD Enforcement**: Every change MUST follow [RED]→[GREEN]→[REFACTOR] cycle
-2. **Fix Pack Limits**: Maximum 300 LOC per PR
-3. **Coverage Requirements**: Diff coverage ≥80%, mutation testing ≥30%
-4. **Human Approval**: All agent PRs require human review before merge
-5. **Feature Control**: FIL-2/FIL-3 changes require FEAT-APPROVED label
-6. **Repository Limits**: Max 3 concurrent repos, each ≤200k LOC
-7. **Budget Controls**: $2.5k per repo monthly, $10k global monthly limit
+# Run specific test suite
+npm test:unit        # Unit tests only
+npm test:integration # Integration tests
+npm test:e2e        # End-to-end tests
 
-### Operational Constraints
-
-- **Languages**: JavaScript/TypeScript, Python only (v1)
-- **Environments**: Development & Staging only (no direct production)
-- **Access**: Read-only by default, PR-only writes
-- **Rollback**: ≤0.3% rollback rate tolerance
-- **Pipeline**: ≥95% uptime requirement
-
-## Agent Roles & Responsibilities
-
-### AUDITOR
-**Purpose**: Continuous code quality assessment
-**Capabilities**:
-- AST/CFG analysis for code complexity
-- Pattern detection and anti-pattern identification
-- Security vulnerability scanning
-- Documentation coverage assessment
-- Test coverage analysis
-
-**Tools**: `code_search`, `analyze_complexity`, `detect_patterns`, `create_linear_task`
-**SLAs**: First scan ≤12min (JS/TS), ≤15min (Python) for 150k LOC
-**Success Criteria**: ≥80% actionable items, ≤10% false positives
-
-### EXECUTOR
-**Purpose**: Implementation of approved improvements
-**Capabilities**:
-- Fix Pack implementation (pre-approved changes only)
-- Test-first development enforcement
-- Atomic commit generation
-- PR creation with full documentation
-
-**Tools**: `code_patch`, `run_tests`, `commit_changes`, `create_pr`
-**Constraints**: Fix Packs only, ≤300 LOC, diff coverage ≥80%
-**Success Criteria**: ≥8 accepted PRs/day, ≤0.3% rollback rate
-
-### GUARDIAN
-**Purpose**: CI/CD pipeline protection and recovery
-**Capabilities**:
-- Pipeline failure detection and analysis
-- Automated fix generation for common failures
-- Rollback orchestration when needed
-- Test flakiness detection and mitigation
-
-**Tools**: `analyze_failure`, `generate_fix`, `run_local_tests`, `trigger_pipeline`
-**SLAs**: Detection ≤5min, recovery ≤10min p95
-**Success Criteria**: Pipeline uptime ≥95%, auto-fix success ≥90%
-
-### STRATEGIST
-**Purpose**: Multi-agent orchestration and planning
-**Capabilities**:
-- Task prioritization and assignment
-- Resource allocation optimization
-- Dependency resolution
-- Conflict prevention and resolution
-
-**Tools**: `assign_task`, `update_linear`, `coordinate_agents`, `generate_report`
-**Performance**: Resource utilization ≥75%, context switches ≤3/agent/day
-**Success Criteria**: On-time delivery ≥90%, orchestration overhead ≤5%
-
-### SCHOLAR
-**Purpose**: Continuous learning and pattern extraction
-**Capabilities**:
-- Pattern extraction from successful fixes
-- Knowledge base maintenance
-- Efficiency optimization recommendations
-- Anti-pattern detection and prevention
-
-**Tools**: `extract_patterns`, `update_knowledge_base`, `train_agents`, `generate_insights`
-**Targets**: ≥2 validated patterns/month, ≥25% pattern reuse
-**Success Criteria**: Efficiency gains ≥10% month-over-month
-
-## Workflow Steps
-
-### 1. Assessment Workflow
-```yaml
-trigger: scheduled | manual | webhook
-steps:
-  - agent: AUDITOR
-    action: scan_repository
-    inputs:
-      - repository_url
-      - branch
-      - scope (full | incremental)
-    outputs:
-      - issues[]
-      - metrics{}
-      - priority_score
-  - agent: AUDITOR
-    action: create_linear_tasks
-    condition: issues.length > 0
-    inputs:
-      - issues[]
-      - team_id
-    outputs:
-      - task_ids[]
+# Watch mode for TDD
+npm test:watch
 ```
 
-### 2. Fix Implementation Workflow
-```yaml
-trigger: linear_task_assigned
-steps:
-  - agent: EXECUTOR
-    action: validate_fix_pack
-    inputs:
-      - task_details
-    outputs:
-      - is_fix_pack: boolean
-      - estimated_loc: number
-  - agent: EXECUTOR
-    action: write_failing_test
-    condition: is_fix_pack == true
-    tag: "[RED]"
-  - agent: EXECUTOR
-    action: implement_fix
-    tag: "[GREEN]"
-  - agent: EXECUTOR
-    action: refactor_code
-    condition: tests_passing == true
-    tag: "[REFACTOR]"
-  - agent: EXECUTOR
-    action: create_pr
-    validations:
-      - diff_coverage >= 80
-      - mutation_score >= 30
-      - all_tests_passing
+### Code Quality
+```bash
+# Lint and auto-fix
+npm run lint
+
+# Check without fixing
+npm run lint:check
+
+# Format code
+npm run format
+
+# Type checking
+npm run typecheck
+
+# Pre-commit checks (runs lint, format, unit tests)
+npm run precommit
 ```
 
-### 3. Pipeline Recovery Workflow
-```yaml
-trigger: pipeline_failure
-steps:
-  - agent: GUARDIAN
-    action: analyze_failure
-    timeout: 5min
-    outputs:
-      - failure_type
-      - can_auto_fix: boolean
-  - agent: GUARDIAN
-    action: generate_fix
-    condition: can_auto_fix == true
-    max_attempts: 3
-  - agent: GUARDIAN
-    action: trigger_rollback
-    condition: fix_attempts >= 3
-  - agent: GUARDIAN
-    action: notify_humans
-    condition: auto_fix_failed == true
+### Build
+```bash
+# TypeScript compilation
+npm run build
 ```
 
-## Change Control Rules
+### Agent Operations
+```bash
+# Assess code quality
+npm run assess
 
-### Feature Impact Level (FIL) Classification
+# Execute approved fixes
+npm run execute:fixpack
 
-```yaml
-FIL-0:  # No approval needed
-  - formatting_changes
-  - dead_code_removal
-  - comment_updates
-
-FIL-1:  # No approval needed
-  - variable_renames
-  - constant_extraction
-  - small_refactors (<50 LOC)
-
-FIL-2:  # Tech Lead approval required
-  - new_utility_functions
-  - config_changes
-  - test_framework_updates
-
-FIL-3:  # Tech Lead + Product Owner approval
-  - new_apis
-  - database_migrations
-  - ui_routes
-  - breaking_changes
+# Sync with Linear
+npm run linear:sync
 ```
 
-### Approval Workflow
-```yaml
-classification:
-  - tool: fil_classifier
-    timeout: 2s
+## Architecture
 
-approval_rules:
-  FIL-0|FIL-1: auto_approved
-  FIL-2:
-    required: [tech_lead]
-    timeout: 24h
-  FIL-3:
-    required: [tech_lead, product_owner]
-    timeout: 48h
+### Multi-Agent System
 
-enforcement:
-  - block_merge_without_approval: true
-  - require_feat_approved_label: true
+The system operates through 20 specialized agents coordinated via Linear.app:
+
+```
+Linear.app (Task Management)
+    ↓
+STRATEGIST (Orchestration)
+    ↓
+┌─────────────┬──────────────┬────────────────┬──────────────┐
+│   AUDITOR   │   EXECUTOR   │   GUARDIAN     │   SCHOLAR    │
+│ (Assessment)│ (Fix Impl.)  │ (CI/CD Guard)  │ (Learning)   │
+└─────────────┴──────────────┴────────────────┴──────────────┘
+       ↓              ↓               ↓                ↓
+[15 Specialized Agents for specific tasks]
 ```
 
-## MCP Tool Specifications
+**Agent Invocation Pattern:**
+```bash
+npm run agent:invoke <AGENT>:<COMMAND> -- [parameters]
 
-### Sequential Thinking
-```yaml
-purpose: Complex problem solving and reasoning
-operations:
-  - think(problem, constraints)
-  - reason(context, goals)
-  - solve(problem, approach)
-sla: <30s p95
-usage: Complex refactoring, architecture decisions
+# Examples:
+npm run agent:invoke AUDITOR:assess-code -- --scope full
+npm run agent:invoke EXECUTOR:implement-fix -- --task-id CLEAN-123
+npm run agent:invoke GUARDIAN:analyze-failure -- --auto-fix
 ```
 
-### Context7 Search
-```yaml
-purpose: Code and documentation understanding
-operations:
-  - search(query, scope)
-  - analyze(code, patterns)
-  - explain(concept, level)
-sla: <5s p95
-usage: Code comprehension, pattern matching
+**Critical Agent References:**
+- `.claude/agents/CLAUDE.md` - Complete agent system reference with Linear matrix
+- `.claude/agents/AGENT-SELECTION-GUIDE.md` - Decision trees for choosing agents
+- `.claude/agents/LINEAR-OPERATIONS-GUIDE.md` - Linear task management clarity
+
+### Directory Structure
+
+```
+.claude/
+├── agents/         # 20 agent specifications
+│   └── CLAUDE.md  # Detailed agent reference
+├── commands/      # Command templates
+└── mcp.json      # MCP server configuration
+
+scripts/           # Operational scripts for agents
+tests/            # Test suites (unit/integration/e2e)
+docs/             # Project documentation
 ```
 
-### Linear Tasks
-```yaml
-purpose: Task management and tracking
-operations:
-  - create(title, description, team_id)
-  - update(task_id, status, fields)
-  - transition(task_id, state)
-sla: <2s p95
-usage: Issue tracking, progress updates
-```
+### Linear Task Management
 
-### Playwright Test
-```yaml
-purpose: End-to-end test automation
-operations:
-  - test(spec, url)
-  - screenshot(page, selector)
-  - trace(actions, timeout)
-sla: <60s p95
-usage: E2E validation, visual regression
-```
+**STRATEGIST is the PRIMARY Linear manager**. Other agents have limited roles:
+- **STRATEGIST**: Full CRUD - manages all tasks, sprints, assignments
+- **AUDITOR**: CREATE only - quality issues (CLEAN-XXX)
+- **MONITOR**: CREATE only - incidents (INCIDENT-XXX)
+- **SCHOLAR**: READ only - pattern analysis
+- **Others**: UPDATE only for specific status changes
 
-## Communication Protocols
+When in doubt about Linear operations, use STRATEGIST.
 
-### Agent Message Format
-```json
-{
-  "id": "uuid-v4",
-  "timestamp": "ISO-8601",
-  "from_agent": "AGENT_NAME",
-  "to_agent": "AGENT_NAME | BROADCAST",
-  "type": "request | response | event",
-  "priority": "low | normal | high | critical",
-  "payload": {
-    "action": "string",
-    "params": {},
-    "context": {
-      "repository": "string",
-      "branch": "string",
-      "task_id": "string",
-      "correlation_id": "uuid-v4"
-    }
-  },
-  "timeout_ms": 30000
-}
-```
+### Key Workflows
 
-### Event Types
-```yaml
-assessment_complete:
-  emitted_by: AUDITOR
-  consumed_by: [STRATEGIST, LINEAR]
+1. **Assessment → Linear → Execution**
+   - AUDITOR scans code → creates Linear tasks → EXECUTOR implements fixes
 
-fix_pack_ready:
-  emitted_by: STRATEGIST
-  consumed_by: [EXECUTOR]
+2. **TDD Enforcement (RED→GREEN→REFACTOR)**
+   - Every change must: write failing test → minimal code to pass → refactor
+   - Enforced by CI: diff coverage ≥80%, mutation testing ≥30%
 
-pipeline_failure:
-  emitted_by: CI_SYSTEM
-  consumed_by: [GUARDIAN]
+3. **Fix Pack Constraints**
+   - Max 300 LOC per PR
+   - Pre-approved changes only (FIL-0/FIL-1)
+   - Atomic commits with rollback plans
 
-pr_created:
-  emitted_by: EXECUTOR
-  consumed_by: [LINEAR, STRATEGIST]
+## Critical Constraints
 
-pattern_identified:
-  emitted_by: SCHOLAR
-  consumed_by: [STRATEGIST, EXECUTOR]
-```
+### Test-Driven Development
+**Mandatory cycle for every change:**
+1. **[RED]** - Write failing test first
+2. **[GREEN]** - Minimal code to pass
+3. **[REFACTOR]** - Improve with passing tests
 
-## Audit & Compliance Requirements
+### Fix Pack Limits
+- ≤300 LOC per PR
+- Diff coverage ≥80%
+- Only FIL-0/FIL-1 changes (no feature work)
 
-### Audit Trail
-```yaml
-retention: 90 days
-storage: immutable
-fields:
-  - timestamp
-  - agent_id
-  - action
-  - repository
-  - task_id
-  - user_approval
-  - fil_classification
-  - outcome
-  - duration_ms
-
-export:
-  formats: [json, csv]
-  destinations: [siem, s3, elasticsearch]
-```
-
-### Compliance Checks
-```yaml
-pre_execution:
-  - rbac_validation
-  - budget_check
-  - repository_access
-  - fil_classification
-
-post_execution:
-  - coverage_validation
-  - security_scan
-  - dependency_check
-  - documentation_update
-```
+### Feature Impact Levels (FIL)
+- **FIL-0/1**: Auto-approved (formatting, dead code, renames)
+- **FIL-2**: Tech Lead approval (utilities, configs)
+- **FIL-3**: Tech Lead + Product approval (APIs, migrations)
 
 ## Performance SLAs
+- Code assessment: ≤12min for 150k LOC (JS/TS)
+- Fix implementation: ≤15min p50
+- Pipeline recovery: ≤10min p95
 
-### Critical Operations
-| Operation | Target | Alerting Threshold |
-|-----------|--------|-------------------|
-| Code Assessment | ≤12min p95 | >15min |
-| Fix Implementation | ≤15min p50 | >20min |
-| Pipeline Recovery | ≤10min p95 | >15min |
-| Linear Sync | ≤2s p95 | >5s |
-| FIL Classification | ≤2s p95 | >3s |
+## MCP Tools Available
+- `sequential-thinking` - Complex reasoning
+- `context7` - Code understanding
+- `linear` - Task management
+- `playwright` - E2E testing
+- `kubernetes` - Deployment
 
-### System Metrics
-| Metric | Target | Critical Threshold |
-|--------|--------|-------------------|
-| Agent Availability | 99.0% | <95% |
-| Task Success Rate | 90% | <80% |
-| Pattern Reuse | 25% | <15% |
-| Cost per Fix | ≤$3 | >$5 |
+## Testing Framework
 
-## Error Handling
+- **Framework**: Jest with TypeScript
+- **Coverage Requirements**: 80% minimum
+- **Test Organization**:
+  - `tests/unit/` - Isolated component tests
+  - `tests/integration/` - Component interaction
+  - `tests/e2e/` - Full user journeys
 
-### Retry Strategy
-```yaml
-transient_errors:
-  max_retries: 3
-  backoff: exponential
-  base_delay: 1s
-  max_delay: 30s
+## Development Workflow
 
-permanent_errors:
-  max_retries: 0
-  action: escalate_to_human
+1. Create feature branch from `develop`
+2. Follow TDD cycle strictly
+3. Run `npm run precommit` before pushing
+4. Create PR with diff coverage ≥80%
+5. Merge to `develop` after review
 
-timeout_errors:
-  max_retries: 1
-  action: reassign_task
-```
+GitFlow branches:
+- `main` - Production releases only
+- `develop` - Integration branch
+- `feature/*` - New features
+- `hotfix/*` - Emergency fixes
 
-### Escalation Path
-```yaml
-levels:
-  L1: agent_retry
-  L2: strategist_intervention
-  L3: human_operator
-  L4: engineering_lead
+## Agent-Specific Notes
 
-triggers:
-  - repeated_failures > 3
-  - pipeline_down > 10min
-  - budget_exceeded
-  - security_violation
-```
+When working with agents:
+1. Check `.claude/agents/CLAUDE.md` for detailed specifications
+2. Use standardized CLI invocation syntax
+3. All agent PRs require human review
+4. Agents operate in development/staging only (no production access)
 
-## Integration Points
+## Linear Integration
 
-### GitHub
-- Webhook events: push, pull_request, workflow_run
-- API operations: create_pr, update_status, add_comment
-- Branch protection: enforce policies, require reviews
+Tasks are automatically created and tracked in Linear:
+- Assessment results → Linear issues
+- Fix Packs → Linear tasks with estimates
+- PR status → Linear progress updates
 
-### Linear
-- Webhook events: issue_create, issue_update, comment_added
-- API operations: create_issue, update_status, add_attachment
-- Sync frequency: real-time for updates, batch for creation
-
-### CI/CD
-- GitHub Actions integration
-- Status checks enforcement
-- Artifact management
-- Secret management via HashiCorp Vault
-
-## Security Controls
-
-### Access Management
-```yaml
-authentication:
-  method: oauth2
-  provider: github
-  token_rotation: 24h
-
-authorization:
-  model: rbac
-  inheritance: github_teams
-  audit: all_operations
-
-secrets:
-  storage: hashicorp_vault
-  rotation: 30d
-  encryption: aes-256-gcm
-```
-
-### Code Security
-```yaml
-scanning:
-  - static_analysis: codeql, semgrep
-  - dependency_check: snyk, dependabot
-  - secret_detection: trufflehog, gitleaks
-
-policies:
-  - no_hardcoded_secrets
-  - no_vulnerable_dependencies
-  - signed_commits_required
-  - sbom_generation_required
-```
-
-## Maintenance Windows
-
-### Scheduled Maintenance
-```yaml
-pattern_extraction:
-  schedule: "0 2 * * 0"  # Weekly Sunday 2 AM
-  duration: 2h
-
-knowledge_base_update:
-  schedule: "0 3 * * *"  # Daily 3 AM
-  duration: 30min
-
-metrics_aggregation:
-  schedule: "0 * * * *"  # Hourly
-  duration: 5min
-```
-
-## Success Criteria
-
-### Phase 0 (Current)
-- [ ] Agents can read code
-- [ ] Linear tasks created automatically
-- [ ] Basic PR comments functional
-
-### Phase 1
-- [ ] ≥80% actionable assessment items
-- [ ] ≤10% false positive rate
-- [ ] SLAs consistently met
-
-### Phase 2
-- [ ] ≥8 Fix Pack PRs/day
-- [ ] Diff coverage ≥80% achieved
-- [ ] GUARDIAN auto-recovery operational
-
-### Phase 3
-- [ ] ≥25% pattern reuse
-- [ ] ≥80% auto-rebase success
-- [ ] Efficiency gains documented
-
-### Phase 4
-- [ ] 3 concurrent repositories
-- [ ] Beta SLOs met for 30 days
-- [ ] Ready for GA rollout
-
-## Version History
-
-| Version | Date | Changes |
-|---------|------|---------|
-| 1.2 | 2024 | Added FIL classification, Fix Pack specs |
-| 1.1 | 2024 | Enhanced guardrails, RBAC matrix |
-| 1.0 | 2024 | Initial specification |
-
----
-
-*This document is machine-readable and should be parsed by the agent system for operational guidance. Updates require approval from the Engineering Excellence team.*
+Always check Linear for task context before implementing fixes.

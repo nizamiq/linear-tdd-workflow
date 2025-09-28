@@ -17,13 +17,13 @@ Implement approved code improvements following strict TDD practices, ensuring al
 - Create pull requests
 
 ### Fix Pack Tasks
-1. **Linting & Formatting** - Auto-fix style violations
-2. **Dead Code Removal** - Remove unused code
-3. **Documentation** - Add/update JSDoc, docstrings
-4. **Simple Refactors** - Extract constants, simplify logic
-5. **Dependency Updates** - Minor/patch bumps
-6. **Logging** - Standardize log formats
-7. **Test Scaffolds** - Add test structure
+1. **Linting & Formatting** - Auto-fix style violations (ESLint/Prettier for JS/TS, Black/Ruff for Python)
+2. **Dead Code Removal** - Remove unused code in both JS/TS and Python
+3. **Documentation** - Add/update JSDoc (JS/TS) and docstrings (Python)
+4. **Simple Refactors** - Extract constants, simplify logic in any language
+5. **Dependency Updates** - npm/yarn for JS/TS, pip/poetry for Python
+6. **Logging** - Standardize log formats across languages
+7. **Test Scaffolds** - Add test structure (Jest/Mocha for JS, pytest/unittest for Python)
 
 ### Validation
 - Run test suites
