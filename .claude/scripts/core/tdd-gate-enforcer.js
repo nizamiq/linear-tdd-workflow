@@ -15,10 +15,59 @@ const { exec } = require('child_process');
 const { promisify } = require('util');
 const fs = require('fs').promises;
 const path = require('path');
-const chalk = require('chalk');
-const ora = require('ora');
 
 const execAsync = promisify(exec);
+
+// Native ANSI colors to replace chalk
+const colors = {
+  red: (text) => `\x1b[31m${text}\x1b[0m`,
+  green: (text) => `\x1b[32m${text}\x1b[0m`,
+  yellow: (text) => `\x1b[33m${text}\x1b[0m`,
+  blue: (text) => `\x1b[34m${text}\x1b[0m`,
+  magenta: (text) => `\x1b[35m${text}\x1b[0m`,
+  cyan: (text) => `\x1b[36m${text}\x1b[0m`,
+  white: (text) => `\x1b[37m${text}\x1b[0m`,
+  gray: (text) => `\x1b[90m${text}\x1b[0m`,
+  bold: (text) => `\x1b[1m${text}\x1b[0m`
+};
+
+// Simple spinner replacement for ora
+class SimpleSpinner {
+  constructor(text) {
+    this.text = text;
+    this.isSpinning = false;
+  }
+
+  start() {
+    console.log(`🔄 ${this.text}...`);
+    this.isSpinning = true;
+    return this;
+  }
+
+  succeed(text) {
+    if (this.isSpinning) {
+      console.log(`✅ ${text || this.text}`);
+      this.isSpinning = false;
+    }
+    return this;
+  }
+
+  fail(text) {
+    if (this.isSpinning) {
+      console.log(`❌ ${text || this.text}`);
+      this.isSpinning = false;
+    }
+    return this;
+  }
+
+  stop() {
+    this.isSpinning = false;
+    return this;
+  }
+}
+
+// Ora replacement function
+const ora = (text) => new SimpleSpinner(text);
 
 class TDDGateEnforcer {
   constructor() {
@@ -632,21 +681,21 @@ if (require.main === module) {
       validationMethod
       .then(result => {
         if (result.valid) {
-          console.log(chalk.green('✓ TDD cycle validation passed'));
+          console.log(colors.green('✓ TDD cycle validation passed'));
           if (result.details) {
             console.log(JSON.stringify(result.details, null, 2));
           }
         } else {
-          console.log(chalk.red('✗ TDD cycle validation failed'));
-          console.log(chalk.yellow(result.message));
+          console.log(colors.red('✗ TDD cycle validation failed'));
+          console.log(colors.yellow(result.message));
           if (result.requiredAction) {
-            console.log(chalk.cyan(`Required action: ${result.requiredAction}`));
+            console.log(colors.cyan(`Required action: ${result.requiredAction}`));
           }
           process.exit(1);
         }
       })
       .catch(error => {
-        console.error(chalk.red(`Validation error: ${error.message}`));
+        console.error(colors.red(`Validation error: ${error.message}`));
         process.exit(1);
       });
       break;
