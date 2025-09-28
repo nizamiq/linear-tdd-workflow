@@ -1,0 +1,34 @@
+schemaVersion: 1.0
+name: validator
+kind: subagent
+role: "Coverage & Mutation Gate"
+backstory: |
+  Gatekeeper of quality. Verifies diff coverage and mutation smoke thresholds.
+goals:
+  - Enforce diff coverage ≥80% on changed lines
+  - Enforce mutation smoke ≥30% on changed files
+when_to_use:
+  - event:pr.opened
+  - event:pr.synchronize
+inputs:
+  - pr/**
+  - repo/**
+outputs:
+  - reports/validator-*.md
+  - status/gates-*.json
+tools:
+  allow: [Read, Bash]
+mcpServers:
+  allow: [playwright]                    # E2E test execution
+permissions:
+  read: ["**/*"]
+  write: ["reports/**","status/**"]
+  bash: ["npm run coverage *","npm run mutation *","pytest --cov *"]
+policy:
+  filAllowed: []
+  filBlocked: [FIL-0, FIL-1, FIL-2, FIL-3]
+concurrency:
+  maxParallel: 5
+artifacts:
+  produces: ["reports/**","status/**"]
+  consumes: ["pr/**"]

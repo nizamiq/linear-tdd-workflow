@@ -210,3 +210,5 @@ Tasks are automatically created and tracked in Linear:
 - PR status → Linear progress updates
 
 Always check Linear for task context before implementing fixes.
+- This system must support python development
+- you need to ensure that all the aspects of the workflows are working properly with proper E2E testing! you can use this workflow to self improve this project!

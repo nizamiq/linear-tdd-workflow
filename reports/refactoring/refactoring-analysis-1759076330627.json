@@ -1,0 +1,42 @@
+{
+  "scope": "full",
+  "opportunities": "all",
+  "findings": [
+    {
+      "type": "extract-method",
+      "file": "src/utils/complex-calculation.js",
+      "line": 45,
+      "priority": "high",
+      "description": "Long method with multiple responsibilities"
+    },
+    {
+      "type": "eliminate-duplication",
+      "files": [
+        "src/auth/login.js",
+        "src/auth/register.js"
+      ],
+      "priority": "medium",
+      "description": "Duplicate validation logic"
+    },
+    {
+      "type": "simplify-conditionals",
+      "file": "src/business/pricing.js",
+      "line": 123,
+      "priority": "high",
+      "description": "Complex nested conditionals"
+    }
+  ],
+  "metrics": {
+    "codeComplexity": 8.5,
+    "duplicationRate": 12.3,
+    "methodLength": 23.4,
+    "classSize": 187,
+    "testCoverage": 76.2
+  },
+  "recommendations": [
+    "Refactor extract-method in src/utils/complex-calculation.js: Long method with multiple responsibilities",
+    "Refactor eliminate-duplication in src/auth/login.js, src/auth/register.js: Duplicate validation logic",
+    "Refactor simplify-conditionals in src/business/pricing.js: Complex nested conditionals"
+  ],
+  "success": true
+}

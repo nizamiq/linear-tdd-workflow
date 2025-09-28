@@ -867,7 +867,32 @@ class ClaudeCLI {
         cwd: process.cwd()
       });
 
+      // Process cleanup handlers for long-running LLM calls
+      const cleanup = () => {
+        if (child && !child.killed) {
+          console.log('⏱️ Gracefully terminating agent process...');
+          child.kill('SIGTERM');
+          setTimeout(() => {
+            if (!child.killed) {
+              console.log('⚠️ Force killing unresponsive agent process...');
+              child.kill('SIGKILL');
+            }
+          }, 15000); // 15 seconds for LLM cleanup
+        }
+      };
+
+      // Cleanup on process exit
+      process.on('SIGINT', cleanup);
+      process.on('SIGTERM', cleanup);
+      process.on('exit', cleanup);
+
+      // Progress indicator for long-running LLM calls
+      const progressTimer = setInterval(() => {
+        console.log(colors.gray('⏳ Agent is processing (LLM calls may take several minutes)...'));
+      }, 30000); // Every 30 seconds
+
       child.on('close', (code) => {
+        clearInterval(progressTimer);
         if (code === 0) {
           console.log(colors.green(`\n✅ Agent command completed successfully`));
         } else {
@@ -878,6 +903,7 @@ class ClaudeCLI {
 
       child.on('error', (error) => {
         console.error(colors.red(`Failed to execute agent command: ${error.message}`));
+        cleanup();
         process.exit(1);
       });
 

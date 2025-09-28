@@ -1,0 +1,49 @@
+{
+  "timestamp": "2025-09-28T17:46:20.127Z",
+  "summary": {
+    "totalTests": 17,
+    "passed": 12,
+    "failed": 5,
+    "successRate": 71
+  },
+  "errors": [
+    {
+      "test": "E2E-001: AUDITOR → Linear",
+      "error": "expect(received).toBe(expected) // Object.is equality\n\nExpected: true\nReceived: false"
+    },
+    {
+      "test": "E2E-003: GUARDIAN monitoring",
+      "error": "expect(received).toBe(expected) // Object.is equality\n\nExpected: true\nReceived: false"
+    },
+    {
+      "test": "E2E-AGENT: SCHOLAR:extract-patterns",
+      "error": "expect(received).toBeUndefined()\n\nReceived: \"spawnSync /bin/sh ETIMEDOUT\""
+    },
+    {
+      "test": "E2E-AGENT: VALIDATOR:execute-tests",
+      "error": "expect(received).toBeUndefined()\n\nReceived: \"spawnSync /bin/sh ETIMEDOUT\""
+    },
+    {
+      "test": "E2E-AGENT: MIGRATOR:migration-status",
+      "error": "expect(received).toBeUndefined()\n\nReceived: \"Command indicated failure\""
+    }
+  ],
+  "timings": {
+    "E2E-002: EXECUTOR implementation": 60011,
+    "E2E-AGENT: STRATEGIST:plan-workflow": 54487,
+    "E2E-AGENT: ANALYZER:measure-complexity": 42784,
+    "E2E-AGENT: CLEANER:remove-dead-code": 39888,
+    "E2E-AGENT: ARCHITECT:design-system": 34578,
+    "E2E-AGENT: REFACTORER:analyze-refactoring": 32551,
+    "E2E-AGENT: DOCUMENTER:generate-api-docs": 31455,
+    "E2E-AGENT: INTEGRATOR:monitor-apis": 37389,
+    "E2E-AGENT: RESEARCHER:analyze-architecture": 33185,
+    "E2E-LINEAR-001: Linear MCP": 0,
+    "E2E-ERROR-001: Invalid task handling": 44400,
+    "E2E-ERROR-002: Network failure handling": 45075
+  },
+  "recommendations": [
+    "Fix failing tests before production deployment",
+    "Consider performance optimization for faster response times"
+  ]
+}

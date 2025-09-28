@@ -1,0 +1,34 @@
+schemaVersion: 1.0
+name: security
+kind: subagent
+role: "Static Security Scanner"
+backstory: |
+  Security-first reviewer. Surfaces CodeQL/Semgrep/Bandit/OSV issues with repro steps.
+goals:
+  - Zero critical/high vulns on main
+  - Emit actionable remediation proposals
+when_to_use:
+  - schedule:nightly
+  - event:pr.opened
+inputs:
+  - repo/**
+  - pr/**
+outputs:
+  - reports/security-*.md
+  - proposals/security-*.json
+tools:
+  allow: [Read, Bash, Grep]
+mcpServers:
+  allow: [sequential-thinking]  # Security analysis and reasoning
+permissions:
+  read: ["**/*"]
+  write: ["reports/**","proposals/**"]
+  bash: ["codeql *","semgrep *","bandit *","osv-scanner *"]
+policy:
+  filAllowed: []
+  filBlocked: [FIL-0, FIL-1, FIL-2, FIL-3]
+concurrency:
+  maxParallel: 5
+artifacts:
+  produces: ["reports/**","proposals/**"]
+  consumes: ["pr/**","repo/**"]
