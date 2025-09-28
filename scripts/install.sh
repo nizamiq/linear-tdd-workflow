@@ -77,10 +77,16 @@ check_prerequisites() {
     local node_version=$(node --version | sed 's/v//')
     local required_version="18.0.0"
 
-    if ! node -e "process.exit(require('semver').gte('$node_version', '$required_version') ? 0 : 1)" 2>/dev/null; then
+    # Simple version comparison without external dependencies
+    local node_major=$(echo "$node_version" | cut -d. -f1)
+    local required_major=$(echo "$required_version" | cut -d. -f1)
+
+    if [ "$node_major" -lt "$required_major" ]; then
         log_error "Node.js version $required_version or higher is required (found: $node_version)"
         exit 1
     fi
+
+    log_success "Node.js version $node_version detected"
 
     # Check npm
     if ! command -v npm &> /dev/null; then
