@@ -26,6 +26,7 @@
     "claude:setup": "node .claude/setup.js",
     "agents:status": "node .claude/scripts/monitoring/agent-status.js",
     "agents:validate": "node .claude/scripts/core/tool-permission-validator.js check-all",
+    "agent:invoke": "node .claude/cli.js agent:invoke",
     "linear:test-connection": "node .claude/cli.js linear:test-connection",
     "linear:sync": "node .claude/cli.js linear:sync",
     "linear:status": "node .claude/cli.js linear:status",

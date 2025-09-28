@@ -181,6 +181,21 @@ class ClaudeCLI {
       .command('linear:status')
       .description('Show Linear integration status')
       .action(this.handleLinearStatus.bind(this));
+
+    // Agent invocation commands
+    this.program
+      .command('agent:invoke')
+      .description('Invoke specific agent with command')
+      .argument('<agent-command>', 'Agent command in format AGENT:COMMAND (e.g., AUDITOR:assess-code)')
+      .option('--scope <scope>', 'Assessment scope (full, changed, critical)', 'changed')
+      .option('--depth <depth>', 'Analysis depth (deep, standard, quick)', 'standard')
+      .option('--language <language>', 'Target language filter')
+      .option('--workers <count>', 'Number of parallel workers', '4')
+      .option('--task-id <id>', 'Linear task ID for fixes')
+      .option('--auto-fix', 'Enable automatic fixes where possible')
+      .option('--dry-run', 'Show what would be done without executing')
+      .allowUnknownOption()
+      .action(this.handleAgentInvoke.bind(this));
   }
 
   /**
@@ -723,6 +738,78 @@ class ClaudeCLI {
 
     } catch (error) {
       console.error(colors.red(`Sync failed: ${error.message}`));
+      process.exit(1);
+    }
+  }
+
+  /**
+   * Handle agent invoke command
+   */
+  async handleAgentInvoke(agentCommand, options) {
+    console.log(colors.bold.cyan(`🤖 Invoking Agent Command: ${agentCommand}\n`));
+
+    try {
+      // Parse agent and command
+      const [agent, command] = agentCommand.split(':');
+      if (!agent || !command) {
+        console.log(colors.red('❌ Invalid agent command format'));
+        console.log(colors.yellow('Expected format: AGENT:COMMAND (e.g., AUDITOR:assess-code)'));
+        process.exit(1);
+      }
+
+      // Validate agent exists
+      const validAgents = [
+        'AUDITOR', 'EXECUTOR', 'GUARDIAN', 'STRATEGIST', 'SCHOLAR',
+        'TESTER', 'VALIDATOR', 'ANALYZER', 'OPTIMIZER', 'CLEANER',
+        'REVIEWER', 'DEPLOYER', 'MONITOR', 'MIGRATOR', 'ARCHITECT',
+        'REFACTORER', 'RESEARCHER', 'SECURITYGUARD', 'DOCUMENTER', 'INTEGRATOR'
+      ];
+
+      if (!validAgents.includes(agent.toUpperCase())) {
+        console.log(colors.red(`❌ Unknown agent: ${agent}`));
+        console.log(colors.yellow('Available agents:'));
+        validAgents.forEach(a => console.log(colors.gray(`   • ${a}`)));
+        process.exit(1);
+      }
+
+      // Build command for agent router
+      const routerScript = path.join(this.claudeDir, 'scripts', 'core', 'agent-command-router.js');
+      let cmd = `node "${routerScript}" invoke ${agent}:${command}`;
+
+      // Add options
+      if (options.scope) cmd += ` --scope ${options.scope}`;
+      if (options.depth) cmd += ` --depth ${options.depth}`;
+      if (options.language) cmd += ` --language ${options.language}`;
+      if (options.workers) cmd += ` --workers ${options.workers}`;
+      if (options.taskId) cmd += ` --task-id ${options.taskId}`;
+      if (options.autoFix) cmd += ` --auto-fix`;
+      if (options.dryRun) cmd += ` --dry-run`;
+
+      console.log(colors.gray(`🔄 Executing: ${cmd}\n`));
+
+      // Execute the command
+      const { spawn } = require('child_process');
+      const child = spawn('sh', ['-c', cmd], {
+        stdio: 'inherit',
+        cwd: process.cwd()
+      });
+
+      child.on('close', (code) => {
+        if (code === 0) {
+          console.log(colors.green(`\n✅ Agent command completed successfully`));
+        } else {
+          console.log(colors.red(`\n❌ Agent command failed with exit code ${code}`));
+          process.exit(code);
+        }
+      });
+
+      child.on('error', (error) => {
+        console.error(colors.red(`Failed to execute agent command: ${error.message}`));
+        process.exit(1);
+      });
+
+    } catch (error) {
+      console.error(colors.red(`Agent invocation failed: ${error.message}`));
       process.exit(1);
     }
   }

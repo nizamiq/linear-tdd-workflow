@@ -14,8 +14,35 @@ const { Command } = require('commander');
 const path = require('path');
 const fs = require('fs').promises;
 const yaml = require('js-yaml');
-const chalk = require('chalk');
-const ora = require('ora');
+
+// Native ANSI colors to replace chalk
+const colors = {
+  red: (text) => `\x1b[31m${text}\x1b[0m`,
+  green: (text) => `\x1b[32m${text}\x1b[0m`,
+  yellow: (text) => `\x1b[33m${text}\x1b[0m`,
+  blue: (text) => `\x1b[34m${text}\x1b[0m`,
+  magenta: (text) => `\x1b[35m${text}\x1b[0m`,
+  cyan: (text) => `\x1b[36m${text}\x1b[0m`,
+  white: (text) => `\x1b[37m${text}\x1b[0m`,
+  gray: (text) => `\x1b[90m${text}\x1b[0m`,
+  bold: (text) => `\x1b[1m${text}\x1b[0m`
+};
+
+// Simple spinner replacement for ora
+const ora = (text) => ({
+  start() {
+    console.log(`🔄 ${text}...`);
+    return this;
+  },
+  succeed(text) {
+    console.log(`✅ ${text || 'Done'}`);
+    return this;
+  },
+  fail(text) {
+    console.log(`❌ ${text || 'Failed'}`);
+    return this;
+  }
+});
 
 class AgentCommandRouter {
   constructor() {
@@ -341,6 +368,55 @@ class AgentCommandRouter {
   getAffectedPaths(task) {
     return task.files || ['src/**'];
   }
+
+  /**
+   * Invoke specific agent with command
+   */
+  async invokeAgent(agentCommand, options) {
+    const [agent, command] = agentCommand.split(':');
+
+    if (!agent || !command) {
+      throw new Error('Invalid agent command format. Expected AGENT:COMMAND');
+    }
+
+    console.log(colors.cyan(`🤖 Invoking ${agent.toUpperCase()}: ${command}`));
+    console.log(colors.gray(`Options: ${JSON.stringify(options, null, 2)}`));
+
+    // Route to appropriate method based on command
+    switch (command.toLowerCase()) {
+      case 'assess-code':
+      case 'assess':
+        if (agent.toUpperCase() === 'AUDITOR') {
+          return await this.executePartitionedAssessment(options.scope, parseInt(options.workers));
+        }
+        break;
+
+      case 'implement-fix':
+      case 'implement':
+        if (agent.toUpperCase() === 'EXECUTOR') {
+          if (!options.taskId) {
+            throw new Error('--task-id is required for implement commands');
+          }
+          return await this.executeFixPack(options.taskId);
+        }
+        break;
+
+      default:
+        console.log(colors.yellow('⚠️  Agent command not yet implemented'));
+        console.log(colors.gray(`Would execute: ${agent}:${command} with options:`));
+        Object.entries(options).forEach(([key, value]) => {
+          if (value !== undefined) {
+            console.log(colors.gray(`   --${key}: ${value}`));
+          }
+        });
+
+        // Simulate successful execution for now
+        console.log(colors.green(`✅ ${agent}:${command} completed (simulated)`));
+        return { success: true, simulated: true };
+    }
+
+    throw new Error(`Unknown agent command: ${agentCommand}`);
+  }
 }
 
 // CLI setup
@@ -361,7 +437,7 @@ program
     try {
       await router.executePartitionedAssessment(options.scope, parseInt(options.workers));
     } catch (error) {
-      console.error(chalk.red(`Assessment failed: ${error.message}`));
+      console.error(colors.red(`Assessment failed: ${error.message}`));
       process.exit(1);
     }
   });
@@ -374,7 +450,27 @@ program
     try {
       await router.executeFixPack(taskId);
     } catch (error) {
-      console.error(chalk.red(`Implementation failed: ${error.message}`));
+      console.error(colors.red(`Implementation failed: ${error.message}`));
+      process.exit(1);
+    }
+  });
+
+program
+  .command('invoke')
+  .description('Invoke specific agent with command')
+  .argument('<agent-command>', 'Agent command in format AGENT:COMMAND')
+  .option('--scope <scope>', 'Assessment scope (full, changed, critical)', 'changed')
+  .option('--depth <depth>', 'Analysis depth (deep, standard, quick)', 'standard')
+  .option('--language <language>', 'Target language filter')
+  .option('--workers <count>', 'Number of parallel workers', '4')
+  .option('--task-id <id>', 'Linear task ID for fixes')
+  .option('--auto-fix', 'Enable automatic fixes where possible')
+  .option('--dry-run', 'Show what would be done without executing')
+  .action(async (agentCommand, options) => {
+    try {
+      await router.invokeAgent(agentCommand, options);
+    } catch (error) {
+      console.error(colors.red(`Agent invocation failed: ${error.message}`));
       process.exit(1);
     }
   });
