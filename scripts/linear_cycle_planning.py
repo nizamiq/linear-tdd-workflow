@@ -13,7 +13,10 @@ from typing import Dict, List, Optional, Tuple
 import math
 
 # Configuration
-LINEAR_API_KEY = os.getenv('LINEAR_API_KEY', os.getenv('LINEAR_API_KEY'))
+LINEAR_API_KEY = os.getenv('LINEAR_API_KEY')
+if not LINEAR_API_KEY:
+    print("Error: LINEAR_API_KEY environment variable not set")
+    sys.exit(1)
 LINEAR_API_URL = "https://api.linear.app/graphql"
 PROJECT_NAME = "ai-coding"  # Fixed typo
 TEAM_KEY = "ACO"  # Using the actual team key from Linear
