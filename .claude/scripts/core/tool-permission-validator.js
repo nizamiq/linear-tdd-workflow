@@ -15,8 +15,20 @@
 const fs = require('fs').promises;
 const path = require('path');
 const yaml = require('js-yaml');
-const chalk = require('chalk');
 const { execSync } = require('child_process');
+
+// Native ANSI colors to replace chalk
+const colors = {
+  red: (text) => `\x1b[31m${text}\x1b[0m`,
+  green: (text) => `\x1b[32m${text}\x1b[0m`,
+  yellow: (text) => `\x1b[33m${text}\x1b[0m`,
+  blue: (text) => `\x1b[34m${text}\x1b[0m`,
+  magenta: (text) => `\x1b[35m${text}\x1b[0m`,
+  cyan: (text) => `\x1b[36m${text}\x1b[0m`,
+  white: (text) => `\x1b[37m${text}\x1b[0m`,
+  gray: (text) => `\x1b[90m${text}\x1b[0m`,
+  bold: (text) => `\x1b[1m${text}\x1b[0m`
+};
 
 class ToolPermissionValidator {
   constructor() {
@@ -633,16 +645,16 @@ if (require.main === module) {
       validator.validateAgentTools(agent, tools)
         .then(result => {
           if (result.valid) {
-            console.log(chalk.green(`✅ All tools allowed for ${agent}`));
+            console.log(colors.green(`✅ All tools allowed for ${agent}`));
           } else {
-            console.log(chalk.red(`❌ Permission violations for ${agent}:`));
+            console.log(colors.red(`❌ Permission violations for ${agent}:`));
             result.violations.forEach(v => {
-              console.log(chalk.yellow(`  - ${v.tool}: ${v.reason} (risk: ${v.risk})`));
+              console.log(colors.yellow(`  - ${v.tool}: ${v.reason} (risk: ${v.risk})`));
             });
           }
         })
         .catch(error => {
-          console.error(chalk.red(`Validation failed: ${error.message}`));
+          console.error(colors.red(`Validation failed: ${error.message}`));
           process.exit(1);
         });
       break;
@@ -650,13 +662,13 @@ if (require.main === module) {
     case 'check-all':
       validator.validateAllAgents()
         .then(report => {
-          console.log(chalk.bold('\n🔒 Agent Permission Report\n'));
-          console.log(chalk.green(`✅ Compliant: ${report.compliant.length}`));
-          console.log(chalk.yellow(`⚠️  Warnings: ${report.warnings.length}`));
-          console.log(chalk.red(`❌ Violations: ${report.violations.length}`));
+          console.log(colors.bold('\n🔒 Agent Permission Report\n'));
+          console.log(colors.green(`✅ Compliant: ${report.compliant.length}`));
+          console.log(colors.yellow(`⚠️  Warnings: ${report.warnings.length}`));
+          console.log(colors.red(`❌ Violations: ${report.violations.length}`));
 
           if (report.violations.length > 0) {
-            console.log(chalk.red('\nViolations:'));
+            console.log(colors.red('\nViolations:'));
             report.violations.forEach(v => {
               console.log(`  ${v.agent}:`);
               v.issues.forEach(i => console.log(`    - ${i.message}`));
@@ -664,7 +676,7 @@ if (require.main === module) {
           }
         })
         .catch(error => {
-          console.error(chalk.red(`Check failed: ${error.message}`));
+          console.error(colors.red(`Check failed: ${error.message}`));
           process.exit(1);
         });
       break;
@@ -675,7 +687,7 @@ if (require.main === module) {
           console.log(JSON.stringify(report, null, 2));
         })
         .catch(error => {
-          console.error(chalk.red(`Report generation failed: ${error.message}`));
+          console.error(colors.red(`Report generation failed: ${error.message}`));
           process.exit(1);
         });
       break;
@@ -696,7 +708,7 @@ if (require.main === module) {
           process.exit(result.status === 'success' ? 0 : 1);
         })
         .catch(error => {
-          console.error(chalk.red(`CI check failed: ${error.message}`));
+          console.error(colors.red(`CI check failed: ${error.message}`));
           process.exit(1);
         });
       break;
