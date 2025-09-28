@@ -4,13 +4,17 @@
   "description": "Linear TDD Workflow System - Autonomous Clean Code Development with Test-Driven Excellence",
   "main": "index.js",
   "scripts": {
-    "test": "jest --coverage --verbose",
+    "test": "jest --coverage --verbose && python scripts/python-test-runner.py test",
     "test:watch": "jest --watch",
     "test:unit": "jest --testPathPattern=tests/unit --coverage",
+    "test:unit:python": "python scripts/python-test-runner.py coverage --files src/**/*.py",
     "test:integration": "jest --testPathPattern=tests/integration --coverage",
     "test:e2e": "jest --testPathPattern=tests/e2e --runInBand",
     "test:ci": "jest --coverage --ci --reporters=default --reporters=jest-junit",
     "test:mutation": "stryker run",
+    "test:mutation:python": "python scripts/python-test-runner.py mutation",
+    "test:tdd:js": "node scripts/tdd-gate-enforcer.js validate",
+    "test:tdd:python": "python scripts/python-test-runner.py tdd",
     "build": "tsc",
     "lint": "eslint . --ext .js,.ts --fix",
     "lint:check": "eslint . --ext .js,.ts",
@@ -22,11 +26,14 @@
     "create:env": "node scripts/create-env.js",
     "agents:init": "node scripts/initialize-agents.js",
     "agents:status": "node scripts/agent-status.js",
-    "assess": "node scripts/assess-code-quality.js",
-    "assess:incremental": "node scripts/assess-code-quality.js --incremental",
+    "assess": "node scripts/agent-command-router.js assess",
+    "assess:incremental": "node scripts/agent-command-router.js assess --scope changed",
+    "assess:full": "node scripts/agent-command-router.js assess --scope full --workers 10",
     "plan": "node scripts/generate-action-plan.js",
     "execute": "node scripts/execute-improvements.js",
-    "execute:fixpack": "node scripts/execute-fixpack.js",
+    "execute:fixpack": "node scripts/agent-command-router.js implement",
+    "tdd:validate": "node scripts/tdd-gate-enforcer.js validate",
+    "tdd:validate:full": "node scripts/tdd-gate-enforcer.js validate --mutation",
     "pattern:extract": "node scripts/extract-patterns.js",
     "pattern:validate": "node scripts/validate-patterns.js",
     "linear:sync": "node scripts/linear-sync.js",
@@ -36,7 +43,7 @@
     "monitor:pipeline": "node scripts/monitor-pipeline.js",
     "monitor:budget": "node scripts/monitor-budget.js",
     "workflow:validate": "node scripts/validate-workflow.js",
-    "fil:classify": "node scripts/fil-classifier.js",
+    "fil:classify": "node scripts/fil-classifier.js"
   },
   "keywords": [
     "tdd",
@@ -69,6 +76,7 @@
     "chalk": "^4.1.2",
     "commander": "^12.0.0",
     "dotenv": "^16.4.5",
+    "js-yaml": "^4.1.0",
     "node-fetch": "^2.7.0",
     "ora": "^5.4.1",
     "winston": "^3.13.0",
@@ -107,6 +115,6 @@
       "text",
       "lcov",
       "html"
-    ],
+    ]
   }
 }

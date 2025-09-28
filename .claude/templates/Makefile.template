@@ -1,0 +1,179 @@
+# Claude Agentic Workflow - Universal Makefile
+# This Makefile provides consistent commands across all project types
+
+.PHONY: help setup test lint format assess fix status clean doctor
+
+# Default target
+help: ## Show this help
+	@echo "Claude Agentic Workflow Commands:"
+	@echo ""
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
+	@echo ""
+	@echo "Language-specific commands:"
+	@echo "  make test-js     Run JavaScript/TypeScript tests"
+	@echo "  make test-py     Run Python tests"
+	@echo "  make lint-js     Lint JavaScript/TypeScript"
+	@echo "  make lint-py     Lint Python"
+
+setup: ## Setup or enhance project with Claude workflow
+	@node .claude/setup.js
+
+assess: ## Run code quality assessment
+	@node .claude/cli.js assess
+
+assess-full: ## Run full code assessment
+	@node .claude/cli.js assess --scope full
+
+fix: ## Implement fix pack (usage: make fix TASK=CLEAN-123)
+	@node .claude/cli.js fix $(TASK)
+
+test: ## Run TDD cycle for all languages
+	@node .claude/cli.js test
+
+test-coverage: ## Run tests with coverage
+	@node .claude/cli.js test --coverage
+
+test-mutation: ## Run mutation testing
+	@node .claude/cli.js test --mutation
+
+test-watch: ## Run tests in watch mode
+	@node .claude/cli.js test --watch
+
+test-js: ## Run JavaScript/TypeScript tests
+	@if [ -f package.json ]; then npm test; else echo "No package.json found"; fi
+
+test-py: ## Run Python tests
+	@if [ -f pyproject.toml ] || [ -f requirements.txt ]; then python .claude/scripts/language/python-runner.py test; else echo "No Python project detected"; fi
+
+lint: ## Lint all code
+	@node .claude/cli.js validate
+
+lint-js: ## Lint JavaScript/TypeScript
+	@if [ -f package.json ]; then npm run lint:check; else echo "No package.json found"; fi
+
+lint-py: ## Lint Python code
+	@if command -v ruff >/dev/null 2>&1; then ruff check .; else echo "Ruff not installed"; fi
+	@if command -v black >/dev/null 2>&1; then black --check .; else echo "Black not installed"; fi
+
+format: ## Format all code
+	@if [ -f package.json ]; then npm run format; fi
+	@if command -v black >/dev/null 2>&1; then black .; fi
+	@if command -v ruff >/dev/null 2>&1; then ruff --fix .; fi
+
+status: ## Show system status
+	@node .claude/cli.js status
+
+status-detailed: ## Show detailed system status
+	@node .claude/cli.js status --detailed
+
+validate: ## Validate project configuration
+	@node .claude/cli.js validate
+
+validate-permissions: ## Validate tool permissions
+	@node .claude/cli.js validate --permissions
+
+validate-tdd: ## Validate TDD compliance
+	@node .claude/cli.js validate --tdd
+
+doctor: ## Diagnose issues and suggest fixes
+	@node .claude/cli.js doctor
+
+clean: ## Clean up temporary files
+	@node .claude/cli.js clean
+
+clean-all: ## Clean up all temporary files including backups
+	@node .claude/cli.js clean --all
+
+export: ## Export workflow configuration
+	@node .claude/cli.js export
+
+import: ## Import workflow configuration (usage: make import SOURCE=config.json)
+	@node .claude/cli.js import $(SOURCE)
+
+analyze-concurrency: ## Run empirical concurrency analysis
+	@node .claude/cli.js analyze-concurrency
+
+# Development shortcuts
+dev-setup: ## Quick development setup
+	@make setup
+	@make validate
+	@echo "✅ Development environment ready"
+
+dev-test: ## Quick development test cycle
+	@make lint
+	@make test
+	@echo "✅ Development tests passed"
+
+# CI/CD targets
+ci-test: ## Run CI test suite
+	@make validate-permissions
+	@make validate-tdd
+	@make test-coverage
+	@echo "✅ CI tests completed"
+
+ci-deploy: ## Prepare for deployment
+	@make ci-test
+	@make assess
+	@echo "✅ Ready for deployment"
+
+# Agent-specific commands
+agents-status: ## Show agent status
+	@node .claude/scripts/monitoring/agent-status.js
+
+agents-validate: ## Validate agent configurations
+	@node .claude/scripts/core/tool-permission-validator.js check-all
+
+# Project initialization shortcuts
+init-js: ## Initialize JavaScript project
+	@echo "Initializing JavaScript project..."
+	@node .claude/setup.js --language javascript
+
+init-ts: ## Initialize TypeScript project
+	@echo "Initializing TypeScript project..."
+	@node .claude/setup.js --language typescript
+
+init-py: ## Initialize Python project
+	@echo "Initializing Python project..."
+	@node .claude/setup.js --language python
+
+init-mixed: ## Initialize mixed language project
+	@echo "Initializing mixed language project..."
+	@node .claude/setup.js --language javascript,python
+
+# Utility targets
+check-deps: ## Check for required dependencies
+	@echo "Checking dependencies..."
+	@node -e "console.log('Node.js:', process.version)"
+	@python --version 2>/dev/null || echo "Python not found"
+	@npm --version 2>/dev/null || echo "npm not found"
+	@poetry --version 2>/dev/null || echo "poetry not found"
+
+install-deps: ## Install missing dependencies
+	@echo "Installing dependencies..."
+	@if [ -f package.json ]; then npm install; fi
+	@if [ -f pyproject.toml ]; then poetry install; elif [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+# Documentation
+docs: ## Generate documentation
+	@echo "Generating documentation..."
+	@echo "See .claude/docs/ for workflow documentation"
+
+# Version management
+version: ## Show version information
+	@echo "Claude Workflow Version:"
+	@node -e "console.log(require('./.claude/package.json').version)" 2>/dev/null || echo "Version not available"
+
+# Quick start
+quickstart: ## Quick start guide
+	@echo ""
+	@echo "🚀 Claude Agentic Workflow Quick Start:"
+	@echo ""
+	@echo "1. Setup your project:     make setup"
+	@echo "2. Run assessment:         make assess"
+	@echo "3. Implement fixes:        make fix TASK=CLEAN-123"
+	@echo "4. Run tests:             make test"
+	@echo "5. Check status:          make status"
+	@echo ""
+	@echo "For help:                 make help"
+	@echo "For troubleshooting:      make doctor"
+	@echo ""

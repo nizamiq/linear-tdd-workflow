@@ -1,12 +1,38 @@
 ---
 name: auditor
-description: Clean code assessment specialist responsible for continuous codebase analysis and improvement task generation
-tools: Read, Grep, Glob, eslint, sonarqube, semgrep, linear
-allowedMcpServers: ["linear", "filesystem", "memory"]
+description: Code quality assessment specialist - finds actionable issues and creates Fix Pack candidates
+tools: [Read, Grep, Glob, eslint, sonarqube, semgrep, linear, sequential-thinking, context7]
+allowedMcpServers: ["linear", "filesystem", "memory", "sequential-thinking", "context7"]
+fil:
+  allow: []  # Read-only assessment agent
+  block: [FIL-0, FIL-1, FIL-2, FIL-3]  # No direct changes
+  createTasks: [FIL-0, FIL-1]  # Can create Fix Pack tasks only
+concurrency:
+  maxParallel: 10  # Parallel assessment workers
+  conflictStrategy: "partition"  # Path-based partitioning
+  partitionBy: "path"
+  sharding:
+    enabled: true
+    strategies: ["path", "package", "language", "complexity"]
+    fanOut:
+      maxWorkers: 10
+      batchSize: 1000  # Files per shard
+    fanIn:
+      deduplication: true
+      aggregation: "priority_merge"
+      timeout: "12m"
+locks:
+  scope: "none"  # Read-only operations
+  patterns: []
 permissions:
-  read: ["**/*.{js,ts,py,md,json,yaml}"]
-  write: ["reports/**", "tasks/**"]
-  bash: ["npm run lint", "npm run test:coverage", "npm run assess"]
+  read: ["**/*.{js,ts,py,md,json,yaml,yml}", "package*.json", "tsconfig.json", "*.config.*"]
+  write: ["reports/**", "assessments/**", ".cache/auditor/**"]
+  bash: ["npm run lint:check", "npm run typecheck", "npm test -- --passWithNoTests"]
+sla:
+  assessmentTime: "12m"  # 150k LOC JS/TS
+  pythonAssessmentTime: "15m"  # 150k LOC Python
+  actionableThreshold: 80  # >= 80% actionable findings
+  falsePositiveThreshold: 10  # <= 10% false positives
 ---
 
 # AUDITOR Agent Specification

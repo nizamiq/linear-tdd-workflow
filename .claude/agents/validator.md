@@ -1,12 +1,39 @@
 ---
 name: validator
-description: Comprehensive testing and validation specialist
-tools: Bash, Read, Write, test_runner, coverage_analyzer
-allowedMcpServers: ["playwright", "filesystem"]
+description: Test execution specialist - runs tests, measures coverage, validates TDD gates
+tools: [Read, Bash, test_runner, coverage_analyzer, sequential-thinking]
+allowedMcpServers: ["filesystem", "memory", "sequential-thinking"]
+fil:
+  allow: []  # Read-only validation agent
+  block: [FIL-0, FIL-1, FIL-2, FIL-3]  # No code changes
+concurrency:
+  maxParallel: 10  # Highly parallel test execution
+  conflictStrategy: "partition"
+  partitionBy: "testSuite"
+locks:
+  scope: "none"  # Read-only operations
+  patterns: []
 permissions:
-  read: ["**/*.{js,ts,py}", "tests/**", "specs/**"]
-  write: ["tests/**", "coverage/**", "reports/**"]
-  bash: ["npm test", "npm run test:*", "jest", "pytest", "npm run mutation"]
+  read: ["**/*.{js,ts,py,json,yaml,yml}", "tests/**", "src/**", "lib/**"]
+  write: ["coverage/**", "test-results/**", ".cache/validator/**"]
+  bash: ["npm test", "npm run test:unit", "npm run test:integration", "npm run test:mutation", "jest", "pytest"]
+specialization:
+  focusArea: "test_execution"
+  phase: "GREEN"  # GREEN phase validation of TDD
+  responsibilities:
+    - "Execute existing tests"
+    - "Measure test coverage"
+    - "Run mutation testing"
+    - "Validate TDD gates"
+    - "Generate coverage reports"
+  notResponsibleFor:
+    - "Creating new tests" # -> TESTER
+    - "Writing test code" # -> TESTER
+    - "Implementing fixes" # -> EXECUTOR
+gates:
+  diffCoverage: 80  # >= 80% diff coverage required
+  mutationScore: 30  # >= 30% mutation testing
+  testSuccess: 100  # All tests must pass
 ---
 
 # VALIDATOR Agent Specification

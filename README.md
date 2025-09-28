@@ -248,7 +248,7 @@ MONTHLY_BUDGET_LIMIT=10000
 - [Full Documentation Index](docs/REFERENCE-MASTER.md) - All documentation
 
 ### Specifications
-- [Product Requirements](docs/PRD.md) - Detailed PRD v1.2
+- [Product Requirements](docs/PRD.md) - Detailed PRD v1.3
 - [Architecture Docs](docs/architecture/) - System design
 - [Workflow Specs](.claude/docs/AGENT_WORKFLOW.md) - Agent workflows
 

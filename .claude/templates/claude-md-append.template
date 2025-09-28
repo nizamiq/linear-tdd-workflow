@@ -1,0 +1,115 @@
+## Claude Agentic Workflow System
+
+This project has been enhanced with the Claude Agentic Workflow System for autonomous code quality management with strict Test-Driven Development enforcement.
+
+### Essential Workflow Commands
+
+```bash
+# Universal commands (work in any project type)
+make assess              # Run code quality assessment
+make fix TASK=CLEAN-123  # Implement fix pack
+make test               # Run TDD cycle for all languages
+make status             # Show system status
+make setup              # Setup/enhance project
+make validate           # Validate configuration
+make doctor             # Diagnose issues
+
+# Language-specific testing
+make test-js            # JavaScript/TypeScript tests
+make test-py            # Python tests
+
+# Advanced operations
+make assess-full        # Full codebase assessment
+make test-coverage      # Tests with coverage
+make test-mutation      # Mutation testing
+make clean              # Clean temporary files
+```
+
+### CLI Interface
+
+```bash
+# Direct CLI access for advanced operations
+node .claude/cli.js assess --scope full --workers 10
+node .claude/cli.js fix CLEAN-123 --test-first --auto-commit
+node .claude/cli.js test --coverage --language python
+node .claude/cli.js status --detailed --agents
+node .claude/cli.js validate --permissions --tdd
+```
+
+### Multi-Agent Architecture
+
+The system operates through 20 specialized agents:
+
+**Core Agents:**
+- AUDITOR - Code quality assessment and issue detection
+- EXECUTOR - Fix implementation with TDD enforcement
+- GUARDIAN - CI/CD pipeline protection and recovery
+- SCHOLAR - Learning from fixes and pattern recognition
+- STRATEGIST - Workflow orchestration and task management
+
+**Specialized Agents:**
+- ANALYZER, ARCHITECT, CLEANER, DEPLOYER, DOCUMENTER
+- INTEGRATOR, MIGRATOR, MONITOR, OPTIMIZER, REFACTORER
+- RESEARCHER, REVIEWER, SECURITYGUARD, TESTER, VALIDATOR
+
+All agents operate under strict permissions with human oversight required for commits.
+
+### Critical TDD Enforcement
+
+**Mandatory cycle for every change:**
+1. **[RED]** - Write failing test first
+2. **[GREEN]** - Write minimal code to pass
+3. **[REFACTOR]** - Improve design with passing tests
+
+**Quality Gates:**
+- Diff coverage ≥80% required
+- All tests must pass before merge
+- Mutation testing ≥30% for critical paths
+- Fix packs limited to ≤300 LOC
+
+### Self-Contained System
+
+The `.claude/` directory contains:
+- 20 agent specifications (`.claude/agents/`)
+- Universal CLI interface (`.claude/cli.js`)
+- Setup and enhancement scripts (`.claude/setup.js`)
+- Project templates (`.claude/templates/`)
+- Operational scripts (`.claude/scripts/`)
+
+**System Features:**
+- Drop-in compatibility with any project
+- Multi-language support (JS/TS/Python)
+- Automatic dependency management
+- CI/CD integration templates
+- Portable configuration
+
+### Agent Operations
+
+**Status Monitoring:**
+```bash
+make agents-status      # Quick agent health check
+make agents-validate    # Validate agent permissions
+```
+
+**Assessment Workflow:**
+1. AUDITOR scans codebase → generates Linear tasks
+2. EXECUTOR implements fixes following TDD
+3. GUARDIAN validates changes and manages CI/CD
+4. SCHOLAR learns from patterns for future optimization
+
+### Development Workflow Integration
+
+1. All changes follow GitFlow branching strategy
+2. Feature branches require TDD compliance
+3. Pull requests auto-validated by GUARDIAN
+4. Continuous assessment via AUDITOR
+5. Fix packs managed through Linear task integration
+
+### Performance SLAs
+
+- Code assessment: ≤12min for 150k LOC
+- Fix implementation: ≤15min p50
+- Pipeline recovery: ≤10min p95
+- Agent response time: ≤30s p95
+
+**For complete documentation, see `.claude/agents/CLAUDE.md`**

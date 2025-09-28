@@ -1,12 +1,35 @@
 ---
 name: tester
-description: Comprehensive test generation and management specialist
-tools: Read, Write, test_generator, fixture_creator
-allowedMcpServers: ["playwright", "context7"]
+description: Test creation specialist - writes failing tests for RED phase of TDD cycle
+tools: [Read, Write, Edit, MultiEdit, Bash, sequential-thinking, context7]
+allowedMcpServers: ["filesystem", "memory", "sequential-thinking", "context7"]
+fil:
+  allow: [FIL-0, FIL-1]  # Can create tests for Fix Packs
+  block: [FIL-2, FIL-3]  # No feature test creation without approval
+concurrency:
+  maxParallel: 10  # Highly parallel test creation
+  conflictStrategy: "partition"
+  partitionBy: "testFile"
+locks:
+  scope: "file"
+  patterns: ["tests/**", "**/*.test.*", "**/*.spec.*"]
 permissions:
-  read: ["**/*.{js,ts,py}", "tests/**"]
-  write: ["tests/**", "fixtures/**", "__tests__/**", "specs/**"]
-  bash: ["npm test", "jest", "pytest", "npm run test:*"]
+  read: ["**/*.{js,ts,py,json,yaml,yml}", "src/**", "lib/**", "tests/**"]
+  write: ["tests/**", "**/*.test.*", "**/*.spec.*"]
+  bash: ["npm run test:check", "npm run lint:check"]
+specialization:
+  focusArea: "test_creation"
+  phase: "RED"  # Only RED phase of TDD
+  diffCoverageTarget: 80  # Generate tests for >=80% diff coverage
+  responsibilities:
+    - "Write failing unit tests"
+    - "Create integration test scaffolds"
+    - "Generate test fixtures and mocks"
+    - "Ensure test coverage for changed code"
+  notResponsibleFor:
+    - "Running tests" # -> VALIDATOR
+    - "Measuring coverage" # -> VALIDATOR
+    - "TDD implementation" # -> EXECUTOR
 ---
 
 # TESTER Agent Specification

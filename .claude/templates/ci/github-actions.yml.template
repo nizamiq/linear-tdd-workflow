@@ -1,0 +1,247 @@
+name: Claude TDD Workflow CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  NODE_VERSION: '{{NODE_VERSION}}'
+  PYTHON_VERSION: '{{PYTHON_VERSION}}'
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      has-js: ${{ steps.detect.outputs.has-js }}
+      has-python: ${{ steps.detect.outputs.has-python }}
+      has-ts: ${{ steps.detect.outputs.has-ts }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Detect project languages
+        id: detect
+        run: |
+          echo "has-js=$(test -f package.json && echo true || echo false)" >> $GITHUB_OUTPUT
+          echo "has-python=$(test -f pyproject.toml -o -f requirements.txt && echo true || echo false)" >> $GITHUB_OUTPUT
+          echo "has-ts=$(test -f tsconfig.json && echo true || echo false)" >> $GITHUB_OUTPUT
+
+  # JavaScript/TypeScript Pipeline
+  js-pipeline:
+    needs: setup
+    if: needs.setup.outputs.has-js == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ['{{NODE_VERSION}}', '20']
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Code quality checks
+        run: |
+          npm run lint:check
+          npm run format:check
+          if [ "${{ needs.setup.outputs.has-ts }}" == "true" ]; then
+            npm run typecheck
+          fi
+
+      - name: Run unit tests
+        run: npm run test:unit
+        env:
+          CI: true
+
+      - name: Run integration tests
+        run: npm run test:integration
+        env:
+          CI: true
+
+      - name: Check test coverage
+        run: |
+          npm test -- --coverage --coverageReporters=text-lcov > coverage.lcov
+          if command -v lcov &> /dev/null; then
+            lcov --summary coverage.lcov
+          fi
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.lcov
+          flags: javascript
+          name: js-coverage
+
+      - name: TDD Compliance Check
+        run: |
+          if [ -f ".claude/scripts/core/tdd-gate-enforcer.js" ]; then
+            node .claude/scripts/core/tdd-gate-enforcer.js validate
+          fi
+
+      - name: Build project
+        if: needs.setup.outputs.has-ts == 'true'
+        run: npm run build
+
+  # Python Pipeline
+  python-pipeline:
+    needs: setup
+    if: needs.setup.outputs.has-python == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['{{PYTHON_VERSION}}', '3.11']
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v3
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install dependencies
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --no-interaction --no-root
+
+      - name: Install project
+        run: poetry install --no-interaction
+
+      - name: Code quality checks
+        run: |
+          poetry run black --check .
+          poetry run ruff check .
+          poetry run mypy . || echo "MyPy warnings found"
+
+      - name: Security scan
+        run: |
+          poetry run bandit -r src/ || echo "Security warnings found"
+          poetry run safety check || echo "Safety warnings found"
+
+      - name: Run unit tests
+        run: poetry run pytest tests/unit/ -v --cov=src --cov-report=xml --cov-report=term-missing
+
+      - name: Run integration tests
+        run: poetry run pytest tests/integration/ -v
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.xml
+          flags: python
+          name: python-coverage
+
+  # Claude Workflow Validation
+  claude-validation:
+    needs: [setup, js-pipeline, python-pipeline]
+    if: always() && (needs.js-pipeline.result == 'success' || needs.python-pipeline.result == 'success' || (needs.setup.outputs.has-js == 'false' && needs.setup.outputs.has-python == 'false'))
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js for Claude CLI
+        uses: actions/setup-node@v4
+        with:
+          node-version: '{{NODE_VERSION}}'
+          cache: 'npm'
+
+      - name: Install Claude dependencies
+        run: |
+          cd .claude
+          npm install chalk commander js-yaml
+
+      - name: Validate Claude configuration
+        run: |
+          node .claude/cli.js validate --permissions
+          node .claude/cli.js doctor
+
+      - name: Agent status check
+        run: node .claude/scripts/monitoring/agent-status.js quick
+
+  # Mutation Testing (Optional - runs on main branch only)
+  mutation-testing:
+    needs: [js-pipeline, python-pipeline]
+    if: github.ref == 'refs/heads/main' && (needs.js-pipeline.result == 'success' || needs.python-pipeline.result == 'success')
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        if: needs.setup.outputs.has-js == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '{{NODE_VERSION}}'
+          cache: 'npm'
+
+      - name: Setup Python
+        if: needs.setup.outputs.has-python == 'true'
+        uses: actions/setup-python@v4
+        with:
+          python-version: '{{PYTHON_VERSION}}'
+
+      - name: Install dependencies
+        run: |
+          if [ "${{ needs.setup.outputs.has-js }}" == "true" ]; then
+            npm ci
+          fi
+          if [ "${{ needs.setup.outputs.has-python }}" == "true" ]; then
+            pip install poetry && poetry install
+          fi
+
+      - name: Run mutation testing
+        timeout-minutes: 30
+        run: |
+          if [ "${{ needs.setup.outputs.has-js }}" == "true" ]; then
+            npm run test:mutation || echo "JS mutation testing completed with warnings"
+          fi
+          if [ "${{ needs.setup.outputs.has-python }}" == "true" ]; then
+            poetry run mutmut run || echo "Python mutation testing completed with warnings"
+          fi
+
+  # Deployment readiness check
+  deployment-check:
+    needs: [claude-validation]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '{{NODE_VERSION}}'
+
+      - name: Run deployment readiness assessment
+        run: |
+          cd .claude
+          npm install chalk commander js-yaml
+          node cli.js assess --scope full
+          echo "✅ Deployment readiness check completed"

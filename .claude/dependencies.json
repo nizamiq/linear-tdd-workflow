@@ -1,0 +1,128 @@
+{
+  "javascript": {
+    "required": [
+      "eslint",
+      "prettier",
+      "jest",
+      "chalk",
+      "commander",
+      "js-yaml"
+    ],
+    "optional": [
+      "typescript",
+      "ts-node",
+      "@stryker-mutator/core",
+      "@stryker-mutator/jest-runner",
+      "husky",
+      "lint-staged"
+    ],
+    "testing": [
+      "jest",
+      "@jest/globals",
+      "jest-junit",
+      "supertest"
+    ],
+    "linting": [
+      "eslint",
+      "@typescript-eslint/eslint-plugin",
+      "@typescript-eslint/parser",
+      "eslint-config-prettier",
+      "eslint-plugin-jest"
+    ],
+    "formatting": [
+      "prettier"
+    ],
+    "mutation": [
+      "@stryker-mutator/core",
+      "@stryker-mutator/jest-runner"
+    ]
+  },
+  "python": {
+    "required": [
+      "pytest",
+      "black",
+      "ruff",
+      "coverage"
+    ],
+    "optional": [
+      "mypy",
+      "mutmut",
+      "hypothesis",
+      "bandit",
+      "safety"
+    ],
+    "testing": [
+      "pytest",
+      "pytest-cov",
+      "pytest-xdist",
+      "pytest-mock",
+      "hypothesis"
+    ],
+    "linting": [
+      "ruff",
+      "pylint",
+      "flake8",
+      "bandit"
+    ],
+    "formatting": [
+      "black",
+      "isort",
+      "autopep8"
+    ],
+    "typing": [
+      "mypy",
+      "pydantic",
+      "typing-extensions"
+    ],
+    "mutation": [
+      "mutmut",
+      "cosmic-ray"
+    ]
+  },
+  "tooling": {
+    "git": [
+      "husky",
+      "lint-staged",
+      "commitizen"
+    ],
+    "ci": [
+      "gh",
+      "act"
+    ],
+    "documentation": [
+      "typedoc",
+      "sphinx",
+      "mkdocs"
+    ]
+  },
+  "frameworks": {
+    "react": {
+      "required": ["@testing-library/react", "@testing-library/jest-dom"],
+      "optional": ["@testing-library/user-event", "react-test-renderer"]
+    },
+    "vue": {
+      "required": ["@vue/test-utils", "vitest"],
+      "optional": ["@testing-library/vue"]
+    },
+    "angular": {
+      "required": ["@angular/testing", "jasmine", "karma"],
+      "optional": ["protractor"]
+    },
+    "express": {
+      "required": ["supertest", "jest"],
+      "optional": ["nock", "sinon"]
+    },
+    "fastapi": {
+      "required": ["pytest", "httpx", "pytest-asyncio"],
+      "optional": ["factory-boy", "faker"]
+    },
+    "flask": {
+      "required": ["pytest", "pytest-flask"],
+      "optional": ["factory-boy", "faker"]
+    },
+    "django": {
+      "required": ["pytest", "pytest-django"],
+      "optional": ["factory-boy", "model-bakery"]
+    }
+  }
+}

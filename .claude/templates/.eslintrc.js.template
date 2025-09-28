@@ -1,0 +1,141 @@
+module.exports = {
+  root: true,
+  env: {
+    node: true,
+    es2020: true,
+    jest: true
+  },
+  extends: [
+    'eslint:recommended',
+    '{{TYPESCRIPT_EXTENDS}}',
+    'prettier'
+  ],
+  parser: '{{PARSER}}',
+  parserOptions: {
+    ecmaVersion: 2020,
+    sourceType: 'module',
+    project: ['./tsconfig.json'],
+    tsconfigRootDir: __dirname
+  },
+  plugins: [
+    '{{PLUGINS}}'
+  ],
+  rules: {
+    // Code Quality
+    'no-console': ['warn', { allow: ['warn', 'error'] }],
+    'no-debugger': 'error',
+    'no-unused-vars': 'off', // Handled by TypeScript
+    'no-var': 'error',
+    'prefer-const': 'error',
+    'prefer-arrow-callback': 'error',
+    'no-duplicate-imports': 'error',
+
+    // TypeScript-specific (if applicable)
+    '{{TYPESCRIPT_RULES}}': {
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/explicit-function-return-type': 'warn',
+      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/prefer-nullish-coalescing': 'error',
+      '@typescript-eslint/prefer-optional-chain': 'error',
+      '@typescript-eslint/no-non-null-assertion': 'warn',
+      '@typescript-eslint/strict-boolean-expressions': 'error'
+    },
+
+    // Jest Testing Rules
+    'jest/no-disabled-tests': 'warn',
+    'jest/no-focused-tests': 'error',
+    'jest/no-identical-title': 'error',
+    'jest/prefer-to-have-length': 'warn',
+    'jest/valid-expect': 'error',
+    'jest/expect-expect': 'error',
+
+    // Code Style (Prettier handles most formatting)
+    'curly': ['error', 'all'],
+    'eqeqeq': ['error', 'always'],
+    'no-eval': 'error',
+    'no-implied-eval': 'error',
+    'no-new-func': 'error',
+    'no-script-url': 'error',
+    'no-self-compare': 'error',
+    'no-sequences': 'error',
+    'no-throw-literal': 'error',
+    'no-void': 'error',
+    'radix': 'error',
+    'wrap-iife': ['error', 'outside'],
+    'yoda': 'error',
+
+    // Best Practices
+    'array-callback-return': 'error',
+    'block-scoped-var': 'error',
+    'complexity': ['warn', 10],
+    'consistent-return': 'error',
+    'default-case': 'error',
+    'dot-notation': 'error',
+    'guard-for-in': 'error',
+    'max-classes-per-file': ['error', 1],
+    'max-depth': ['error', 4],
+    'max-lines': ['warn', 500],
+    'max-lines-per-function': ['warn', 50],
+    'max-params': ['warn', 5],
+    'no-alert': 'error',
+    'no-caller': 'error',
+    'no-constructor-return': 'error',
+    'no-else-return': 'error',
+    'no-empty-function': 'error',
+    'no-eq-null': 'error',
+    'no-extend-native': 'error',
+    'no-extra-bind': 'error',
+    'no-extra-label': 'error',
+    'no-floating-decimal': 'error',
+    'no-implicit-coercion': 'error',
+    'no-implicit-globals': 'error',
+    'no-iterator': 'error',
+    'no-labels': 'error',
+    'no-lone-blocks': 'error',
+    'no-loop-func': 'error',
+    'no-magic-numbers': ['warn', { ignore: [0, 1, -1] }],
+    'no-multi-spaces': 'error',
+    'no-multi-str': 'error',
+    'no-new': 'error',
+    'no-new-wrappers': 'error',
+    'no-octal-escape': 'error',
+    'no-param-reassign': 'error',
+    'no-proto': 'error',
+    'no-return-assign': 'error',
+    'no-return-await': 'error',
+    'no-unmodified-loop-condition': 'error',
+    'no-unused-expressions': 'error',
+    'no-useless-call': 'error',
+    'no-useless-concat': 'error',
+    'no-useless-return': 'error',
+    'prefer-promise-reject-errors': 'error',
+    'require-await': 'error'
+  },
+  overrides: [
+    {
+      files: ['**/*.test.{js,ts}', '**/*.spec.{js,ts}'],
+      env: {
+        jest: true
+      },
+      rules: {
+        'no-magic-numbers': 'off',
+        'max-lines-per-function': 'off',
+        '@typescript-eslint/explicit-function-return-type': 'off'
+      }
+    },
+    {
+      files: ['scripts/**/*.js', '.claude/**/*.js'],
+      rules: {
+        'no-console': 'off',
+        '@typescript-eslint/no-var-requires': 'off'
+      }
+    }
+  ],
+  ignorePatterns: [
+    'dist/',
+    'coverage/',
+    'node_modules/',
+    '*.config.js',
+    'jest.config.js'
+  ]
+};

@@ -43,8 +43,26 @@ jobs:
       - name: Run type checking
         run: npm run typecheck
 
+      - name: Validate agent tool permissions
+        run: |
+          node scripts/tool-permission-validator.js check-all
+          if [ $? -ne 0 ]; then
+            echo "Tool permission violations detected"
+            exit 1
+          fi
+
       - name: Run unit tests with coverage
         run: npm run test:unit
+
+      - name: Validate TDD gates
+        run: node scripts/tdd-gate-enforcer.js validate --mutation
+        continue-on-error: false
+
+      - name: Check diff coverage threshold
+        run: |
+          # Use TDD gate enforcer for comprehensive diff coverage validation
+          node scripts/tdd-gate-enforcer.js validate --coverage-only --threshold=80
+        continue-on-error: false
 
       - name: Run integration tests
         run: npm run test:integration

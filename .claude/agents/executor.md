@@ -1,3 +1,37 @@
+---
+name: executor
+description: Fix Pack implementation engine - implements ≤300 LOC improvements via strict TDD cycle
+tools: [Read, Write, Edit, MultiEdit, Bash, git, sequential-thinking, context7]
+allowedMcpServers: ["filesystem", "memory", "sequential-thinking", "context7"]
+fil:
+  allow: [FIL-0, FIL-1]  # Auto-approved Fix Packs only
+  block: [FIL-2, FIL-3]  # Features require RFC approval
+  maxLinesOfCode: 300  # Strict Fix Pack limit
+concurrency:
+  maxParallel: 2  # Limited parallel changes per repo
+  conflictStrategy: "queue"  # Serialize conflicting changes
+  partitionBy: "module"
+locks:
+  scope: "path"
+  patterns: ["src/**", "lib/**", "tests/**"]
+permissions:
+  read: ["**/*.{js,ts,py,json,yaml,yml,md}", "package*.json", "tsconfig.json", "*.config.*"]
+  write: ["src/**", "lib/**", "tests/**", "docs/**"]
+  bash: ["npm test", "npm run lint", "npm run typecheck", "git status", "git add", "git commit", "npm run test:mutation"]
+tdd:
+  enforceRedGreenRefactor: true
+  requiredCoverage: 80  # Diff coverage >= 80%
+  mutationThreshold: 30  # Mutation testing >= 30%
+  phases:
+    red: "Write failing test first"
+    green: "Minimal code to pass test"
+    refactor: "Improve with test safety"
+sla:
+  implementationTime: "15m"  # Average Fix Pack time
+  rollbackRate: 0.3  # <= 0.3% rollback rate
+  dailyThroughput: 8  # >= 8 Fix Pack PRs/day
+---
+
 # EXECUTOR Agent Specification
 
 ## Role

@@ -1,0 +1,203 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project Context
+
+**{{PROJECT_NAME}}** - {{PROJECT_DESCRIPTION}}
+
+## Claude Agentic Workflow System
+
+This project uses the Claude Agentic Workflow System for autonomous code quality management with strict Test-Driven Development enforcement.
+
+### Essential Commands
+
+#### Testing
+```bash
+# Run all tests with coverage
+{{TEST_COMMAND}}
+
+# Run single test file
+{{SINGLE_TEST_COMMAND}}
+
+# Run tests matching pattern
+{{PATTERN_TEST_COMMAND}}
+
+# Run specific test suite
+{{UNIT_TEST_COMMAND}}        # Unit tests only
+{{INTEGRATION_TEST_COMMAND}} # Integration tests
+{{E2E_TEST_COMMAND}}         # End-to-end tests
+
+# Watch mode for TDD
+{{WATCH_TEST_COMMAND}}
+```
+
+#### Code Quality
+```bash
+# Lint and auto-fix
+{{LINT_COMMAND}}
+
+# Check without fixing
+{{LINT_CHECK_COMMAND}}
+
+# Format code
+{{FORMAT_COMMAND}}
+
+# Type checking (if TypeScript)
+{{TYPECHECK_COMMAND}}
+
+# Pre-commit checks (runs lint, format, unit tests)
+{{PRECOMMIT_COMMAND}}
+```
+
+#### Build
+```bash
+# Build project
+{{BUILD_COMMAND}}
+```
+
+#### Claude Workflow Operations
+```bash
+# Universal commands (work in any project)
+make assess              # Run code quality assessment
+make fix TASK=CLEAN-123  # Implement fix pack
+make test               # Run TDD cycle
+make status             # Show system status
+make setup              # Setup/enhance project
+make validate           # Validate configuration
+
+# Direct CLI access
+node .claude/cli.js assess --scope full
+node .claude/cli.js fix CLEAN-123 --test-first
+node .claude/cli.js test --coverage
+node .claude/cli.js status --detailed
+```
+
+### Architecture
+
+#### Multi-Agent System
+
+The system operates through 20 specialized agents coordinated via Linear.app:
+
+```
+Linear.app (Task Management)
+    ↓
+STRATEGIST (Orchestration)
+    ↓
+┌─────────────┬──────────────┬────────────────┬──────────────┐
+│   AUDITOR   │   EXECUTOR   │   GUARDIAN     │   SCHOLAR    │
+│ (Assessment)│ (Fix Impl.)  │ (CI/CD Guard)  │ (Learning)   │
+└─────────────┴──────────────┴────────────────┴──────────────┘
+       ↓              ↓               ↓                ↓
+[16 Specialized Agents for specific tasks]
+```
+
+**Agent Directory:**
+- `.claude/agents/` - All 20 agent specifications
+- `.claude/agents/CLAUDE.md` - Detailed agent reference guide
+
+#### Directory Structure
+
+```
+.claude/
+├── agents/         # 20 agent specifications
+├── scripts/        # Operational scripts
+│   └── core/       # Core workflow scripts
+├── templates/      # Project templates
+│   └── ci/         # CI/CD templates
+├── cli.js         # Universal command interface
+├── setup.js       # Universal setup script
+└── dependencies.json # Dependency management
+```
+
+### Critical Constraints
+
+#### Test-Driven Development (Mandatory)
+**Every change must follow the TDD cycle:**
+1. **[RED]** - Write failing test first
+2. **[GREEN]** - Minimal code to pass
+3. **[REFACTOR]** - Improve with passing tests
+
+#### Fix Pack Limits
+- ≤300 LOC per PR
+- Diff coverage ≥80%
+- Only FIL-0/FIL-1 changes (no feature work)
+
+#### Feature Impact Levels (FIL)
+- **FIL-0/1**: Auto-approved (formatting, dead code, renames)
+- **FIL-2**: Tech Lead approval (utilities, configs)
+- **FIL-3**: Tech Lead + Product approval (APIs, migrations)
+
+### Testing Framework
+
+- **Framework**: {{TEST_FRAMEWORK}}
+- **Coverage Requirements**: 80% minimum
+- **Test Organization**:
+  - `tests/unit/` - Isolated component tests
+  - `tests/integration/` - Component interaction
+  - `tests/e2e/` - Full user journeys
+
+### Development Workflow
+
+1. Create feature branch from `develop`
+2. Follow TDD cycle strictly
+3. Run pre-commit checks before pushing
+4. Create PR with diff coverage ≥80%
+5. Merge to `develop` after review
+
+**GitFlow branches:**
+- `main` - Production releases only
+- `develop` - Integration branch
+- `feature/*` - New features
+- `hotfix/*` - Emergency fixes
+
+### Agent Operations
+
+**Available Agents:**
+- AUDITOR - Code quality assessment
+- EXECUTOR - Fix implementation
+- GUARDIAN - CI/CD protection
+- SCHOLAR - Learning and optimization
+- STRATEGIST - Workflow orchestration
+- [15 additional specialized agents]
+
+**Agent Invocation:**
+```bash
+# Via CLI
+node .claude/cli.js assess --scope full
+node .claude/cli.js fix CLEAN-123
+
+# Via Make
+make assess
+make fix TASK=CLEAN-123
+```
+
+### MCP Tools Available
+- `sequential-thinking` - Complex reasoning
+- `context7` - Code understanding
+- `linear-server` - Task management
+- `playwright` - E2E testing
+- `kubernetes` - Deployment
+
+### Performance SLAs
+- Code assessment: ≤12min for 150k LOC
+- Fix implementation: ≤15min p50
+- Pipeline recovery: ≤10min p95
+
+### Self-Contained System
+
+The `.claude/` directory is completely self-contained and portable:
+- Drop into any project (new or existing)
+- Run `make setup` to initialize
+- All dependencies and scripts included
+- Works across JavaScript, TypeScript, and Python projects
+
+### Important Notes
+
+1. **Always follow TDD cycle** - Write test first, then minimal code
+2. **Use the CLI commands** - Consistent interface across all projects
+3. **Check agent status** - `make status` shows system health
+4. **Validate before changes** - `make validate` ensures proper setup
+5. **All agent PRs require human review** - No autonomous commits
+
+For detailed documentation, see `.claude/docs/` directory.

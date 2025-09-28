@@ -1,0 +1,121 @@
+{
+  "realTests": {
+    "sequential_thinking_1": {
+      "success": true,
+      "duration": 554,
+      "results": 1,
+      "avgResponseTime": 554,
+      "errors": 0,
+      "details": [
+        {
+          "index": 0,
+          "thought": "Test analysis 0",
+          "duration": 554,
+          "success": true,
+          "result": {
+            "thoughtNumber": 1,
+            "totalThoughts": 2,
+            "nextThoughtNeeded": true
+          }
+        }
+      ]
+    },
+    "sequential_thinking_2": {
+      "success": true,
+      "duration": 730,
+      "results": 2,
+      "avgResponseTime": 365,
+      "errors": 0,
+      "details": [
+        {
+          "index": 0,
+          "thought": "Test analysis 0",
+          "duration": 730,
+          "success": true,
+          "result": {
+            "thoughtNumber": 1,
+            "totalThoughts": 2,
+            "nextThoughtNeeded": true
+          }
+        },
+        {
+          "index": 1,
+          "thought": "Test analysis 1",
+          "duration": 494,
+          "success": true,
+          "result": {
+            "thoughtNumber": 1,
+            "totalThoughts": 2,
+            "nextThoughtNeeded": true
+          }
+        }
+      ]
+    },
+    "linear_teams_1": {
+      "success": true,
+      "duration": 239,
+      "results": 1,
+      "avgResponseTime": 239,
+      "errors": 0,
+      "details": [
+        {
+          "index": 0,
+          "operation": "teams",
+          "duration": 239,
+          "success": true,
+          "result": {
+            "operation": "list_teams",
+            "count": 3
+          }
+        }
+      ]
+    },
+    "linear_teams_2": {
+      "success": true,
+      "duration": 402,
+      "results": 2,
+      "avgResponseTime": 201,
+      "errors": 0,
+      "details": [
+        {
+          "index": 0,
+          "operation": "teams",
+          "duration": 362,
+          "success": true,
+          "result": {
+            "operation": "list_teams",
+            "count": 3
+          }
+        },
+        {
+          "index": 1,
+          "operation": "teams",
+          "duration": 401,
+          "success": true,
+          "result": {
+            "operation": "list_teams",
+            "count": 3
+          }
+        }
+      ]
+    }
+  },
+  "timestamp": "2025-09-28T04:53:52.389Z",
+  "findings": {
+    "mcpConcurrencyLimits": {
+      "sequential_thinking": 2,
+      "linear": 2
+    },
+    "realWorldConstraints": [
+      "MCP server response times vary (200-800ms typical)",
+      "Error handling needed for occasional MCP timeouts"
+    ],
+    "practicalRecommendations": [
+      "MCP servers can handle at least 2 concurrent operations",
+      "Start with 2-3 concurrent agents as a safe baseline"
+    ],
+    "implementationConsiderations": [
+      "Implement queue management for higher concurrency"
+    ]
+  }
+}
