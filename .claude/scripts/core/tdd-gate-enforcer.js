@@ -80,11 +80,11 @@ class TDDGateEnforcer {
    * Validate complete TDD cycle for a PR/commit
    */
   async validateTDDCycle(options = {}) {
-    const { branch = 'develop', validateMutation = true } = options;
+    const { branch = null, validateMutation = true } = options;
     const spinner = ora('Validating TDD cycle').start();
 
     try {
-      // 1. Get changed files
+      // 1. Get changed files (auto-detect branch if not provided)
       const changedFiles = await this.getChangedFiles(branch);
       if (changedFiles.length === 0) {
         spinner.succeed('No changes to validate');
@@ -348,11 +348,67 @@ class TDDGateEnforcer {
   }
 
   /**
-   * Get changed files from git diff
+   * Detect the default/main branch of the repository
+   */
+  async detectDefaultBranch() {
+    try {
+      // Try to get the default branch from origin
+      try {
+        const { stdout } = await execAsync('git symbolic-ref refs/remotes/origin/HEAD');
+        const branch = stdout.trim().replace('refs/remotes/origin/', '');
+        if (branch) return branch;
+      } catch (error) {
+        // Fall through to other methods
+      }
+
+      // Check if common branches exist
+      const commonBranches = ['main', 'master', 'develop'];
+      for (const branch of commonBranches) {
+        try {
+          await execAsync(`git rev-parse --verify ${branch}`);
+          return branch;
+        } catch (error) {
+          // Branch doesn't exist, try next
+        }
+      }
+
+      // If no common branches found, use current branch
+      const { stdout } = await execAsync('git rev-parse --abbrev-ref HEAD');
+      return stdout.trim();
+    } catch (error) {
+      // Default fallback
+      return 'main';
+    }
+  }
+
+  /**
+   * Get changed files from git diff with robust branch detection
    */
   async getChangedFiles(baseBranch) {
     try {
-      const { stdout } = await execAsync(`git diff --name-only ${baseBranch}...HEAD`);
+      // First try the provided baseBranch
+      if (baseBranch) {
+        try {
+          const { stdout } = await execAsync(`git diff --name-only ${baseBranch}...HEAD`);
+          return stdout.trim().split('\n').filter(line => line.length > 0);
+        } catch (error) {
+          // Fall through to auto-detection
+        }
+      }
+
+      // Auto-detect the default branch
+      const defaultBranch = await this.detectDefaultBranch();
+      const currentBranch = await execAsync('git rev-parse --abbrev-ref HEAD');
+      const current = currentBranch.stdout.trim();
+
+      // If we're on the default branch, compare with previous commit
+      if (current === defaultBranch) {
+        const { stdout } = await execAsync('git diff --name-only HEAD^ HEAD');
+        return stdout.trim().split('\n').filter(line => line.length > 0);
+      }
+
+      // Otherwise compare with default branch
+      const { stdout } = await execAsync(`git diff --name-only ${defaultBranch}...HEAD`);
       return stdout.trim().split('\n').filter(line => line.length > 0);
     } catch (error) {
       throw new Error(`Failed to get changed files: ${error.message}`);
@@ -597,7 +653,7 @@ class TDDGateEnforcer {
 
     try {
       // Get changed files
-      const changedFiles = await this.getChangedFiles('origin/develop');
+      const changedFiles = await this.getChangedFiles();
       const sourceFiles = changedFiles.filter(file =>
         file.match(/\.(js|ts)$/) &&
         !file.includes('test') &&
