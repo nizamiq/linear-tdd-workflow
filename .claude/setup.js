@@ -13,8 +13,25 @@
 const fs = require('fs').promises;
 const path = require('path');
 const { execSync } = require('child_process');
-const chalk = require('chalk');
 const readline = require('readline');
+
+// Native console styling to replace chalk
+const colors = {
+  gray: (text) => `\x1b[90m${text}\x1b[0m`,
+  red: (text) => `\x1b[31m${text}\x1b[0m`,
+  green: (text) => `\x1b[32m${text}\x1b[0m`,
+  yellow: (text) => `\x1b[33m${text}\x1b[0m`,
+  blue: (text) => `\x1b[34m${text}\x1b[0m`,
+  cyan: (text) => `\x1b[36m${text}\x1b[0m`,
+  bold: Object.assign(
+    (text) => `\x1b[1m${text}\x1b[0m`,
+    {
+      cyan: (text) => `\x1b[1m\x1b[36m${text}\x1b[0m`,
+      green: (text) => `\x1b[1m\x1b[32m${text}\x1b[0m`,
+      yellow: (text) => `\x1b[1m\x1b[33m${text}\x1b[0m`
+    }
+  )
+};
 
 class ClaudeSetup {
   constructor() {
@@ -42,14 +59,14 @@ class ClaudeSetup {
     const used = process.memoryUsage();
     const mb = (bytes) => Math.round(bytes / 1024 / 1024 * 100) / 100;
 
-    console.log(chalk.gray(`[MEMORY] ${label}: RSS ${mb(used.rss)}MB, Heap ${mb(used.heapUsed)}/${mb(used.heapTotal)}MB, External ${mb(used.external)}MB`));
+    console.log(colors.gray(`[MEMORY] ${label}: RSS ${mb(used.rss)}MB, Heap ${mb(used.heapUsed)}/${mb(used.heapTotal)}MB, External ${mb(used.external)}MB`));
   }
 
   /**
    * Main setup orchestration
    */
   async setup() {
-    console.log(chalk.bold.cyan('\n🚀 Claude Agentic Workflow Setup\n'));
+    console.log(colors.bold.cyan('\n🚀 Claude Agentic Workflow Setup\n'));
 
     try {
       this.logMemoryUsage('Setup started');
@@ -80,11 +97,11 @@ class ClaudeSetup {
       // Step 7: Final validation
       await this.validateSetup();
 
-      console.log(chalk.bold.green('\n✅ Setup completed successfully!\n'));
+      console.log(colors.bold.green('\n✅ Setup completed successfully!\n'));
       console.log(this.getUsageInstructions());
 
     } catch (error) {
-      console.error(chalk.red(`\n❌ Setup failed: ${error.message}\n`));
+      console.error(colors.red(`\n❌ Setup failed: ${error.message}\n`));
       process.exit(1);
     }
   }
@@ -93,7 +110,7 @@ class ClaudeSetup {
    * Detect project characteristics
    */
   async detectProject() {
-    console.log(chalk.yellow('🔍 Detecting project characteristics...\n'));
+    console.log(colors.yellow('🔍 Detecting project characteristics...\n'));
 
     // Check if project is new or existing
     const hasPackageJson = await this.fileExists('package.json');
@@ -104,10 +121,10 @@ class ClaudeSetup {
 
     if (!hasPackageJson && !hasPyprojectToml && !hasRequirementsTxt && !hasSetupPy && !hasSourceFiles) {
       this.projectInfo.type = 'new';
-      console.log(chalk.green('📁 New project detected'));
+      console.log(colors.green('📁 New project detected'));
     } else {
       this.projectInfo.type = 'existing';
-      console.log(chalk.blue('📂 Existing project detected'));
+      console.log(colors.blue('📂 Existing project detected'));
     }
 
     // Detect languages
@@ -153,7 +170,7 @@ class ClaudeSetup {
       this.projectInfo.languages = await this.askForLanguages();
     }
 
-    console.log(chalk.green(`📝 Languages: ${this.projectInfo.languages.join(', ')}`));
+    console.log(colors.green(`📝 Languages: ${this.projectInfo.languages.join(', ')}`));
   }
 
   /**
@@ -172,7 +189,7 @@ class ClaudeSetup {
       this.projectInfo.packageManager = 'pip';
     }
 
-    console.log(chalk.green(`📦 Package Manager: ${this.projectInfo.packageManager}`));
+    console.log(colors.green(`📦 Package Manager: ${this.projectInfo.packageManager}`));
   }
 
   /**
@@ -205,7 +222,7 @@ class ClaudeSetup {
     this.projectInfo.testFrameworks = frameworks;
     this.projectInfo.hasTests = frameworks.length > 0 || await this.hasTestFiles();
 
-    console.log(chalk.green(`🧪 Test Frameworks: ${frameworks.join(', ') || 'none detected'}`));
+    console.log(colors.green(`🧪 Test Frameworks: ${frameworks.join(', ') || 'none detected'}`));
   }
 
   /**
@@ -228,7 +245,7 @@ class ClaudeSetup {
     }
 
     this.projectInfo.hasCI = ciSystems.length > 0;
-    console.log(chalk.green(`🔄 CI/CD: ${ciSystems.join(', ') || 'none detected'}`));
+    console.log(colors.green(`🔄 CI/CD: ${ciSystems.join(', ') || 'none detected'}`));
   }
 
   /**
@@ -259,24 +276,24 @@ class ClaudeSetup {
       }
     }
 
-    console.log(chalk.green(`🏗️ Framework: ${this.projectInfo.framework}`));
+    console.log(colors.green(`🏗️ Framework: ${this.projectInfo.framework}`));
   }
 
   /**
    * Confirm detection results with user
    */
   async confirmDetection() {
-    console.log(chalk.bold.yellow('\n📋 Detected Configuration:\n'));
-    console.log(`Project Type: ${chalk.cyan(this.projectInfo.type)}`);
-    console.log(`Languages: ${chalk.cyan(this.projectInfo.languages.join(', '))}`);
-    console.log(`Package Manager: ${chalk.cyan(this.projectInfo.packageManager)}`);
-    console.log(`Test Frameworks: ${chalk.cyan(this.projectInfo.testFrameworks.join(', ') || 'none')}`);
-    console.log(`Framework: ${chalk.cyan(this.projectInfo.framework)}`);
-    console.log(`Has CI/CD: ${chalk.cyan(this.projectInfo.hasCI ? 'Yes' : 'No')}`);
+    console.log(colors.bold.yellow('\n📋 Detected Configuration:\n'));
+    console.log(`Project Type: ${colors.cyan(this.projectInfo.type)}`);
+    console.log(`Languages: ${colors.cyan(this.projectInfo.languages.join(', '))}`);
+    console.log(`Package Manager: ${colors.cyan(this.projectInfo.packageManager)}`);
+    console.log(`Test Frameworks: ${colors.cyan(this.projectInfo.testFrameworks.join(', ') || 'none')}`);
+    console.log(`Framework: ${colors.cyan(this.projectInfo.framework)}`);
+    console.log(`Has CI/CD: ${colors.cyan(this.projectInfo.hasCI ? 'Yes' : 'No')}`);
 
     const proceed = await this.askYesNo('\nProceed with this configuration?', true);
     if (!proceed) {
-      console.log(chalk.yellow('Setup cancelled by user.'));
+      console.log(colors.yellow('Setup cancelled by user.'));
       process.exit(0);
     }
   }
@@ -285,7 +302,7 @@ class ClaudeSetup {
    * Install required dependencies
    */
   async installDependencies() {
-    console.log(chalk.yellow('\n📦 Installing dependencies...\n'));
+    console.log(colors.yellow('\n📦 Installing dependencies...\n'));
 
     const depsFile = path.join(this.claudeDir, 'dependencies.json');
 
@@ -303,7 +320,7 @@ class ClaudeSetup {
       }
 
     } catch (error) {
-      console.warn(chalk.yellow(`Warning: Could not load dependencies config: ${error.message}`));
+      console.warn(colors.yellow(`Warning: Could not load dependencies config: ${error.message}`));
     }
   }
 
@@ -335,13 +352,13 @@ class ClaudeSetup {
     }
 
     if (toInstall.length > 0) {
-      console.log(chalk.blue(`Installing JS/TS dependencies: ${toInstall.join(', ')}`));
+      console.log(colors.blue(`Installing JS/TS dependencies: ${toInstall.join(', ')}`));
 
       try {
         const installCmd = this.getInstallCommand(packageManager, toInstall, true);
         execSync(installCmd, { stdio: 'inherit' });
       } catch (error) {
-        console.warn(chalk.yellow(`Warning: Failed to install some dependencies: ${error.message}`));
+        console.warn(colors.yellow(`Warning: Failed to install some dependencies: ${error.message}`));
       }
     }
   }
@@ -364,7 +381,7 @@ class ClaudeSetup {
     }
 
     if (toInstall.length > 0) {
-      console.log(chalk.blue(`Installing Python dependencies: ${toInstall.join(', ')}`));
+      console.log(colors.blue(`Installing Python dependencies: ${toInstall.join(', ')}`));
 
       try {
         if (this.projectInfo.packageManager === 'poetry') {
@@ -373,7 +390,7 @@ class ClaudeSetup {
           execSync(`pip install ${toInstall.join(' ')}`, { stdio: 'inherit' });
         }
       } catch (error) {
-        console.warn(chalk.yellow(`Warning: Failed to install some Python dependencies: ${error.message}`));
+        console.warn(colors.yellow(`Warning: Failed to install some Python dependencies: ${error.message}`));
       }
     }
   }
@@ -382,7 +399,7 @@ class ClaudeSetup {
    * Initialize new project
    */
   async initializeNewProject() {
-    console.log(chalk.yellow('\n🆕 Initializing new project...\n'));
+    console.log(colors.yellow('\n🆕 Initializing new project...\n'));
 
     // Create package.json for JS/TS projects
     if (this.projectInfo.languages.includes('javascript') || this.projectInfo.languages.includes('typescript')) {
@@ -405,7 +422,7 @@ class ClaudeSetup {
    * Enhance existing project
    */
   async enhanceExistingProject() {
-    console.log(chalk.yellow('\n🔧 Enhancing existing project...\n'));
+    console.log(colors.yellow('\n🔧 Enhancing existing project...\n'));
 
     // Backup existing configurations
     await this.backupConfigurations();
@@ -431,7 +448,7 @@ class ClaudeSetup {
         await this.createGitHubActions();
       }
     } else {
-      console.log(chalk.blue('Existing CI/CD detected, skipping setup.'));
+      console.log(colors.blue('Existing CI/CD detected, skipping setup.'));
     }
   }
 
@@ -439,7 +456,7 @@ class ClaudeSetup {
    * Enhance CLAUDE.md with workflow system directive
    */
   async enhanceClaudeMd() {
-    console.log(chalk.yellow('\n📝 Updating CLAUDE.md with workflow system...\n'));
+    console.log(colors.yellow('\n📝 Updating CLAUDE.md with workflow system...\n'));
 
     const claudeMdPath = path.join(this.projectRoot, 'CLAUDE.md');
     const templatePath = path.join(this.claudeDir, 'templates', 'claude-md-append.template');
@@ -470,7 +487,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
       // Check if workflow directive already exists
       if (existingContent.includes('## Claude Agentic Workflow System')) {
-        console.log(chalk.blue('CLAUDE.md already contains workflow system directive, skipping.'));
+        console.log(colors.blue('CLAUDE.md already contains workflow system directive, skipping.'));
         return;
       }
 
@@ -480,13 +497,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
       await fs.writeFile(claudeMdPath, updatedContent, 'utf8');
 
       if (fileExists) {
-        console.log(chalk.green('✅ Enhanced existing CLAUDE.md with workflow system directive'));
+        console.log(colors.green('✅ Enhanced existing CLAUDE.md with workflow system directive'));
       } else {
-        console.log(chalk.green('✅ Created new CLAUDE.md with workflow system directive'));
+        console.log(colors.green('✅ Created new CLAUDE.md with workflow system directive'));
       }
 
     } catch (error) {
-      console.error(chalk.red(`Failed to update CLAUDE.md: ${error.message}`));
+      console.error(colors.red(`Failed to update CLAUDE.md: ${error.message}`));
     }
   }
 
@@ -494,14 +511,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
    * Validate setup
    */
   async validateSetup() {
-    console.log(chalk.yellow('\n✅ Validating setup...\n'));
+    console.log(colors.yellow('\n✅ Validating setup...\n'));
 
     try {
       // Run agent status check
       const statusScript = path.join(this.claudeDir, 'scripts', 'monitoring', 'agent-status.js');
       execSync(`node ${statusScript} quick`, { stdio: 'inherit' });
     } catch (error) {
-      console.warn(chalk.yellow('Warning: Agent status check failed'));
+      console.warn(colors.yellow('Warning: Agent status check failed'));
     }
   }
 
@@ -551,7 +568,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
     return new Promise((resolve) => {
       const defaultStr = defaultValue ? '[Y/n]' : '[y/N]';
-      rl.question(chalk.cyan(`${question} ${defaultStr}: `), (answer) => {
+      rl.question(colors.cyan(`${question} ${defaultStr}: `), (answer) => {
         rl.close();
         const normalized = answer.toLowerCase().trim();
         if (normalized === '') {
@@ -583,13 +600,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   async createPackageJson() {
     const templatePath = path.join(this.claudeDir, 'templates', 'package.json.template');
     // Implementation would read template and customize
-    console.log(chalk.green('📄 Created package.json'));
+    console.log(colors.green('📄 Created package.json'));
   }
 
   async createPyprojectToml() {
     const templatePath = path.join(this.claudeDir, 'templates', 'pyproject.toml.template');
     // Implementation would read template and customize
-    console.log(chalk.green('📄 Created pyproject.toml'));
+    console.log(colors.green('📄 Created pyproject.toml'));
   }
 
   async createDirectoryStructure() {
@@ -597,28 +614,28 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
     for (const dir of dirs) {
       await fs.mkdir(path.join(this.projectRoot, dir), { recursive: true });
     }
-    console.log(chalk.green('📁 Created directory structure'));
+    console.log(colors.green('📁 Created directory structure'));
   }
 
   async createInitialFiles() {
     // Create basic files
-    console.log(chalk.green('📄 Created initial files'));
+    console.log(colors.green('📄 Created initial files'));
   }
 
   async backupConfigurations() {
     const backupDir = path.join(this.projectRoot, '.claude-backup');
     await fs.mkdir(backupDir, { recursive: true });
-    console.log(chalk.green('💾 Backed up existing configurations'));
+    console.log(colors.green('💾 Backed up existing configurations'));
   }
 
   async enhancePackageJson() {
-    console.log(chalk.green('📦 Enhanced package.json with Claude scripts'));
+    console.log(colors.green('📦 Enhanced package.json with Claude scripts'));
   }
 
   async createGitHubActions() {
     const actionsDir = path.join(this.projectRoot, '.github', 'workflows');
     await fs.mkdir(actionsDir, { recursive: true });
-    console.log(chalk.green('🔄 Created GitHub Actions workflow'));
+    console.log(colors.green('🔄 Created GitHub Actions workflow'));
   }
 
   /**
@@ -654,7 +671,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   }
 
   getUsageInstructions() {
-    return chalk.bold(`
+    return colors.bold.cyan(`
 🎉 Claude Agentic Workflow is ready!
 
 Quick Start:
