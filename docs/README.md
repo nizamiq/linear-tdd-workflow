@@ -57,54 +57,36 @@ The **Linear TDD Workflow System** is an advanced multi-agent AI development fra
 
 ## 🚀 Quick Start Guide
 
+**Ready to begin?** Choose your onboarding path:
+
+### For New Projects (5 minutes)
+```bash
+mkdir my-project && cd my-project
+git clone https://github.com/your-org/claude-workflow .claude
+node .claude/setup.js
+```
+**→ [Complete New Project Guide](ONBOARDING-NEW-PROJECT.md)**
+
+### For Existing Projects (10 minutes)
+```bash
+cd your-existing-project
+git clone https://github.com/your-org/claude-workflow .claude
+node .claude/setup.js
+make validate
+```
+**→ [Complete Existing Project Guide](ONBOARDING-EXISTING-PROJECT.md)**
+
 ### Prerequisites
 
 ```bash
 # Required Software
-- Node.js 18.0.0+ or Python 3.10+
-- Git 2.30.0+ with GitFlow extension
-- Docker 20.10.0+ (optional for containerized deployment)
-- npm 9.0.0+ or yarn 1.22.0+
+- Node.js 18.0.0+
+- Git 2.30.0+
+- Python 3.8+ (for Python projects)
 
-# Required Accounts
-- Linear.app account with API access
-- GitHub/GitLab account with repository access
-- CI/CD platform access (GitHub Actions/GitLab CI/Jenkins)
-```
-
-### Installation (5 minutes)
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/your-org/linear-tdd-workflow.git
-cd linear-tdd-workflow
-
-# 2. Initialize GitFlow
-git flow init -d
-
-# 3. Install dependencies
-npm install
-# or for Python projects
-pip install -r requirements.txt
-
-# 4. Set up environment
-cp .env.example .env
-# Edit .env with your credentials (see Configuration section)
-
-# 5. Initialize the system
-npm run setup:init
-
-# 6. Configure Linear.app integration
-npm run setup:linear
-
-# 7. Set up MCP tools
-npm run setup:mcp-tools
-
-# 8. Run initial assessment
-npm run assess:initial
-
-# 9. Verify installation
-npm run health:check
+# Optional
+- Linear.app account (for task management)
+- Docker (for containerized projects)
 ```
 
 ### First Run Checklist
@@ -121,14 +103,23 @@ npm run health:check
 
 ## 📚 Documentation Index
 
+### 🚀 Onboarding Guides (START HERE)
+
+| Document | Purpose | Time | Audience |
+|----------|---------|------|----------|
+| [**Onboarding Overview**](ONBOARDING-OVERVIEW.md) | Choose your path | 5 min | Everyone |
+| [**New Project Guide**](ONBOARDING-NEW-PROJECT.md) | Complete new setup | 10-20 min | New projects |
+| [**Existing Project Guide**](ONBOARDING-EXISTING-PROJECT.md) | Non-disruptive integration | 20-30 min | Existing codebases |
+| [**Quick Start**](ONBOARDING-QUICKSTART.md) | Immediate evaluation | 5 min | Demos & trials |
+
 ### 🏗️ Architecture & Design
 
 | Document | Description | Key Topics |
 |----------|-------------|------------|
-| [System Architecture](./architecture/system-overview.md) | Complete system design and components | Multi-agent architecture, MCP integration, Data flow |
-| [Agent Specifications](./architecture/agent-specifications.md) | Detailed agent roles and capabilities | AUDITOR, EXECUTOR, GUARDIAN, STRATEGIST, SCHOLAR |
-| [MCP Tools Integration](./architecture/mcp-integration.md) | Model Context Protocol tools setup | Sequential thinking, Kubernetes, Playwright, Linear API |
-| [Data Model](./architecture/data-model.md) | System data structures and schemas | Entities, relationships, storage patterns |
+| [System Architecture](ARCHITECTURE-AGENTS.md) | Complete system design and components | Multi-agent architecture, MCP integration, Data flow |
+| [Agent Specifications](ARCHITECTURE-AGENTS.md) | Detailed agent roles and capabilities | AUDITOR, EXECUTOR, GUARDIAN, STRATEGIST, SCHOLAR |
+| [MCP Tools Integration](INTEGRATION-MCP-TOOLS.md) | Model Context Protocol tools setup | Sequential thinking, Kubernetes, Playwright, Linear API |
+| [Product Requirements](PRD.md) | Complete system specification | Requirements, metrics, roadmap |
 
 ### 🔧 Development Protocols
 

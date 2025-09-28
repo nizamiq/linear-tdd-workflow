@@ -51,3 +51,18 @@ temp/
 # Cache
 .eslintcache
 .prettierignore
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Claude workflow temporary files
+.claude/reports/
+.claude/logs/
+.claude-backup/
