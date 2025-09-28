@@ -194,6 +194,48 @@ class ClaudeCLI {
       .option('--task-id <id>', 'Linear task ID for fixes')
       .option('--auto-fix', 'Enable automatic fixes where possible')
       .option('--dry-run', 'Show what would be done without executing')
+      // STRATEGIST-specific options
+      .option('--task-type <type>', 'Workflow task type (assessment, fix, recovery)')
+      .option('--priority <priority>', 'Task priority (low, normal, high, critical)')
+      .option('--workflow <name>', 'Workflow name for coordination')
+      .option('--agents <list>', 'Comma-separated list of agents')
+      .option('--mode <mode>', 'Execution mode (sequential, parallel)')
+      .option('--action <action>', 'Backlog action (prioritize, assign, review)')
+      .option('--team <team>', 'Linear team ID')
+      .option('--type <type>', 'Conflict or escalation type')
+      .option('--severity <severity>', 'Issue severity (low, medium, high, critical)')
+      .option('--budget <amount>', 'Resource budget allocation')
+      .option('--timeframe <duration>', 'Time allocation (1d, 1w, etc.)')
+      // DEPLOYER-specific options
+      .option('--env <environment>', 'Target environment (dev, staging, prod)')
+      .option('--app-version <tag>', 'Version or tag to deploy')
+      .option('--strategy <strategy>', 'Deployment strategy (rolling, bluegreen, canary)')
+      .option('--target <version>', 'Target version for rollback')
+      .option('--immediate', 'Execute immediate rollback')
+      .option('--release-action <action>', 'Release action (create, promote, tag)')
+      .option('--from-env <env>', 'Source environment for promotion')
+      .option('--to-env <env>', 'Target environment for promotion')
+      // OPTIMIZER-specific options
+      .option('--profile-type <type>', 'Profiling type (cpu, memory, io)')
+      .option('--profile-duration <seconds>', 'Profiling duration in seconds')
+      .option('--complexity <target>', 'Target algorithm complexity (O(n), O(log n))')
+      .option('--optimization-scope <scope>', 'Optimization scope (function, module)')
+      .option('--memory-target <percentage>', 'Memory reduction target percentage')
+      .option('--analyze-leaks', 'Enable memory leak analysis')
+      // VALIDATOR-specific options
+      .option('--coverage', 'Run tests with coverage reporting')
+      .option('--suite <type>', 'Test suite type (unit, integration, e2e, all)')
+      .option('--threshold <percentage>', 'Coverage or mutation threshold percentage')
+      .option('--parallel', 'Run tests in parallel')
+      .option('--verbose', 'Verbose test output')
+      // SCHOLAR-specific options
+      .option('--period <duration>', 'Analysis time period (7d, 30d, etc.)')
+      .option('--source <type>', 'Source type for pattern extraction (commits, fixes, refactors)')
+      .option('--pattern-id <id>', 'Pattern ID for effectiveness analysis')
+      .option('--metrics <type>', 'Metrics type (reuse, quality, impact)')
+      .option('--agent <name>', 'Target agent for training')
+      .option('--patterns <list>', 'Pattern list for training')
+      .option('--training-mode <mode>', 'Training mode (supervised, reinforcement)')
       .allowUnknownOption()
       .action(this.handleAgentInvoke.bind(this));
   }
@@ -784,6 +826,37 @@ class ClaudeCLI {
       if (options.taskId) cmd += ` --task-id ${options.taskId}`;
       if (options.autoFix) cmd += ` --auto-fix`;
       if (options.dryRun) cmd += ` --dry-run`;
+
+      // STRATEGIST-specific options
+      if (options.taskType) cmd += ` --task-type ${options.taskType}`;
+      if (options.priority) cmd += ` --priority ${options.priority}`;
+      if (options.workflow) cmd += ` --workflow ${options.workflow}`;
+      if (options.agents) cmd += ` --agents ${options.agents}`;
+      if (options.mode) cmd += ` --mode ${options.mode}`;
+      if (options.action) cmd += ` --action ${options.action}`;
+      if (options.team) cmd += ` --team ${options.team}`;
+      if (options.type) cmd += ` --type ${options.type}`;
+      if (options.severity) cmd += ` --severity ${options.severity}`;
+      if (options.budget) cmd += ` --budget ${options.budget}`;
+      if (options.timeframe) cmd += ` --timeframe ${options.timeframe}`;
+
+      // DEPLOYER-specific options
+      if (options.env) cmd += ` --env ${options.env}`;
+      if (options.appVersion) cmd += ` --app-version ${options.appVersion}`;
+      if (options.strategy) cmd += ` --strategy ${options.strategy}`;
+      if (options.target) cmd += ` --target ${options.target}`;
+      if (options.immediate) cmd += ` --immediate`;
+      if (options.releaseAction) cmd += ` --release-action ${options.releaseAction}`;
+      if (options.fromEnv) cmd += ` --from-env ${options.fromEnv}`;
+      if (options.toEnv) cmd += ` --to-env ${options.toEnv}`;
+
+      // OPTIMIZER-specific options
+      if (options.profileType) cmd += ` --profile-type ${options.profileType}`;
+      if (options.profileDuration) cmd += ` --profile-duration ${options.profileDuration}`;
+      if (options.complexity) cmd += ` --complexity ${options.complexity}`;
+      if (options.optimizationScope) cmd += ` --optimization-scope ${options.optimizationScope}`;
+      if (options.memoryTarget) cmd += ` --memory-target ${options.memoryTarget}`;
+      if (options.analyzeLeaks) cmd += ` --analyze-leaks`;
 
       console.log(colors.gray(`🔄 Executing: ${cmd}\n`));
 

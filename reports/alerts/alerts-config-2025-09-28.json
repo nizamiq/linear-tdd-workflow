@@ -1,0 +1,53 @@
+{
+  "metric": "cpu_usage",
+  "threshold": 85,
+  "severity": "high",
+  "enabled": true,
+  "rules": [
+    {
+      "id": "alert_cpu_usage_1759062479746",
+      "name": "CPU_USAGE Threshold Alert",
+      "metric": "cpu_usage",
+      "condition": ">= 85",
+      "threshold": 85,
+      "severity": "high",
+      "enabled": true,
+      "responseTime": "15m",
+      "escalation": true,
+      "channels": [
+        "email",
+        "slack",
+        "pagerduty"
+      ],
+      "createdAt": "2025-09-28T12:27:59.747Z",
+      "lastTriggered": null,
+      "triggerCount": 0
+    }
+  ],
+  "notifications": [
+    {
+      "channel": "email",
+      "template": {
+        "subject": "🚨 Alert: CPU_USAGE Threshold Alert",
+        "body": "Alert triggered for cpu_usage.\nThreshold: >= 85\nSeverity: high\nResponse time: 15m"
+      },
+      "enabled": true
+    },
+    {
+      "channel": "slack",
+      "template": {
+        "text": "🚨 *CPU_USAGE Threshold Alert*\ncpu_usage >= 85 (high)"
+      },
+      "enabled": true
+    },
+    {
+      "channel": "pagerduty",
+      "template": {
+        "summary": "CPU_USAGE Threshold Alert - high",
+        "severity": "high"
+      },
+      "enabled": true
+    }
+  ],
+  "success": false
+}

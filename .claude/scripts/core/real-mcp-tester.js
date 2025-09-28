@@ -7,7 +7,18 @@
  * rather than simulations.
  */
 
-const chalk = require('chalk');
+// Native ANSI colors to replace chalk
+const colors = {
+  red: (text) => `[31m${text}[0m`,
+  green: (text) => `[32m${text}[0m`,
+  yellow: (text) => `[33m${text}[0m`,
+  blue: (text) => `[34m${text}[0m`,
+  magenta: (text) => `[35m${text}[0m`,
+  cyan: (text) => `[36m${text}[0m`,
+  white: (text) => `[37m${text}[0m`,
+  gray: (text) => `[90m${text}[0m`,
+  bold: (text) => `[1m${text}[0m`
+};
 const fs = require('fs').promises;
 const path = require('path');
 
@@ -24,7 +35,7 @@ class RealMcpTester {
    * Run real MCP server tests
    */
   async runRealTests() {
-    console.log(chalk.bold.cyan('\n🧪 Real MCP Server Testing\n'));
+    console.log(colors.bold.cyan('\n🧪 Real MCP Server Testing\n'));
 
     try {
       // Test 1: Sequential Thinking concurrency
@@ -36,10 +47,10 @@ class RealMcpTester {
       // Generate findings
       await this.generateFindings();
 
-      console.log(chalk.bold.green('\n✅ Real MCP testing complete!\n'));
+      console.log(colors.bold.green('\n✅ Real MCP testing complete!\n'));
 
     } catch (error) {
-      console.error(chalk.red(`Real MCP testing failed: ${error.message}`));
+      console.error(colors.red(`Real MCP testing failed: ${error.message}`));
       throw error;
     }
   }
@@ -48,13 +59,13 @@ class RealMcpTester {
    * Test real sequential thinking operations concurrently
    */
   async testSequentialThinkingReal() {
-    console.log(chalk.yellow('🧠 Testing real Sequential Thinking concurrency...\n'));
+    console.log(colors.yellow('🧠 Testing real Sequential Thinking concurrency...\n'));
 
     // Test simple concurrent thinking operations
     const concurrencyLevels = [1, 2];
 
     for (const concurrency of concurrencyLevels) {
-      console.log(chalk.blue(`  Testing ${concurrency} concurrent thinking operations...`));
+      console.log(colors.blue(`  Testing ${concurrency} concurrent thinking operations...`));
 
       try {
         const startTime = Date.now();
@@ -77,7 +88,7 @@ class RealMcpTester {
         };
 
         const successCount = results.filter(r => !r.error).length;
-        console.log(chalk.green(`    ✅ ${successCount}/${concurrency} successful - ${duration}ms total`));
+        console.log(colors.green(`    ✅ ${successCount}/${concurrency} successful - ${duration}ms total`));
 
       } catch (error) {
         this.results.realTests[`sequential_thinking_${concurrency}`] = {
@@ -85,7 +96,7 @@ class RealMcpTester {
           error: error.message
         };
 
-        console.log(chalk.red(`    ❌ ${concurrency} concurrent failed - ${error.message}`));
+        console.log(colors.red(`    ❌ ${concurrency} concurrent failed - ${error.message}`));
         break;
       }
 
@@ -97,14 +108,14 @@ class RealMcpTester {
    * Test real Linear server operations concurrently
    */
   async testLinearServerReal() {
-    console.log(chalk.yellow('\n📋 Testing real Linear server concurrency...\n'));
+    console.log(colors.yellow('\n📋 Testing real Linear server concurrency...\n'));
 
     try {
       // Test simple list operations
       const concurrencyLevels = [1, 2];
 
       for (const concurrency of concurrencyLevels) {
-        console.log(chalk.blue(`  Testing ${concurrency} concurrent Linear operations...`));
+        console.log(colors.blue(`  Testing ${concurrency} concurrent Linear operations...`));
 
         try {
           const startTime = Date.now();
@@ -127,7 +138,7 @@ class RealMcpTester {
           };
 
           const successCount = results.filter(r => !r.error).length;
-          console.log(chalk.green(`    ✅ ${successCount}/${concurrency} successful - ${duration}ms total`));
+          console.log(colors.green(`    ✅ ${successCount}/${concurrency} successful - ${duration}ms total`));
 
         } catch (error) {
           this.results.realTests[`linear_teams_${concurrency}`] = {
@@ -135,7 +146,7 @@ class RealMcpTester {
             error: error.message
           };
 
-          console.log(chalk.red(`    ❌ ${concurrency} concurrent failed - ${error.message}`));
+          console.log(colors.red(`    ❌ ${concurrency} concurrent failed - ${error.message}`));
           break;
         }
 
@@ -143,7 +154,7 @@ class RealMcpTester {
       }
 
     } catch (error) {
-      console.log(chalk.gray('  Linear server not available or not configured'));
+      console.log(colors.gray('  Linear server not available or not configured'));
       this.results.realTests.linear_note = 'Linear server not available for testing';
     }
   }
@@ -233,8 +244,8 @@ class RealMcpTester {
     const summaryPath = path.join(reportDir, `${this.testId}-real-findings.md`);
     await fs.writeFile(summaryPath, this.generatePracticalSummary());
 
-    console.log(chalk.blue(`\nReal test results: ${reportPath}`));
-    console.log(chalk.blue(`Practical summary: ${summaryPath}`));
+    console.log(colors.blue(`\nReal test results: ${reportPath}`));
+    console.log(colors.blue(`Practical summary: ${summaryPath}`));
   }
 
   /**
@@ -361,7 +372,7 @@ Based on these real-world tests:
 if (require.main === module) {
   const tester = new RealMcpTester();
   tester.runRealTests().catch(error => {
-    console.error(chalk.red(`\nReal MCP testing failed: ${error.message}`));
+    console.error(colors.red(`\nReal MCP testing failed: ${error.message}`));
     process.exit(1);
   });
 }

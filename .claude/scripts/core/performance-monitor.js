@@ -11,9 +11,21 @@
  */
 
 const EventEmitter = require('events');
-const chalk = require('chalk');
 const fs = require('fs').promises;
 const path = require('path');
+
+// Native ANSI colors to replace chalk
+const colors = {
+  red: (text) => `\x1b[31m${text}\x1b[0m`,
+  green: (text) => `\x1b[32m${text}\x1b[0m`,
+  yellow: (text) => `\x1b[33m${text}\x1b[0m`,
+  blue: (text) => `\x1b[34m${text}\x1b[0m`,
+  magenta: (text) => `\x1b[35m${text}\x1b[0m`,
+  cyan: (text) => `\x1b[36m${text}\x1b[0m`,
+  white: (text) => `\x1b[37m${text}\x1b[0m`,
+  gray: (text) => `\x1b[90m${text}\x1b[0m`,
+  bold: (text) => `\x1b[1m${text}\x1b[0m`
+};
 
 class PerformanceMonitor extends EventEmitter {
   constructor(options = {}) {
@@ -66,7 +78,6 @@ class PerformanceMonitor extends EventEmitter {
     this.sampleTimer = null;
     this.reportTimer = null;
 
-    console.log(chalk.blue('📊 Performance Monitor initialized'));
   }
 
   /**
@@ -74,7 +85,6 @@ class PerformanceMonitor extends EventEmitter {
    */
   start(orchestrator, mcpQueueManager, agentPool) {
     if (this.isMonitoring) {
-      console.log(chalk.yellow('⚠️  Performance Monitor already running'));
       return;
     }
 
@@ -95,7 +105,6 @@ class PerformanceMonitor extends EventEmitter {
       this.generateReport();
     }, this.config.reportInterval);
 
-    console.log(chalk.green('✅ Performance monitoring started'));
     this.emit('monitoring-started');
   }
 
@@ -121,14 +130,12 @@ class PerformanceMonitor extends EventEmitter {
         this.collectAgentMetrics(agentStatus, timestamp);
       }
 
-      // Check for alert conditions
       this.evaluateAlerts(timestamp);
 
       // Clean old data
       this.cleanOldData(timestamp);
 
     } catch (error) {
-      console.log(chalk.red(`❌ Error collecting performance sample: ${error.message}`));
     }
   }
 
@@ -155,7 +162,6 @@ class PerformanceMonitor extends EventEmitter {
       });
     }
 
-    // Throughput (requests per minute)
     const totalRequests = metrics.totalRequests;
     const uptimeMinutes = this.metrics.system.uptime / 60000;
     const throughput = uptimeMinutes > 0 ? totalRequests / uptimeMinutes : 0;
@@ -290,7 +296,6 @@ class PerformanceMonitor extends EventEmitter {
     // Add timestamp to alert
     alert.timestamp = timestamp;
 
-    // Check if we've already alerted for this condition recently (avoid spam)
     const recentAlerts = this.metrics.alerts.filter(a =>
       a.type === alert.type &&
       (timestamp - a.timestamp) < 300000 // 5 minutes
@@ -301,8 +306,7 @@ class PerformanceMonitor extends EventEmitter {
       this.metrics.alerts.push(alert);
 
       // Display alert
-      const color = alert.severity === 'critical' ? chalk.red : chalk.yellow;
-      console.log(color(`\n🚨 ALERT [${alert.severity.toUpperCase()}]: ${alert.message}\n`));
+      const color = alert.severity === 'critical' ? colors.red : colors.yellow;
 
       // Emit alert event
       this.emit('alert', alert);
@@ -324,11 +328,8 @@ class PerformanceMonitor extends EventEmitter {
     const now = Date.now();
     const uptime = (now - this.metrics.system.startTime) / 1000;
 
-    console.log(chalk.bold.cyan('\n📊 Performance Report'));
-    console.log(chalk.blue('═'.repeat(60)));
 
     // System overview
-    console.log(chalk.white(`Uptime:             ${(uptime / 60).toFixed(1)} minutes`));
 
     // MCP performance
     this.reportMcpPerformance();
@@ -339,36 +340,31 @@ class PerformanceMonitor extends EventEmitter {
     // Recent alerts
     this.reportRecentAlerts();
 
-    console.log(chalk.blue('═'.repeat(60)));
   }
 
   /**
    * Report MCP performance metrics
    */
   reportMcpPerformance() {
-    console.log(chalk.blue('\n🔌 MCP Performance:'));
 
     // Response time
     const recentResponseTimes = this.getRecentSamples(this.metrics.mcp.responseTimeSamples, 10);
     if (recentResponseTimes.length > 0) {
       const avgResponseTime = recentResponseTimes.reduce((sum, s) => sum + s.value, 0) / recentResponseTimes.length;
-      const color = avgResponseTime > this.config.alertThresholds.mcpResponseTime ? chalk.yellow : chalk.white;
-      console.log(color(`  Response Time:    ${avgResponseTime.toFixed(0)}ms (10min avg)`));
+      const color = avgResponseTime > this.config.alertThresholds.mcpResponseTime ? colors.yellow : colors.white;
     }
 
     // Success rate
     const recentSuccessRates = this.getRecentSamples(this.metrics.mcp.successRateSamples, 10);
     if (recentSuccessRates.length > 0) {
       const avgSuccessRate = recentSuccessRates.reduce((sum, s) => sum + s.value, 0) / recentSuccessRates.length;
-      const color = avgSuccessRate < this.config.alertThresholds.mcpSuccessRate ? chalk.yellow : chalk.white;
-      console.log(color(`  Success Rate:     ${avgSuccessRate.toFixed(1)}% (10min avg)`));
+      const color = avgSuccessRate < this.config.alertThresholds.mcpSuccessRate ? colors.yellow : colors.white;
     }
 
     // Throughput
     const recentThroughput = this.getRecentSamples(this.metrics.mcp.throughputSamples, 10);
     if (recentThroughput.length > 0) {
       const avgThroughput = recentThroughput.reduce((sum, s) => sum + s.value, 0) / recentThroughput.length;
-      console.log(chalk.white(`  Throughput:       ${avgThroughput.toFixed(1)} ops/min`));
     }
   }
 
@@ -376,36 +372,31 @@ class PerformanceMonitor extends EventEmitter {
    * Report agent performance metrics
    */
   reportAgentPerformance() {
-    console.log(chalk.blue('\n🤖 Agent Performance:'));
 
     // Utilization
     const recentUtilization = this.getRecentSamples(this.metrics.agents.utilizationSamples, 10);
     if (recentUtilization.length > 0) {
       const avgUtilization = recentUtilization.reduce((sum, s) => sum + s.value, 0) / recentUtilization.length;
-      const color = avgUtilization > this.config.alertThresholds.agentUtilization ? chalk.yellow : chalk.white;
-      console.log(color(`  Utilization:      ${avgUtilization.toFixed(1)}% (10min avg)`));
+      const color = avgUtilization > this.config.alertThresholds.agentUtilization ? colors.yellow : colors.white;
     }
 
     // Queue depth
     const recentQueueDepth = this.getRecentSamples(this.metrics.agents.queueDepthSamples, 10);
     if (recentQueueDepth.length > 0) {
       const avgQueueDepth = recentQueueDepth.reduce((sum, s) => sum + s.value, 0) / recentQueueDepth.length;
-      const color = avgQueueDepth > this.config.alertThresholds.queueDepth ? chalk.yellow : chalk.white;
-      console.log(color(`  Queue Depth:      ${avgQueueDepth.toFixed(1)} tasks (10min avg)`));
+      const color = avgQueueDepth > this.config.alertThresholds.queueDepth ? colors.yellow : colors.white;
     }
 
     // Completion rate
     const recentCompletionRate = this.getRecentSamples(this.metrics.agents.completionRateSamples, 10);
     if (recentCompletionRate.length > 0) {
       const avgCompletionRate = recentCompletionRate.reduce((sum, s) => sum + s.value, 0) / recentCompletionRate.length;
-      console.log(chalk.white(`  Completion Rate:  ${avgCompletionRate.toFixed(1)}%`));
     }
 
     // Task duration
     const recentTaskDuration = this.getRecentSamples(this.metrics.agents.taskDurationSamples, 10);
     if (recentTaskDuration.length > 0) {
       const avgTaskDuration = recentTaskDuration.reduce((sum, s) => sum + s.value, 0) / recentTaskDuration.length;
-      console.log(chalk.white(`  Avg Task Time:    ${(avgTaskDuration / 1000).toFixed(1)}s`));
     }
   }
 
@@ -418,11 +409,9 @@ class PerformanceMonitor extends EventEmitter {
     );
 
     if (recentAlerts.length > 0) {
-      console.log(chalk.blue('\n🚨 Recent Alerts (10min):'));
       for (const alert of recentAlerts.slice(-5)) { // Show last 5
-        const color = alert.severity === 'critical' ? chalk.red : chalk.yellow;
+        const color = alert.severity === 'critical' ? colors.red : colors.yellow;
         const timeAgo = Math.round((Date.now() - alert.timestamp) / 60000);
-        console.log(color(`  ${alert.type}: ${alert.message} (${timeAgo}m ago)`));
       }
     }
   }
@@ -495,9 +484,7 @@ class PerformanceMonitor extends EventEmitter {
     try {
       const summary = this.getMetricsSummary();
       await fs.writeFile(filePath, JSON.stringify(summary, null, 2));
-      console.log(chalk.green(`✅ Metrics exported to ${filePath}`));
     } catch (error) {
-      console.log(chalk.red(`❌ Failed to export metrics: ${error.message}`));
     }
   }
 
@@ -521,7 +508,6 @@ class PerformanceMonitor extends EventEmitter {
       this.reportTimer = null;
     }
 
-    console.log(chalk.green('✅ Performance monitoring stopped'));
     this.emit('monitoring-stopped');
   }
 }

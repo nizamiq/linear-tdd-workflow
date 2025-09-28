@@ -1,0 +1,38 @@
+{
+  "type": "full",
+  "format": "json",
+  "reportId": "report-1759064931430",
+  "sections": {
+    "complexity": {
+      "averageComplexity": 1,
+      "violations": 0,
+      "recommendations": [
+        "Complexity levels are acceptable"
+      ]
+    },
+    "metrics": {
+      "linesOfCode": 2060,
+      "testCoverage": 0,
+      "qualityScore": 53,
+      "recommendations": [
+        "Increase test coverage to 80%+",
+        "Improve overall code quality metrics"
+      ]
+    },
+    "health": {
+      "overall": "fair",
+      "trends": [
+        "Stable",
+        "Coverage improving",
+        "Complexity controlled"
+      ],
+      "alerts": []
+    }
+  },
+  "recommendations": [
+    "Complexity levels are acceptable",
+    "Increase test coverage to 80%+",
+    "Improve overall code quality metrics"
+  ],
+  "success": false
+}

@@ -1,0 +1,97 @@
+{
+  "depth": "deep",
+  "focus": "structure",
+  "components": [
+    {
+      "name": "AuthModule",
+      "type": "authentication",
+      "file": "src/auth/index.js",
+      "complexity": 6
+    },
+    {
+      "name": "UserService",
+      "type": "service",
+      "file": "src/services/user.js",
+      "complexity": 8
+    },
+    {
+      "name": "DatabaseLayer",
+      "type": "data",
+      "file": "src/db/connection.js",
+      "complexity": 4
+    },
+    {
+      "name": "APIController",
+      "type": "controller",
+      "file": "src/controllers/api.js",
+      "complexity": 7
+    },
+    {
+      "name": "UtilityHelpers",
+      "type": "utility",
+      "file": "src/utils/helpers.js",
+      "complexity": 3
+    }
+  ],
+  "patterns": [
+    "MVC",
+    "Layered Architecture",
+    "Module Pattern"
+  ],
+  "dependencies": [
+    {
+      "from": "UserService",
+      "to": "DatabaseLayer",
+      "type": "data",
+      "weight": 5
+    },
+    {
+      "from": "APIController",
+      "to": "UserService",
+      "type": "service",
+      "weight": 8
+    },
+    {
+      "from": "AuthModule",
+      "to": "UserService",
+      "type": "service",
+      "weight": 6
+    },
+    {
+      "from": "APIController",
+      "to": "AuthModule",
+      "type": "authentication",
+      "weight": 9
+    },
+    {
+      "from": "UtilityHelpers",
+      "to": "DatabaseLayer",
+      "type": "utility",
+      "weight": 3
+    },
+    {
+      "from": "UserService",
+      "to": "UtilityHelpers",
+      "type": "utility",
+      "weight": 4
+    }
+  ],
+  "insights": [
+    {
+      "type": "complexity",
+      "message": "System has 5 components with average complexity of 6",
+      "severity": "info"
+    },
+    {
+      "type": "pattern",
+      "message": "Identified 3 architectural patterns: MVC, Layered Architecture, Module Pattern",
+      "severity": "info"
+    },
+    {
+      "type": "recommendation",
+      "message": "Consider implementing interface segregation for better modularity",
+      "severity": "suggestion"
+    }
+  ],
+  "success": false
+}

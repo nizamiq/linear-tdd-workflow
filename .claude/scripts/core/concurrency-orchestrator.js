@@ -11,7 +11,18 @@
  */
 
 const EventEmitter = require('events');
-const chalk = require('chalk');
+// Native ANSI colors to replace chalk
+const colors = {
+  red: (text) => `[31m${text}[0m`,
+  green: (text) => `[32m${text}[0m`,
+  yellow: (text) => `[33m${text}[0m`,
+  blue: (text) => `[34m${text}[0m`,
+  magenta: (text) => `[35m${text}[0m`,
+  cyan: (text) => `[36m${text}[0m`,
+  white: (text) => `[37m${text}[0m`,
+  gray: (text) => `[90m${text}[0m`,
+  bold: (text) => `[1m${text}[0m`
+};
 const McpQueueManager = require('./mcp-queue-manager');
 const AgentPool = require('./agent-pool');
 const PerformanceMonitor = require('./performance-monitor');
@@ -55,7 +66,7 @@ class ConcurrencyOrchestrator extends EventEmitter {
       systemLoad: 0 // 0-1 scale
     };
 
-    console.log(chalk.bold.green('🎭 Concurrency Orchestrator initialized'));
+    console.log(colors.bold.green('🎭 Concurrency Orchestrator initialized'));
   }
 
   /**
@@ -75,16 +86,16 @@ class ConcurrencyOrchestrator extends EventEmitter {
 
     // Listen for circuit breaker events
     this.errorRecoveryManager.on('circuit-breaker-opened', (event) => {
-      console.log(chalk.yellow(`🔌 Circuit breaker opened for ${event.serverName} - operations will be blocked`));
+      console.log(colors.yellow(`🔌 Circuit breaker opened for ${event.serverName} - operations will be blocked`));
     });
 
     this.errorRecoveryManager.on('circuit-breaker-closed', (event) => {
-      console.log(chalk.green(`🔌 Circuit breaker closed for ${event.serverName} - operations resumed`));
+      console.log(colors.green(`🔌 Circuit breaker closed for ${event.serverName} - operations resumed`));
     });
 
     // Listen for health degradation
     this.errorRecoveryManager.on('health-critical', (health) => {
-      console.log(chalk.red(`🚨 CRITICAL: System health compromised - ${health.reason}`));
+      console.log(colors.red(`🚨 CRITICAL: System health compromised - ${health.reason}`));
     });
   }
 
@@ -93,11 +104,11 @@ class ConcurrencyOrchestrator extends EventEmitter {
    */
   async start() {
     if (this.isRunning) {
-      console.log(chalk.yellow('⚠️  Orchestrator already running'));
+      console.log(colors.yellow('⚠️  Orchestrator already running'));
       return;
     }
 
-    console.log(chalk.bold.cyan('\n🚀 Starting Concurrency Orchestrator\n'));
+    console.log(colors.bold.cyan('\n🚀 Starting Concurrency Orchestrator\n'));
 
     this.startTime = Date.now();
     this.isRunning = true;
@@ -114,7 +125,7 @@ class ConcurrencyOrchestrator extends EventEmitter {
     // Setup graceful shutdown
     this.setupGracefulShutdown();
 
-    console.log(chalk.green('✅ Concurrency Orchestrator started successfully\n'));
+    console.log(colors.green('✅ Concurrency Orchestrator started successfully\n'));
 
     // Emit start event
     this.emit('started');
@@ -131,7 +142,7 @@ class ConcurrencyOrchestrator extends EventEmitter {
     const workflowId = this.generateWorkflowId();
     const startTime = Date.now();
 
-    console.log(chalk.bold.blue(`🎯 Starting workflow ${workflowId}: ${workflowSpec.name}`));
+    console.log(colors.bold.blue(`🎯 Starting workflow ${workflowId}: ${workflowSpec.name}`));
 
     try {
       // Parse workflow tasks
@@ -142,7 +153,7 @@ class ConcurrencyOrchestrator extends EventEmitter {
 
       const duration = Date.now() - startTime;
 
-      console.log(chalk.green(`✅ Workflow ${workflowId} completed in ${duration}ms`));
+      console.log(colors.green(`✅ Workflow ${workflowId} completed in ${duration}ms`));
 
       // Update system metrics
       this.updateSystemMetrics(tasks.length, results);
@@ -157,7 +168,7 @@ class ConcurrencyOrchestrator extends EventEmitter {
 
     } catch (error) {
       const duration = Date.now() - startTime;
-      console.log(chalk.red(`❌ Workflow ${workflowId} failed after ${duration}ms: ${error.message}`));
+      console.log(colors.red(`❌ Workflow ${workflowId} failed after ${duration}ms: ${error.message}`));
 
       throw error;
     }
@@ -295,7 +306,7 @@ class ConcurrencyOrchestrator extends EventEmitter {
    * Execute tasks in parallel (respecting agent pool limits)
    */
   async executeParallel(tasks) {
-    console.log(chalk.blue(`🔀 Executing ${tasks.length} tasks in parallel`));
+    console.log(colors.blue(`🔀 Executing ${tasks.length} tasks in parallel`));
 
     const taskPromises = tasks.map(task =>
       this.agentPool.executeTask(task).catch(error => ({
@@ -311,7 +322,7 @@ class ConcurrencyOrchestrator extends EventEmitter {
    * Execute tasks sequentially
    */
   async executeSequential(tasks) {
-    console.log(chalk.blue(`➡️  Executing ${tasks.length} tasks sequentially`));
+    console.log(colors.blue(`➡️  Executing ${tasks.length} tasks sequentially`));
 
     const results = [];
 
@@ -334,7 +345,7 @@ class ConcurrencyOrchestrator extends EventEmitter {
    * Execute tasks with dependency awareness
    */
   async executeDependencyAware(tasks) {
-    console.log(chalk.blue(`🕸️  Executing ${tasks.length} tasks with dependency awareness`));
+    console.log(colors.blue(`🕸️  Executing ${tasks.length} tasks with dependency awareness`));
 
     // Simple dependency resolution for Phase B.1
     // More sophisticated topological sorting could be added later
@@ -479,8 +490,8 @@ class ConcurrencyOrchestrator extends EventEmitter {
     }
 
     if (warnings.length > 0) {
-      console.log(chalk.yellow('\n⚠️  Health Check Warnings:'));
-      warnings.forEach(warning => console.log(chalk.yellow(`   - ${warning}`)));
+      console.log(colors.yellow('\n⚠️  Health Check Warnings:'));
+      warnings.forEach(warning => console.log(colors.yellow(`   - ${warning}`)));
       console.log();
     }
 
@@ -496,23 +507,23 @@ class ConcurrencyOrchestrator extends EventEmitter {
    * Display comprehensive system status
    */
   displaySystemStatus() {
-    console.log(chalk.bold.cyan('\n🎭 Concurrency Orchestrator Status'));
-    console.log(chalk.blue('═'.repeat(60)));
+    console.log(colors.bold.cyan('\n🎭 Concurrency Orchestrator Status'));
+    console.log(colors.blue('═'.repeat(60)));
 
     // System overview
     const uptimeMinutes = (this.systemMetrics.uptime / 60000).toFixed(1);
     const loadPercentage = (this.systemMetrics.systemLoad * 100).toFixed(1);
 
-    console.log(chalk.white(`Uptime:             ${uptimeMinutes} minutes`));
-    console.log(chalk.white(`System Load:        ${loadPercentage}%`));
-    console.log(chalk.white(`Throughput:         ${this.systemMetrics.throughput.toFixed(1)} tasks/min`));
-    console.log(chalk.white(`Total Tasks:        ${this.systemMetrics.totalTasks}`));
+    console.log(colors.white(`Uptime:             ${uptimeMinutes} minutes`));
+    console.log(colors.white(`System Load:        ${loadPercentage}%`));
+    console.log(colors.white(`Throughput:         ${this.systemMetrics.throughput.toFixed(1)} tasks/min`));
+    console.log(colors.white(`Total Tasks:        ${this.systemMetrics.totalTasks}`));
 
     // Component status
     this.agentPool.displayStatus();
     this.mcpQueueManager.displayStatus();
 
-    console.log(chalk.blue('═'.repeat(60)));
+    console.log(colors.blue('═'.repeat(60)));
   }
 
   /**
@@ -520,7 +531,7 @@ class ConcurrencyOrchestrator extends EventEmitter {
    */
   setupGracefulShutdown() {
     const gracefulShutdown = async (signal) => {
-      console.log(chalk.yellow(`\n🛑 Received ${signal}, initiating graceful shutdown...`));
+      console.log(colors.yellow(`\n🛑 Received ${signal}, initiating graceful shutdown...`));
       await this.shutdown();
       process.exit(0);
     };
@@ -537,7 +548,7 @@ class ConcurrencyOrchestrator extends EventEmitter {
       return;
     }
 
-    console.log(chalk.yellow('🛑 Shutting down Concurrency Orchestrator...'));
+    console.log(colors.yellow('🛑 Shutting down Concurrency Orchestrator...'));
 
     this.isRunning = false;
 
@@ -557,7 +568,7 @@ class ConcurrencyOrchestrator extends EventEmitter {
       this.mcpQueueManager.shutdown(timeout)
     ]);
 
-    console.log(chalk.green('✅ Concurrency Orchestrator shutdown complete'));
+    console.log(colors.green('✅ Concurrency Orchestrator shutdown complete'));
 
     // Emit shutdown event
     this.emit('shutdown');

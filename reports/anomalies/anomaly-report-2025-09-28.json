@@ -1,0 +1,47 @@
+{
+  "baseline": "7d",
+  "sensitivity": "medium",
+  "algorithms": [
+    "statistical",
+    "threshold",
+    "trend"
+  ],
+  "anomalies": [],
+  "analysis": {
+    "cpu_usage": {
+      "mean": 51.32856966502774,
+      "stdDev": 13.934603573554973,
+      "threshold": 2.5,
+      "anomalies": [],
+      "totalPoints": 25,
+      "anomalyRate": 0
+    },
+    "memory_usage": {
+      "mean": 54.02648055539864,
+      "stdDev": 8.518530377598884,
+      "threshold": 2.5,
+      "anomalies": [],
+      "totalPoints": 25,
+      "anomalyRate": 0
+    },
+    "disk_usage": {
+      "mean": 70.48560755931926,
+      "stdDev": 5.414268386182651,
+      "threshold": 2.5,
+      "anomalies": [],
+      "totalPoints": 25,
+      "anomalyRate": 0
+    },
+    "response_time": {
+      "mean": 207.09702253481467,
+      "stdDev": 53.81184443890219,
+      "threshold": 2.5,
+      "anomalies": [],
+      "totalPoints": 25,
+      "anomalyRate": 0
+    }
+  },
+  "confidence": 0.3,
+  "success": false,
+  "patterns": []
+}

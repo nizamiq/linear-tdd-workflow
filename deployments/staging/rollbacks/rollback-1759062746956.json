@@ -1,0 +1,49 @@
+{
+  "env": "staging",
+  "target": "previous",
+  "immediate": false,
+  "rollbackId": "rollback-1759062746956",
+  "originalDeployment": {
+    "deploymentId": "deploy-1758976346956",
+    "version": "1.2.3",
+    "strategy": "rolling",
+    "env": "staging",
+    "success": true,
+    "timestamp": "2025-09-27T12:32:26.956Z"
+  },
+  "steps": [
+    {
+      "step": "Prepare rollback configuration",
+      "status": "completed",
+      "duration": "15s"
+    },
+    {
+      "step": "Update container images",
+      "status": "completed",
+      "duration": "1min"
+    },
+    {
+      "step": "Rolling back pods",
+      "status": "completed",
+      "duration": "2min"
+    },
+    {
+      "step": "Verify rollback pods healthy",
+      "status": "completed",
+      "duration": "30s"
+    }
+  ],
+  "success": false,
+  "verification": {
+    "successful": true,
+    "issues": [],
+    "verificationTime": "30s",
+    "healthScore": 95
+  },
+  "linearUpdate": {
+    "updated": true,
+    "rollbackLogged": true,
+    "incidentCreated": false,
+    "escalated": false
+  }
+}

@@ -10,7 +10,18 @@
 const { spawn } = require('child_process');
 const fs = require('fs').promises;
 const path = require('path');
-const chalk = require('chalk');
+// Native ANSI colors to replace chalk
+const colors = {
+  red: (text) => `[31m${text}[0m`,
+  green: (text) => `[32m${text}[0m`,
+  yellow: (text) => `[33m${text}[0m`,
+  blue: (text) => `[34m${text}[0m`,
+  magenta: (text) => `[35m${text}[0m`,
+  cyan: (text) => `[36m${text}[0m`,
+  white: (text) => `[37m${text}[0m`,
+  gray: (text) => `[90m${text}[0m`,
+  bold: (text) => `[1m${text}[0m`
+};
 const os = require('os');
 
 class ConcurrencyTester {
@@ -29,8 +40,8 @@ class ConcurrencyTester {
    * Run comprehensive concurrency analysis
    */
   async runAnalysis() {
-    console.log(chalk.bold.cyan('\n🔬 Phase B.0: Concurrency Analysis\n'));
-    console.log(chalk.yellow(`Test ID: ${this.testId}\n`));
+    console.log(colors.bold.cyan('\n🔬 Phase B.0: Concurrency Analysis\n'));
+    console.log(colors.yellow(`Test ID: ${this.testId}\n`));
 
     try {
       // Task 1: Test concurrent Task tool invocations
@@ -48,11 +59,11 @@ class ConcurrencyTester {
       // Generate comprehensive report
       await this.generateReport();
 
-      console.log(chalk.bold.green('\n✅ Concurrency analysis complete!\n'));
-      console.log(chalk.blue(`Report saved to: .claude/analysis/${this.testId}.json\n`));
+      console.log(colors.bold.green('\n✅ Concurrency analysis complete!\n'));
+      console.log(colors.blue(`Report saved to: .claude/analysis/${this.testId}.json\n`));
 
     } catch (error) {
-      console.error(chalk.red(`Analysis failed: ${error.message}`));
+      console.error(colors.red(`Analysis failed: ${error.message}`));
       throw error;
     }
   }
@@ -61,7 +72,7 @@ class ConcurrencyTester {
    * Test Task tool concurrent invocation capabilities
    */
   async testTaskToolConcurrency() {
-    console.log(chalk.yellow('📋 Testing Task tool concurrency limits...\n'));
+    console.log(colors.yellow('📋 Testing Task tool concurrency limits...\n'));
 
     const tests = [
       { agents: 1, description: 'Baseline single agent' },
@@ -71,7 +82,7 @@ class ConcurrencyTester {
     ];
 
     for (const test of tests) {
-      console.log(chalk.blue(`  Testing ${test.agents} concurrent agents...`));
+      console.log(colors.blue(`  Testing ${test.agents} concurrent agents...`));
 
       const startTime = Date.now();
       const startMemory = process.memoryUsage();
@@ -89,7 +100,7 @@ class ConcurrencyTester {
           description: test.description
         };
 
-        console.log(chalk.green(`    ✅ Success - ${duration}ms, ${results.length} completions`));
+        console.log(colors.green(`    ✅ Success - ${duration}ms, ${results.length} completions`));
 
       } catch (error) {
         this.results.taskToolLimits[test.agents] = {
@@ -98,7 +109,7 @@ class ConcurrencyTester {
           description: test.description
         };
 
-        console.log(chalk.red(`    ❌ Failed - ${error.message}`));
+        console.log(colors.red(`    ❌ Failed - ${error.message}`));
         break; // Stop testing higher concurrency if this level fails
       }
 
@@ -159,16 +170,16 @@ class ConcurrencyTester {
    * Measure system resource usage patterns
    */
   async measureResourceUsage() {
-    console.log(chalk.yellow('\n📊 Measuring resource usage patterns...\n'));
+    console.log(colors.yellow('\n📊 Measuring resource usage patterns...\n'));
 
     const baseline = await this.getSystemResources();
-    console.log(chalk.blue('  Baseline system resources captured'));
+    console.log(colors.blue('  Baseline system resources captured'));
 
     // Test resource usage under different loads
     const loadTests = [1, 2, 3, 5];
 
     for (const load of loadTests) {
-      console.log(chalk.blue(`  Testing resource usage with ${load} concurrent operations...`));
+      console.log(colors.blue(`  Testing resource usage with ${load} concurrent operations...`));
 
       const beforeResources = await this.getSystemResources();
 
@@ -188,7 +199,7 @@ class ConcurrencyTester {
         memoryDelta: afterResources.memory - beforeResources.memory
       };
 
-      console.log(chalk.green(`    ✅ Load test ${load} complete`));
+      console.log(colors.green(`    ✅ Load test ${load} complete`));
       await this.sleep(1000);
     }
 
@@ -199,7 +210,7 @@ class ConcurrencyTester {
    * Test MCP server concurrency limits
    */
   async testMcpServerLimits() {
-    console.log(chalk.yellow('\n🔌 Testing MCP server concurrency limits...\n'));
+    console.log(colors.yellow('\n🔌 Testing MCP server concurrency limits...\n'));
 
     // Test different MCP operations
     const mcpTests = [
@@ -216,7 +227,7 @@ class ConcurrencyTester {
     ];
 
     for (const mcpTest of mcpTests) {
-      console.log(chalk.blue(`  Testing ${mcpTest.name} server...`));
+      console.log(colors.blue(`  Testing ${mcpTest.name} server...`));
 
       for (const concurrency of mcpTest.concurrent) {
         try {
@@ -241,7 +252,7 @@ class ConcurrencyTester {
             avgResponseTime: duration / results.length
           };
 
-          console.log(chalk.green(`    ✅ ${concurrency} concurrent ops - ${duration}ms`));
+          console.log(colors.green(`    ✅ ${concurrency} concurrent ops - ${duration}ms`));
 
         } catch (error) {
           if (!this.results.mcpServerLimits[mcpTest.name]) {
@@ -253,7 +264,7 @@ class ConcurrencyTester {
             error: error.message
           };
 
-          console.log(chalk.red(`    ❌ ${concurrency} concurrent ops failed`));
+          console.log(colors.red(`    ❌ ${concurrency} concurrent ops failed`));
           break;
         }
 
@@ -266,7 +277,7 @@ class ConcurrencyTester {
    * Analyze file system conflict patterns
    */
   async analyzeFileConflicts() {
-    console.log(chalk.yellow('\n📁 Analyzing file system conflict patterns...\n'));
+    console.log(colors.yellow('\n📁 Analyzing file system conflict patterns...\n'));
 
     // Test different conflict scenarios
     const conflictTests = [
@@ -294,7 +305,7 @@ class ConcurrencyTester {
     ];
 
     for (const test of conflictTests) {
-      console.log(chalk.blue(`  Testing ${test.name}...`));
+      console.log(colors.blue(`  Testing ${test.name}...`));
 
       for (const concurrency of [1, 2, 3, 5]) {
         try {
@@ -315,7 +326,7 @@ class ConcurrencyTester {
             description: test.description
           };
 
-          console.log(chalk.green(`    ✅ ${concurrency} concurrent ${test.name} - ${duration}ms`));
+          console.log(colors.green(`    ✅ ${concurrency} concurrent ${test.name} - ${duration}ms`));
 
         } catch (error) {
           if (!this.results.fileConflicts[test.name]) {
@@ -328,7 +339,7 @@ class ConcurrencyTester {
             description: test.description
           };
 
-          console.log(chalk.red(`    ❌ ${concurrency} concurrent ${test.name} failed`));
+          console.log(colors.red(`    ❌ ${concurrency} concurrent ${test.name} failed`));
           break;
         }
 
@@ -556,7 +567,7 @@ ${analysis.recommendations.map(r => `1. ${r}`).join('\n')}
 if (require.main === module) {
   const tester = new ConcurrencyTester();
   tester.runAnalysis().catch(error => {
-    console.error(chalk.red(`\nAnalysis failed: ${error.message}`));
+    console.error(colors.red(`\nAnalysis failed: ${error.message}`));
     process.exit(1);
   });
 }

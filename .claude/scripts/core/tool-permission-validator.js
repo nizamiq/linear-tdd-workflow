@@ -68,7 +68,6 @@ class ToolPermissionValidator {
       }
     };
 
-    // Language-specific patterns
     this.languagePatterns = {
       javascript: {
         extensions: ['.js', '.jsx', '.mjs', '.cjs'],
@@ -139,7 +138,6 @@ class ToolPermissionValidator {
     try {
       const config = yaml.load(frontmatterMatch[1]);
 
-      // Apply defaults if missing
       // Ensure tools is an array
       if (!config.tools) {
         config.tools = this.defaultPermissions.tools;
@@ -238,7 +236,6 @@ class ToolPermissionValidator {
       }
     }
 
-    // Default to both if unclear
     if (languages.size === 0) {
       languages.add('javascript');
       languages.add('typescript');
@@ -277,7 +274,6 @@ class ToolPermissionValidator {
       return agentConfig.allowedMcpServers?.includes(server);
     }
 
-    // Check language-specific tools
     if (context.language) {
       if (context.language.includes('javascript') || context.language.includes('typescript')) {
         if (this.toolCategories.read.jsTools.includes(tool)) {
@@ -386,7 +382,6 @@ class ToolPermissionValidator {
   validateAgentConfig(config) {
     const issues = [];
 
-    // Check for required fields
     if (!config.tools || config.tools.length === 0) {
       issues.push({
         severity: 'error',
@@ -394,7 +389,6 @@ class ToolPermissionValidator {
       });
     }
 
-    // Check for overly permissive configurations
     if (config.tools?.includes('*') || config.allowedBashCommands?.includes('*')) {
       issues.push({
         severity: 'critical',
@@ -402,7 +396,6 @@ class ToolPermissionValidator {
       });
     }
 
-    // Check write permissions for read-only agents
     if (this.isReadOnlyAgent(config)) {
       const writeTools = Array.isArray(config.tools) ?
         config.tools.filter(t => this.toolCategories.write.tools.includes(t)) :
@@ -416,7 +409,6 @@ class ToolPermissionValidator {
       }
     }
 
-    // Check for both JS/TS and Python tool support
     const hasJSTools = config.tools?.some(t =>
       this.toolCategories.read.jsTools.includes(t) ||
       this.toolCategories.write.jsTools.includes(t) ||
@@ -486,7 +478,6 @@ class ToolPermissionValidator {
     const usage = [];
     const lines = diff.split('\n');
 
-    // Parse diff for tool invocations
     const toolPatterns = [
       /agent:invoke\s+(\w+):(\w+)/g,
       /npm\s+run\s+(\S+)/g,
@@ -533,7 +524,6 @@ class ToolPermissionValidator {
         'utf8'
       );
 
-      // Clean up old audit logs (>90 days)
       await this.cleanOldAudits();
     } catch (error) {
       console.error('Audit logging failed:', error);
@@ -614,16 +604,13 @@ class ToolPermissionValidator {
   calculateAgentRisk(config) {
     let risk = 0;
 
-    // Check for high-risk tools
     const highRiskTools = [...this.toolCategories.write.tools, ...this.toolCategories.execute.tools];
     const hasHighRisk = config.tools?.some(t => highRiskTools.includes(t));
     if (hasHighRisk) risk += 3;
 
-    // Check for external access
     const hasExternal = config.allowedMcpServers?.length > 0;
     if (hasExternal) risk += 2;
 
-    // Check for wildcards
     const hasWildcard = config.tools?.includes('*') || config.allowedBashCommands?.includes('*');
     if (hasWildcard) risk += 5;
 
@@ -645,11 +632,8 @@ if (require.main === module) {
       validator.validateAgentTools(agent, tools)
         .then(result => {
           if (result.valid) {
-            console.log(colors.green(`✅ All tools allowed for ${agent}`));
           } else {
-            console.log(colors.red(`❌ Permission violations for ${agent}:`));
             result.violations.forEach(v => {
-              console.log(colors.yellow(`  - ${v.tool}: ${v.reason} (risk: ${v.risk})`));
             });
           }
         })
@@ -662,16 +646,9 @@ if (require.main === module) {
     case 'check-all':
       validator.validateAllAgents()
         .then(report => {
-          console.log(colors.bold('\n🔒 Agent Permission Report\n'));
-          console.log(colors.green(`✅ Compliant: ${report.compliant.length}`));
-          console.log(colors.yellow(`⚠️  Warnings: ${report.warnings.length}`));
-          console.log(colors.red(`❌ Violations: ${report.violations.length}`));
 
           if (report.violations.length > 0) {
-            console.log(colors.red('\nViolations:'));
             report.violations.forEach(v => {
-              console.log(`  ${v.agent}:`);
-              v.issues.forEach(i => console.log(`    - ${i.message}`));
             });
           }
         })
@@ -684,7 +661,6 @@ if (require.main === module) {
     case 'report':
       validator.generatePermissionReport()
         .then(report => {
-          console.log(JSON.stringify(report, null, 2));
         })
         .catch(error => {
           console.error(colors.red(`Report generation failed: ${error.message}`));
@@ -704,7 +680,6 @@ if (require.main === module) {
 
       validator.generateCICheck(diff)
         .then(result => {
-          console.log(result.summary);
           process.exit(result.status === 'success' ? 0 : 1);
         })
         .catch(error => {
@@ -714,11 +689,6 @@ if (require.main === module) {
       break;
 
     default:
-      console.log('Usage:');
-      console.log('  tool-permission-validator validate <agent> <tool1> [tool2...]');
-      console.log('  tool-permission-validator check-all');
-      console.log('  tool-permission-validator report');
-      console.log('  tool-permission-validator ci-check [diff-file]');
       break;
   }
 }

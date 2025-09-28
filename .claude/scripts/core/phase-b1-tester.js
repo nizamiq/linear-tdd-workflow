@@ -11,7 +11,18 @@
  * 5. Graceful degradation under stress
  */
 
-const chalk = require('chalk');
+// Native ANSI colors to replace chalk
+const colors = {
+  red: (text) => `[31m${text}[0m`,
+  green: (text) => `[32m${text}[0m`,
+  yellow: (text) => `[33m${text}[0m`,
+  blue: (text) => `[34m${text}[0m`,
+  magenta: (text) => `[35m${text}[0m`,
+  cyan: (text) => `[36m${text}[0m`,
+  white: (text) => `[37m${text}[0m`,
+  gray: (text) => `[90m${text}[0m`,
+  bold: (text) => `[1m${text}[0m`
+};
 const ConcurrencyOrchestrator = require('./concurrency-orchestrator');
 
 class PhaseB1Tester {
@@ -31,14 +42,14 @@ class PhaseB1Tester {
       stress: null
     };
 
-    console.log(chalk.bold.blue('🧪 Phase B.1 Tester initialized'));
+    console.log(colors.bold.blue('🧪 Phase B.1 Tester initialized'));
   }
 
   /**
    * Run comprehensive Phase B.1 test suite
    */
   async runTestSuite() {
-    console.log(chalk.bold.cyan('\n🚀 Starting Phase B.1 Comprehensive Test Suite\n'));
+    console.log(colors.bold.cyan('\n🚀 Starting Phase B.1 Comprehensive Test Suite\n'));
 
     const startTime = Date.now();
 
@@ -47,23 +58,23 @@ class PhaseB1Tester {
       await this.initializeOrchestrator();
 
       // Test 1: Basic concurrent execution
-      console.log(chalk.bold.yellow('\n📋 Test 1: Basic Concurrent Execution'));
+      console.log(colors.bold.yellow('\n📋 Test 1: Basic Concurrent Execution'));
       this.testResults.basic = await this.testBasicConcurrency();
 
       // Test 2: Load testing with queue management
-      console.log(chalk.bold.yellow('\n📋 Test 2: Load Testing with Queue Management'));
+      console.log(colors.bold.yellow('\n📋 Test 2: Load Testing with Queue Management'));
       this.testResults.load = await this.testLoadHandling();
 
       // Test 3: Error recovery and circuit breakers
-      console.log(chalk.bold.yellow('\n📋 Test 3: Error Recovery and Circuit Breakers'));
+      console.log(colors.bold.yellow('\n📋 Test 3: Error Recovery and Circuit Breakers'));
       this.testResults.errorRecovery = await this.testErrorRecovery();
 
       // Test 4: Performance monitoring
-      console.log(chalk.bold.yellow('\n📋 Test 4: Performance Monitoring Accuracy'));
+      console.log(colors.bold.yellow('\n📋 Test 4: Performance Monitoring Accuracy'));
       this.testResults.monitoring = await this.testPerformanceMonitoring();
 
       // Test 5: Stress testing
-      console.log(chalk.bold.yellow('\n📋 Test 5: System Stress Testing'));
+      console.log(colors.bold.yellow('\n📋 Test 5: System Stress Testing'));
       this.testResults.stress = await this.testSystemStress();
 
       // Generate comprehensive report
@@ -74,7 +85,7 @@ class PhaseB1Tester {
       await this.cleanup();
 
     } catch (error) {
-      console.log(chalk.red(`❌ Test suite failed: ${error.message}`));
+      console.log(colors.red(`❌ Test suite failed: ${error.message}`));
       await this.cleanup();
       throw error;
     }
@@ -84,7 +95,7 @@ class PhaseB1Tester {
    * Initialize orchestrator for testing
    */
   async initializeOrchestrator() {
-    console.log(chalk.blue('🎭 Initializing Concurrency Orchestrator for testing...'));
+    console.log(colors.blue('🎭 Initializing Concurrency Orchestrator for testing...'));
 
     const config = {
       mcpConfig: {
@@ -111,14 +122,14 @@ class PhaseB1Tester {
     this.orchestrator = new ConcurrencyOrchestrator(config);
     await this.orchestrator.start();
 
-    console.log(chalk.green('✅ Orchestrator initialized and started'));
+    console.log(colors.green('✅ Orchestrator initialized and started'));
   }
 
   /**
    * Test 1: Basic concurrent execution
    */
   async testBasicConcurrency() {
-    console.log(chalk.blue('Testing basic 3-agent concurrent execution...'));
+    console.log(colors.blue('Testing basic 3-agent concurrent execution...'));
 
     const testSpec = {
       name: 'Basic Concurrency Test',
@@ -174,7 +185,7 @@ class PhaseB1Tester {
    * Test 2: Load testing with queue management
    */
   async testLoadHandling() {
-    console.log(chalk.blue('Testing load handling with queue management...'));
+    console.log(colors.blue('Testing load handling with queue management...'));
 
     const loadTests = [];
     const concurrentWorkflows = 5; // More workflows than agent capacity
@@ -239,7 +250,7 @@ class PhaseB1Tester {
    * Test 3: Error recovery and circuit breakers
    */
   async testErrorRecovery() {
-    console.log(chalk.blue('Testing error recovery and circuit breaker functionality...'));
+    console.log(colors.blue('Testing error recovery and circuit breaker functionality...'));
 
     const startTime = Date.now();
 
@@ -291,7 +302,7 @@ class PhaseB1Tester {
    * Test 4: Performance monitoring accuracy
    */
   async testPerformanceMonitoring() {
-    console.log(chalk.blue('Testing performance monitoring accuracy...'));
+    console.log(colors.blue('Testing performance monitoring accuracy...'));
 
     const startTime = Date.now();
 
@@ -345,7 +356,7 @@ class PhaseB1Tester {
    * Test 5: System stress testing
    */
   async testSystemStress() {
-    console.log(chalk.blue('Testing system under stress conditions...'));
+    console.log(colors.blue('Testing system under stress conditions...'));
 
     const startTime = Date.now();
 
@@ -422,15 +433,15 @@ class PhaseB1Tester {
    * Generate comprehensive test report
    */
   async generateTestReport(totalDuration) {
-    console.log(chalk.bold.cyan('\n📊 Phase B.1 Test Results Report'));
-    console.log(chalk.blue('═'.repeat(80)));
+    console.log(colors.bold.cyan('\n📊 Phase B.1 Test Results Report'));
+    console.log(colors.blue('═'.repeat(80)));
 
     const overallSuccess = Object.values(this.testResults).every(result => result?.success);
 
     // Overall summary
-    console.log(chalk.white(`Total Test Duration:    ${(totalDuration / 1000).toFixed(1)}s`));
-    console.log(chalk.white(`Overall Status:         ${overallSuccess ? chalk.green('✅ PASSED') : chalk.red('❌ FAILED')}`));
-    console.log(chalk.blue('─'.repeat(80)));
+    console.log(colors.white(`Total Test Duration:    ${(totalDuration / 1000).toFixed(1)}s`));
+    console.log(colors.white(`Overall Status:         ${overallSuccess ? colors.green('✅ PASSED') : colors.red('❌ FAILED')}`));
+    console.log(colors.blue('─'.repeat(80)));
 
     // Individual test results
     this.reportTestResult('Basic Concurrency', this.testResults.basic);
@@ -440,8 +451,8 @@ class PhaseB1Tester {
     this.reportTestResult('Stress Testing', this.testResults.stress);
 
     // Success criteria validation
-    console.log(chalk.blue('\n🎯 Success Criteria Validation'));
-    console.log(chalk.blue('─'.repeat(50)));
+    console.log(colors.blue('\n🎯 Success Criteria Validation'));
+    console.log(colors.blue('─'.repeat(50)));
 
     const criteria = {
       'Concurrent Execution': this.testResults.basic?.success,
@@ -452,16 +463,16 @@ class PhaseB1Tester {
     };
 
     for (const [criterion, passed] of Object.entries(criteria)) {
-      const status = passed ? chalk.green('✅ PASS') : chalk.red('❌ FAIL');
-      console.log(chalk.white(`${criterion.padEnd(25)} ${status}`));
+      const status = passed ? colors.green('✅ PASS') : colors.red('❌ FAIL');
+      console.log(colors.white(`${criterion.padEnd(25)} ${status}`));
     }
 
-    console.log(chalk.blue('═'.repeat(80)));
+    console.log(colors.blue('═'.repeat(80)));
 
     // Export detailed results
     const reportPath = '/tmp/phase-b1-test-report.json';
     await this.exportTestResults(reportPath);
-    console.log(chalk.green(`📄 Detailed results exported to: ${reportPath}\n`));
+    console.log(colors.green(`📄 Detailed results exported to: ${reportPath}\n`));
 
     return overallSuccess;
   }
@@ -471,17 +482,17 @@ class PhaseB1Tester {
    */
   reportTestResult(testName, result) {
     if (!result) {
-      console.log(chalk.yellow(`${testName.padEnd(25)} ⚠️  NOT RUN`));
+      console.log(colors.yellow(`${testName.padEnd(25)} ⚠️  NOT RUN`));
       return;
     }
 
-    const status = result.success ? chalk.green('✅ PASS') : chalk.red('❌ FAIL');
+    const status = result.success ? colors.green('✅ PASS') : colors.red('❌ FAIL');
     const duration = result.duration ? `(${(result.duration / 1000).toFixed(1)}s)` : '';
 
-    console.log(chalk.white(`${testName.padEnd(25)} ${status} ${duration}`));
+    console.log(colors.white(`${testName.padEnd(25)} ${status} ${duration}`));
 
     if (result.error) {
-      console.log(chalk.red(`  Error: ${result.error}`));
+      console.log(colors.red(`  Error: ${result.error}`));
     }
   }
 
@@ -505,7 +516,7 @@ class PhaseB1Tester {
     try {
       await fs.writeFile(filePath, JSON.stringify(exportData, null, 2));
     } catch (error) {
-      console.log(chalk.yellow(`⚠️  Could not export results: ${error.message}`));
+      console.log(colors.yellow(`⚠️  Could not export results: ${error.message}`));
     }
   }
 
@@ -521,7 +532,7 @@ class PhaseB1Tester {
    */
   async cleanup() {
     if (this.orchestrator) {
-      console.log(chalk.blue('🧹 Cleaning up orchestrator...'));
+      console.log(colors.blue('🧹 Cleaning up orchestrator...'));
       await this.orchestrator.shutdown();
       this.orchestrator = null;
     }
@@ -535,11 +546,11 @@ if (require.main === module) {
   tester.runTestSuite()
     .then((success) => {
       const exitCode = success ? 0 : 1;
-      console.log(chalk.bold[success ? 'green' : 'red'](`\n🏁 Test suite ${success ? 'PASSED' : 'FAILED'}`));
+      console.log(colors.bold[success ? 'green' : 'red'](`\n🏁 Test suite ${success ? 'PASSED' : 'FAILED'}`));
       process.exit(exitCode);
     })
     .catch((error) => {
-      console.log(chalk.red(`💥 Test suite crashed: ${error.message}`));
+      console.log(colors.red(`💥 Test suite crashed: ${error.message}`));
       console.log(error.stack);
       process.exit(1);
     });

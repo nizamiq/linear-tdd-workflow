@@ -1,3 +1,9 @@
+# Project Title
+
+[![Build Status](https://travis-ci.org/user/repo.svg?branch=main)](https://travis-ci.org/user/repo)
+[![Coverage Status](https://coveralls.io/repos/github/user/repo/badge.svg?branch=main)](https://coveralls.io/github/user/repo?branch=main)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 # Linear TDD Workflow System
 
 > **Enterprise-grade multi-agent AI framework for autonomous code quality management**
