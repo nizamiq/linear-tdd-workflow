@@ -11,7 +11,28 @@ const { Command } = require('commander');
 const path = require('path');
 const fs = require('fs').promises;
 const { execSync, spawn } = require('child_process');
-const chalk = require('chalk');
+
+// Native console styling to replace chalk
+const colors = {
+  gray: (text) => `\x1b[90m${text}\x1b[0m`,
+  red: (text) => `\x1b[31m${text}\x1b[0m`,
+  green: (text) => `\x1b[32m${text}\x1b[0m`,
+  yellow: (text) => `\x1b[33m${text}\x1b[0m`,
+  blue: (text) => `\x1b[34m${text}\x1b[0m`,
+  cyan: (text) => `\x1b[36m${text}\x1b[0m`,
+  magenta: (text) => `\x1b[35m${text}\x1b[0m`,
+  bold: Object.assign(
+    (text) => `\x1b[1m${text}\x1b[0m`,
+    {
+      cyan: (text) => `\x1b[1m\x1b[36m${text}\x1b[0m`,
+      green: (text) => `\x1b[1m\x1b[32m${text}\x1b[0m`,
+      yellow: (text) => `\x1b[1m\x1b[33m${text}\x1b[0m`,
+      blue: (text) => `\x1b[1m\x1b[34m${text}\x1b[0m`,
+      red: (text) => `\x1b[1m\x1b[31m${text}\x1b[0m`,
+      magenta: (text) => `\x1b[1m\x1b[35m${text}\x1b[0m`
+    }
+  )
+};
 
 class ClaudeCLI {
   constructor() {
@@ -149,7 +170,7 @@ class ClaudeCLI {
    * Handle assess command
    */
   async handleAssess(options) {
-    console.log(chalk.bold.cyan('🔍 Running Code Assessment\n'));
+    console.log(colors.bold.cyan('🔍 Running Code Assessment\n'));
 
     try {
       const routerScript = path.join(this.claudeDir, 'scripts', 'core', 'agent-command-router.js');
@@ -162,7 +183,7 @@ class ClaudeCLI {
       this.execCommand(cmd);
 
     } catch (error) {
-      console.error(chalk.red(`Assessment failed: ${error.message}`));
+      console.error(colors.red(`Assessment failed: ${error.message}`));
       process.exit(1);
     }
   }
@@ -171,7 +192,7 @@ class ClaudeCLI {
    * Handle fix command
    */
   async handleFix(taskId, options) {
-    console.log(chalk.bold.green(`🔧 Implementing Fix Pack: ${taskId}\n`));
+    console.log(colors.bold.green(`🔧 Implementing Fix Pack: ${taskId}\n`));
 
     try {
       const routerScript = path.join(this.claudeDir, 'scripts', 'core', 'agent-command-router.js');
@@ -188,7 +209,7 @@ class ClaudeCLI {
       }
 
     } catch (error) {
-      console.error(chalk.red(`Fix implementation failed: ${error.message}`));
+      console.error(colors.red(`Fix implementation failed: ${error.message}`));
       process.exit(1);
     }
   }
@@ -197,7 +218,7 @@ class ClaudeCLI {
    * Handle test command
    */
   async handleTest(options) {
-    console.log(chalk.bold.yellow('🧪 Running TDD Cycle\n'));
+    console.log(colors.bold.yellow('🧪 Running TDD Cycle\n'));
 
     try {
       const languages = await this.detectLanguages();
@@ -213,7 +234,7 @@ class ClaudeCLI {
       }
 
     } catch (error) {
-      console.error(chalk.red(`Testing failed: ${error.message}`));
+      console.error(colors.red(`Testing failed: ${error.message}`));
       process.exit(1);
     }
   }
@@ -222,7 +243,7 @@ class ClaudeCLI {
    * Handle status command
    */
   async handleStatus(options) {
-    console.log(chalk.bold.blue('📊 System Status\n'));
+    console.log(colors.bold.blue('📊 System Status\n'));
 
     try {
       const statusScript = path.join(this.claudeDir, 'scripts', 'monitoring', 'agent-status.js');
@@ -234,7 +255,7 @@ class ClaudeCLI {
       }
 
     } catch (error) {
-      console.error(chalk.red(`Status check failed: ${error.message}`));
+      console.error(colors.red(`Status check failed: ${error.message}`));
       process.exit(1);
     }
   }
@@ -243,14 +264,14 @@ class ClaudeCLI {
    * Handle setup command
    */
   async handleSetup(options) {
-    console.log(chalk.bold.magenta('🚀 Setting up Claude Workflow\n'));
+    console.log(colors.bold.magenta('🚀 Setting up Claude Workflow\n'));
 
     try {
       const setupScript = path.join(this.claudeDir, 'setup.js');
       this.execCommand(`node "${setupScript}"`);
 
     } catch (error) {
-      console.error(chalk.red(`Setup failed: ${error.message}`));
+      console.error(colors.red(`Setup failed: ${error.message}`));
       process.exit(1);
     }
   }
@@ -259,7 +280,7 @@ class ClaudeCLI {
    * Handle validate command
    */
   async handleValidate(options) {
-    console.log(chalk.bold.cyan('✅ Validating Configuration\n'));
+    console.log(colors.bold.cyan('✅ Validating Configuration\n'));
 
     try {
       if (options.permissions) {
@@ -278,7 +299,7 @@ class ClaudeCLI {
       }
 
     } catch (error) {
-      console.error(chalk.red(`Validation failed: ${error.message}`));
+      console.error(colors.red(`Validation failed: ${error.message}`));
       process.exit(1);
     }
   }
@@ -287,7 +308,7 @@ class ClaudeCLI {
    * Handle doctor command
    */
   async handleDoctor() {
-    console.log(chalk.bold.green('🩺 Running Diagnostics\n'));
+    console.log(colors.bold.green('🩺 Running Diagnostics\n'));
 
     const issues = [];
     const suggestions = [];
@@ -311,7 +332,7 @@ class ClaudeCLI {
     try {
       const statusScript = path.join(this.claudeDir, 'scripts', 'monitoring', 'agent-status.js');
       execSync(`node "${statusScript}" quick`, { stdio: 'ignore' });
-      console.log(chalk.green('✅ All core agents configured'));
+      console.log(colors.green('✅ All core agents configured'));
     } catch {
       issues.push('❌ Agent configuration issues detected');
       suggestions.push('Run: ./claude validate --permissions');
@@ -319,12 +340,12 @@ class ClaudeCLI {
 
     // Display results
     if (issues.length === 0) {
-      console.log(chalk.green('\n🎉 No issues detected! System is healthy.\n'));
+      console.log(colors.green('\n🎉 No issues detected! System is healthy.\n'));
     } else {
-      console.log(chalk.red('\n🚨 Issues detected:\n'));
+      console.log(colors.red('\n🚨 Issues detected:\n'));
       issues.forEach(issue => console.log(`  ${issue}`));
 
-      console.log(chalk.yellow('\n💡 Suggestions:\n'));
+      console.log(colors.yellow('\n💡 Suggestions:\n'));
       suggestions.forEach(suggestion => console.log(`  ${suggestion}`));
     }
   }
@@ -333,7 +354,7 @@ class ClaudeCLI {
    * Handle clean command
    */
   async handleClean(options) {
-    console.log(chalk.bold.red('🧹 Cleaning up\n'));
+    console.log(colors.bold.red('🧹 Cleaning up\n'));
 
     const cleanTargets = [
       'node_modules/.cache',
@@ -352,20 +373,20 @@ class ClaudeCLI {
     for (const target of cleanTargets) {
       try {
         await fs.rm(target, { recursive: true, force: true });
-        console.log(chalk.green(`✅ Cleaned ${target}`));
+        console.log(colors.green(`✅ Cleaned ${target}`));
       } catch {
         // Ignore errors - target might not exist
       }
     }
 
-    console.log(chalk.green('\n🎉 Cleanup completed\n'));
+    console.log(colors.green('\n🎉 Cleanup completed\n'));
   }
 
   /**
    * Handle export command
    */
   async handleExport(options) {
-    console.log(chalk.bold.blue('📦 Exporting configuration\n'));
+    console.log(colors.bold.blue('📦 Exporting configuration\n'));
 
     const config = {
       version: this.config.version,
@@ -383,14 +404,14 @@ class ClaudeCLI {
       await fs.writeFile(filename, JSON.stringify(config, null, 2));
     }
 
-    console.log(chalk.green(`✅ Configuration exported to ${filename}\n`));
+    console.log(colors.green(`✅ Configuration exported to ${filename}\n`));
   }
 
   /**
    * Handle import command
    */
   async handleImport(source) {
-    console.log(chalk.bold.blue(`📥 Importing configuration from ${source}\n`));
+    console.log(colors.bold.blue(`📥 Importing configuration from ${source}\n`));
 
     try {
       let config;
@@ -413,10 +434,10 @@ class ClaudeCLI {
       // Apply configuration
       await this.applyImportedConfig(config);
 
-      console.log(chalk.green('✅ Configuration imported successfully\n'));
+      console.log(colors.green('✅ Configuration imported successfully\n'));
 
     } catch (error) {
-      console.error(chalk.red(`Import failed: ${error.message}`));
+      console.error(colors.red(`Import failed: ${error.message}`));
       process.exit(1);
     }
   }
@@ -425,7 +446,7 @@ class ClaudeCLI {
    * Handle concurrency analysis command
    */
   async handleConcurrencyAnalysis(options) {
-    console.log(chalk.bold.cyan('🔬 Running Concurrency Analysis\n'));
+    console.log(colors.bold.cyan('🔬 Running Concurrency Analysis\n'));
 
     try {
       const ConcurrencyTester = require(path.join(this.claudeDir, 'scripts', 'core', 'concurrency-tester.js'));
@@ -435,11 +456,11 @@ class ClaudeCLI {
 
       if (options.output === 'json') {
         const reportPath = path.join(this.claudeDir, 'analysis', `${tester.testId}.json`);
-        console.log(chalk.blue(`\nDetailed results: ${reportPath}`));
+        console.log(colors.blue(`\nDetailed results: ${reportPath}`));
       }
 
     } catch (error) {
-      console.error(chalk.red(`Concurrency analysis failed: ${error.message}`));
+      console.error(colors.red(`Concurrency analysis failed: ${error.message}`));
       process.exit(1);
     }
   }
@@ -448,7 +469,7 @@ class ClaudeCLI {
    * Handle Phase B.1 testing command
    */
   async handlePhaseB1Testing(options) {
-    console.log(chalk.bold.cyan('🧪 Running Phase B.1 Comprehensive Testing\n'));
+    console.log(colors.bold.cyan('🧪 Running Phase B.1 Comprehensive Testing\n'));
 
     try {
       const PhaseB1Tester = require(path.join(this.claudeDir, 'scripts', 'core', 'phase-b1-tester.js'));
@@ -462,13 +483,13 @@ class ClaudeCLI {
       const success = await tester.runTestSuite();
 
       if (options.exportResults) {
-        console.log(chalk.blue(`\nDetailed results exported to: ${options.exportResults}`));
+        console.log(colors.blue(`\nDetailed results exported to: ${options.exportResults}`));
       }
 
       process.exit(success ? 0 : 1);
 
     } catch (error) {
-      console.error(chalk.red(`Phase B.1 testing failed: ${error.message}`));
+      console.error(colors.red(`Phase B.1 testing failed: ${error.message}`));
       console.error(error.stack);
       process.exit(1);
     }
@@ -519,14 +540,14 @@ class ClaudeCLI {
     try {
       execSync('git add .', { stdio: 'inherit' });
       execSync(`git commit -m "feat: implement fix pack ${taskId}\n\n🤖 Generated with Claude Code\n\nCo-Authored-By: Claude <noreply@anthropic.com>"`, { stdio: 'inherit' });
-      console.log(chalk.green(`✅ Changes committed for ${taskId}`));
+      console.log(colors.green(`✅ Changes committed for ${taskId}`));
     } catch (error) {
-      console.warn(chalk.yellow(`Warning: Auto-commit failed: ${error.message}`));
+      console.warn(colors.yellow(`Warning: Auto-commit failed: ${error.message}`));
     }
   }
 
   execCommand(cmd) {
-    console.log(chalk.gray(`> ${cmd}\n`));
+    console.log(colors.gray(`> ${cmd}\n`));
     execSync(cmd, { stdio: 'inherit' });
   }
 
@@ -564,7 +585,7 @@ class ClaudeCLI {
 if (require.main === module) {
   const cli = new ClaudeCLI();
   cli.run().catch(error => {
-    console.error(chalk.red(`CLI Error: ${error.message}`));
+    console.error(colors.red(`CLI Error: ${error.message}`));
     process.exit(1);
   });
 }
