@@ -326,9 +326,9 @@ initialize_system() {
 
     cd "$TARGET_DIR"
 
-    # Run setup script
+    # Run setup script with increased memory limit
     if [[ -f ".claude/setup.js" ]]; then
-        node .claude/setup.js --auto-detect
+        node --max-old-space-size=4096 .claude/setup.js --auto-detect
     fi
 
     # Validate installation

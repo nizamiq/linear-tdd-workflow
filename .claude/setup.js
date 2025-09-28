@@ -20,6 +20,10 @@ class ClaudeSetup {
   constructor() {
     this.projectRoot = process.cwd();
     this.claudeDir = __dirname;
+
+    // Monitor memory usage
+    this.logMemoryUsage('Setup started');
+
     this.projectInfo = {
       type: 'unknown', // 'new', 'existing'
       languages: [], // 'javascript', 'typescript', 'python'
@@ -32,14 +36,27 @@ class ClaudeSetup {
   }
 
   /**
+   * Log memory usage for debugging
+   */
+  logMemoryUsage(label = '') {
+    const used = process.memoryUsage();
+    const mb = (bytes) => Math.round(bytes / 1024 / 1024 * 100) / 100;
+
+    console.log(chalk.gray(`[MEMORY] ${label}: RSS ${mb(used.rss)}MB, Heap ${mb(used.heapUsed)}/${mb(used.heapTotal)}MB, External ${mb(used.external)}MB`));
+  }
+
+  /**
    * Main setup orchestration
    */
   async setup() {
     console.log(chalk.bold.cyan('\n🚀 Claude Agentic Workflow Setup\n'));
 
     try {
+      this.logMemoryUsage('Setup started');
+
       // Step 1: Detect project characteristics
       await this.detectProject();
+      this.logMemoryUsage('Project detected');
 
       // Step 2: Show detection results and confirm
       await this.confirmDetection();
@@ -661,7 +678,14 @@ Next Steps:
 // CLI execution
 if (require.main === module) {
   const setup = new ClaudeSetup();
-  setup.setup().catch(console.error);
+  setup.setup()
+    .then(() => {
+      process.exit(0);
+    })
+    .catch((error) => {
+      console.error('Setup failed:', error);
+      process.exit(1);
+    });
 }
 
 module.exports = ClaudeSetup;
