@@ -25,7 +25,11 @@
     "claude:status": "node .claude/cli.js status",
     "claude:setup": "node .claude/setup.js",
     "agents:status": "node .claude/scripts/monitoring/agent-status.js",
-    "agents:validate": "node .claude/scripts/core/tool-permission-validator.js check-all"
+    "agents:validate": "node .claude/scripts/core/tool-permission-validator.js check-all",
+    "linear:test-connection": "node .claude/cli.js linear:test-connection",
+    "linear:sync": "node .claude/cli.js linear:sync",
+    "linear:status": "node .claude/cli.js linear:status",
+    "validate": "node .claude/cli.js validate"
   },
   "keywords": [
     "{{KEYWORDS}}"

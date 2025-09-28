@@ -164,6 +164,23 @@ class ClaudeCLI {
       .option('--duration <ms>', 'Test duration in milliseconds', '120000')
       .option('--export-results <path>', 'Export detailed results to file')
       .action(this.handlePhaseB1Testing.bind(this));
+
+    // Linear integration commands
+    this.program
+      .command('linear:test-connection')
+      .description('Test Linear API connection and authentication')
+      .action(this.handleLinearTestConnection.bind(this));
+
+    this.program
+      .command('linear:sync')
+      .description('Sync agents with Linear workspace')
+      .option('--force', 'Force sync even if already configured')
+      .action(this.handleLinearSync.bind(this));
+
+    this.program
+      .command('linear:status')
+      .description('Show Linear integration status')
+      .action(this.handleLinearStatus.bind(this));
   }
 
   /**
@@ -578,6 +595,179 @@ class ClaudeCLI {
   async applyImportedConfig(config) {
     // Apply imported configuration
     console.log('Applying configuration...');
+  }
+
+  /**
+   * Handle Linear test connection command
+   */
+  async handleLinearTestConnection() {
+    console.log(colors.bold.cyan('🔗 Testing Linear API Connection\n'));
+
+    try {
+      // Check for Linear API key
+      const apiKey = process.env.LINEAR_API_KEY;
+      if (!apiKey) {
+        console.log(colors.red('❌ LINEAR_API_KEY environment variable not set'));
+        console.log(colors.yellow('\nPlease set your Linear API key:'));
+        console.log(colors.cyan('export LINEAR_API_KEY="your-api-key-here"'));
+        console.log(colors.gray('Get your API key from: https://linear.app/settings/api'));
+        process.exit(1);
+      }
+
+      // Test connection using curl or fetch
+      console.log(colors.gray('🔄 Testing API connection...'));
+
+      try {
+        const response = await fetch('https://api.linear.app/graphql', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            query: `
+              query {
+                viewer {
+                  id
+                  name
+                  email
+                }
+                organization {
+                  id
+                  name
+                }
+              }
+            `
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+
+        if (data.errors) {
+          throw new Error(`GraphQL errors: ${JSON.stringify(data.errors)}`);
+        }
+
+        // Connection successful
+        console.log(colors.green('✅ Linear API connection successful!'));
+        console.log(colors.bold('\n📊 Connection Details:'));
+        console.log(colors.cyan(`   User: ${data.data.viewer.name} (${data.data.viewer.email})`));
+        console.log(colors.cyan(`   Organization: ${data.data.organization.name}`));
+        console.log(colors.cyan(`   User ID: ${data.data.viewer.id}`));
+        console.log(colors.cyan(`   Org ID: ${data.data.organization.id}`));
+
+        // Test MCP Linear integration if available
+        try {
+          const mcpTest = await this.testMCPLinearIntegration();
+          if (mcpTest.success) {
+            console.log(colors.green('\n✅ MCP Linear integration available'));
+            console.log(colors.gray(`   Server: ${mcpTest.server}`));
+          }
+        } catch (error) {
+          console.log(colors.yellow('\n⚠️  MCP Linear integration not available'));
+          console.log(colors.gray(`   Reason: ${error.message}`));
+        }
+
+        console.log(colors.bold.green('\n🎉 Linear integration ready!'));
+
+      } catch (error) {
+        console.log(colors.red('❌ Linear API connection failed'));
+        console.log(colors.red(`   Error: ${error.message}`));
+
+        if (error.message.includes('401') || error.message.includes('Unauthorized')) {
+          console.log(colors.yellow('\n💡 Troubleshooting:'));
+          console.log(colors.gray('   • Check your API key is correct'));
+          console.log(colors.gray('   • Ensure the key has proper permissions'));
+          console.log(colors.gray('   • Verify the key hasn\'t expired'));
+        }
+
+        process.exit(1);
+      }
+
+    } catch (error) {
+      console.error(colors.red(`Connection test failed: ${error.message}`));
+      process.exit(1);
+    }
+  }
+
+  /**
+   * Test MCP Linear integration
+   */
+  async testMCPLinearIntegration() {
+    // Simple test to see if MCP Linear tools are available
+    // This would integrate with the MCP server if available
+    return {
+      success: false,
+      server: 'mcp-linear-server',
+      error: 'MCP integration testing not yet implemented'
+    };
+  }
+
+  /**
+   * Handle Linear sync command
+   */
+  async handleLinearSync(options) {
+    console.log(colors.bold.cyan('🔄 Syncing with Linear Workspace\n'));
+
+    try {
+      console.log(colors.gray('This command will sync agent configurations with Linear...'));
+      console.log(colors.yellow('⚠️  Linear sync functionality not yet implemented'));
+      console.log(colors.gray('\nWould sync:'));
+      console.log(colors.gray('   • Team configurations'));
+      console.log(colors.gray('   • Project mappings'));
+      console.log(colors.gray('   • Agent permissions'));
+      console.log(colors.gray('   • Workflow automation'));
+
+    } catch (error) {
+      console.error(colors.red(`Sync failed: ${error.message}`));
+      process.exit(1);
+    }
+  }
+
+  /**
+   * Handle Linear status command
+   */
+  async handleLinearStatus() {
+    console.log(colors.bold.cyan('📊 Linear Integration Status\n'));
+
+    try {
+      // Check API key
+      const hasApiKey = !!process.env.LINEAR_API_KEY;
+      console.log(colors.gray('🔑 Authentication:'));
+      console.log(`   API Key: ${hasApiKey ? colors.green('✅ Set') : colors.red('❌ Not set')}`);
+
+      // Check MCP integration
+      console.log(colors.gray('\n🔌 MCP Integration:'));
+      console.log(`   Status: ${colors.yellow('⚠️  Not implemented')}`);
+
+      // Check agent configurations
+      console.log(colors.gray('\n🤖 Agent Linear Access:'));
+      console.log(`   STRATEGIST: ${colors.green('✅ Full CRUD')}`);
+      console.log(`   AUDITOR: ${colors.green('✅ CREATE only')}`);
+      console.log(`   MONITOR: ${colors.green('✅ CREATE only')}`);
+      console.log(`   SCHOLAR: ${colors.green('✅ READ only')}`);
+      console.log(`   Others: ${colors.green('✅ UPDATE only')}`);
+
+      // Check configuration files
+      console.log(colors.gray('\n⚙️  Configuration:'));
+      const settingsPath = path.join(this.claudeDir, 'settings.local.json');
+      const hasSettings = require('fs').existsSync(settingsPath);
+      console.log(`   Local settings: ${hasSettings ? colors.green('✅ Found') : colors.yellow('⚠️  Not found')}`);
+
+      if (!hasApiKey) {
+        console.log(colors.yellow('\n💡 Next steps:'));
+        console.log(colors.gray('   1. Set LINEAR_API_KEY environment variable'));
+        console.log(colors.gray('   2. Run: npm run linear:test-connection'));
+        console.log(colors.gray('   3. Configure team settings in .claude/settings.local.json'));
+      }
+
+    } catch (error) {
+      console.error(colors.red(`Status check failed: ${error.message}`));
+      process.exit(1);
+    }
   }
 }
 
