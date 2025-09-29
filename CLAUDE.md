@@ -27,6 +27,7 @@ make onboard
 - `/learn` - Mine patterns from successful PRs (uses SCHOLAR agent)
 - `/release <version>` - Manage production deployment (uses STRATEGIST agent)
 - `/status` - Current workflow & Linear status (uses STRATEGIST agent)
+- `/cycle [plan|status|execute|review]` - Automated sprint/cycle planning (uses PLANNER agent)
 
 **Alternative Script Entrypoints:**
 ```bash
@@ -111,18 +112,25 @@ npm run execute:fixpack
 
 # Sync with Linear
 npm run linear:sync
+
+# Cycle Planning (NEW!)
+npm run cycle:analyze    # Phase 1: Analyze current state
+npm run cycle:plan       # Phase 2: Select and score issues
+npm run cycle:align      # Phase 3: Map work to agents
+npm run cycle:ready      # Phase 4: Validate readiness
+npm run cycle:full       # Run all 4 phases sequentially
 ```
 
 ## Architecture
 
 ### Multi-Agent System
 
-The system operates through 20 specialized agents coordinated via Linear.app:
+The system operates through 21 specialized agents coordinated via Linear.app:
 
 ```
 Linear.app (Task Management)
     ↓
-STRATEGIST (Orchestration)
+STRATEGIST (Orchestration) ← → PLANNER (Cycle Planning)
     ↓
 ┌─────────────┬──────────────┬────────────────┬──────────────┐
 │   AUDITOR   │   EXECUTOR   │   GUARDIAN     │   SCHOLAR    │
@@ -134,7 +142,7 @@ STRATEGIST (Orchestration)
 
 **Agent Usage:**
 Claude Code natively discovers and uses agents through:
-- **Slash Commands**: `/assess`, `/fix`, `/recover`, `/learn`, `/release`, `/status`
+- **Slash Commands**: `/assess`, `/fix`, `/recover`, `/learn`, `/release`, `/status`, `/cycle`
 - **Agent Files**: `.claude/agents/*.md` - Each agent has comprehensive system prompts
 - **Direct Invocation**: Agents are automatically selected based on the task
 

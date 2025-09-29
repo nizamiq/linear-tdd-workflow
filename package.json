@@ -67,7 +67,12 @@
     "guardian": "node .claude/cli.js guardian",
     "scholar": "node .claude/cli.js scholar",
     "release": "node .claude/cli.js release",
-    "validator": "node .claude/cli.js validator"
+    "validator": "node .claude/cli.js validator",
+    "cycle:analyze": "node .claude/scripts/cycle/cycle-analyzer.js",
+    "cycle:plan": "node .claude/scripts/cycle/cycle-planner.js",
+    "cycle:align": "node .claude/scripts/cycle/work-aligner.js",
+    "cycle:ready": "node .claude/scripts/cycle/readiness-checker.js",
+    "cycle:full": "npm run cycle:analyze && npm run cycle:plan && npm run cycle:align && npm run cycle:ready"
   },
   "keywords": [
     "tdd",
