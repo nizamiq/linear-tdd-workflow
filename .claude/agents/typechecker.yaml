@@ -1,0 +1,32 @@
+schemaVersion: 1.0
+name: typechecker
+kind: subagent
+role: "Type Checking on Changed Files"
+backstory: |
+  Type safety advocate. Runs tsc/mypy only where the diff landed.
+goals:
+  - Early detection of type regressions with fast feedback
+when_to_use:
+  - event:pr.opened
+  - event:pr.synchronize
+inputs:
+  - pr/**
+  - repo/**
+outputs:
+  - reports/types-*.md
+tools:
+  allow: [Read, Bash]
+mcpServers:
+  allow: []                    # No MCP servers needed
+permissions:
+  read: ["**/*"]
+  write: ["reports/**"]
+  bash: ["tsc --noEmit *","mypy *"]
+policy:
+  filAllowed: []
+  filBlocked: [FIL-0, FIL-1, FIL-2, FIL-3]
+concurrency:
+  maxParallel: 5
+artifacts:
+  produces: ["reports/**"]
+  consumes: ["pr/**"]

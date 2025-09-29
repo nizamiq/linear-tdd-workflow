@@ -2,6 +2,50 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## 🚀 IMPORTANT: Autonomous Workflow System Detected
+
+This project has the **Linear TDD Workflow System** installed. You have access to powerful autonomous capabilities:
+
+### Quick Discovery
+```bash
+# Check if system is active
+test -d .claude && echo "✅ TDD Workflow System Available" || echo "❌ System not found"
+
+# View system capabilities
+cat .claude/README.md
+
+# Activate if needed
+make onboard
+```
+
+### Primary Commands Available to You (Slash Commands)
+
+**Core Journey Commands** - Aligned to TDD + Linear workflow:
+- `/assess` - Scan code quality → Create Linear tasks (JR-2)
+- `/fix TASK-ID` - Implement fix with TDD enforcement (JR-3)
+- `/recover` - Auto-fix broken CI/CD pipeline (JR-4)
+- `/learn` - Mine patterns from successful PRs (JR-5)
+- `/release` - Manage production deployment (JR-6)
+- `/status` - Current workflow & Linear status
+
+**Script Entrypoints:**
+```bash
+# Via Makefile (recommended)
+make assess                  # Code assessment
+make fix TASK=CLEAN-123      # TDD fix implementation
+make recover                 # Pipeline recovery
+make learn                   # Pattern learning
+make release                 # Release management
+make status                  # System status
+
+# Command discovery
+node .claude/cli.js commands:list      # List all commands
+node .claude/cli.js commands:list --json # JSON format for parsing
+```
+
+**Documentation:** Each command has full docs in `.claude/commands/`
+**For detailed instructions:** See `.claude/DISCOVERY.md`
+
 ## Project Context
 
 **Linear TDD Workflow System** - Multi-agent autonomous code quality management system that enforces strict Test-Driven Development.
@@ -204,9 +248,26 @@ When working with agents:
 
 ## Linear Integration
 
-Tasks are automatically created and tracked in Linear:
-- Assessment results → Linear issues
+**Primary Integration: MCP Tools + GitHub CLI** (No infrastructure needed!)
+
+The system uses Claude Code's built-in tools for seamless integration:
+- **Linear MCP Server** - Direct API access to Linear.app
+- **GitHub CLI (`gh`)** - Direct GitHub operations
+- **No webhooks needed** - Works immediately in Claude Code
+
+### Integration Modes
+- **🟢 Standard (Recommended)** - MCP tools + CLI (zero setup)
+- **🟡 Polling** - Scheduled sync for CI/CD
+- **🔴 Webhooks** - Advanced/Enterprise only (see `.claude/advanced/webhooks/`)
+
+For details, see `.claude/INTEGRATION-GUIDE.md`
+
+### How It Works
+Tasks are automatically managed via Linear MCP:
+- Assessment results → Linear issues (via MCP)
 - Fix Packs → Linear tasks with estimates
-- PR status → Linear progress updates
+- PR status → GitHub CLI + Linear MCP updates
 
 Always check Linear for task context before implementing fixes.
+- This system must support python development
+- you need to ensure that all the aspects of the workflows are working properly with proper E2E testing! you can use this workflow to self improve this project!

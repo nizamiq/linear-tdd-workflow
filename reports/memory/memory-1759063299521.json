@@ -1,0 +1,46 @@
+{
+  "target": {
+    "reduction": "35%",
+    "savings_mb": 245.96490581954714,
+    "new_usage": 254.03509418045286,
+    "optimizations_applied": 3
+  },
+  "analyzeLeaks": true,
+  "optimizationId": "memory-1759063299521",
+  "current": {
+    "total": 751.450912334318,
+    "used": 421.2108001516041,
+    "free": 74.9404286757879,
+    "allocations_per_second": 1000
+  },
+  "optimizations": [
+    {
+      "technique": "object_pooling",
+      "estimated_savings": 117.8023675786847,
+      "difficulty": "easy"
+    },
+    {
+      "technique": "lazy_loading",
+      "estimated_savings": 27.43111370089622,
+      "difficulty": "medium"
+    },
+    {
+      "technique": "memory_compression",
+      "estimated_savings": 100.73142453996623,
+      "difficulty": "hard"
+    }
+  ],
+  "leaks": [
+    {
+      "type": "event_listeners",
+      "size": 14.328724100267427,
+      "location": "src/components/eventlisteners.js"
+    },
+    {
+      "type": "dom_references",
+      "size": 50.38830785798821,
+      "location": "src/components/domreferences.js"
+    }
+  ],
+  "success": false
+}

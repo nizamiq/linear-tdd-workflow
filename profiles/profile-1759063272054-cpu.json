@@ -1,0 +1,41 @@
+{
+  "type": "cpu",
+  "duration": 30,
+  "profileId": "profile-1759063272054",
+  "metrics": {
+    "cpuUsage": 69.91572075958712,
+    "functions": [
+      {
+        "name": "processData",
+        "selfTime": 895.4773614667482,
+        "totalTime": 364.6088430515642
+      },
+      {
+        "name": "renderComponent",
+        "selfTime": 255.771117606439,
+        "totalTime": 281.55192966662435
+      },
+      {
+        "name": "validateInput",
+        "selfTime": 128.2390710700751,
+        "totalTime": 195.86381965131898
+      }
+    ],
+    "hotspots": 4
+  },
+  "bottlenecks": [
+    {
+      "type": "slow_function",
+      "function": "processData",
+      "time": 895.4773614667482
+    }
+  ],
+  "recommendations": [
+    {
+      "type": "function_optimization",
+      "suggestion": "Optimize processData function execution",
+      "priority": "medium"
+    }
+  ],
+  "success": false
+}

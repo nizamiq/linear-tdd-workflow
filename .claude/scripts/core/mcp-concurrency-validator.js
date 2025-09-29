@@ -7,7 +7,18 @@
  * real-world concurrency constraints for our multi-agent system.
  */
 
-const chalk = require('chalk');
+// Native ANSI colors to replace chalk
+const colors = {
+  red: (text) => `[31m${text}[0m`,
+  green: (text) => `[32m${text}[0m`,
+  yellow: (text) => `[33m${text}[0m`,
+  blue: (text) => `[34m${text}[0m`,
+  magenta: (text) => `[35m${text}[0m`,
+  cyan: (text) => `[36m${text}[0m`,
+  white: (text) => `[37m${text}[0m`,
+  gray: (text) => `[90m${text}[0m`,
+  bold: (text) => `[1m${text}[0m`
+};
 const fs = require('fs').promises;
 const path = require('path');
 
@@ -26,7 +37,7 @@ class McpConcurrencyValidator {
    * Run comprehensive MCP concurrency validation
    */
   async runValidation() {
-    console.log(chalk.bold.cyan('\n🔌 MCP Server Concurrency Validation\n'));
+    console.log(colors.bold.cyan('\n🔌 MCP Server Concurrency Validation\n'));
 
     try {
       // Test Linear server concurrency
@@ -41,10 +52,10 @@ class McpConcurrencyValidator {
       // Generate report
       await this.generateReport();
 
-      console.log(chalk.bold.green('\n✅ MCP concurrency validation complete!\n'));
+      console.log(colors.bold.green('\n✅ MCP concurrency validation complete!\n'));
 
     } catch (error) {
-      console.error(chalk.red(`MCP validation failed: ${error.message}`));
+      console.error(colors.red(`MCP validation failed: ${error.message}`));
       throw error;
     }
   }
@@ -53,7 +64,7 @@ class McpConcurrencyValidator {
    * Test Linear server concurrency capabilities
    */
   async testLinearServerConcurrency() {
-    console.log(chalk.yellow('📋 Testing Linear server concurrency...\n'));
+    console.log(colors.yellow('📋 Testing Linear server concurrency...\n'));
 
     const tests = [
       {
@@ -70,7 +81,7 @@ class McpConcurrencyValidator {
     ];
 
     for (const test of tests) {
-      console.log(chalk.blue(`  Testing ${test.operation}...`));
+      console.log(colors.blue(`  Testing ${test.operation}...`));
 
       for (const concurrency of test.concurrent) {
         try {
@@ -99,7 +110,7 @@ class McpConcurrencyValidator {
             errors: results.filter(r => r.error).length
           };
 
-          console.log(chalk.green(`    ✅ ${concurrency} concurrent - ${duration}ms avg`));
+          console.log(colors.green(`    ✅ ${concurrency} concurrent - ${duration}ms avg`));
 
         } catch (error) {
           if (!this.results.linearServer[test.operation]) {
@@ -111,7 +122,7 @@ class McpConcurrencyValidator {
             error: error.message
           };
 
-          console.log(chalk.red(`    ❌ ${concurrency} concurrent failed - ${error.message}`));
+          console.log(colors.red(`    ❌ ${concurrency} concurrent failed - ${error.message}`));
           break;
         }
 
@@ -124,12 +135,12 @@ class McpConcurrencyValidator {
    * Test Sequential Thinking concurrency
    */
   async testSequentialThinkingConcurrency() {
-    console.log(chalk.yellow('\n🧠 Testing Sequential Thinking concurrency...\n'));
+    console.log(colors.yellow('\n🧠 Testing Sequential Thinking concurrency...\n'));
 
     const concurrencyLevels = [1, 2];
 
     for (const concurrency of concurrencyLevels) {
-      console.log(chalk.blue(`  Testing ${concurrency} concurrent thinking operations...`));
+      console.log(colors.blue(`  Testing ${concurrency} concurrent thinking operations...`));
 
       try {
         const startTime = Date.now();
@@ -155,7 +166,7 @@ class McpConcurrencyValidator {
           errors: results.filter(r => r.error).length
         };
 
-        console.log(chalk.green(`    ✅ ${concurrency} concurrent - ${duration}ms avg`));
+        console.log(colors.green(`    ✅ ${concurrency} concurrent - ${duration}ms avg`));
 
       } catch (error) {
         this.results.sequentialThinking[concurrency] = {
@@ -163,7 +174,7 @@ class McpConcurrencyValidator {
           error: error.message
         };
 
-        console.log(chalk.red(`    ❌ ${concurrency} concurrent failed - ${error.message}`));
+        console.log(colors.red(`    ❌ ${concurrency} concurrent failed - ${error.message}`));
         break;
       }
 
@@ -175,20 +186,20 @@ class McpConcurrencyValidator {
    * Test other available MCP servers
    */
   async testOtherMcpServers() {
-    console.log(chalk.yellow('\n🔧 Testing other MCP servers...\n'));
+    console.log(colors.yellow('\n🔧 Testing other MCP servers...\n'));
 
     // Test Context7 if available
     try {
       await this.testContext7Concurrency();
     } catch (error) {
-      console.log(chalk.gray('  Context7 server not available or not configured'));
+      console.log(colors.gray('  Context7 server not available or not configured'));
     }
 
     // Test Kubernetes if available
     try {
       await this.testKubernetesConcurrency();
     } catch (error) {
-      console.log(chalk.gray('  Kubernetes server not available or not configured'));
+      console.log(colors.gray('  Kubernetes server not available or not configured'));
     }
   }
 
@@ -196,7 +207,7 @@ class McpConcurrencyValidator {
    * Test Context7 server concurrency
    */
   async testContext7Concurrency() {
-    console.log(chalk.blue('  Testing Context7 server...'));
+    console.log(colors.blue('  Testing Context7 server...'));
 
     try {
       // Simulate library lookup operations
@@ -214,14 +225,14 @@ class McpConcurrencyValidator {
         results: results.length
       };
 
-      console.log(chalk.green('    ✅ Context7 concurrent operations successful'));
+      console.log(colors.green('    ✅ Context7 concurrent operations successful'));
 
     } catch (error) {
       this.results.context7 = {
         success: false,
         error: error.message
       };
-      console.log(chalk.red(`    ❌ Context7 test failed - ${error.message}`));
+      console.log(colors.red(`    ❌ Context7 test failed - ${error.message}`));
     }
   }
 
@@ -229,7 +240,7 @@ class McpConcurrencyValidator {
    * Test Kubernetes server concurrency
    */
   async testKubernetesConcurrency() {
-    console.log(chalk.blue('  Testing Kubernetes server...'));
+    console.log(colors.blue('  Testing Kubernetes server...'));
 
     try {
       // Simulate kubectl operations
@@ -245,14 +256,14 @@ class McpConcurrencyValidator {
         results: results.length
       };
 
-      console.log(chalk.green('    ✅ Kubernetes concurrent operations successful'));
+      console.log(colors.green('    ✅ Kubernetes concurrent operations successful'));
 
     } catch (error) {
       this.results.kubernetes = {
         success: false,
         error: error.message
       };
-      console.log(chalk.red(`    ❌ Kubernetes test failed - ${error.message}`));
+      console.log(colors.red(`    ❌ Kubernetes test failed - ${error.message}`));
     }
   }
 
@@ -274,8 +285,8 @@ class McpConcurrencyValidator {
     const summaryPath = path.join(reportDir, `${this.testId}-mcp-summary.md`);
     await fs.writeFile(summaryPath, this.generateMarkdownSummary());
 
-    console.log(chalk.blue(`\nReport saved to: ${reportPath}`));
-    console.log(chalk.blue(`Summary saved to: ${summaryPath}`));
+    console.log(colors.blue(`\nReport saved to: ${reportPath}`));
+    console.log(colors.blue(`Summary saved to: ${summaryPath}`));
   }
 
   /**
@@ -429,7 +440,7 @@ Based on these findings:
 if (require.main === module) {
   const validator = new McpConcurrencyValidator();
   validator.runValidation().catch(error => {
-    console.error(chalk.red(`\nMCP validation failed: ${error.message}`));
+    console.error(colors.red(`\nMCP validation failed: ${error.message}`));
     process.exit(1);
   });
 }

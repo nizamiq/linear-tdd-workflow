@@ -10,10 +10,22 @@
  */
 
 const EventEmitter = require('events');
-const chalk = require('chalk');
 const path = require('path');
 const fs = require('fs').promises;
 const { spawn } = require('child_process');
+
+// Native ANSI colors to replace chalk
+const colors = {
+  red: (text) => `\x1b[31m${text}\x1b[0m`,
+  green: (text) => `\x1b[32m${text}\x1b[0m`,
+  yellow: (text) => `\x1b[33m${text}\x1b[0m`,
+  blue: (text) => `\x1b[34m${text}\x1b[0m`,
+  magenta: (text) => `\x1b[35m${text}\x1b[0m`,
+  cyan: (text) => `\x1b[36m${text}\x1b[0m`,
+  white: (text) => `\x1b[37m${text}\x1b[0m`,
+  gray: (text) => `\x1b[90m${text}\x1b[0m`,
+  bold: (text) => `\x1b[1m${text}\x1b[0m`
+};
 
 class AgentPool extends EventEmitter {
   constructor(mcpQueueManager, options = {}) {
@@ -21,7 +33,6 @@ class AgentPool extends EventEmitter {
 
     this.mcpQueueManager = mcpQueueManager;
 
-    // Evidence-based configuration
     this.config = {
       maxConcurrentAgents: 3, // Conservative start based on MCP limits
       agentTimeout: 300000,   // 5 minutes max per agent task
@@ -54,7 +65,6 @@ class AgentPool extends EventEmitter {
       'researcher', 'reviewer', 'securityguard', 'tester', 'validator'
     ];
 
-    console.log(chalk.blue(`🤖 Agent Pool initialized (max ${this.config.maxConcurrentAgents} concurrent agents)`));
 
     // Start health monitoring
     this.startHealthMonitoring();
@@ -82,7 +92,6 @@ class AgentPool extends EventEmitter {
 
     this.metrics.totalTasks++;
 
-    console.log(chalk.gray(`📋 Queuing task ${taskId} for ${task.agentType}:${task.command}`));
 
     return new Promise((resolve, reject) => {
       task.resolve = resolve;
@@ -91,7 +100,6 @@ class AgentPool extends EventEmitter {
       // Add to task queue
       this.addToTaskQueue(task);
 
-      // Try to execute immediately if capacity available
       this.processTaskQueue();
     });
   }
@@ -105,7 +113,6 @@ class AgentPool extends EventEmitter {
     } else if (task.priority === 'low') {
       this.taskQueue.push(task);
     } else {
-      // Normal priority - insert before low priority items
       const lowPriorityIndex = this.taskQueue.findIndex(item => item.priority === 'low');
       if (lowPriorityIndex !== -1) {
         this.taskQueue.splice(lowPriorityIndex, 0, task);
@@ -131,7 +138,6 @@ class AgentPool extends EventEmitter {
     const task = this.taskQueue.shift();
     if (!task) return;
 
-    // Spawn agent for this task
     this.spawnAgent(task)
       .finally(() => {
         // Process next task in queue
@@ -159,7 +165,6 @@ class AgentPool extends EventEmitter {
     this.activeAgents.set(agentId, agentInfo);
     this.metrics.agentsSpawned++;
 
-    console.log(chalk.blue(`🚀 Spawning agent ${agentId} (${task.agentType}) for task ${task.id}`));
 
     try {
       // Execute the agent task
@@ -171,7 +176,6 @@ class AgentPool extends EventEmitter {
 
       this.updateMetrics(duration, 'success');
 
-      console.log(chalk.green(`✅ Agent ${agentId} completed task ${task.id} - ${duration}ms`));
 
       // Resolve the task
       task.resolve(result);
@@ -180,17 +184,13 @@ class AgentPool extends EventEmitter {
       // Handle task failure
       const duration = Date.now() - startTime;
 
-      // Check if we should retry
       if (task.attempts < this.config.retryAttempts) {
         task.attempts++;
-        console.log(chalk.yellow(`⚠️  Retrying task ${task.id} (attempt ${task.attempts})`));
 
-        // Add back to queue for retry
         this.addToTaskQueue(task);
       } else {
         // Task failed permanently
         this.updateMetrics(duration, 'failure');
-        console.log(chalk.red(`❌ Agent ${agentId} failed task ${task.id} - ${error.message}`));
 
         task.reject(error);
       }
@@ -253,7 +253,6 @@ class AgentPool extends EventEmitter {
       );
     }
 
-    // Execute MCP operations if any
     let mcpResults = [];
     if (mcpOperations.length > 0) {
       mcpResults = await Promise.all(mcpOperations);
@@ -262,7 +261,6 @@ class AgentPool extends EventEmitter {
     // Simulate agent processing time
     await this.sleep(agentBehavior.processingTime);
 
-    // Simulate occasional failures (5% rate)
     if (Math.random() < 0.05) {
       throw new Error(`Simulated ${task.agentType} agent failure`);
     }
@@ -391,9 +389,7 @@ class AgentPool extends EventEmitter {
     for (const [agentId, agentInfo] of this.activeAgents.entries()) {
       const runtime = now - agentInfo.startTime;
 
-      // Check for timeout
       if (runtime > agentInfo.task.timeout) {
-        console.log(chalk.red(`⏰ Agent ${agentId} timed out after ${runtime}ms`));
 
         // Mark task as failed due to timeout
         this.updateMetrics(runtime, 'timeout');
@@ -409,7 +405,6 @@ class AgentPool extends EventEmitter {
    * Gracefully shutdown the agent pool
    */
   async shutdown(timeout = 60000) {
-    console.log(chalk.yellow('🛑 Shutting down Agent Pool...'));
 
     // Stop accepting new tasks
     this.shuttingDown = true;
@@ -420,21 +415,17 @@ class AgentPool extends EventEmitter {
       task.reject(new Error('Agent pool shutting down'));
     }
 
-    // Wait for active agents to complete
     const shutdownStart = Date.now();
     while (this.activeAgents.size > 0 && (Date.now() - shutdownStart) < timeout) {
       await this.sleep(1000);
-      console.log(chalk.gray(`Waiting for ${this.activeAgents.size} agents to complete...`));
     }
 
     // Force cleanup any remaining agents
     for (const [agentId, agentInfo] of this.activeAgents.entries()) {
-      console.log(chalk.red(`🚫 Force stopping agent ${agentId}`));
       agentInfo.task.reject(new Error('Agent pool shutdown'));
       this.activeAgents.delete(agentId);
     }
 
-    console.log(chalk.green('✅ Agent Pool shutdown complete'));
   }
 
   /**
@@ -464,31 +455,17 @@ class AgentPool extends EventEmitter {
   displayStatus() {
     const status = this.getStatus();
 
-    console.log(chalk.bold.cyan('\n🤖 Agent Pool Status'));
-    console.log(chalk.blue('─'.repeat(50)));
 
     // Current state
-    console.log(chalk.white(`Active Agents:      ${status.currentState.activeAgents}/${status.configuration.maxConcurrentAgents}`));
-    console.log(chalk.white(`Queued Tasks:       ${status.currentState.queuedTasks}`));
-    console.log(chalk.white(`Utilization:        ${status.currentState.utilization}`));
 
     // Active agents
     if (status.activeAgents.length > 0) {
-      console.log(chalk.blue('\nActive Agents:'));
       for (const agent of status.activeAgents) {
         const runtime = (agent.runtime / 1000).toFixed(1);
-        console.log(chalk.white(`  ${agent.id.padEnd(10)} ${agent.type.padEnd(12)} ${agent.status.padEnd(10)} ${runtime}s`));
       }
     }
 
     // Metrics
-    console.log(chalk.blue('─'.repeat(50)));
-    console.log(chalk.white(`Total Tasks:        ${status.metrics.totalTasks}`));
-    console.log(chalk.white(`Completed:          ${status.metrics.completedTasks}`));
-    console.log(chalk.white(`Failed:             ${status.metrics.failedTasks}`));
-    console.log(chalk.white(`Success Rate:       ${(status.metrics.completedTasks / Math.max(1, status.metrics.totalTasks) * 100).toFixed(1)}%`));
-    console.log(chalk.white(`Avg Task Time:      ${status.metrics.averageTaskTime.toFixed(0)}ms`));
-    console.log(chalk.blue('─'.repeat(50)));
   }
 }
 

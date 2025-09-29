@@ -49,25 +49,36 @@ ENABLE_AUTO_FIX=true
 ENABLE_TDD_ENFORCEMENT=true
 ```
 
-### 4. Initialize the System
+### 4. Run Automatic Onboarding (Autonomous Journey JR-1)
 
 ```bash
-npm run setup
+make onboard
+# OR using npm:
+# npm run journey:onboard
 ```
 
-This command will:
-- Verify your environment
+This autonomous journey will:
+- Detect your project type (Python/JS/TS)
+- Verify prerequisites
 - Initialize GitFlow
 - Set up agent configurations
 - Create necessary directories
+- Configure Linear integration
+- Run initial TDD validation
 
-### 5. Run Your First Assessment
+### 5. Run Your First Assessment (Autonomous Journey JR-2)
 
 ```bash
-npm run assess
+make assess
+# OR using npm:
+# npm run journey:assess
 ```
 
-The AUDITOR agent will scan your code and create Linear tasks for improvements.
+The assessment journey will autonomously:
+- Scan your codebase with AUDITOR
+- Create Linear tasks for improvements
+- Generate Fix Packs for FIL-0/FIL-1 issues
+- Provide actionable recommendations
 
 ## Core Concepts
 
@@ -81,13 +92,22 @@ Every change follows the RED-GREEN-REFACTOR cycle:
 
 ### Multi-Agent Architecture
 
-The system uses five specialized agents:
+The system uses 20 specialized agents coordinated through autonomous journeys:
 
+**Core Agents:**
 1. **AUDITOR** - Scans code for quality issues
 2. **EXECUTOR** - Implements approved fixes
 3. **GUARDIAN** - Monitors and recovers pipelines
 4. **STRATEGIST** - Orchestrates agent activities
 5. **SCHOLAR** - Learns from successful patterns
+
+**Autonomous Journeys:**
+- **JR-1 Onboarding** - Automatic project setup and configuration
+- **JR-2 Assessment** - Comprehensive code quality evaluation
+- **JR-3 Fix Pack** - TDD-enforced fix implementation
+- **JR-4 CI Recovery** - Automated pipeline recovery
+- **JR-5 Pattern Mining** - Learning from successful patterns
+- **JR-6 Release** - Automated release management
 
 ### Fix Packs
 
@@ -108,6 +128,26 @@ Feature Impact Levels categorize changes by risk:
 
 ## Common Operations
 
+### Using the Universal Makefile
+
+The project includes a universal Makefile that auto-detects your project type:
+
+```bash
+# Autonomous Journeys
+make onboard          # Run onboarding journey (JR-1)
+make assess           # Run assessment journey (JR-2)
+make fix-pack         # Execute TDD fix pack (JR-3)
+make ci-recovery      # Recover CI/CD pipeline (JR-4)
+make pattern-mining   # Mine successful patterns (JR-5)
+make release          # Manage release (JR-6)
+
+# Development Commands
+make test             # Run tests with coverage
+make lint             # Lint and format code
+make build            # Build the project
+make clean            # Clean generated files
+```
+
 ### Running Tests
 
 ```bash
@@ -124,14 +164,22 @@ npm run test:integration
 npm run test:mutation
 ```
 
-### Code Assessment
+### Working with Autonomous Journeys
 
 ```bash
-# Full repository scan
-npm run assess
+# Run specific journey
+npm run journey:onboard      # JR-1: Onboarding
+npm run journey:assess        # JR-2: Assessment
+npm run journey:fix-pack      # JR-3: Fix Pack
+npm run journey:ci-recovery   # JR-4: CI Recovery
+npm run journey:pattern       # JR-5: Pattern Mining
+npm run journey:release       # JR-6: Release
 
-# Incremental scan (changed files only)
-npm run assess:incremental
+# List available journeys
+npm run journey:list
+
+# View journey status
+npm run journey:status
 ```
 
 ### Working with Agents
@@ -143,8 +191,9 @@ npm run agents:init
 # Check agent status
 npm run agents:status
 
-# Execute Fix Packs
-npm run execute:fixpack
+# Invoke specific agent
+npm run agent:invoke AUDITOR:assess-code -- --scope full
+npm run agent:invoke EXECUTOR:implement-fix -- --task-id CLEAN-123
 ```
 
 ### Linear Integration
@@ -165,14 +214,23 @@ npm run linear:update
 ```
 linear-tdd-workflow/
 ├── .claude/              # Agent configurations
-│   ├── agents/          # Agent specifications
-│   ├── docs/            # Agent documentation
+│   ├── agents/          # 20 agent specifications
+│   ├── journeys/        # Autonomous journey implementations
+│   │   ├── jr1-onboarding.js
+│   │   ├── jr2-assessment.js
+│   │   ├── jr3-fix-pack.js
+│   │   ├── jr4-ci-recovery.js
+│   │   ├── jr5-pattern-mining.js
+│   │   ├── jr6-release.js
+│   │   └── registry.yaml
+│   ├── cli.js           # Enhanced CLI interface
 │   └── settings.json    # System settings
 ├── .github/             # GitHub Actions workflows
 ├── docs/                # Documentation
 ├── scripts/             # Utility scripts
 ├── src/                 # Source code
 ├── tests/               # Test suites
+├── Makefile             # Universal command interface
 ├── .env                 # Environment configuration
 ├── package.json         # Project dependencies
 └── README.md           # Project overview

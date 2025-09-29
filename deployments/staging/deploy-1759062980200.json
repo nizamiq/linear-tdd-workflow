@@ -1,0 +1,132 @@
+{
+  "env": "staging",
+  "version": "v1.2.3",
+  "strategy": "rolling",
+  "deploymentId": "deploy-1759062980200",
+  "services": [
+    {
+      "name": "web-app",
+      "instances": 3,
+      "healthy": 3,
+      "version": "v1.2.3"
+    },
+    {
+      "name": "api-service",
+      "instances": 2,
+      "healthy": 2,
+      "version": "v1.2.3"
+    }
+  ],
+  "steps": [
+    {
+      "step": "Pre-deployment checks",
+      "status": "completed",
+      "duration": "30s"
+    },
+    {
+      "step": "Update container images",
+      "status": "completed",
+      "duration": "2min"
+    },
+    {
+      "step": "Rolling update pods",
+      "status": "completed",
+      "duration": "3min"
+    },
+    {
+      "step": "Verify new pods healthy",
+      "status": "completed",
+      "duration": "1min"
+    },
+    {
+      "step": "Update load balancer",
+      "status": "completed",
+      "duration": "30s"
+    }
+  ],
+  "success": false,
+  "rollbackAvailable": false,
+  "validation": {
+    "ready": true,
+    "issues": [
+      "Security Scan check failed"
+    ],
+    "checks": {
+      "Code Quality": {
+        "passing": true,
+        "critical": true
+      },
+      "Tests Passing": {
+        "passing": true,
+        "critical": true
+      },
+      "Security Scan": {
+        "passing": false,
+        "critical": false
+      },
+      "Dependencies": {
+        "passing": true,
+        "critical": true
+      },
+      "Environment Config": {
+        "passing": true,
+        "critical": true
+      },
+      "Database Migration": {
+        "passing": true,
+        "critical": false
+      }
+    }
+  },
+  "healthCheck": {
+    "healthy": true,
+    "checks": [
+      {
+        "name": "HTTP Health Check",
+        "passing": true,
+        "details": {
+          "name": "HTTP Health Check",
+          "endpoint": "/health",
+          "passing": true
+        }
+      },
+      {
+        "name": "Database Connectivity",
+        "passing": true,
+        "details": {
+          "name": "Database Connectivity",
+          "database": "primary",
+          "passing": true
+        }
+      },
+      {
+        "name": "External API Connectivity",
+        "passing": true,
+        "details": {
+          "name": "External API Connectivity",
+          "service": "auth",
+          "passing": true
+        }
+      },
+      {
+        "name": "Memory Usage",
+        "passing": true,
+        "details": {
+          "name": "Memory Usage",
+          "threshold": "80%",
+          "passing": true
+        }
+      },
+      {
+        "name": "CPU Usage",
+        "passing": false,
+        "details": {
+          "name": "CPU Usage",
+          "threshold": "70%",
+          "passing": false
+        }
+      }
+    ],
+    "overallScore": 80
+  }
+}

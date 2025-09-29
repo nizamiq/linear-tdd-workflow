@@ -1,0 +1,39 @@
+{
+  "complexity": "linear",
+  "scope": "module",
+  "optimizationId": "optimize-1759063293443",
+  "functions": [
+    {
+      "name": "linearSearch",
+      "complexity": "O(n)",
+      "file": "src/utils/search.js"
+    },
+    {
+      "name": "findDuplicates",
+      "complexity": "O(n²)",
+      "file": "src/utils/array.js"
+    }
+  ],
+  "improvements": [
+    {
+      "function": "linearSearch",
+      "before": "O(n)",
+      "after": "linear",
+      "strategy": "general_optimization",
+      "estimated_speedup": 2.6222471682024
+    },
+    {
+      "function": "findDuplicates",
+      "before": "O(n²)",
+      "after": "linear",
+      "strategy": "general_optimization",
+      "estimated_speedup": 2.065834804741851
+    }
+  ],
+  "performance": {
+    "speedup": "2.3x",
+    "complexity_improved": 2,
+    "estimated_time_savings": "234%"
+  },
+  "success": false
+}

@@ -1,0 +1,51 @@
+{
+  "timestamp": "2025-09-29T04:04:43.975Z",
+  "summary": {
+    "totalTests": 17,
+    "passed": 11,
+    "failed": 6,
+    "successRate": 65
+  },
+  "errors": [
+    {
+      "test": "E2E-001: AUDITOR → Linear",
+      "error": "expect(received).toBe(expected) // Object.is equality\n\nExpected: true\nReceived: false"
+    },
+    {
+      "test": "E2E-003: GUARDIAN monitoring",
+      "error": "expect(received).toBe(expected) // Object.is equality\n\nExpected: true\nReceived: false"
+    },
+    {
+      "test": "E2E-AGENT: VALIDATOR:execute-tests",
+      "error": "expect(received).toBeUndefined()\n\nReceived: \"spawnSync /bin/sh ETIMEDOUT\""
+    },
+    {
+      "test": "E2E-AGENT: MIGRATOR:migration-status",
+      "error": "expect(received).toBeUndefined()\n\nReceived: \"Command indicated failure\""
+    },
+    {
+      "test": "E2E-AGENT: REFACTORER:analyze-refactoring",
+      "error": "expect(received).toBeUndefined()\n\nReceived: \"spawnSync /bin/sh ETIMEDOUT\""
+    },
+    {
+      "test": "E2E-AGENT: DOCUMENTER:generate-api-docs",
+      "error": "expect(received).toBeUndefined()\n\nReceived: \"spawnSync /bin/sh ETIMEDOUT\""
+    }
+  ],
+  "timings": {
+    "E2E-002: EXECUTOR implementation": 22306,
+    "E2E-AGENT: STRATEGIST:plan-workflow": 27391,
+    "E2E-AGENT: SCHOLAR:extract-patterns": 39057,
+    "E2E-AGENT: ANALYZER:measure-complexity": 45273,
+    "E2E-AGENT: CLEANER:remove-dead-code": 51031,
+    "E2E-AGENT: ARCHITECT:design-system": 55416,
+    "E2E-AGENT: INTEGRATOR:monitor-apis": 45986,
+    "E2E-AGENT: RESEARCHER:analyze-architecture": 1072,
+    "E2E-LINEAR-001: Linear MCP": 0,
+    "E2E-ERROR-001: Invalid task handling": 1069,
+    "E2E-ERROR-002: Network failure handling": 6874
+  },
+  "recommendations": [
+    "Fix failing tests before production deployment"
+  ]
+}

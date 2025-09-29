@@ -33,6 +33,45 @@ const colors = {
   )
 };
 
+// Ignore patterns for glob operations to prevent memory issues
+const IGNORE_PATTERNS = [
+  '**/node_modules/**',
+  '**/.git/**',
+  '**/dist/**',
+  '**/build/**',
+  '**/.venv/**',
+  '**/venv/**',
+  '**/env/**',
+  '**/.env/**',
+  '**/coverage/**',
+  '**/.next/**',
+  '**/.nuxt/**',
+  '**/out/**',
+  '**/.cache/**',
+  '**/tmp/**',
+  '**/temp/**',
+  '**/*.min.js',
+  '**/*.bundle.js',
+  '**/.pytest_cache/**',
+  '**/__pycache__/**',
+  '**/*.pyc',
+  '**/site-packages/**',
+  '**/vendor/**',
+  '**/.tox/**',
+  '**/.eggs/**',
+  '**/*.egg-info/**',
+  '**/htmlcov/**',
+  '**/.mypy_cache/**',
+  '**/.ruff_cache/**',
+  '**/.hypothesis/**'
+];
+
+// Maximum depth for glob operations
+const MAX_GLOB_DEPTH = 10;
+
+// Maximum files to process in detection
+const MAX_FILES_TO_CHECK = 20;
+
 class ClaudeSetup {
   constructor() {
     this.projectRoot = process.cwd();
@@ -287,11 +326,28 @@ class ClaudeSetup {
         // Additional check: look for pytest-specific imports in test files
         try {
           const { glob } = require('glob');
-          const files = await glob(pattern, { cwd: this.projectRoot });
+          const files = await glob(pattern, {
+            cwd: this.projectRoot,
+            ignore: IGNORE_PATTERNS,
+            maxDepth: MAX_GLOB_DEPTH,
+            nodir: true,
+            dot: false,
+            follow: false,
+            realpath: false
+          });
 
-          for (const file of files.slice(0, 5)) { // Check first 5 files
+          // Limit to checking first few files to prevent memory issues
+          const filesToCheck = files.slice(0, Math.min(MAX_FILES_TO_CHECK, files.length));
+
+          for (const file of filesToCheck) {
             try {
-              const content = await fs.readFile(path.join(this.projectRoot, file), 'utf8');
+              const filePath = path.join(this.projectRoot, file);
+              const stats = await fs.stat(filePath);
+
+              // Skip large files (> 1MB) to prevent memory issues
+              if (stats.size > 1024 * 1024) continue;
+
+              const content = await fs.readFile(filePath, 'utf8');
               if (content.includes('import pytest') ||
                   content.includes('from pytest') ||
                   content.includes('@pytest.') ||
@@ -303,6 +359,7 @@ class ClaudeSetup {
             }
           }
         } catch (error) {
+          console.warn(colors.yellow(`Warning: Pytest detection incomplete: ${error.message}`));
           // If glob fails, fall back to basic file pattern check
           return await this.hasFiles(pytestPatterns.slice(0, 2));
         }
@@ -325,11 +382,28 @@ class ClaudeSetup {
       if (await this.hasFiles([pattern])) {
         try {
           const { glob } = require('glob');
-          const files = await glob(pattern, { cwd: this.projectRoot });
+          const files = await glob(pattern, {
+            cwd: this.projectRoot,
+            ignore: IGNORE_PATTERNS,
+            maxDepth: MAX_GLOB_DEPTH,
+            nodir: true,
+            dot: false,
+            follow: false,
+            realpath: false
+          });
 
-          for (const file of files.slice(0, 5)) { // Check first 5 files
+          // Limit to checking first few files to prevent memory issues
+          const filesToCheck = files.slice(0, Math.min(MAX_FILES_TO_CHECK, files.length));
+
+          for (const file of filesToCheck) {
             try {
-              const content = await fs.readFile(path.join(this.projectRoot, file), 'utf8');
+              const filePath = path.join(this.projectRoot, file);
+              const stats = await fs.stat(filePath);
+
+              // Skip large files (> 1MB) to prevent memory issues
+              if (stats.size > 1024 * 1024) continue;
+
+              const content = await fs.readFile(filePath, 'utf8');
               if (content.includes('import unittest') ||
                   content.includes('from unittest') ||
                   content.includes('unittest.TestCase')) {
@@ -340,6 +414,7 @@ class ClaudeSetup {
             }
           }
         } catch (error) {
+          console.warn(colors.yellow(`Warning: Unittest detection incomplete: ${error.message}`));
           // If glob fails, fall back to basic detection
           return await this.hasFiles(['**/test*.py']);
         }
@@ -711,12 +786,29 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   }
 
   async hasFiles(patterns) {
-    const { glob } = require('glob');
-    for (const pattern of patterns) {
-      const files = await glob(pattern, { cwd: this.projectRoot });
-      if (files.length > 0) return true;
+    try {
+      const { glob } = require('glob');
+      for (const pattern of patterns) {
+        const files = await glob(pattern, {
+          cwd: this.projectRoot,
+          ignore: IGNORE_PATTERNS,
+          maxDepth: MAX_GLOB_DEPTH,
+          nodir: true,
+          dot: false,
+          follow: false,  // Don't follow symlinks
+          realpath: false // Don't resolve symlinks
+        });
+        if (files.length > 0) return true;
+      }
+      return false;
+    } catch (error) {
+      console.warn(colors.yellow(`Warning: File detection failed: ${error.message}`));
+      if (error.message.includes('EMFILE') || error.message.includes('memory')) {
+        console.warn(colors.yellow('Tip: Try increasing Node.js memory limit:'));
+        console.warn(colors.gray('  node --max-old-space-size=4096 .claude/setup.js'));
+      }
+      return false;
     }
-    return false;
   }
 
   async hasAnySourceFiles() {
@@ -731,8 +823,46 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
     ]);
   }
 
-  async hasStringInFiles(strings) {
-    // Simplified implementation
+  async hasStringInFiles(strings, filePatterns = ['**/app.py', '**/main.py']) {
+    try {
+      const { glob } = require('glob');
+
+      for (const pattern of filePatterns) {
+        const files = await glob(pattern, {
+          cwd: this.projectRoot,
+          ignore: IGNORE_PATTERNS,
+          maxDepth: MAX_GLOB_DEPTH,
+          nodir: true,
+          dot: false,
+          follow: false,
+          realpath: false
+        });
+
+        // Check only first few files
+        const filesToCheck = files.slice(0, Math.min(5, files.length));
+
+        for (const file of filesToCheck) {
+          try {
+            const filePath = path.join(this.projectRoot, file);
+            const stats = await fs.stat(filePath);
+
+            // Skip large files
+            if (stats.size > 1024 * 1024) continue;
+
+            const content = await fs.readFile(filePath, 'utf8');
+            for (const str of strings) {
+              if (content.includes(str)) {
+                return true;
+              }
+            }
+          } catch (error) {
+            // Continue checking other files
+          }
+        }
+      }
+    } catch (error) {
+      console.warn(colors.yellow(`Warning: String search in files failed: ${error.message}`));
+    }
     return false;
   }
 

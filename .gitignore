@@ -66,3 +66,29 @@ htmlcov/
 .claude/reports/
 .claude/logs/
 .claude-backup/
+
+# Archive directory (for obsolete files)
+archive/
+
+# Generated reports (keep directory structure only)
+reports/*/*.json
+reports/*/*.html
+
+# API documentation snapshots
+docs/api/*.json
+
+# Temporary validation/test files in root
+validate-*.js
+test-*.js
+self-improvement-*.js
+
+# Assessment and diagnostic outputs
+assessments/
+diagnostics/
+incidents/
+fix-packs/
+prs/
+releases/
+insights/
+ci-recovery/
+patterns/

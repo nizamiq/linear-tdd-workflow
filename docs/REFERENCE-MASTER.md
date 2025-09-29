@@ -77,6 +77,7 @@ npm run assess
 | Document | Purpose | Reading Time |
 |----------|---------|--------------|
 | [ARCHITECTURE-AGENTS.md](ARCHITECTURE-AGENTS.md) | Complete 20-agent system specification | 30 min |
+| [JOURNEYS.md](JOURNEYS.md) | Autonomous journey system (JR-1 to JR-6) | 15 min |
 | [Agent System Reference](../.claude/agents/CLAUDE.md) | Agent quick reference and MCP matrix | 10 min |
 | [Agent Selection Guide](../.claude/agents/AGENT-SELECTION-GUIDE.md) | Decision trees for choosing agents | 5 min |
 | [Linear Operations Guide](../.claude/agents/LINEAR-OPERATIONS-GUIDE.md) | Linear task management clarity | 5 min |

@@ -12,7 +12,19 @@
  */
 
 const EventEmitter = require('events');
-const chalk = require('chalk');
+
+// Native ANSI colors to replace chalk
+const colors = {
+  red: (text) => `\x1b[31m${text}\x1b[0m`,
+  green: (text) => `\x1b[32m${text}\x1b[0m`,
+  yellow: (text) => `\x1b[33m${text}\x1b[0m`,
+  blue: (text) => `\x1b[34m${text}\x1b[0m`,
+  magenta: (text) => `\x1b[35m${text}\x1b[0m`,
+  cyan: (text) => `\x1b[36m${text}\x1b[0m`,
+  white: (text) => `\x1b[37m${text}\x1b[0m`,
+  gray: (text) => `\x1b[90m${text}\x1b[0m`,
+  bold: (text) => `\x1b[1m${text}\x1b[0m`
+};
 
 class ErrorRecoveryManager extends EventEmitter {
   constructor(options = {}) {
@@ -76,7 +88,6 @@ class ErrorRecoveryManager extends EventEmitter {
     this.healthTimer = null;
     this.isMonitoring = false;
 
-    console.log(chalk.blue('🛡️  Error Recovery Manager initialized'));
   }
 
   /**
@@ -88,9 +99,7 @@ class ErrorRecoveryManager extends EventEmitter {
       name: 'MCP Timeout Recovery',
       action: async (context) => {
         const { serverName, operation } = context;
-        console.log(chalk.yellow(`🔄 Recovering from MCP timeout: ${serverName}:${operation}`));
 
-        // Open circuit breaker for this server
         this.openCircuitBreaker(serverName);
 
         // Wait before retry
@@ -105,12 +114,10 @@ class ErrorRecoveryManager extends EventEmitter {
       name: 'Agent Failure Recovery',
       action: async (context) => {
         const { agentType, taskId, error } = context;
-        console.log(chalk.yellow(`🔄 Recovering from agent failure: ${agentType} (task: ${taskId})`));
 
         this.errorStats.agents.failures++;
         this.errorStats.agents.lastError = error;
 
-        // Determine if this is a transient failure
         const isTransient = this.isTransientError(error);
 
         if (isTransient) {
@@ -119,7 +126,6 @@ class ErrorRecoveryManager extends EventEmitter {
           await this.sleep(delay);
           return { recovered: true, action: 'retry_with_backoff', delay };
         } else {
-          // Permanent failure - mark task as failed
           return { recovered: false, action: 'permanent_failure' };
         }
       }
@@ -129,7 +135,6 @@ class ErrorRecoveryManager extends EventEmitter {
     this.recoveryStrategies.set('system_overload', {
       name: 'System Overload Recovery',
       action: async (context) => {
-        console.log(chalk.yellow('🔄 Recovering from system overload'));
 
         this.errorStats.system.degradedCount++;
         this.errorStats.system.lastDegradation = Date.now();
@@ -152,9 +157,7 @@ class ErrorRecoveryManager extends EventEmitter {
       name: 'Network Connectivity Recovery',
       action: async (context) => {
         const { serverName } = context;
-        console.log(chalk.yellow(`🔄 Recovering from network error: ${serverName}`));
 
-        // Progressive backoff for network issues
         const delay = Math.min(
           this.config.retry.baseDelay * Math.pow(2, context.attempt || 1),
           this.config.retry.maxDelay
@@ -172,7 +175,6 @@ class ErrorRecoveryManager extends EventEmitter {
    */
   start() {
     if (this.isMonitoring) {
-      console.log(chalk.yellow('⚠️  Error Recovery Manager already running'));
       return;
     }
 
@@ -183,7 +185,6 @@ class ErrorRecoveryManager extends EventEmitter {
       this.performHealthCheck();
     }, this.config.healthCheck.interval);
 
-    console.log(chalk.green('✅ Error recovery monitoring started'));
     this.emit('monitoring-started');
   }
 
@@ -191,14 +192,12 @@ class ErrorRecoveryManager extends EventEmitter {
    * Handle error with appropriate recovery strategy
    */
   async handleError(errorType, context = {}) {
-    console.log(chalk.red(`🚨 Handling error: ${errorType}`));
 
     try {
       // Get recovery strategy
       const strategy = this.recoveryStrategies.get(errorType);
 
       if (!strategy) {
-        console.log(chalk.yellow(`⚠️  No recovery strategy for error type: ${errorType}`));
         return { recovered: false, action: 'no_strategy' };
       }
 
@@ -206,10 +205,8 @@ class ErrorRecoveryManager extends EventEmitter {
       const result = await strategy.action(context);
 
       if (result.recovered) {
-        console.log(chalk.green(`✅ Recovery successful: ${strategy.name}`));
         this.errorStats.agents.recoveries++;
       } else {
-        console.log(chalk.red(`❌ Recovery failed: ${strategy.name}`));
       }
 
       // Emit recovery event
@@ -224,7 +221,6 @@ class ErrorRecoveryManager extends EventEmitter {
       return result;
 
     } catch (error) {
-      console.log(chalk.red(`❌ Error during recovery: ${error.message}`));
       return { recovered: false, action: 'recovery_error', error: error.message };
     }
   }
@@ -240,7 +236,6 @@ class ErrorRecoveryManager extends EventEmitter {
       breaker.openTime = Date.now();
       breaker.failures = 0; // Reset failure count
 
-      console.log(chalk.yellow(`🔌 Circuit breaker opened for ${serverName}`));
 
       // Schedule reset attempt
       setTimeout(() => {
@@ -262,7 +257,6 @@ class ErrorRecoveryManager extends EventEmitter {
       breaker.halfOpenCalls = 0;
       breaker.halfOpenSuccesses = 0;
 
-      console.log(chalk.blue(`🔌 Circuit breaker attempting reset for ${serverName}`));
       this.emit('circuit-breaker-half-open', { serverName, timestamp: Date.now() });
     }
   }
@@ -281,10 +275,8 @@ class ErrorRecoveryManager extends EventEmitter {
         breaker.halfOpenSuccesses++;
         breaker.halfOpenCalls++;
 
-        // Check if we can close the circuit
         if (breaker.halfOpenSuccesses >= this.config.circuitBreaker.successThreshold) {
           breaker.state = 'closed';
-          console.log(chalk.green(`🔌 Circuit breaker closed for ${serverName}`));
           this.emit('circuit-breaker-closed', { serverName, timestamp: Date.now() });
         }
       } else if (breaker.state === 'closed') {
@@ -297,17 +289,14 @@ class ErrorRecoveryManager extends EventEmitter {
       if (breaker.state === 'closed') {
         breaker.failures++;
 
-        // Check if we should open the circuit
         if (breaker.failures >= this.config.circuitBreaker.failureThreshold) {
           this.openCircuitBreaker(serverName);
         }
       } else if (breaker.state === 'half-open') {
         breaker.halfOpenCalls++;
 
-        // Failed in half-open state - go back to open
         breaker.state = 'open';
         breaker.openTime = Date.now();
-        console.log(chalk.red(`🔌 Circuit breaker reopened for ${serverName}`));
 
         // Schedule another reset attempt
         setTimeout(() => {
@@ -387,10 +376,8 @@ class ErrorRecoveryManager extends EventEmitter {
     const health = this.assessSystemHealth();
 
     if (health.status === 'degraded') {
-      console.log(chalk.yellow(`⚠️  System health degraded: ${health.reason}`));
       this.emit('health-degraded', health);
     } else if (health.status === 'critical') {
-      console.log(chalk.red(`🚨 System health critical: ${health.reason}`));
       this.emit('health-critical', health);
     }
   }
@@ -468,7 +455,6 @@ class ErrorRecoveryManager extends EventEmitter {
     this.errorStats.system.criticalCount = 0;
     this.errorStats.system.lastDegradation = null;
 
-    console.log(chalk.green('✅ Error statistics reset'));
   }
 
   /**
@@ -493,7 +479,6 @@ class ErrorRecoveryManager extends EventEmitter {
       this.healthTimer = null;
     }
 
-    console.log(chalk.green('✅ Error recovery monitoring stopped'));
     this.emit('monitoring-stopped');
   }
 }

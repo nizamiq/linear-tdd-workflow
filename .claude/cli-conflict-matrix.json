@@ -1,0 +1,376 @@
+{
+  "version": "1.0.0",
+  "created": "2025-09-28T13:45:00.000Z",
+  "purpose": "Comprehensive CLI options registry to prevent conflicts across 20 agents",
+  "total_options": 44,
+  "conflict_status": "RESOLVED",
+
+  "global_options": {
+    "scope": {
+      "flag": "--scope <scope>",
+      "description": "Assessment scope",
+      "values": ["full", "changed", "incremental", "critical"],
+      "default": "changed",
+      "agents": ["AUDITOR", "ANALYZER", "CLEANER", "MIGRATOR", "ARCHITECT", "REFACTORER", "DOCUMENTER", "INTEGRATOR", "RESEARCHER"],
+      "conflicts": "NONE"
+    },
+    "depth": {
+      "flag": "--depth <depth>",
+      "description": "Analysis depth",
+      "values": ["shallow", "deep", "standard", "quick"],
+      "default": "standard",
+      "agents": ["AUDITOR", "ANALYZER", "CLEANER", "MIGRATOR", "ARCHITECT", "REFACTORER", "DOCUMENTER", "INTEGRATOR", "RESEARCHER"],
+      "conflicts": "NONE"
+    },
+    "language": {
+      "flag": "--language <lang>",
+      "description": "Target language filter",
+      "values": ["javascript", "typescript", "python", "go", "rust"],
+      "agents": ["AUDITOR", "ANALYZER", "VALIDATOR", "TESTER"],
+      "conflicts": "NONE"
+    },
+    "workers": {
+      "flag": "--workers <count>",
+      "description": "Number of parallel workers",
+      "default": "4",
+      "agents": ["AUDITOR", "ANALYZER", "STRATEGIST"],
+      "conflicts": "NONE"
+    }
+  },
+
+  "agent_specific_options": {
+    "EXECUTOR": {
+      "task-id": {
+        "flag": "--task-id <id>",
+        "description": "Linear task ID for fixes",
+        "required": true,
+        "conflicts": "NONE"
+      },
+      "test-first": {
+        "flag": "--test-first",
+        "description": "Enforce test-first development",
+        "type": "boolean",
+        "conflicts": "NONE"
+      },
+      "auto-commit": {
+        "flag": "--auto-commit",
+        "description": "Auto-commit changes",
+        "type": "boolean",
+        "conflicts": "NONE"
+      },
+      "auto-fix": {
+        "flag": "--auto-fix",
+        "description": "Enable automatic fixes where possible",
+        "type": "boolean",
+        "conflicts": "NONE"
+      },
+      "dry-run": {
+        "flag": "--dry-run",
+        "description": "Show what would be done without executing",
+        "type": "boolean",
+        "conflicts": "NONE"
+      }
+    },
+
+    "STRATEGIST": {
+      "task-type": {
+        "flag": "--task-type <type>",
+        "description": "Workflow task type",
+        "values": ["assessment", "fix", "recovery"],
+        "conflicts": "NONE"
+      },
+      "priority": {
+        "flag": "--priority <priority>",
+        "description": "Task priority",
+        "values": ["low", "normal", "high", "critical"],
+        "conflicts": "NONE"
+      },
+      "workflow": {
+        "flag": "--workflow <name>",
+        "description": "Workflow name for coordination",
+        "conflicts": "NONE"
+      },
+      "agents": {
+        "flag": "--agents <list>",
+        "description": "Comma-separated list of agents",
+        "conflicts": "NONE"
+      },
+      "mode": {
+        "flag": "--mode <mode>",
+        "description": "Execution mode",
+        "values": ["sequential", "parallel"],
+        "conflicts": "NONE"
+      },
+      "action": {
+        "flag": "--action <action>",
+        "description": "Backlog action",
+        "values": ["prioritize", "assign", "review"],
+        "conflicts": "NONE"
+      },
+      "team": {
+        "flag": "--team <team>",
+        "description": "Linear team ID",
+        "conflicts": "NONE"
+      },
+      "type": {
+        "flag": "--type <type>",
+        "description": "Conflict or escalation type",
+        "conflicts": "NONE"
+      },
+      "severity": {
+        "flag": "--severity <severity>",
+        "description": "Issue severity",
+        "values": ["low", "medium", "high", "critical"],
+        "conflicts": "NONE"
+      },
+      "budget": {
+        "flag": "--budget <amount>",
+        "description": "Resource budget allocation",
+        "conflicts": "NONE"
+      },
+      "timeframe": {
+        "flag": "--timeframe <duration>",
+        "description": "Time allocation",
+        "format": "1d, 1w, etc.",
+        "conflicts": "NONE"
+      }
+    },
+
+    "DEPLOYER": {
+      "env": {
+        "flag": "--env <environment>",
+        "description": "Target environment",
+        "values": ["dev", "staging", "prod"],
+        "conflicts": "NONE"
+      },
+      "app-version": {
+        "flag": "--app-version <tag>",
+        "description": "Version or tag to deploy",
+        "conflicts": "NONE"
+      },
+      "strategy": {
+        "flag": "--strategy <strategy>",
+        "description": "Deployment strategy",
+        "values": ["rolling", "bluegreen", "canary"],
+        "conflicts": "NONE"
+      },
+      "target": {
+        "flag": "--target <version>",
+        "description": "Target version for rollback",
+        "conflicts": "NONE"
+      },
+      "immediate": {
+        "flag": "--immediate",
+        "description": "Execute immediate rollback",
+        "type": "boolean",
+        "conflicts": "NONE"
+      },
+      "release-action": {
+        "flag": "--release-action <action>",
+        "description": "Release action",
+        "values": ["create", "promote", "tag"],
+        "conflicts": "NONE"
+      },
+      "from-env": {
+        "flag": "--from-env <env>",
+        "description": "Source environment for promotion",
+        "conflicts": "NONE"
+      },
+      "to-env": {
+        "flag": "--to-env <env>",
+        "description": "Target environment for promotion",
+        "conflicts": "NONE"
+      }
+    },
+
+    "OPTIMIZER": {
+      "profile-type": {
+        "flag": "--profile-type <type>",
+        "description": "Profiling type",
+        "values": ["cpu", "memory", "io"],
+        "conflicts": "NONE"
+      },
+      "profile-duration": {
+        "flag": "--profile-duration <seconds>",
+        "description": "Profiling duration in seconds",
+        "conflicts": "NONE"
+      },
+      "complexity": {
+        "flag": "--complexity <target>",
+        "description": "Target algorithm complexity",
+        "values": ["O(n)", "O(log n)", "O(n^2)"],
+        "conflicts": "NONE"
+      },
+      "optimization-scope": {
+        "flag": "--optimization-scope <scope>",
+        "description": "Optimization scope",
+        "values": ["function", "module"],
+        "conflicts": "NONE"
+      },
+      "memory-target": {
+        "flag": "--memory-target <percentage>",
+        "description": "Memory reduction target percentage",
+        "conflicts": "NONE"
+      },
+      "analyze-leaks": {
+        "flag": "--analyze-leaks",
+        "description": "Enable memory leak analysis",
+        "type": "boolean",
+        "conflicts": "NONE"
+      }
+    },
+
+    "VALIDATOR": {
+      "coverage": {
+        "flag": "--coverage",
+        "description": "Run tests with coverage reporting",
+        "type": "boolean",
+        "conflicts": "NONE"
+      },
+      "suite": {
+        "flag": "--suite <type>",
+        "description": "Test suite type",
+        "values": ["unit", "integration", "e2e", "all"],
+        "conflicts": "NONE"
+      },
+      "threshold": {
+        "flag": "--threshold <percentage>",
+        "description": "Coverage or mutation threshold percentage",
+        "conflicts": "NONE"
+      },
+      "parallel": {
+        "flag": "--parallel",
+        "description": "Run tests in parallel",
+        "type": "boolean",
+        "conflicts": "NONE"
+      },
+      "verbose": {
+        "flag": "--verbose",
+        "description": "Verbose test output",
+        "type": "boolean",
+        "conflicts": "NONE"
+      },
+      "mutation": {
+        "flag": "--mutation",
+        "description": "Run mutation testing",
+        "type": "boolean",
+        "conflicts": "NONE"
+      },
+      "watch": {
+        "flag": "--watch",
+        "description": "Watch mode",
+        "type": "boolean",
+        "conflicts": "NONE"
+      }
+    },
+
+    "SCHOLAR": {
+      "period": {
+        "flag": "--period <duration>",
+        "description": "Analysis time period",
+        "format": "7d, 30d, etc.",
+        "conflicts": "NONE"
+      },
+      "source": {
+        "flag": "--source <type>",
+        "description": "Source type for pattern extraction",
+        "values": ["commits", "fixes", "refactors"],
+        "conflicts": "NONE"
+      },
+      "pattern-id": {
+        "flag": "--pattern-id <id>",
+        "description": "Pattern ID for effectiveness analysis",
+        "conflicts": "NONE"
+      },
+      "metrics": {
+        "flag": "--metrics <type>",
+        "description": "Metrics type",
+        "values": ["reuse", "quality", "impact"],
+        "conflicts": "NONE"
+      },
+      "agent": {
+        "flag": "--agent <name>",
+        "description": "Target agent for training",
+        "conflicts": "NONE"
+      },
+      "patterns": {
+        "flag": "--patterns <list>",
+        "description": "Pattern list for training",
+        "conflicts": "NONE"
+      },
+      "training-mode": {
+        "flag": "--training-mode <mode>",
+        "description": "Training mode",
+        "values": ["supervised", "reinforcement"],
+        "conflicts": "NONE"
+      }
+    }
+  },
+
+  "shared_but_safe": {
+    "force": {
+      "flag": "--force",
+      "description": "Force operation",
+      "contexts": ["setup", "linear:sync"],
+      "conflicts": "NONE - context separated"
+    },
+    "format": {
+      "flag": "--format <format>",
+      "description": "Output format",
+      "contexts": ["export", "analysis"],
+      "conflicts": "NONE - context separated"
+    },
+    "output": {
+      "flag": "--output <format>",
+      "description": "Output format",
+      "contexts": ["analyze-concurrency"],
+      "conflicts": "NONE - context separated"
+    },
+    "all": {
+      "flag": "--all",
+      "description": "Include all items",
+      "contexts": ["clean"],
+      "conflicts": "NONE - context separated"
+    }
+  },
+
+  "resolution_strategy": {
+    "approach": "NAMESPACING_BY_AGENT",
+    "description": "Options are scoped to specific agents or commands, preventing conflicts",
+    "implementation": "Commander.js allowUnknownOption() with agent-specific filtering",
+    "validation": "Options validated per agent context in agent-command-router.js"
+  },
+
+  "conflict_analysis": {
+    "total_conflicts_found": 0,
+    "potential_risks": [
+      {
+        "risk": "Option name collision",
+        "mitigation": "Agent-specific scoping implemented",
+        "status": "RESOLVED"
+      },
+      {
+        "risk": "Value format mismatch",
+        "mitigation": "Validation per agent implemented",
+        "status": "RESOLVED"
+      }
+    ],
+    "recommendations": [
+      "Continue using allowUnknownOption() pattern",
+      "Maintain agent-specific option validation",
+      "Document new options in this matrix"
+    ]
+  },
+
+  "usage_examples": {
+    "single_agent": "node .claude/cli.js agent:invoke AUDITOR:assess-code --scope full --depth deep",
+    "with_agent_options": "node .claude/cli.js agent:invoke EXECUTOR:implement-fix --task-id CLEAN-123 --test-first --auto-commit",
+    "complex_strategist": "node .claude/cli.js agent:invoke STRATEGIST:plan-workflow --priority high --mode parallel --agents AUDITOR,EXECUTOR --timeframe 1d"
+  },
+
+  "maintenance": {
+    "last_updated": "2025-09-28T13:45:00.000Z",
+    "update_procedure": "Add new options to appropriate section when implementing new agent commands",
+    "validation_required": "Test CLI with new options before deployment"
+  }
+}

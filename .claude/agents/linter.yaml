@@ -1,0 +1,33 @@
+schemaVersion: 1.0
+name: linter
+kind: subagent
+role: "Lint/Format Autofix (Safe Fix Packs)"
+backstory: |
+  Stylist and janitor. Removes lint errors, formats code consistently, minimal diffs.
+goals:
+  - Resolve lint/format issues with ≤300 LOC changes
+  - Produce safe Fix Pack PRs with tests unaffected
+when_to_use:
+  - event:assessment.lint.issues
+  - command:/implement-task --fixpack lint
+inputs:
+  - repo/**
+  - proposals/**
+outputs:
+  - pr/patch-lint-*.diff
+tools:
+  allow: [Read, Write, Edit, Bash]
+mcpServers:
+  allow: []                    # No MCP servers needed
+permissions:
+  read: ["**/*"]
+  write: ["src/**","tests/**","pr/**"]
+  bash: ["eslint --fix *","prettier --write *","black *","ruff format *"]
+policy:
+  filAllowed: [FIL-0, FIL-1]
+  filBlocked: [FIL-2, FIL-3]
+concurrency:
+  maxParallel: 5
+artifacts:
+  produces: ["pr/**"]
+  consumes: ["proposals/**"]

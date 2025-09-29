@@ -1,0 +1,52 @@
+{
+  "action": "create",
+  "version": "v1.3.0",
+  "releaseId": "release-1759062993679",
+  "environments": [
+    "dev",
+    "staging",
+    "production"
+  ],
+  "promotions": [
+    {
+      "env": "dev",
+      "status": "ready",
+      "readyAt": "2025-09-28T12:36:33.680Z"
+    },
+    {
+      "env": "staging",
+      "status": "pending",
+      "blockers": []
+    },
+    {
+      "env": "production",
+      "status": "pending",
+      "blockers": [
+        "staging-approval"
+      ]
+    }
+  ],
+  "artifacts": [
+    {
+      "type": "deployment-manifest",
+      "path": "k8s/v1.3.0.yaml",
+      "generated": true
+    },
+    {
+      "type": "release-notes",
+      "path": "releases/v1.3.0.md",
+      "generated": true
+    },
+    {
+      "type": "security-report",
+      "path": "security/v1.3.0.json",
+      "generated": true
+    }
+  ],
+  "success": false,
+  "validation": {
+    "ready": true,
+    "issues": [],
+    "score": 99
+  }
+}

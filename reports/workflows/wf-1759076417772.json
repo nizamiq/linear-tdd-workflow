@@ -1,0 +1,45 @@
+{
+  "taskType": "assessment",
+  "priority": "normal",
+  "workflowId": "wf-1759076417772",
+  "agents": [
+    "AUDITOR"
+  ],
+  "phases": [
+    {
+      "name": "Analysis",
+      "agents": [
+        "AUDITOR"
+      ],
+      "duration": "12m",
+      "dependencies": [],
+      "outputs": [
+        "assessment-report",
+        "task-list"
+      ]
+    }
+  ],
+  "timeline": {
+    "totalDuration": 12,
+    "parallelizable": [],
+    "sequential": [],
+    "criticalPath": [
+      {
+        "phase": "Analysis",
+        "start": 0,
+        "end": 12
+      }
+    ]
+  },
+  "resourceAllocation": {
+    "totalCost": 2.5,
+    "agentCosts": {
+      "AUDITOR": 2.5
+    },
+    "peakCpu": 2,
+    "peakMemory": 4,
+    "totalDuration": 12
+  },
+  "dependencies": [],
+  "success": false
+}

@@ -1,0 +1,65 @@
+{
+  "category": "design",
+  "patterns": [
+    {
+      "name": "Singleton",
+      "confidence": 0.8,
+      "files": [
+        "src/config.js"
+      ]
+    },
+    {
+      "name": "Factory",
+      "confidence": 0.9,
+      "files": [
+        "src/factory.js"
+      ]
+    },
+    {
+      "name": "Observer",
+      "confidence": 0.7,
+      "files": [
+        "src/events.js"
+      ]
+    }
+  ],
+  "examples": [
+    {
+      "pattern": "Singleton",
+      "examples": [
+        {
+          "file": "src/config.js",
+          "lineNumber": 65,
+          "code": "// Example of Singleton pattern"
+        }
+      ]
+    },
+    {
+      "pattern": "Factory",
+      "examples": [
+        {
+          "file": "src/factory.js",
+          "lineNumber": 17,
+          "code": "// Example of Factory pattern"
+        }
+      ]
+    },
+    {
+      "pattern": "Observer",
+      "examples": [
+        {
+          "file": "src/events.js",
+          "lineNumber": 86,
+          "code": "// Example of Observer pattern"
+        }
+      ]
+    }
+  ],
+  "metrics": {
+    "totalPatterns": 3,
+    "averageConfidence": 80,
+    "highConfidencePatterns": 1,
+    "filesCovered": 3
+  },
+  "success": false
+}
