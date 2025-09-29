@@ -6,45 +6,45 @@ Agents are specialized AI workers, each with specific expertise and responsibili
 
 ## Core Agents (The Big 5)
 
-### AUDITOR (`auditor.yaml`)
+### AUDITOR (`auditor.md`)
 **Role:** Code Quality Scanner
 **Responsibilities:**
 - Scan codebase for issues
 - Create Linear tasks (CLEAN-XXX)
 - Generate quality reports
-**Invoke:** `npm run agent:invoke AUDITOR:assess-code`
+**Slash Command:** `/assess`
 
-### EXECUTOR (`executor.yaml`)
+### EXECUTOR (`executor.md`)
 **Role:** Fix Implementation Engine
 **Responsibilities:**
 - Implement approved fixes
 - Enforce TDD cycle
 - Create atomic PRs (≤300 LOC)
-**Invoke:** `npm run agent:invoke EXECUTOR:implement-fix -- --task-id CLEAN-123`
+**Slash Command:** `/fix <TASK-ID>`
 
-### GUARDIAN (`guardian.yaml`)
+### GUARDIAN (`guardian.md`)
 **Role:** CI/CD Pipeline Monitor
 **Responsibilities:**
 - Monitor pipeline health
 - Auto-recover from failures
 - Create incident reports
-**Invoke:** `npm run agent:invoke GUARDIAN:analyze-failure`
+**Slash Command:** `/recover`
 
-### STRATEGIST (`strategist.yaml`)
+### STRATEGIST (`strategist.md`)
 **Role:** Multi-Agent Orchestrator
 **Responsibilities:**
 - Coordinate other agents
 - Manage Linear tasks (full CRUD)
 - Plan multi-step operations
-**Invoke:** `npm run agent:invoke STRATEGIST:orchestrate`
+**Slash Commands:** `/release`, `/status`
 
-### SCHOLAR (`scholar.yaml`)
+### SCHOLAR (`scholar.md`)
 **Role:** Pattern Learning Engine
 **Responsibilities:**
 - Analyze successful PRs
 - Extract reusable patterns
 - Improve decision making
-**Invoke:** `npm run agent:invoke SCHOLAR:mine-patterns`
+**Slash Command:** `/learn`
 
 ## Supporting Agents
 
@@ -58,19 +58,21 @@ Agents are specialized AI workers, each with specific expertise and responsibili
 - **ROUTER** - Request routing
 - **SECURITY** - Security scanning
 
-## Agent YAML Structure
+## Agent File Structure
 
-Each agent definition includes:
-```yaml
-name: AGENT_NAME
+Each agent is defined as a Markdown file with YAML frontmatter:
+```markdown
+---
+name: agent_name
 role: Brief description
-capabilities:
-  - What it can do
-tools:
-  - MCP tools it uses
-linear_permissions:
-  - CREATE/READ/UPDATE/DELETE
-confidence_threshold: 0.85
+tools: [Read, Write, Bash]
+mcp_servers: [linear-server, context7]
+---
+
+# AGENT_NAME - Role Description
+
+[Comprehensive system prompt with agent's responsibilities,
+ operational guidelines, and constraints]
 ```
 
 ## Linear Permissions Matrix
@@ -83,31 +85,32 @@ confidence_threshold: 0.85
 | GUARDIAN | ✅ | ✅ | ✅ | ❌ |
 | SCHOLAR | ❌ | ✅ | ❌ | ❌ |
 
-## Agent Invocation
+## Agent Usage
 
-### Direct Invocation Pattern
-```bash
-npm run agent:invoke <AGENT>:<COMMAND> -- [options]
-```
+### Claude Code Native Discovery
+Agents are automatically discovered and used through:
+- **Slash Commands**: `/assess`, `/fix`, `/recover`, `/learn`, `/release`, `/status`
+- **Agent Files**: `.claude/agents/*.md` with frontmatter
+- **Automatic Selection**: Claude Code selects appropriate agent for the task
 
 ### Common Commands
 
 **Assessment:**
-```bash
-npm run agent:invoke AUDITOR:assess-code -- --scope full
-npm run agent:invoke AUDITOR:assess-code -- --scope changed
+```
+/assess                    # Full code assessment
+/assess --scope=src        # Assess specific directory
 ```
 
 **Fix Implementation:**
-```bash
-npm run agent:invoke EXECUTOR:implement-fix -- --task-id CLEAN-123
-npm run agent:invoke EXECUTOR:validate-fix -- --pr-id 456
+```
+/fix CLEAN-123            # Implement specific fix
+/fix CLEAN-456 --branch=feature/custom  # Custom branch
 ```
 
 **CI/CD Recovery:**
-```bash
-npm run agent:invoke GUARDIAN:analyze-failure
-npm run agent:invoke GUARDIAN:recover -- --auto-fix
+```
+/recover                  # Auto-recover pipeline
+/recover --auto-revert    # With automatic revert if needed
 ```
 
 ## Agent Coordination
@@ -127,10 +130,10 @@ Each agent uses:
 ## Creating New Agents
 
 To add an agent:
-1. Create `agent-name.yaml` in this directory
-2. Define capabilities and tools
-3. Set Linear permissions
-4. Register in `index.yaml`
+1. Create `agent-name.md` in this directory with YAML frontmatter
+2. Define tools and mcp_servers in frontmatter
+3. Write comprehensive system prompt as Markdown body
+4. Create corresponding slash command in `.claude/commands/`
 
 ## Important Constraints
 
@@ -142,12 +145,13 @@ To add an agent:
 
 ## Quick Agent Selection
 
-| Task | Use Agent | Command Pattern |
-|------|-----------|-----------------|
-| Scan code | AUDITOR | `AUDITOR:assess-code` |
-| Fix issues | EXECUTOR | `EXECUTOR:implement-fix` |
-| Check pipeline | GUARDIAN | `GUARDIAN:analyze-failure` |
-| Coordinate work | STRATEGIST | `STRATEGIST:orchestrate` |
-| Learn patterns | SCHOLAR | `SCHOLAR:mine-patterns` |
-| Create tests | TESTER | `TESTER:create-tests` |
-| Review code | VALIDATOR | `VALIDATOR:review-pr` |
+| Task | Use Agent | Slash Command |
+|------|-----------|---------------|
+| Scan code | AUDITOR | `/assess` |
+| Fix issues | EXECUTOR | `/fix <TASK-ID>` |
+| Check pipeline | GUARDIAN | `/recover` |
+| Learn patterns | SCHOLAR | `/learn` |
+| Release code | STRATEGIST | `/release <version>` |
+| Check status | STRATEGIST | `/status` |
+| Create tests | TESTER | (via EXECUTOR in TDD) |
+| Review code | VALIDATOR | (automatic in PR) |

@@ -28,12 +28,10 @@ node .claude/journeys/jr1-onboarding.js
    - `make pattern-mining` - Learn from patterns
    - `make release` - Release management
 
-2. **20 Specialized Agents** - Ready to invoke:
-   ```bash
-   npm run agent:invoke AUDITOR:assess-code
-   npm run agent:invoke EXECUTOR:implement-fix
-   npm run agent:invoke GUARDIAN:analyze-failure
-   ```
+2. **Native Claude Code Agents** - Automatically discovered:
+   - Agents defined in `.claude/agents/*.md` with frontmatter
+   - Slash commands in `.claude/commands/*.md`
+   - Claude Code natively discovers and uses these agents
 
 3. **Strict TDD Enforcement** - Automatic validation:
    - RED→GREEN→REFACTOR cycle enforcement
@@ -51,11 +49,12 @@ node .claude/journeys/jr1-onboarding.js
 
 When the user asks you to:
 
-1. **"Check code quality"** → Run `make assess`
-2. **"Fix issues"** → Run `make fix-pack`
-3. **"Help with tests"** → Use TESTER agent
-4. **"Review PR"** → Use VALIDATOR agent
-5. **"Deploy"** → Run `make release`
+1. **"Check code quality"** → Use `/assess` command
+2. **"Fix issues"** → Use `/fix <TASK-ID>` command
+3. **"Fix pipeline"** → Use `/recover` command
+4. **"Learn patterns"** → Use `/learn` command
+5. **"Deploy"** → Use `/release <version>` command
+6. **"Check status"** → Use `/status` command
 
 ### For Autonomous Operation
 

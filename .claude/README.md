@@ -20,13 +20,24 @@ make status
 
 ### Primary Commands You Should Know
 
+**Native Claude Code Slash Commands:**
+| Command | Purpose | Agent Used |
+|---------|---------|------------|
+| `/assess` | Scan code quality | AUDITOR |
+| `/fix <TASK-ID>` | Fix problems with TDD | EXECUTOR |
+| `/recover` | Fix CI/CD issues | GUARDIAN |
+| `/learn` | Extract patterns | SCHOLAR |
+| `/release <version>` | Manage release | STRATEGIST |
+| `/status` | Check workflow status | STRATEGIST |
+
+**Alternative Makefile Commands:**
 | Command | Purpose | When to Use |
 |---------|---------|-------------|
-| `make assess` | Scan code quality | User asks about code issues |
-| `make fix-pack` | Fix problems with TDD | User wants fixes implemented |
-| `make test` | Run test suite | User asks to run tests |
-| `make ci-recovery` | Fix CI/CD issues | Pipeline is broken |
-| `make release` | Manage release | User wants to deploy |
+| `make assess` | Scan code quality | If slash commands unavailable |
+| `make fix-pack` | Fix problems with TDD | Batch processing |
+| `make test` | Run test suite | Direct test execution |
+| `make ci-recovery` | Fix CI/CD issues | Pipeline recovery |
+| `make release` | Manage release | Deployment process |
 
 ## 📂 Directory Structure
 
@@ -40,7 +51,8 @@ make status
 │   ├── jr5-pattern-mining.js
 │   ├── jr6-release.js
 │   └── registry.yaml
-├── agents/          # 20 specialized agents
+├── agents/          # Specialized agents (Markdown with frontmatter)
+├── commands/        # Slash command definitions
 ├── docs/           # Documentation
 ├── scripts/        # Utility scripts
 ├── cli.js          # Direct agent control
@@ -102,28 +114,23 @@ make release
 
 ## 🤝 Working with Agents
 
-### Direct Agent Invocation
-```bash
-# Pattern:
-npm run agent:invoke <AGENT>:<COMMAND> -- [options]
-
-# Examples:
-npm run agent:invoke AUDITOR:assess-code -- --scope full
-npm run agent:invoke EXECUTOR:implement-fix -- --task-id CLEAN-123
-npm run agent:invoke GUARDIAN:analyze-failure -- --auto-fix
-```
+### Claude Code Native Integration
+Agents are now natively discoverable by Claude Code through:
+- **Slash Commands**: `/assess`, `/fix`, `/recover`, `/learn`, `/release`, `/status`
+- **Agent Definitions**: `.claude/agents/*.md` files with YAML frontmatter
+- **Automatic Selection**: Claude Code selects appropriate agents based on task
 
 ### Available Agents
-- **AUDITOR** - Code quality scanner
-- **EXECUTOR** - Fix implementation
-- **GUARDIAN** - CI/CD monitoring
-- **STRATEGIST** - Orchestration
-- **SCHOLAR** - Pattern learning
-- **TESTER** - Test creation
-- **VALIDATOR** - Code review
-- **MONITOR** - System health
-- **ARCHITECT** - Design decisions
-- **DOCUMENTER** - Documentation
+- **AUDITOR** (`auditor.md`) - Code quality scanner
+- **EXECUTOR** (`executor.md`) - Fix implementation with TDD
+- **GUARDIAN** (`guardian.md`) - CI/CD monitoring and recovery
+- **STRATEGIST** (`strategist.md`) - Workflow orchestration
+- **SCHOLAR** (`scholar.md`) - Pattern learning and mining
+- **TESTER** (`tester.md`) - Test creation and validation
+- **VALIDATOR** (`validator.md`) - Code review and quality gates
+- **LINTER** (`linter.md`) - Code style enforcement
+- **TYPECHECKER** (`typechecker.md`) - Type safety validation
+- **SECURITY** (`security.md`) - Security scanning
 
 ## 🔧 Configuration
 

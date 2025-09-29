@@ -18,19 +18,19 @@ cat .claude/README.md
 make onboard
 ```
 
-### Primary Commands Available to You (Slash Commands)
+### Primary Commands Available to You (Native Claude Code Commands)
 
-**Core Journey Commands** - Aligned to TDD + Linear workflow:
-- `/assess` - Scan code quality → Create Linear tasks (JR-2)
-- `/fix TASK-ID` - Implement fix with TDD enforcement (JR-3)
-- `/recover` - Auto-fix broken CI/CD pipeline (JR-4)
-- `/learn` - Mine patterns from successful PRs (JR-5)
-- `/release` - Manage production deployment (JR-6)
-- `/status` - Current workflow & Linear status
+**Slash Commands** - Direct Claude Code integration:
+- `/assess` - Scan code quality → Create Linear tasks (uses AUDITOR agent)
+- `/fix <TASK-ID>` - Implement fix with TDD enforcement (uses EXECUTOR agent)
+- `/recover` - Auto-fix broken CI/CD pipeline (uses GUARDIAN agent)
+- `/learn` - Mine patterns from successful PRs (uses SCHOLAR agent)
+- `/release <version>` - Manage production deployment (uses STRATEGIST agent)
+- `/status` - Current workflow & Linear status (uses STRATEGIST agent)
 
-**Script Entrypoints:**
+**Alternative Script Entrypoints:**
 ```bash
-# Via Makefile (recommended)
+# Via Makefile (if slash commands not available)
 make assess                  # Code assessment
 make fix TASK=CLEAN-123      # TDD fix implementation
 make recover                 # Pipeline recovery
@@ -38,9 +38,9 @@ make learn                   # Pattern learning
 make release                 # Release management
 make status                  # System status
 
-# Command discovery
-node .claude/cli.js commands:list      # List all commands
-node .claude/cli.js commands:list --json # JSON format for parsing
+# Direct agent discovery
+ls .claude/agents/*.md       # List available agents
+ls .claude/commands/*.md     # List available commands
 ```
 
 **Documentation:** Each command has full docs in `.claude/commands/`
@@ -132,20 +132,16 @@ STRATEGIST (Orchestration)
 [15 Specialized Agents for specific tasks]
 ```
 
-**Agent Invocation Pattern:**
-```bash
-npm run agent:invoke <AGENT>:<COMMAND> -- [parameters]
+**Agent Usage:**
+Claude Code natively discovers and uses agents through:
+- **Slash Commands**: `/assess`, `/fix`, `/recover`, `/learn`, `/release`, `/status`
+- **Agent Files**: `.claude/agents/*.md` - Each agent has comprehensive system prompts
+- **Direct Invocation**: Agents are automatically selected based on the task
 
-# Examples:
-npm run agent:invoke AUDITOR:assess-code -- --scope full
-npm run agent:invoke EXECUTOR:implement-fix -- --task-id CLEAN-123
-npm run agent:invoke GUARDIAN:analyze-failure -- --auto-fix
-```
-
-**Critical Agent References:**
-- `.claude/agents/CLAUDE.md` - Complete agent system reference with Linear matrix
-- `.claude/agents/AGENT-SELECTION-GUIDE.md` - Decision trees for choosing agents
-- `.claude/agents/LINEAR-OPERATIONS-GUIDE.md` - Linear task management clarity
+**Agent Documentation:**
+- `.claude/agents/` - All agent definitions in Markdown with frontmatter
+- `.claude/commands/` - Slash command definitions
+- Each agent file contains complete role description and capabilities
 
 ### Directory Structure
 
