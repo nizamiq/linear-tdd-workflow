@@ -15,7 +15,9 @@
       "Bash(chmod:*)",
       "Bash(node:*)",
       "Bash(make coverage-validate:*)",
-      "Bash(npm run coverage:validate:*)"
+      "Bash(npm run coverage:validate:*)",
+      "Bash(git checkout:*)",
+      "Bash(git fetch:*)"
     ],
     "deny": [],
     "ask": []
