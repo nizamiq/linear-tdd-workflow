@@ -1,1014 +1,220 @@
 #!/usr/bin/env node
 
 /**
- * Universal Setup Script for .claude Agentic Workflow
+ * Setup Script for Claude Code Workflow System
  *
- * This script detects project type and configures the agentic workflow
- * for any project (new or existing) with support for:
- * - JavaScript/TypeScript (Node.js)
- * - Python
- * - Mixed language projects
+ * Simplified for native Claude Code integration.
+ * This script verifies the system is properly configured
+ * with .md agents and slash commands.
  */
 
 const fs = require('fs').promises;
 const path = require('path');
 const { execSync } = require('child_process');
-const readline = require('readline');
 
-// Native console styling to replace chalk
+// Console colors
 const colors = {
-  gray: (text) => `\x1b[90m${text}\x1b[0m`,
-  red: (text) => `\x1b[31m${text}\x1b[0m`,
   green: (text) => `\x1b[32m${text}\x1b[0m`,
+  red: (text) => `\x1b[31m${text}\x1b[0m`,
   yellow: (text) => `\x1b[33m${text}\x1b[0m`,
-  blue: (text) => `\x1b[34m${text}\x1b[0m`,
   cyan: (text) => `\x1b[36m${text}\x1b[0m`,
-  bold: Object.assign(
-    (text) => `\x1b[1m${text}\x1b[0m`,
-    {
-      cyan: (text) => `\x1b[1m\x1b[36m${text}\x1b[0m`,
-      green: (text) => `\x1b[1m\x1b[32m${text}\x1b[0m`,
-      yellow: (text) => `\x1b[1m\x1b[33m${text}\x1b[0m`
-    }
-  )
+  bold: (text) => `\x1b[1m${text}\x1b[0m`
 };
 
-// Ignore patterns for glob operations to prevent memory issues
-const IGNORE_PATTERNS = [
-  '**/node_modules/**',
-  '**/.git/**',
-  '**/dist/**',
-  '**/build/**',
-  '**/.venv/**',
-  '**/venv/**',
-  '**/env/**',
-  '**/.env/**',
-  '**/coverage/**',
-  '**/.next/**',
-  '**/.nuxt/**',
-  '**/out/**',
-  '**/.cache/**',
-  '**/tmp/**',
-  '**/temp/**',
-  '**/*.min.js',
-  '**/*.bundle.js',
-  '**/.pytest_cache/**',
-  '**/__pycache__/**',
-  '**/*.pyc',
-  '**/site-packages/**',
-  '**/vendor/**',
-  '**/.tox/**',
-  '**/.eggs/**',
-  '**/*.egg-info/**',
-  '**/htmlcov/**',
-  '**/.mypy_cache/**',
-  '**/.ruff_cache/**',
-  '**/.hypothesis/**'
-];
-
-// Maximum depth for glob operations
-const MAX_GLOB_DEPTH = 10;
-
-// Maximum files to process in detection
-const MAX_FILES_TO_CHECK = 20;
-
-class ClaudeSetup {
+class Setup {
   constructor() {
     this.projectRoot = process.cwd();
-    this.claudeDir = __dirname;
-
-    // Monitor memory usage
-    this.logMemoryUsage('Setup started');
-
-    this.projectInfo = {
-      type: 'unknown', // 'new', 'existing'
-      languages: [], // 'javascript', 'typescript', 'python'
-      packageManager: 'npm', // 'npm', 'yarn', 'pnpm', 'poetry', 'pip'
-      hasTests: false,
-      testFrameworks: [],
-      hasCI: false,
-      framework: 'none' // 'react', 'vue', 'angular', 'express', 'fastapi', etc.
-    };
+    this.claudeDir = path.join(this.projectRoot, '.claude');
   }
 
-  /**
-   * Log memory usage for debugging
-   */
-  logMemoryUsage(label = '') {
-    const used = process.memoryUsage();
-    const mb = (bytes) => Math.round(bytes / 1024 / 1024 * 100) / 100;
-
-    console.log(colors.gray(`[MEMORY] ${label}: RSS ${mb(used.rss)}MB, Heap ${mb(used.heapUsed)}/${mb(used.heapTotal)}MB, External ${mb(used.external)}MB`));
-  }
-
-  /**
-   * Main setup orchestration
-   */
-  async setup() {
-    console.log(colors.bold.cyan('\n🚀 Claude Agentic Workflow Setup\n'));
+  async run() {
+    console.log(colors.bold('\n🚀 Claude Code Workflow System Setup\n'));
 
     try {
-      this.logMemoryUsage('Setup started');
+      // Check if .claude directory exists
+      await this.checkClaudeDirectory();
 
-      // Step 1: Detect project characteristics
-      await this.detectProject();
-      this.logMemoryUsage('Project detected');
+      // Check for agents
+      await this.checkAgents();
 
-      // Step 2: Show detection results and confirm
-      await this.confirmDetection();
+      // Check for commands
+      await this.checkCommands();
 
-      // Step 3: Install dependencies
-      await this.installDependencies();
+      // Check environment setup
+      await this.checkEnvironment();
 
-      // Step 4: Configure project
-      if (this.projectInfo.type === 'new') {
-        await this.initializeNewProject();
-      } else {
-        await this.enhanceExistingProject();
-      }
+      // Check Linear configuration
+      await this.checkLinearConfig();
 
-      // Step 5: Setup CI/CD
-      await this.setupCI();
+      // Install dependencies if needed
+      await this.checkDependencies();
 
-      // Step 6: Enhance CLAUDE.md
-      await this.enhanceClaudeMd();
+      console.log(colors.green('\n✅ Setup complete! System is ready for Claude Code.\n'));
+      console.log('Available slash commands:');
+      console.log('  ' + colors.cyan('/assess') + ' - Code quality assessment');
+      console.log('  ' + colors.cyan('/fix <TASK-ID>') + ' - Implement fix with TDD');
+      console.log('  ' + colors.cyan('/recover') + ' - Fix CI/CD pipeline');
+      console.log('  ' + colors.cyan('/learn') + ' - Extract patterns');
+      console.log('  ' + colors.cyan('/release <version>') + ' - Manage release');
+      console.log('  ' + colors.cyan('/status') + ' - Check workflow status');
 
-      // Step 7: Final validation
-      await this.validateSetup();
-
-      console.log(colors.bold.green('\n✅ Setup completed successfully!\n'));
-      console.log(this.getUsageInstructions());
+      // Create marker file
+      await fs.writeFile(
+        path.join(this.projectRoot, '.claude-installed'),
+        `Claude Code Workflow System v2.0\nInstalled: ${new Date().toISOString()}\n`
+      );
 
     } catch (error) {
-      console.error(colors.red(`\n❌ Setup failed: ${error.message}\n`));
+      console.error(colors.red(`Setup failed: ${error.message}`));
       process.exit(1);
     }
   }
 
-  /**
-   * Detect project characteristics
-   */
-  async detectProject() {
-    console.log(colors.yellow('🔍 Detecting project characteristics...\n'));
-
-    // Check if project is new or existing
-    const hasPackageJson = await this.fileExists('package.json');
-    const hasPyprojectToml = await this.fileExists('pyproject.toml');
-    const hasRequirementsTxt = await this.fileExists('requirements.txt');
-    const hasSetupPy = await this.fileExists('setup.py');
-    const hasSourceFiles = await this.hasAnySourceFiles();
-
-    if (!hasPackageJson && !hasPyprojectToml && !hasRequirementsTxt && !hasSetupPy && !hasSourceFiles) {
-      this.projectInfo.type = 'new';
-      console.log(colors.green('📁 New project detected'));
-    } else {
-      this.projectInfo.type = 'existing';
-      console.log(colors.blue('📂 Existing project detected'));
-    }
-
-    // Detect languages
-    await this.detectLanguages();
-
-    // Detect package manager
-    await this.detectPackageManager();
-
-    // Detect test frameworks
-    await this.detectTestFrameworks();
-
-    // Detect CI/CD
-    await this.detectCI();
-
-    // Detect framework
-    await this.detectFramework();
-  }
-
-  /**
-   * Detect programming languages in use
-   */
-  async detectLanguages() {
-    const languages = new Set();
-
-    // Check for JavaScript/TypeScript files
-    if (await this.hasFiles(['**/*.js', '**/*.jsx', '**/*.mjs', '**/*.cjs'])) {
-      languages.add('javascript');
-    }
-
-    if (await this.hasFiles(['**/*.ts', '**/*.tsx', '**/*.d.ts']) || await this.fileExists('tsconfig.json')) {
-      languages.add('typescript');
-    }
-
-    // Check for Python files
-    if (await this.hasFiles(['**/*.py', '**/*.pyx', '**/*.pyi'])) {
-      languages.add('python');
-    }
-
-    this.projectInfo.languages = Array.from(languages);
-
-    if (this.projectInfo.languages.length === 0) {
-      // Ask user for preferred language
-      this.projectInfo.languages = await this.askForLanguages();
-    }
-
-    console.log(colors.green(`📝 Languages: ${this.projectInfo.languages.join(', ')}`));
-  }
-
-  /**
-   * Detect package manager
-   */
-  async detectPackageManager() {
-    if (await this.fileExists('yarn.lock')) {
-      this.projectInfo.packageManager = 'yarn';
-    } else if (await this.fileExists('pnpm-lock.yaml')) {
-      this.projectInfo.packageManager = 'pnpm';
-    } else if (await this.fileExists('poetry.lock')) {
-      this.projectInfo.packageManager = 'poetry';
-    } else if (await this.fileExists('package-lock.json')) {
-      this.projectInfo.packageManager = 'npm';
-    } else if (this.projectInfo.languages.includes('python')) {
-      this.projectInfo.packageManager = 'pip';
-    }
-
-    console.log(colors.green(`📦 Package Manager: ${this.projectInfo.packageManager}`));
-  }
-
-  /**
-   * Detect existing test frameworks
-   */
-  async detectTestFrameworks() {
-    const frameworks = [];
-
-    // Check package.json for JS/TS test frameworks
-    if (await this.fileExists('package.json')) {
-      const packageJson = JSON.parse(await fs.readFile('package.json', 'utf8'));
-      const deps = { ...packageJson.dependencies, ...packageJson.devDependencies };
-
-      if (deps.jest) frameworks.push('jest');
-      if (deps.mocha) frameworks.push('mocha');
-      if (deps.vitest) frameworks.push('vitest');
-      if (deps.jasmine) frameworks.push('jasmine');
-    }
-
-    // Enhanced Python test framework detection
-    if (this.projectInfo.languages.includes('python')) {
-      const hasPytest = await this.detectPytestUsage();
-      const hasUnittest = await this.detectUnittestUsage();
-
-      if (hasPytest) frameworks.push('pytest');
-      if (hasUnittest) frameworks.push('unittest');
-    }
-
-    this.projectInfo.testFrameworks = frameworks;
-    this.projectInfo.hasTests = frameworks.length > 0 || await this.hasTestFiles();
-
-    console.log(colors.green(`🧪 Test Frameworks: ${frameworks.join(', ') || 'none detected'}`));
-  }
-
-  /**
-   * Comprehensive pytest detection for Python projects
-   */
-  async detectPytestUsage() {
-    // Check for pytest in requirements files
-    const requirementFiles = ['requirements.txt', 'requirements-dev.txt', 'dev-requirements.txt', 'test-requirements.txt'];
-    for (const reqFile of requirementFiles) {
-      if (await this.fileExists(reqFile)) {
-        try {
-          const content = await fs.readFile(reqFile, 'utf8');
-          if (content.includes('pytest')) return true;
-        } catch (error) {
-          // Continue checking other files
-        }
-      }
-    }
-
-    // Check pyproject.toml for pytest
-    if (await this.fileExists('pyproject.toml')) {
-      try {
-        const content = await fs.readFile('pyproject.toml', 'utf8');
-        if (content.includes('pytest') || content.includes('[tool.pytest')) return true;
-      } catch (error) {
-        // Continue with other checks
-      }
-    }
-
-    // Check setup.py for pytest
-    if (await this.fileExists('setup.py')) {
-      try {
-        const content = await fs.readFile('setup.py', 'utf8');
-        if (content.includes('pytest')) return true;
-      } catch (error) {
-        // Continue with other checks
-      }
-    }
-
-    // Check for pytest configuration files
-    const pytestConfigFiles = ['pytest.ini', 'pyproject.toml', 'tox.ini', 'setup.cfg'];
-    for (const configFile of pytestConfigFiles) {
-      if (await this.fileExists(configFile)) {
-        try {
-          const content = await fs.readFile(configFile, 'utf8');
-          if (content.includes('[pytest]') || content.includes('[tool.pytest')) return true;
-        } catch (error) {
-          // Continue checking
-        }
-      }
-    }
-
-    // Check for pytest-style test files
-    const pytestPatterns = [
-      '**/test_*.py',
-      '**/*_test.py',
-      '**/tests/**/*.py',
-      '**/test/**/*.py'
-    ];
-
-    for (const pattern of pytestPatterns) {
-      if (await this.hasFiles([pattern])) {
-        // Additional check: look for pytest-specific imports in test files
-        try {
-          const { glob } = require('glob');
-          const files = await glob(pattern, {
-            cwd: this.projectRoot,
-            ignore: IGNORE_PATTERNS,
-            maxDepth: MAX_GLOB_DEPTH,
-            nodir: true,
-            dot: false,
-            follow: false,
-            realpath: false
-          });
-
-          // Limit to checking first few files to prevent memory issues
-          const filesToCheck = files.slice(0, Math.min(MAX_FILES_TO_CHECK, files.length));
-
-          for (const file of filesToCheck) {
-            try {
-              const filePath = path.join(this.projectRoot, file);
-              const stats = await fs.stat(filePath);
-
-              // Skip large files (> 1MB) to prevent memory issues
-              if (stats.size > 1024 * 1024) continue;
-
-              const content = await fs.readFile(filePath, 'utf8');
-              if (content.includes('import pytest') ||
-                  content.includes('from pytest') ||
-                  content.includes('@pytest.') ||
-                  content.includes('pytest.')) {
-                return true;
-              }
-            } catch (error) {
-              // Continue checking other files
-            }
-          }
-        } catch (error) {
-          console.warn(colors.yellow(`Warning: Pytest detection incomplete: ${error.message}`));
-          // If glob fails, fall back to basic file pattern check
-          return await this.hasFiles(pytestPatterns.slice(0, 2));
-        }
-      }
-    }
-
-    return false;
-  }
-
-  /**
-   * Detect unittest usage in Python projects
-   */
-  async detectUnittestUsage() {
-    const unittestPatterns = [
-      '**/test*.py',
-      '**/tests/**/*.py'
-    ];
-
-    for (const pattern of unittestPatterns) {
-      if (await this.hasFiles([pattern])) {
-        try {
-          const { glob } = require('glob');
-          const files = await glob(pattern, {
-            cwd: this.projectRoot,
-            ignore: IGNORE_PATTERNS,
-            maxDepth: MAX_GLOB_DEPTH,
-            nodir: true,
-            dot: false,
-            follow: false,
-            realpath: false
-          });
-
-          // Limit to checking first few files to prevent memory issues
-          const filesToCheck = files.slice(0, Math.min(MAX_FILES_TO_CHECK, files.length));
-
-          for (const file of filesToCheck) {
-            try {
-              const filePath = path.join(this.projectRoot, file);
-              const stats = await fs.stat(filePath);
-
-              // Skip large files (> 1MB) to prevent memory issues
-              if (stats.size > 1024 * 1024) continue;
-
-              const content = await fs.readFile(filePath, 'utf8');
-              if (content.includes('import unittest') ||
-                  content.includes('from unittest') ||
-                  content.includes('unittest.TestCase')) {
-                return true;
-              }
-            } catch (error) {
-              // Continue checking other files
-            }
-          }
-        } catch (error) {
-          console.warn(colors.yellow(`Warning: Unittest detection incomplete: ${error.message}`));
-          // If glob fails, fall back to basic detection
-          return await this.hasFiles(['**/test*.py']);
-        }
-      }
-    }
-
-    return false;
-  }
-
-  /**
-   * Detect CI/CD systems
-   */
-  async detectCI() {
-    const ciSystems = [];
-
-    if (await this.fileExists('.github/workflows')) {
-      ciSystems.push('github-actions');
-    }
-    if (await this.fileExists('.gitlab-ci.yml')) {
-      ciSystems.push('gitlab-ci');
-    }
-    if (await this.fileExists('Jenkinsfile')) {
-      ciSystems.push('jenkins');
-    }
-    if (await this.fileExists('.circleci/config.yml')) {
-      ciSystems.push('circleci');
-    }
-
-    this.projectInfo.hasCI = ciSystems.length > 0;
-    console.log(colors.green(`🔄 CI/CD: ${ciSystems.join(', ') || 'none detected'}`));
-  }
-
-  /**
-   * Detect framework
-   */
-  async detectFramework() {
-    if (await this.fileExists('package.json')) {
-      const packageJson = JSON.parse(await fs.readFile('package.json', 'utf8'));
-      const deps = { ...packageJson.dependencies, ...packageJson.devDependencies };
-
-      if (deps.react) this.projectInfo.framework = 'react';
-      else if (deps.vue) this.projectInfo.framework = 'vue';
-      else if (deps['@angular/core']) this.projectInfo.framework = 'angular';
-      else if (deps.express) this.projectInfo.framework = 'express';
-      else if (deps.next) this.projectInfo.framework = 'next';
-    }
-
-    if (this.projectInfo.languages.includes('python')) {
-      if (await this.hasFiles(['**/app.py', '**/main.py'])) {
-        // Try to detect Python frameworks by common patterns
-        if (await this.hasStringInFiles(['FastAPI', 'fastapi'])) {
-          this.projectInfo.framework = 'fastapi';
-        } else if (await this.hasStringInFiles(['Flask', 'flask'])) {
-          this.projectInfo.framework = 'flask';
-        } else if (await this.hasStringInFiles(['Django', 'django'])) {
-          this.projectInfo.framework = 'django';
-        }
-      }
-    }
-
-    console.log(colors.green(`🏗️ Framework: ${this.projectInfo.framework}`));
-  }
-
-  /**
-   * Confirm detection results with user
-   */
-  async confirmDetection() {
-    console.log(colors.bold.yellow('\n📋 Detected Configuration:\n'));
-    console.log(`Project Type: ${colors.cyan(this.projectInfo.type)}`);
-    console.log(`Languages: ${colors.cyan(this.projectInfo.languages.join(', '))}`);
-    console.log(`Package Manager: ${colors.cyan(this.projectInfo.packageManager)}`);
-    console.log(`Test Frameworks: ${colors.cyan(this.projectInfo.testFrameworks.join(', ') || 'none')}`);
-    console.log(`Framework: ${colors.cyan(this.projectInfo.framework)}`);
-    console.log(`Has CI/CD: ${colors.cyan(this.projectInfo.hasCI ? 'Yes' : 'No')}`);
-
-    const proceed = await this.askYesNo('\nProceed with this configuration?', true);
-    if (!proceed) {
-      console.log(colors.yellow('Setup cancelled by user.'));
-      process.exit(0);
-    }
-  }
-
-  /**
-   * Install required dependencies
-   */
-  async installDependencies() {
-    console.log(colors.yellow('\n📦 Installing dependencies...\n'));
-
-    const depsFile = path.join(this.claudeDir, 'dependencies.json');
-
+  async checkClaudeDirectory() {
     try {
-      const depsConfig = JSON.parse(await fs.readFile(depsFile, 'utf8'));
-
-      // Install JavaScript/TypeScript dependencies
-      if (this.projectInfo.languages.includes('javascript') || this.projectInfo.languages.includes('typescript')) {
-        await this.installJSDependencies(depsConfig.javascript);
-      }
-
-      // Install Python dependencies
-      if (this.projectInfo.languages.includes('python')) {
-        await this.installPythonDependencies(depsConfig.python);
-      }
-
-    } catch (error) {
-      console.warn(colors.yellow(`Warning: Could not load dependencies config: ${error.message}`));
-    }
-  }
-
-  /**
-   * Install JavaScript/TypeScript dependencies
-   */
-  async installJSDependencies(deps) {
-    if (!deps) return;
-
-    const { packageManager } = this.projectInfo;
-    const toInstall = [];
-
-    // Check what's already installed
-    let existingDeps = {};
-    try {
-      if (await this.fileExists('package.json')) {
-        const pkg = JSON.parse(await fs.readFile('package.json', 'utf8'));
-        existingDeps = { ...pkg.dependencies, ...pkg.devDependencies };
-      }
-    } catch (error) {
-      // Ignore
-    }
-
-    // Add missing required dependencies
-    for (const dep of deps.required || []) {
-      if (!existingDeps[dep]) {
-        toInstall.push(dep);
-      }
-    }
-
-    if (toInstall.length > 0) {
-      console.log(colors.blue(`Installing JS/TS dependencies: ${toInstall.join(', ')}`));
-
-      try {
-        const installCmd = this.getInstallCommand(packageManager, toInstall, true);
-        execSync(installCmd, { stdio: 'inherit' });
-      } catch (error) {
-        console.warn(colors.yellow(`Warning: Failed to install some dependencies: ${error.message}`));
-      }
-    }
-  }
-
-  /**
-   * Install Python dependencies
-   */
-  async installPythonDependencies(deps) {
-    if (!deps) return;
-
-    const toInstall = [];
-
-    // Detect Python environment
-    const pythonEnv = await this.detectPythonEnvironment();
-
-    // Check what's already installed (simplified)
-    for (const dep of deps.required || []) {
-      try {
-        execSync(`${pythonEnv.python} -c "import ${dep}"`, { stdio: 'ignore' });
-      } catch {
-        toInstall.push(dep);
-      }
-    }
-
-    if (toInstall.length > 0) {
-      console.log(colors.blue(`Installing Python dependencies: ${toInstall.join(', ')}`));
-      console.log(colors.gray(`Using Python environment: ${pythonEnv.type}`));
-
-      try {
-        if (this.projectInfo.packageManager === 'poetry') {
-          execSync(`poetry add --group dev ${toInstall.join(' ')}`, { stdio: 'inherit' });
-        } else {
-          execSync(`${pythonEnv.pip} install ${toInstall.join(' ')}`, { stdio: 'inherit' });
-        }
-      } catch (error) {
-        console.warn(colors.yellow(`Warning: Failed to install some Python dependencies: ${error.message}`));
-        if (error.message.includes('PEP 668') || error.message.includes('externally-managed')) {
-          console.warn(colors.yellow('Tip: Consider using a virtual environment:'));
-          console.warn(colors.gray('  python -m venv venv'));
-          console.warn(colors.gray('  source venv/bin/activate  # (or venv\\Scripts\\activate on Windows)'));
-          console.warn(colors.gray('  pip install <packages>'));
-        }
-      }
-    }
-  }
-
-  /**
-   * Detect Python environment (virtual env, system, etc.)
-   */
-  async detectPythonEnvironment() {
-    // Check for virtual environment
-    const venvPaths = [
-      '.venv/bin/python',
-      '.venv/Scripts/python.exe',
-      'venv/bin/python',
-      'venv/Scripts/python.exe',
-      'env/bin/python',
-      'env/Scripts/python.exe'
-    ];
-
-    for (const venvPath of venvPaths) {
-      if (await this.fileExists(venvPath)) {
-        const pipPath = venvPath.replace('python', 'pip').replace('.exe', '');
-        return {
-          type: 'virtual environment',
-          python: venvPath,
-          pip: pipPath
-        };
-      }
-    }
-
-    // Check if we're already in a virtual environment
-    if (process.env.VIRTUAL_ENV) {
-      return {
-        type: 'active virtual environment',
-        python: 'python',
-        pip: 'pip'
-      };
-    }
-
-    // Fall back to system Python
-    return {
-      type: 'system Python',
-      python: 'python',
-      pip: 'pip'
-    };
-  }
-
-  /**
-   * Initialize new project
-   */
-  async initializeNewProject() {
-    console.log(colors.yellow('\n🆕 Initializing new project...\n'));
-
-    // Create package.json for JS/TS projects
-    if (this.projectInfo.languages.includes('javascript') || this.projectInfo.languages.includes('typescript')) {
-      await this.createPackageJson();
-    }
-
-    // Create pyproject.toml for Python projects
-    if (this.projectInfo.languages.includes('python')) {
-      await this.createPyprojectToml();
-    }
-
-    // Create directory structure
-    await this.createDirectoryStructure();
-
-    // Create initial files
-    await this.createInitialFiles();
-  }
-
-  /**
-   * Enhance existing project
-   */
-  async enhanceExistingProject() {
-    console.log(colors.yellow('\n🔧 Enhancing existing project...\n'));
-
-    // Backup existing configurations
-    await this.backupConfigurations();
-
-    // Merge package.json scripts
-    if (await this.fileExists('package.json')) {
-      await this.enhancePackageJson();
-    }
-
-    // Add Python configuration if needed
-    if (this.projectInfo.languages.includes('python') && !await this.fileExists('pyproject.toml')) {
-      await this.createPyprojectToml();
-    }
-  }
-
-  /**
-   * Setup CI/CD
-   */
-  async setupCI() {
-    if (!this.projectInfo.hasCI) {
-      const setupCI = await this.askYesNo('\nSetup GitHub Actions CI/CD?', true);
-      if (setupCI) {
-        await this.createGitHubActions();
-      }
-    } else {
-      console.log(colors.blue('Existing CI/CD detected, skipping setup.'));
-    }
-  }
-
-  /**
-   * Enhance CLAUDE.md with workflow system directive
-   */
-  async enhanceClaudeMd() {
-    console.log(colors.yellow('\n📝 Updating CLAUDE.md with workflow system...\n'));
-
-    const claudeMdPath = path.join(this.projectRoot, 'CLAUDE.md');
-    const templatePath = path.join(this.claudeDir, 'templates', 'claude-md-append.template');
-
-    try {
-      // Read the append template
-      const appendContent = await fs.readFile(templatePath, 'utf8');
-
-      // Check if CLAUDE.md exists
-      let existingContent = '';
-      let fileExists = false;
-
-      try {
-        existingContent = await fs.readFile(claudeMdPath, 'utf8');
-        fileExists = true;
-      } catch (error) {
-        // File doesn't exist, will create new one
-        existingContent = `# CLAUDE.md
-
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
-## Project Context
-
-**${this.getProjectName()}** - ${this.getProjectDescription()}
-
-`;
-      }
-
-      // Check if workflow directive already exists
-      if (existingContent.includes('## Claude Agentic Workflow System')) {
-        console.log(colors.blue('CLAUDE.md already contains workflow system directive, skipping.'));
-        return;
-      }
-
-      // Append the workflow directive
-      const updatedContent = existingContent + '\n' + appendContent;
-
-      await fs.writeFile(claudeMdPath, updatedContent, 'utf8');
-
-      if (fileExists) {
-        console.log(colors.green('✅ Enhanced existing CLAUDE.md with workflow system directive'));
-      } else {
-        console.log(colors.green('✅ Created new CLAUDE.md with workflow system directive'));
-      }
-
-    } catch (error) {
-      console.error(colors.red(`Failed to update CLAUDE.md: ${error.message}`));
-    }
-  }
-
-  /**
-   * Validate setup
-   */
-  async validateSetup() {
-    console.log(colors.yellow('\n✅ Validating setup...\n'));
-
-    try {
-      // Run agent status check
-      const statusScript = path.join(this.claudeDir, 'scripts', 'monitoring', 'agent-status.js');
-      execSync(`node ${statusScript} quick`, { stdio: 'inherit' });
-    } catch (error) {
-      console.warn(colors.yellow('Warning: Agent status check failed'));
-    }
-  }
-
-  /**
-   * Helper methods
-   */
-  async fileExists(filepath) {
-    try {
-      await fs.access(path.join(this.projectRoot, filepath));
-      return true;
+      await fs.access(this.claudeDir);
+      console.log(colors.green('✓') + ' .claude directory found');
     } catch {
-      return false;
+      console.error(colors.red('✗') + ' .claude directory not found');
+      throw new Error('.claude directory is required');
     }
   }
 
-  async hasFiles(patterns) {
+  async checkAgents() {
+    const agentDir = path.join(this.claudeDir, 'agents');
+    const files = await fs.readdir(agentDir);
+    const mdAgents = files.filter(f => f.endsWith('.md'));
+
+    if (mdAgents.length === 0) {
+      console.error(colors.red('✗') + ' No agent files found');
+      throw new Error('No .md agent files in .claude/agents/');
+    }
+
+    console.log(colors.green('✓') + ` ${mdAgents.length} agents configured`);
+
+    // Verify core agents exist
+    const coreAgents = ['auditor.md', 'executor.md', 'guardian.md', 'strategist.md', 'scholar.md'];
+    const missingCore = coreAgents.filter(agent => !mdAgents.includes(agent));
+
+    if (missingCore.length > 0) {
+      console.warn(colors.yellow('⚠') + ` Missing core agents: ${missingCore.join(', ')}`);
+    }
+  }
+
+  async checkCommands() {
+    const commandDir = path.join(this.claudeDir, 'commands');
+    const files = await fs.readdir(commandDir);
+    const mdCommands = files.filter(f => f.endsWith('.md') && !f.includes('README'));
+
+    if (mdCommands.length === 0) {
+      console.error(colors.red('✗') + ' No command files found');
+      throw new Error('No .md command files in .claude/commands/');
+    }
+
+    console.log(colors.green('✓') + ` ${mdCommands.length} slash commands configured`);
+
+    // Verify core commands exist
+    const coreCommands = ['assess.md', 'fix.md', 'recover.md', 'learn.md', 'release.md', 'status.md'];
+    const missingCommands = coreCommands.filter(cmd => !mdCommands.includes(cmd));
+
+    if (missingCommands.length > 0) {
+      console.warn(colors.yellow('⚠') + ` Missing core commands: ${missingCommands.join(', ')}`);
+    }
+  }
+
+  async checkEnvironment() {
+    const envPath = path.join(this.projectRoot, '.env');
+    const envExamplePath = path.join(this.projectRoot, '.env.example');
+
     try {
-      const { glob } = require('glob');
-      for (const pattern of patterns) {
-        const files = await glob(pattern, {
-          cwd: this.projectRoot,
-          ignore: IGNORE_PATTERNS,
-          maxDepth: MAX_GLOB_DEPTH,
-          nodir: true,
-          dot: false,
-          follow: false,  // Don't follow symlinks
-          realpath: false // Don't resolve symlinks
-        });
-        if (files.length > 0) return true;
+      await fs.access(envPath);
+      console.log(colors.green('✓') + ' .env file exists');
+    } catch {
+      console.log(colors.yellow('⚠') + ' .env file not found');
+
+      // Try to create from example
+      try {
+        const exampleContent = await fs.readFile(envExamplePath, 'utf8');
+        await fs.writeFile(envPath, exampleContent);
+        console.log(colors.green('✓') + ' Created .env from .env.example');
+        console.log(colors.yellow('  ⚠ Please configure your LINEAR_API_KEY in .env'));
+      } catch {
+        // Create basic .env
+        const basicEnv = `# Linear Integration
+LINEAR_API_KEY=lin_api_xxxxx  # Replace with your Linear API key
+LINEAR_TEAM_ID=your-team-id   # Replace with your Linear team ID
+LINEAR_PROJECT_ID=             # Optional: specific project ID
+LINEAR_TASK_PREFIX=            # Optional: custom task prefix
+
+# System Settings
+DEBUG=false
+NODE_ENV=development
+`;
+        await fs.writeFile(envPath, basicEnv);
+        console.log(colors.green('✓') + ' Created basic .env file');
+        console.log(colors.yellow('  ⚠ Please configure your Linear credentials in .env'));
       }
-      return false;
-    } catch (error) {
-      console.warn(colors.yellow(`Warning: File detection failed: ${error.message}`));
-      if (error.message.includes('EMFILE') || error.message.includes('memory')) {
-        console.warn(colors.yellow('Tip: Try increasing Node.js memory limit:'));
-        console.warn(colors.gray('  node --max-old-space-size=4096 .claude/setup.js'));
-      }
-      return false;
     }
   }
 
-  async hasAnySourceFiles() {
-    return await this.hasFiles(['**/*.js', '**/*.ts', '**/*.py', '**/*.jsx', '**/*.tsx']);
-  }
+  async checkLinearConfig() {
+    // Check if Linear config exists
+    const configPath = path.join(this.claudeDir, 'config', 'linear.config.js');
 
-  async hasTestFiles() {
-    return await this.hasFiles([
-      '**/test/**/*.js', '**/test/**/*.ts', '**/test/**/*.py',
-      '**/*.test.js', '**/*.test.ts', '**/*.spec.js', '**/*.spec.ts',
-      '**/test_*.py', '**/*_test.py'
-    ]);
-  }
-
-  async hasStringInFiles(strings, filePatterns = ['**/app.py', '**/main.py']) {
     try {
-      const { glob } = require('glob');
+      await fs.access(configPath);
+      console.log(colors.green('✓') + ' Linear configuration found');
 
-      for (const pattern of filePatterns) {
-        const files = await glob(pattern, {
-          cwd: this.projectRoot,
-          ignore: IGNORE_PATTERNS,
-          maxDepth: MAX_GLOB_DEPTH,
-          nodir: true,
-          dot: false,
-          follow: false,
-          realpath: false
-        });
-
-        // Check only first few files
-        const filesToCheck = files.slice(0, Math.min(5, files.length));
-
-        for (const file of filesToCheck) {
-          try {
-            const filePath = path.join(this.projectRoot, file);
-            const stats = await fs.stat(filePath);
-
-            // Skip large files
-            if (stats.size > 1024 * 1024) continue;
-
-            const content = await fs.readFile(filePath, 'utf8');
-            for (const str of strings) {
-              if (content.includes(str)) {
-                return true;
-              }
-            }
-          } catch (error) {
-            // Continue checking other files
-          }
-        }
-      }
-    } catch (error) {
-      console.warn(colors.yellow(`Warning: String search in files failed: ${error.message}`));
-    }
-    return false;
-  }
-
-  async askYesNo(question, defaultValue = true) {
-    const rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout
-    });
-
-    return new Promise((resolve) => {
-      const defaultStr = defaultValue ? '[Y/n]' : '[y/N]';
-      rl.question(colors.cyan(`${question} ${defaultStr}: `), (answer) => {
-        rl.close();
-        const normalized = answer.toLowerCase().trim();
-        if (normalized === '') {
-          resolve(defaultValue);
+      // Try to load and validate
+      try {
+        require('dotenv').config();
+        const LinearConfig = require(configPath);
+        const config = new LinearConfig();
+        const linearConfig = config.getConfig();
+        console.log(colors.green('✓') + ' Linear configuration valid');
+      } catch (error) {
+        if (error.message.includes('LINEAR_API_KEY')) {
+          console.log(colors.yellow('⚠') + ' Linear API key not configured');
         } else {
-          resolve(normalized === 'y' || normalized === 'yes');
+          console.warn(colors.yellow('⚠') + ` Linear config issue: ${error.message}`);
         }
-      });
-    });
-  }
-
-  async askForLanguages() {
-    // For now, default to both JS and Python
-    return ['javascript', 'python'];
-  }
-
-  getInstallCommand(packageManager, deps, isDev = false) {
-    const devFlag = isDev ? ' --save-dev' : '';
-    switch (packageManager) {
-      case 'yarn':
-        return `yarn add${isDev ? ' --dev' : ''} ${deps.join(' ')}`;
-      case 'pnpm':
-        return `pnpm add${devFlag} ${deps.join(' ')}`;
-      default:
-        return `npm install${devFlag} ${deps.join(' ')}`;
-    }
-  }
-
-  async createPackageJson() {
-    const templatePath = path.join(this.claudeDir, 'templates', 'package.json.template');
-    // Implementation would read template and customize
-    console.log(colors.green('📄 Created package.json'));
-  }
-
-  async createPyprojectToml() {
-    const templatePath = path.join(this.claudeDir, 'templates', 'pyproject.toml.template');
-    // Implementation would read template and customize
-    console.log(colors.green('📄 Created pyproject.toml'));
-  }
-
-  async createDirectoryStructure() {
-    const dirs = ['src', 'tests', 'docs'];
-    for (const dir of dirs) {
-      await fs.mkdir(path.join(this.projectRoot, dir), { recursive: true });
-    }
-    console.log(colors.green('📁 Created directory structure'));
-  }
-
-  async createInitialFiles() {
-    // Create basic files
-    console.log(colors.green('📄 Created initial files'));
-  }
-
-  async backupConfigurations() {
-    const backupDir = path.join(this.projectRoot, '.claude-backup');
-    await fs.mkdir(backupDir, { recursive: true });
-    console.log(colors.green('💾 Backed up existing configurations'));
-  }
-
-  async enhancePackageJson() {
-    console.log(colors.green('📦 Enhanced package.json with Claude scripts'));
-  }
-
-  async createGitHubActions() {
-    const actionsDir = path.join(this.projectRoot, '.github', 'workflows');
-    await fs.mkdir(actionsDir, { recursive: true });
-    console.log(colors.green('🔄 Created GitHub Actions workflow'));
-  }
-
-  /**
-   * Get project name from package.json or directory name
-   */
-  getProjectName() {
-    try {
-      const packageJsonPath = path.join(this.projectRoot, 'package.json');
-      if (require('fs').existsSync(packageJsonPath)) {
-        const pkg = JSON.parse(require('fs').readFileSync(packageJsonPath, 'utf8'));
-        return pkg.name || path.basename(this.projectRoot);
       }
-    } catch (error) {
-      // Ignore
+    } catch {
+      console.log(colors.yellow('⚠') + ' Linear configuration not found (optional)');
     }
-    return path.basename(this.projectRoot);
   }
 
-  /**
-   * Get project description from package.json or default
-   */
-  getProjectDescription() {
+  async checkDependencies() {
+    const packageJsonPath = path.join(this.projectRoot, 'package.json');
+
     try {
-      const packageJsonPath = path.join(this.projectRoot, 'package.json');
-      if (require('fs').existsSync(packageJsonPath)) {
-        const pkg = JSON.parse(require('fs').readFileSync(packageJsonPath, 'utf8'));
-        return pkg.description || 'Project enhanced with Claude Agentic Workflow System';
+      const packageJson = JSON.parse(await fs.readFile(packageJsonPath, 'utf8'));
+
+      // Check for required dependencies
+      const required = ['commander', 'dotenv'];
+      const missing = required.filter(dep =>
+        !packageJson.dependencies?.[dep] && !packageJson.devDependencies?.[dep]
+      );
+
+      if (missing.length > 0) {
+        console.log(colors.yellow('⚠') + ` Installing missing dependencies: ${missing.join(', ')}`);
+        execSync(`npm install ${missing.join(' ')}`, { stdio: 'inherit' });
       }
+
+      console.log(colors.green('✓') + ' Dependencies installed');
     } catch (error) {
-      // Ignore
+      console.warn(colors.yellow('⚠') + ' Could not verify dependencies');
     }
-    return 'Project enhanced with Claude Agentic Workflow System';
-  }
-
-  getUsageInstructions() {
-    return colors.bold.cyan(`
-🎉 Claude Agentic Workflow is ready!
-
-Quick Start:
-  ./claude assess              # Run code assessment
-  ./claude fix CLEAN-123       # Implement fix pack
-  ./claude test               # Run TDD cycle
-  ./claude status             # Show system status
-
-Documentation:
-  ./claude help               # Get help
-  ./claude doctor            # Diagnose issues
-
-Next Steps:
-  1. Run your first assessment: ./claude assess
-  2. Check the .claude/docs/ directory for guides
-  3. Configure Linear integration in .claude/settings.local.json
-    `);
   }
 }
 
-// CLI execution
+// Run setup
 if (require.main === module) {
-  const setup = new ClaudeSetup();
-  setup.setup()
-    .then(() => {
-      process.exit(0);
-    })
-    .catch((error) => {
-      console.error('Setup failed:', error);
-      process.exit(1);
-    });
+  const setup = new Setup();
+  setup.run().catch(error => {
+    console.error(colors.red(`Setup failed: ${error.message}`));
+    process.exit(1);
+  });
 }
 
-module.exports = ClaudeSetup;
+module.exports = Setup;

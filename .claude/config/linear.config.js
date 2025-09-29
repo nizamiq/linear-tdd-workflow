@@ -407,3 +407,4 @@ Examples:
         process.exit(1);
     }
 }
+module.exports = LinearConfig;
