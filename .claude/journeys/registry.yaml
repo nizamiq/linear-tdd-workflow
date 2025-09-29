@@ -1,0 +1,250 @@
+schemaVersion: 1.0
+name: journey-registry
+description: "Registry of all autonomous TDD workflow journeys"
+
+# Journey Registry - Enables Claude Code to autonomously select and execute journeys
+journeys:
+  JR-1:
+    name: "New Project Onboarding"
+    description: "Initialize project with agents and run first assessment"
+    entry: "jr1-onboarding.js"
+    autonomous: true
+    triggers:
+      - type: "manual"
+        command: "make onboard"
+      - type: "file-created"
+        pattern: ".claude-init"
+      - type: "first-run"
+        condition: "no .claude directory exists"
+    agents:
+      - auditor     # Initial assessment
+      - strategist  # Create Linear tasks
+      - executor    # First fix pack
+      - validator   # Quality gates
+    outputs:
+      - "reports/initial-assessment.json"
+      - "linear/onboarding-tasks.json"
+      - "pr/first-fix-pack.md"
+    success_criteria:
+      - ".claude directory installed"
+      - "Initial assessment complete"
+      - "Linear tasks created"
+      - "First PR green"
+
+  JR-2:
+    name: "Clean-Code Assessment"
+    description: "Autonomous code quality scanning and issue detection"
+    entry: "jr2-assessment.js"
+    autonomous: true
+    triggers:
+      - type: "schedule"
+        cron: "0 */4 * * *"  # Every 4 hours
+      - type: "event"
+        name: "push:main"
+      - type: "manual"
+        command: "make assess"
+      - type: "threshold"
+        metric: "technical_debt"
+        operator: ">"
+        value: 100  # hours
+    agents:
+      - auditor     # Multi-dimensional scan
+      - strategist  # Action plan creation
+      - scholar     # Pattern recognition
+    autonomous_decisions:
+      - name: "scope_selection"
+        logic: "If last assessment < 24h ago, use incremental; else full"
+      - name: "priority_assignment"
+        logic: "Critical security > Performance > Code quality"
+      - name: "batch_size"
+        logic: "Max 10 issues per assessment to avoid overload"
+    outputs:
+      - "assessments/quality-{timestamp}.json"
+      - "proposals/fix-packs-{timestamp}.json"
+      - "plan/action-plan-{timestamp}.yaml"
+
+  JR-3:
+    name: "TDD Fix Pack Implementation"
+    description: "Autonomous TDD cycle execution for approved tasks"
+    entry: "jr3-fix-pack.js"
+    autonomous: true
+    triggers:
+      - type: "linear-task"
+        status: "ready"
+        labels: ["fix-pack", "approved"]
+      - type: "manual"
+        command: "make fix TASK={id}"
+      - type: "batch"
+        condition: "5+ approved FIL-0/1 tasks in backlog"
+    agents:
+      - executor    # TDD implementation
+      - tester      # RED phase tests
+      - validator   # Quality gates
+      - strategist  # PR coordination
+    autonomous_workflow:
+      - step: "task_selection"
+        decision: "Pick highest priority FIL-0/1 task"
+      - step: "red_phase"
+        decision: "Generate failing test based on task requirements"
+      - step: "green_phase"
+        decision: "Implement minimal code to pass"
+      - step: "refactor_phase"
+        decision: "Improve if complexity > threshold"
+      - step: "pr_creation"
+        decision: "Auto-create PR when gates pass"
+    quality_gates:
+      diff_coverage: 80
+      mutation_score: 30
+      max_loc: 300
+      tdd_evidence: required
+
+  JR-4:
+    name: "CI Break Diagnosis & Recovery"
+    description: "Autonomous pipeline monitoring and self-healing"
+    entry: "jr4-ci-recovery.js"
+    autonomous: true
+    triggers:
+      - type: "webhook"
+        source: "ci/cd"
+        event: "pipeline.failed"
+      - type: "poll"
+        interval: "2m"
+        check: "pipeline.status"
+      - type: "manual"
+        command: "make recover"
+    agents:
+      - guardian    # Pipeline monitoring
+      - strategist  # Incident management
+      - scholar     # Pattern learning
+    autonomous_recovery:
+      strategies:
+        - name: "retry"
+          condition: "transient or timeout error"
+          max_attempts: 3
+        - name: "cache_clear"
+          condition: "dependency or cache error"
+          max_attempts: 1
+        - name: "quarantine"
+          condition: "flaky test detected"
+          max_attempts: 1
+        - name: "revert"
+          condition: "code regression detected"
+          requires_approval: false  # Autonomous for FIL-0/1
+      escalation:
+        after_attempts: 3
+        after_time: "10m"
+        create_incident: true
+        notify: ["oncall", "tech-lead"]
+
+  JR-5:
+    name: "Pattern Mining & Continuous Improvement"
+    description: "Autonomous learning from code changes and fixes"
+    entry: "jr5-pattern-mining.js"
+    autonomous: true
+    triggers:
+      - type: "schedule"
+        cron: "0 0 * * SUN"  # Weekly on Sunday
+      - type: "event"
+        name: "fix-pack.merged"
+        count: 10  # After every 10 fix packs
+      - type: "manual"
+        command: "make learn"
+    agents:
+      - scholar     # Pattern extraction
+      - strategist  # Pattern prioritization
+      - auditor     # Pattern validation
+    autonomous_learning:
+      extraction:
+        sources: ["commits", "prs", "fixes", "tests"]
+        min_occurrences: 3
+        confidence_threshold: 0.8
+      validation:
+        method: "test on sample code"
+        success_rate: 0.8
+        false_positive_rate: 0.05
+      application:
+        auto_apply: true  # For high-confidence patterns
+        scope: "FIL-0/1 only"
+    outputs:
+      - "patterns/catalog-{version}.yaml"
+      - "reports/insights-{timestamp}.md"
+      - "metrics/efficiency-gains.json"
+
+  JR-6:
+    name: "UAT & Production Release"
+    description: "Semi-autonomous release coordination"
+    entry: "jr6-release.js"
+    autonomous: false  # Requires human approval
+    triggers:
+      - type: "manual"
+        command: "make release VERSION={version}"
+      - type: "linear-milestone"
+        status: "complete"
+      - type: "schedule"
+        cron: "0 9 * * 1"  # Monday 9am for weekly releases
+        requires_approval: true
+    agents:
+      - strategist  # Release coordination
+      - validator   # Pre-flight checks
+      - guardian    # Deployment monitoring
+      - scholar     # Post-release analysis
+    autonomous_preparation:
+      - "Create release branch"
+      - "Update version numbers"
+      - "Generate changelog"
+      - "Run all quality gates"
+      - "Prepare UAT scenarios"
+    human_gates:
+      - "UAT sign-off"
+      - "Product owner approval"
+      - "Tech lead approval"
+      - "Final go/no-go decision"
+
+# Global Configuration for Autonomous Operation
+autonomous_config:
+  decision_engine:
+    confidence_threshold: 0.85  # Min confidence for autonomous action
+    risk_assessment: true
+    fil_auto_approve: [0, 1]    # Auto-approve these FIL levels
+
+  concurrency:
+    max_journeys: 3              # Max concurrent journeys
+    max_agents: 10               # Max concurrent agents
+    coordination: "path-locking"  # Prevent conflicts
+
+  safety:
+    dry_run_mode: false          # Set true to simulate without changes
+    audit_all_decisions: true    # Log all autonomous decisions
+    rollback_enabled: true       # Auto-rollback on failure
+
+  learning:
+    feedback_loop: true          # Learn from outcomes
+    pattern_sharing: true        # Share patterns between projects
+    success_tracking: true       # Track success rates
+
+  budget:
+    max_monthly: 2500            # USD per repository
+    alert_at: 80                 # Alert at 80% usage
+    pause_at: 100                # Pause at 100% usage
+
+# Workflow Orchestration Rules
+orchestration:
+  priority_order:
+    - JR-4  # CI recovery (highest - keep pipeline green)
+    - JR-3  # Fix implementation (active work)
+    - JR-2  # Assessment (planning)
+    - JR-5  # Pattern mining (improvement)
+    - JR-1  # Onboarding (setup)
+    - JR-6  # Release (scheduled)
+
+  conflict_resolution:
+    same_files: "queue"          # Queue if touching same files
+    same_journey: "skip"         # Skip if already running
+    resource_conflict: "priority" # Higher priority wins
+
+  batch_processing:
+    enabled: true
+    batch_size:
+      assessments: 100           # Files per assessment
+      fix_packs: 5               # Concurrent fix packs
+      patterns: 50               # Patterns per mining run

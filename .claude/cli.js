@@ -152,6 +152,55 @@ class ClaudeCLI {
       .argument('<source>', 'Source file or URL')
       .action(this.handleImport.bind(this));
 
+    // Journey commands
+    this.program
+      .command('journey')
+      .description('Manage autonomous journeys')
+      .argument('<action>', 'Journey action (start|list|status|stop)')
+      .argument('[journey-id]', 'Journey ID (e.g., JR-1)')
+      .option('--auto-fix', 'Enable autonomous fixes')
+      .option('--dry-run', 'Simulate without changes')
+      .option('--parallel', 'Run journeys in parallel')
+      .option('--project-type <type>', 'Override detected project type')
+      .action(this.handleJourney.bind(this));
+
+    // Guardian command for CI monitoring
+    this.program
+      .command('guardian')
+      .description('Pipeline monitoring and recovery')
+      .argument('<action>', 'Action (monitor-pipeline|recover|status)')
+      .option('--auto-fix', 'Enable automatic recovery')
+      .option('--project-type <type>', 'Project type override')
+      .action(this.handleGuardian.bind(this));
+
+    // Scholar command for pattern learning
+    this.program
+      .command('scholar')
+      .description('Pattern mining and learning')
+      .argument('<action>', 'Action (extract-patterns|analyze|train)')
+      .option('--project-type <type>', 'Project type')
+      .option('--languages <list>', 'Languages to analyze')
+      .action(this.handleScholar.bind(this));
+
+    // Release command
+    this.program
+      .command('release')
+      .description('Release management')
+      .argument('<action>', 'Action (prepare|validate|deploy)')
+      .option('--version <version>', 'Release version')
+      .option('--project-type <type>', 'Project type')
+      .action(this.handleRelease.bind(this));
+
+    // Validator command for quality gates
+    this.program
+      .command('validator')
+      .description('Quality gate validation')
+      .argument('<action>', 'Action (check-gates|run-tests)')
+      .option('--project-type <type>', 'Project type')
+      .option('--test-cmd <cmd>', 'Test command override')
+      .option('--lint-cmd <cmd>', 'Lint command override')
+      .action(this.handleValidator.bind(this));
+
     this.program
       .command('analyze-concurrency')
       .description('Run empirical concurrency analysis')
@@ -909,6 +958,173 @@ class ClaudeCLI {
 
     } catch (error) {
       console.error(colors.red(`Agent invocation failed: ${error.message}`));
+      process.exit(1);
+    }
+  }
+
+  /**
+   * Handle journey command
+   */
+  async handleJourney(action, journeyId, options) {
+    console.log(colors.bold.cyan(`🚀 Journey Management: ${action}\n`));
+
+    try {
+      const journeyPath = path.join(this.claudeDir, 'journeys');
+
+      switch (action) {
+        case 'start':
+          if (!journeyId) {
+            console.log(colors.red('❌ Journey ID required for start action'));
+            console.log(colors.yellow('Available journeys:'));
+            console.log(colors.gray('   • JR-1: New Project Onboarding'));
+            console.log(colors.gray('   • JR-2: Clean-Code Assessment'));
+            console.log(colors.gray('   • JR-3: TDD Fix Pack Implementation'));
+            console.log(colors.gray('   • JR-4: CI Break Diagnosis & Recovery'));
+            console.log(colors.gray('   • JR-5: Pattern Mining & Continuous Improvement'));
+            console.log(colors.gray('   • JR-6: UAT & Production Release'));
+            process.exit(1);
+          }
+
+          const journeyScript = path.join(journeyPath, `${journeyId.toLowerCase()}-*.js`);
+          const files = require('glob').sync(journeyScript);
+
+          if (files.length === 0) {
+            console.log(colors.red(`❌ Journey ${journeyId} not found`));
+            process.exit(1);
+          }
+
+          let cmd = `node "${files[0]}"`;
+          if (options.autoFix) cmd += ' --auto-fix';
+          if (options.dryRun) cmd += ' --dry-run';
+          if (options.projectType) cmd += ` --project-type ${options.projectType}`;
+
+          console.log(colors.gray(`Starting journey ${journeyId}...`));
+          this.execCommand(cmd);
+          break;
+
+        case 'list':
+          console.log(colors.bold('Available Journeys:\n'));
+          const registry = require(path.join(journeyPath, 'registry.yaml'));
+          // Simple YAML parsing for display
+          console.log(colors.cyan('JR-1: New Project Onboarding'));
+          console.log(colors.gray('   Initialize project with agents and run first assessment\n'));
+          console.log(colors.cyan('JR-2: Clean-Code Assessment'));
+          console.log(colors.gray('   Autonomous code quality scanning and issue detection\n'));
+          console.log(colors.cyan('JR-3: TDD Fix Pack Implementation'));
+          console.log(colors.gray('   Autonomous TDD cycle execution for approved tasks\n'));
+          console.log(colors.cyan('JR-4: CI Break Diagnosis & Recovery'));
+          console.log(colors.gray('   Autonomous pipeline monitoring and self-healing\n'));
+          console.log(colors.cyan('JR-5: Pattern Mining & Continuous Improvement'));
+          console.log(colors.gray('   Autonomous learning from code changes and fixes\n'));
+          console.log(colors.cyan('JR-6: UAT & Production Release'));
+          console.log(colors.gray('   Semi-autonomous release coordination\n'));
+          break;
+
+        case 'status':
+          console.log(colors.yellow('⚠️  Journey status monitoring not yet implemented'));
+          break;
+
+        case 'stop':
+          if (!journeyId) {
+            console.log(colors.red('❌ Journey ID required for stop action'));
+            process.exit(1);
+          }
+          console.log(colors.yellow(`⚠️  Stopping journey ${journeyId} not yet implemented`));
+          break;
+
+        default:
+          console.log(colors.red(`❌ Unknown action: ${action}`));
+          console.log(colors.yellow('Available actions: start, list, status, stop'));
+          process.exit(1);
+      }
+
+    } catch (error) {
+      console.error(colors.red(`Journey command failed: ${error.message}`));
+      process.exit(1);
+    }
+  }
+
+  /**
+   * Handle guardian command
+   */
+  async handleGuardian(action, options) {
+    console.log(colors.bold.yellow(`🛡️ Guardian: ${action}\n`));
+
+    try {
+      const guardianScript = path.join(this.claudeDir, 'agents', 'guardian.js');
+      let cmd = `node "${guardianScript}" ${action}`;
+
+      if (options.autoFix) cmd += ' --auto-fix';
+      if (options.projectType) cmd += ` --project-type ${options.projectType}`;
+
+      this.execCommand(cmd);
+
+    } catch (error) {
+      console.error(colors.red(`Guardian command failed: ${error.message}`));
+      process.exit(1);
+    }
+  }
+
+  /**
+   * Handle scholar command
+   */
+  async handleScholar(action, options) {
+    console.log(colors.bold.magenta(`🧠 Scholar: ${action}\n`));
+
+    try {
+      const scholarScript = path.join(this.claudeDir, 'agents', 'scholar.js');
+      let cmd = `node "${scholarScript}" ${action}`;
+
+      if (options.projectType) cmd += ` --project-type ${options.projectType}`;
+      if (options.languages) cmd += ` --languages ${options.languages}`;
+
+      this.execCommand(cmd);
+
+    } catch (error) {
+      console.error(colors.red(`Scholar command failed: ${error.message}`));
+      process.exit(1);
+    }
+  }
+
+  /**
+   * Handle release command
+   */
+  async handleRelease(action, options) {
+    console.log(colors.bold.blue(`🚀 Release: ${action}\n`));
+
+    try {
+      const releaseScript = path.join(this.claudeDir, 'scripts', 'release.js');
+      let cmd = `node "${releaseScript}" ${action}`;
+
+      if (options.version) cmd += ` --version ${options.version}`;
+      if (options.projectType) cmd += ` --project-type ${options.projectType}`;
+
+      this.execCommand(cmd);
+
+    } catch (error) {
+      console.error(colors.red(`Release command failed: ${error.message}`));
+      process.exit(1);
+    }
+  }
+
+  /**
+   * Handle validator command
+   */
+  async handleValidator(action, options) {
+    console.log(colors.bold.green(`✅ Validator: ${action}\n`));
+
+    try {
+      const validatorScript = path.join(this.claudeDir, 'agents', 'validator.js');
+      let cmd = `node "${validatorScript}" ${action}`;
+
+      if (options.projectType) cmd += ` --project-type ${options.projectType}`;
+      if (options.testCmd) cmd += ` --test-cmd "${options.testCmd}"`;
+      if (options.lintCmd) cmd += ` --lint-cmd "${options.lintCmd}"`;
+
+      this.execCommand(cmd);
+
+    } catch (error) {
+      console.error(colors.red(`Validator command failed: ${error.message}`));
       process.exit(1);
     }
   }
