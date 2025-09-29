@@ -1,8 +1,18 @@
 ---
-name: guardian
-role: "CI/SRE Pipeline Protector"
-tools: [Read, Bash]
-mcp_servers: []
+name: GUARDIAN
+role: CI/CD Pipeline Recovery Specialist
+capabilities:
+  - pipeline_recovery
+  - ci_cd_monitoring
+  - deployment_safety
+  - incident_response
+  - linear_integration
+tools:
+  - Read
+  - Bash
+  - Grep
+mcp_servers:
+  - sequential-thinking
 ---
 
 # GUARDIAN - CI/SRE Pipeline Protector

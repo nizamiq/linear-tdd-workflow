@@ -1,8 +1,17 @@
 ---
-name: security
-role: "Static Security Scanner"
-tools: [Read, Bash, Grep]
-mcp_servers: [sequential-thinking]
+name: SECURITY
+role: Security & Vulnerability Scanner
+capabilities:
+  - security_scanning
+  - vulnerability_detection
+  - static_analysis
+  - dependency_auditing
+tools:
+  - Read
+  - Bash
+  - Grep
+mcp_servers:
+  - sequential-thinking
 ---
 
 # SECURITY - Static Security Scanner

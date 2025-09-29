@@ -4,7 +4,7 @@
 
 Agents are specialized AI workers, each with specific expertise and responsibilities. They work together to maintain code quality, implement fixes, and manage the development workflow.
 
-## Core Agents (The Big 5)
+## Core Agents (The Big 6)
 
 ### AUDITOR (`auditor.md`)
 **Role:** Code Quality Scanner
@@ -46,6 +46,14 @@ Agents are specialized AI workers, each with specific expertise and responsibili
 - Improve decision making
 **Slash Command:** `/learn`
 
+### PLANNER (`planner.md`)
+**Role:** Cycle Planning Orchestrator
+**Responsibilities:**
+- Automated sprint/cycle planning
+- Capacity-based work selection
+- Multi-phase workflow orchestration
+**Slash Command:** `/cycle`
+
 ## Supporting Agents
 
 ### Development Agents
@@ -63,10 +71,19 @@ Agents are specialized AI workers, each with specific expertise and responsibili
 Each agent is defined as a Markdown file with YAML frontmatter:
 ```markdown
 ---
-name: agent_name
-role: Brief description
-tools: [Read, Write, Bash]
-mcp_servers: [linear-server, context7]
+name: AGENT_NAME
+role: Brief Role Description
+capabilities:
+  - capability_1
+  - capability_2
+  - linear_integration
+tools:
+  - Read
+  - Write
+  - Bash
+mcp_servers:
+  - linear-server
+  - context7
 ---
 
 # AGENT_NAME - Role Description
@@ -80,6 +97,7 @@ mcp_servers: [linear-server, context7]
 | Agent | Create | Read | Update | Delete |
 |-------|--------|------|--------|--------|
 | STRATEGIST | ✅ | ✅ | ✅ | ✅ |
+| PLANNER | ✅ | ✅ | ✅ | ❌ |
 | AUDITOR | ✅ | ✅ | ❌ | ❌ |
 | EXECUTOR | ❌ | ✅ | ✅ | ❌ |
 | GUARDIAN | ✅ | ✅ | ✅ | ❌ |
@@ -89,7 +107,7 @@ mcp_servers: [linear-server, context7]
 
 ### Claude Code Native Discovery
 Agents are automatically discovered and used through:
-- **Slash Commands**: `/assess`, `/fix`, `/recover`, `/learn`, `/release`, `/status`
+- **Slash Commands**: `/assess`, `/fix`, `/recover`, `/learn`, `/release`, `/status`, `/cycle`
 - **Agent Files**: `.claude/agents/*.md` with frontmatter
 - **Automatic Selection**: Claude Code selects appropriate agent for the task
 
@@ -113,12 +131,21 @@ Agents are automatically discovered and used through:
 /recover --auto-revert    # With automatic revert if needed
 ```
 
+**Cycle Planning:**
+```
+/cycle plan               # Full 4-phase planning workflow
+/cycle status             # Current cycle health
+/cycle execute            # Begin cycle execution
+/cycle review             # Post-cycle analysis
+```
+
 ## Agent Coordination
 
 Agents work together through:
 1. **Linear Tasks** - Shared task management
 2. **STRATEGIST** - Central orchestration
-3. **Journeys** - Pre-defined workflows
+3. **PLANNER** - Cycle planning coordination
+4. **Journeys** - Pre-defined workflows
 
 ## Decision Making
 
@@ -130,10 +157,11 @@ Each agent uses:
 ## Creating New Agents
 
 To add an agent:
-1. Create `agent-name.md` in this directory with YAML frontmatter
-2. Define tools and mcp_servers in frontmatter
-3. Write comprehensive system prompt as Markdown body
-4. Create corresponding slash command in `.claude/commands/`
+1. Create `AGENT_NAME.md` in this directory with YAML frontmatter
+2. Define name (uppercase), role, capabilities, tools, and mcp_servers
+3. Include capabilities array for skill-based discovery
+4. Write comprehensive system prompt as Markdown body
+5. Create corresponding slash command in `.claude/commands/`
 
 ## Important Constraints
 
@@ -153,5 +181,6 @@ To add an agent:
 | Learn patterns | SCHOLAR | `/learn` |
 | Release code | STRATEGIST | `/release <version>` |
 | Check status | STRATEGIST | `/status` |
+| Plan cycles | PLANNER | `/cycle` |
 | Create tests | TESTER | (via EXECUTOR in TDD) |
 | Review code | VALIDATOR | (automatic in PR) |

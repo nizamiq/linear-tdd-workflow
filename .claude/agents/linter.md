@@ -1,7 +1,16 @@
 ---
-name: linter
-role: "Lint/Format Autofix (Safe Fix Packs)"
-tools: [Read, Write, Edit, Bash]
+name: LINTER
+role: Code Style & Format Enforcement
+capabilities:
+  - code_formatting
+  - style_enforcement
+  - autofix_generation
+  - safe_transformations
+tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
 mcp_servers: []
 ---
 

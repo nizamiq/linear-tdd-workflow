@@ -1,7 +1,23 @@
 ---
 name: assess
 description: Perform comprehensive code quality assessment
-subagent: auditor
+agent: AUDITOR
+usage: "/assess [--scope=<directory>] [--format=<json|markdown>] [--depth=<shallow|deep>]"
+parameters:
+  - name: scope
+    description: Directory to assess (default: entire project)
+    type: string
+    required: false
+  - name: format
+    description: Output format for the report
+    type: string
+    options: [json, markdown]
+    default: markdown
+  - name: depth
+    description: Analysis depth
+    type: string
+    options: [shallow, deep]
+    default: deep
 ---
 
 # /assess - Code Quality Assessment

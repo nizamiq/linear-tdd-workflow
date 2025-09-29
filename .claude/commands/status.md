@@ -1,7 +1,18 @@
 ---
 name: status
 description: Get current workflow and Linear status
-subagent: strategist
+agent: STRATEGIST
+usage: "/status [--detailed] [--format=<json|table>]"
+parameters:
+  - name: detailed
+    description: Include detailed agent and task information
+    type: boolean
+    required: false
+  - name: format
+    description: Output format
+    type: string
+    options: [json, table]
+    default: table
 ---
 
 # /status - Workflow Status

@@ -1,15 +1,21 @@
 ---
 name: PLANNER
 role: Cycle Planning Orchestrator
+capabilities:
+  - cycle_planning
+  - sprint_orchestration
+  - capacity_planning
+  - backlog_analysis
+  - linear_integration
 tools:
-  - linear
-  - sequential-thinking
-  - context7
-  - grep
-  - glob
-  - bash
+  - Read
+  - Grep
+  - Glob
+  - Bash
 mcp_servers:
   - linear-server
+  - sequential-thinking
+  - context7
 ---
 
 # PLANNER Agent - Cycle Planning Orchestrator

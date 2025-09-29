@@ -1,0 +1,72 @@
+{
+  "timestamp": "2025-09-29T13:13:14.237Z",
+  "summary": {
+    "totalTests": 17,
+    "passed": 4,
+    "failed": 13,
+    "successRate": 24
+  },
+  "errors": [
+    {
+      "test": "E2E-001: AUDITOR → Linear",
+      "error": "expect(received).toBe(expected) // Object.is equality\n\nExpected: true\nReceived: false"
+    },
+    {
+      "test": "E2E-003: GUARDIAN monitoring",
+      "error": "expect(received).toBe(expected) // Object.is equality\n\nExpected: true\nReceived: false"
+    },
+    {
+      "test": "E2E-AGENT: STRATEGIST:plan-workflow",
+      "error": "expect(received).toBeUndefined()\n\nReceived: \"Command failed: npm run agent:invoke STRATEGIST:plan-workflow -- --taskType assessment\nnpm error Missing script: \\\"agent:invoke\\\"\nnpm error\nnpm error To see a list of scripts, run:\nnpm error   npm run\nnpm error A complete log of this run can be found in: /Users/cnross/.npm/_logs/2025-09-29T13_13_12_530Z-debug-0.log\n\""
+    },
+    {
+      "test": "E2E-AGENT: SCHOLAR:extract-patterns",
+      "error": "expect(received).toBeUndefined()\n\nReceived: \"Command failed: npm run agent:invoke SCHOLAR:extract-patterns -- --source commits --period 7d\nnpm error Missing script: \\\"agent:invoke\\\"\nnpm error\nnpm error To see a list of scripts, run:\nnpm error   npm run\nnpm error A complete log of this run can be found in: /Users/cnross/.npm/_logs/2025-09-29T13_13_12_663Z-debug-0.log\n\""
+    },
+    {
+      "test": "E2E-AGENT: VALIDATOR:execute-tests",
+      "error": "expect(received).toBeUndefined()\n\nReceived: \"Command failed: npm run agent:invoke VALIDATOR:execute-tests -- --suite unit\nnpm error Missing script: \\\"agent:invoke\\\"\nnpm error\nnpm error To see a list of scripts, run:\nnpm error   npm run\nnpm error A complete log of this run can be found in: /Users/cnross/.npm/_logs/2025-09-29T13_13_12_802Z-debug-0.log\n\""
+    },
+    {
+      "test": "E2E-AGENT: ANALYZER:measure-complexity",
+      "error": "expect(received).toBeUndefined()\n\nReceived: \"Command failed: npm run agent:invoke ANALYZER:measure-complexity -- --scope full\nnpm error Missing script: \\\"agent:invoke\\\"\nnpm error\nnpm error To see a list of scripts, run:\nnpm error   npm run\nnpm error A complete log of this run can be found in: /Users/cnross/.npm/_logs/2025-09-29T13_13_12_945Z-debug-0.log\n\""
+    },
+    {
+      "test": "E2E-AGENT: CLEANER:remove-dead-code",
+      "error": "expect(received).toBeUndefined()\n\nReceived: \"Command failed: npm run agent:invoke CLEANER:remove-dead-code -- --scope full\nnpm error Missing script: \\\"agent:invoke\\\"\nnpm error\nnpm error To see a list of scripts, run:\nnpm error   npm run\nnpm error A complete log of this run can be found in: /Users/cnross/.npm/_logs/2025-09-29T13_13_13_078Z-debug-0.log\n\""
+    },
+    {
+      "test": "E2E-AGENT: MIGRATOR:migration-status",
+      "error": "expect(received).toBeUndefined()\n\nReceived: \"Command failed: npm run agent:invoke MIGRATOR:migration-status --·\nnpm error Missing script: \\\"agent:invoke\\\"\nnpm error\nnpm error To see a list of scripts, run:\nnpm error   npm run\nnpm error A complete log of this run can be found in: /Users/cnross/.npm/_logs/2025-09-29T13_13_13_211Z-debug-0.log\n\""
+    },
+    {
+      "test": "E2E-AGENT: ARCHITECT:design-system",
+      "error": "expect(received).toBeUndefined()\n\nReceived: \"Command failed: npm run agent:invoke ARCHITECT:design-system -- --scope current\nnpm error Missing script: \\\"agent:invoke\\\"\nnpm error\nnpm error To see a list of scripts, run:\nnpm error   npm run\nnpm error A complete log of this run can be found in: /Users/cnross/.npm/_logs/2025-09-29T13_13_13_367Z-debug-0.log\n\""
+    },
+    {
+      "test": "E2E-AGENT: REFACTORER:analyze-refactoring",
+      "error": "expect(received).toBeUndefined()\n\nReceived: \"Command failed: npm run agent:invoke REFACTORER:analyze-refactoring -- --scope full\nnpm error Missing script: \\\"agent:invoke\\\"\nnpm error\nnpm error To see a list of scripts, run:\nnpm error   npm run\nnpm error A complete log of this run can be found in: /Users/cnross/.npm/_logs/2025-09-29T13_13_13_499Z-debug-0.log\n\""
+    },
+    {
+      "test": "E2E-AGENT: DOCUMENTER:generate-api-docs",
+      "error": "expect(received).toBeUndefined()\n\nReceived: \"Command failed: npm run agent:invoke DOCUMENTER:generate-api-docs --·\nnpm error Missing script: \\\"agent:invoke\\\"\nnpm error\nnpm error To see a list of scripts, run:\nnpm error   npm run\nnpm error A complete log of this run can be found in: /Users/cnross/.npm/_logs/2025-09-29T13_13_13_631Z-debug-0.log\n\""
+    },
+    {
+      "test": "E2E-AGENT: INTEGRATOR:monitor-apis",
+      "error": "expect(received).toBeUndefined()\n\nReceived: \"Command failed: npm run agent:invoke INTEGRATOR:monitor-apis --·\nnpm error Missing script: \\\"agent:invoke\\\"\nnpm error\nnpm error To see a list of scripts, run:\nnpm error   npm run\nnpm error A complete log of this run can be found in: /Users/cnross/.npm/_logs/2025-09-29T13_13_13_763Z-debug-0.log\n\""
+    },
+    {
+      "test": "E2E-AGENT: RESEARCHER:analyze-architecture",
+      "error": "expect(received).toBeUndefined()\n\nReceived: \"Command failed: npm run agent:invoke RESEARCHER:analyze-architecture -- --focus structure\nnpm error Missing script: \\\"agent:invoke\\\"\nnpm error\nnpm error To see a list of scripts, run:\nnpm error   npm run\nnpm error A complete log of this run can be found in: /Users/cnross/.npm/_logs/2025-09-29T13_13_13_905Z-debug-0.log\n\""
+    }
+  ],
+  "timings": {
+    "E2E-002: EXECUTOR implementation": 155,
+    "E2E-LINEAR-001: Linear MCP": 0,
+    "E2E-ERROR-001: Invalid task handling": 135,
+    "E2E-ERROR-002: Network failure handling": 139
+  },
+  "recommendations": [
+    "Fix failing tests before production deployment"
+  ]
+}

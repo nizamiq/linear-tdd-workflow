@@ -1,9 +1,16 @@
 ---
 name: cycle
 description: Automated sprint/cycle planning and management
-syntax: /cycle [plan|status|execute|review]
-agents:
-  - PLANNER
+agent: PLANNER
+usage: "/cycle [plan|status|execute|review]"
+parameters:
+  - name: subcommand
+    description: Cycle planning operation
+    type: string
+    options: [plan, status, execute, review]
+    required: false
+    default: plan
+supporting_agents:
   - STRATEGIST
   - AUDITOR
   - SCHOLAR

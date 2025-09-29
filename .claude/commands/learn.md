@@ -1,7 +1,19 @@
 ---
 name: learn
 description: Mine patterns from successful PRs and implementations
-subagent: scholar
+agent: SCHOLAR
+usage: "/learn [--scope=<timeframe>] [--type=<pattern-type>]"
+parameters:
+  - name: scope
+    description: Time frame for analysis (e.g., last-week, last-month)
+    type: string
+    required: false
+    default: last-week
+  - name: type
+    description: Type of patterns to extract
+    type: string
+    options: [fixes, features, tests, refactors, all]
+    default: all
 ---
 
 # /learn - Pattern Learning

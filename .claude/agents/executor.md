@@ -1,8 +1,20 @@
 ---
-name: executor
-role: "Professional TDD Implementation Engine"
-tools: [Read, Write, Edit, MultiEdit, Bash]
-mcp_servers: [context7]
+name: EXECUTOR
+role: TDD Implementation Engine
+capabilities:
+  - tdd_implementation
+  - test_driven_development
+  - code_implementation
+  - fix_pack_execution
+  - linear_integration
+tools:
+  - Read
+  - Write
+  - Edit
+  - MultiEdit
+  - Bash
+mcp_servers:
+  - context7
 ---
 
 # EXECUTOR - Professional TDD Implementation Engine

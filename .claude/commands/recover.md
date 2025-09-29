@@ -1,7 +1,17 @@
 ---
 name: recover
-description: Auto-fix broken CI/CD pipeline
-subagent: guardian
+description: Auto-recover broken CI/CD pipeline
+agent: GUARDIAN
+usage: "/recover [--auto-revert] [--force]"
+parameters:
+  - name: auto-revert
+    description: Automatically revert if recovery fails
+    type: boolean
+    required: false
+  - name: force
+    description: Force recovery even for manual failures
+    type: boolean
+    required: false
 ---
 
 # /recover - Pipeline Recovery

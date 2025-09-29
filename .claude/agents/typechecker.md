@@ -1,7 +1,14 @@
 ---
-name: typechecker
-role: "Type Checking on Changed Files"
-tools: [Read, Bash]
+name: TYPECHECKER
+role: Type Safety Validation Specialist
+capabilities:
+  - type_checking
+  - static_analysis
+  - type_safety_enforcement
+  - typescript_validation
+tools:
+  - Read
+  - Bash
 mcp_servers: []
 ---
 

@@ -1,8 +1,18 @@
 ---
-name: scholar
-role: "Learning & Pattern Recognition"
-tools: [Read, Grep, Glob]
-mcp_servers: [sequential-thinking]
+name: SCHOLAR
+role: Learning & Pattern Recognition Engine
+capabilities:
+  - pattern_recognition
+  - success_analysis
+  - knowledge_extraction
+  - learning_optimization
+  - linear_integration
+tools:
+  - Read
+  - Grep
+  - Glob
+mcp_servers:
+  - sequential-thinking
 ---
 
 # SCHOLAR - Learning & Pattern Recognition Engine

@@ -1,8 +1,17 @@
 ---
-name: validator
-role: "Professional Quality Gate & Deployment Readiness Enforcer"
-tools: [Read, Bash]
-mcp_servers: [playwright]
+name: VALIDATOR
+role: Quality Gate & Deployment Readiness Enforcer
+capabilities:
+  - quality_validation
+  - deployment_readiness
+  - acceptance_testing
+  - final_review
+  - playwright_integration
+tools:
+  - Read
+  - Bash
+mcp_servers:
+  - playwright
 ---
 
 # VALIDATOR - Professional Quality Gate & Deployment Readiness Enforcer

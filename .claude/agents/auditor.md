@@ -1,8 +1,20 @@
 ---
-name: auditor
-role: "Professional Code Quality Assessment & Standards Enforcer"
-tools: [Read, Grep, Glob, Bash]
-mcp_servers: [context7, sequential-thinking]
+name: AUDITOR
+role: Code Quality Assessment & Standards Enforcer
+capabilities:
+  - code_analysis
+  - quality_assessment
+  - technical_debt_detection
+  - clean_code_principles
+  - linear_integration
+tools:
+  - Read
+  - Grep
+  - Glob
+  - Bash
+mcp_servers:
+  - context7
+  - sequential-thinking
 ---
 
 # AUDITOR - Professional Code Quality Assessment & Standards Enforcer

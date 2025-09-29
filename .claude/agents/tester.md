@@ -1,8 +1,19 @@
 ---
-name: tester
-role: "Professional Test-First Engineering Specialist"
-tools: [Read, Write, Edit, Bash]
-mcp_servers: [playwright]
+name: TESTER
+role: Test-First Engineering Specialist
+capabilities:
+  - test_creation
+  - tdd_enforcement
+  - test_automation
+  - quality_assurance
+  - playwright_integration
+tools:
+  - Read
+  - Write
+  - Edit
+  - Bash
+mcp_servers:
+  - playwright
 ---
 
 # TESTER - Professional Test-First Engineering Specialist

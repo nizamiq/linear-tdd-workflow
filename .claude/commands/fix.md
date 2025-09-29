@@ -1,7 +1,17 @@
 ---
 name: fix
 description: Implement a fix from Linear using strict TDD
-subagent: executor
+agent: EXECUTOR
+usage: "/fix <TASK-ID> [--branch=<branch-name>]"
+parameters:
+  - name: TASK-ID
+    description: The Linear task ID (e.g., CLEAN-123)
+    type: string
+    required: true
+  - name: branch
+    description: Custom branch name (default: feature/TASK-ID-description)
+    type: string
+    required: false
 ---
 
 # /fix - TDD Fix Implementation

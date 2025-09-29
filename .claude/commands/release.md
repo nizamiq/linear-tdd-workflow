@@ -1,7 +1,21 @@
 ---
 name: release
 description: Manage production release with comprehensive validation
-subagent: strategist
+agent: STRATEGIST
+usage: "/release <version> [--dry-run] [--force]"
+parameters:
+  - name: version
+    description: Version number (semver format, e.g., 1.2.3)
+    type: string
+    required: true
+  - name: dry-run
+    description: Preview release without executing
+    type: boolean
+    required: false
+  - name: force
+    description: Skip some validation checks
+    type: boolean
+    required: false
 ---
 
 # /release - Production Release Management
