@@ -51,8 +51,9 @@ node .claude/cli.js commands:list --json # JSON format for parsing
 **Linear TDD Workflow System** - Multi-agent autonomous code quality management system that enforces strict Test-Driven Development.
 
 Linear Configuration:
-- Team: `a-coders`
-- Project: `ai-coding`
+- Team: Configured via `LINEAR_TEAM_ID` environment variable
+- Project: Configured via `LINEAR_PROJECT_ID` environment variable (optional)
+- Task Prefix: Configured via `LINEAR_TASK_PREFIX` environment variable (optional)
 
 ## Essential Commands
 

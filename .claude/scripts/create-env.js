@@ -48,9 +48,11 @@ class EnvironmentSetup {
 # Copy this file to .env and fill in your actual values
 
 # Linear Integration
+# Get your API key from: https://linear.app/settings/api
 LINEAR_API_KEY=your_linear_api_key_here
-LINEAR_TEAM_ID=a-coders
-LINEAR_PROJECT_ID=ai-coding
+LINEAR_TEAM_ID=your_team_id_here
+LINEAR_PROJECT_ID=your_project_id_here
+LINEAR_TASK_PREFIX=TASK-
 LINEAR_WEBHOOK_SECRET=your_webhook_secret_here
 
 # Environment Settings

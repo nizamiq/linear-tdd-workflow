@@ -73,6 +73,17 @@ help:
 	@echo "  make monitor      - Start monitoring dashboards"
 	@echo "  make status       - Show workflow and agent status"
 	@echo ""
+	@echo "Unified Quality Assurance:"
+	@echo "  make qa-unified           - Coverage validation + Linear standardization"
+	@echo "  make coverage-linear-workflow - Combined coverage + Linear pipeline"
+	@echo "  make linear-quality-pipeline  - Complete Linear data quality check"
+	@echo "  make quality-report           - Generate comprehensive QA report"
+	@echo ""
+	@echo "Linear Integration:"
+	@echo "  make linear-standardize       - Run JR-8 Linear standardization"
+	@echo "  make linear-duplicates        - Detect duplicate Linear tasks"
+	@echo "  make linear-validate-tasks    - Validate tasks against standards"
+	@echo ""
 	@echo "Development Commands:"
 	@echo "  make test         - Run test suite with coverage"
 	@echo "  make lint         - Run linting and formatting"
@@ -283,5 +294,158 @@ ifeq ($(PROJECT_TYPE),python)
 else ifeq ($(PROJECT_TYPE),javascript)
 	@$(MAKE) install-javascript
 endif
+
+# ============================================================================
+# COVERAGE VERIFICATION COMMANDS
+# ============================================================================
+
+# Validate coverage against specifications
+coverage-validate:
+	@echo "🔍 Validating test coverage against specifications..."
+	@node .claude/scripts/coverage/spec-validator.js \
+		--threshold $(COVERAGE_THRESHOLD) \
+		--output json
+
+# Audit test-to-spec mapping
+coverage-audit:
+	@echo "📊 Auditing test-to-specification mapping..."
+	@node .claude/scripts/coverage/test-mapper.js \
+		--detailed \
+		--output markdown
+
+# Run full coverage verification journey
+coverage-journey:
+	@echo "🚀 Starting JR-7: Coverage Verification Journey..."
+	@node .claude/journeys/jr7-coverage-verification.js \
+		--create-tasks
+
+# Check TDD compliance
+tdd-check:
+	@echo "✅ Checking TDD compliance..."
+	@node .claude/scripts/coverage/tdd-analyzer.js \
+		--strict
+
+# Coverage threshold for validation (default 80%)
+COVERAGE_THRESHOLD ?= 80
+
+# ============================================================================
+# UNIFIED WORKFLOW INTEGRATION - Linear Standardization
+# ============================================================================
+
+# Run unified quality assurance with Linear integration
+qa-unified:
+	@echo "🔄 Starting Unified Quality Assurance Workflow..."
+	@echo "   Coverage validation → Linear standardization → Task creation"
+	@$(MAKE) coverage-validate
+	@$(MAKE) linear-standardize
+	@$(MAKE) linear-validate-tasks
+	@echo "✅ Unified QA workflow complete"
+
+# Linear task standardization journey (JR-8)
+linear-standardize:
+	@echo "📋 Starting JR-8: Linear Task Standardization..."
+	@node .claude/journeys/jr8-linear-standardization.js \
+		--execute \
+		--threshold 0.7
+
+# Detect and merge duplicate Linear tasks
+linear-duplicates:
+	@echo "🔍 Scanning for duplicate Linear tasks..."
+	@node .claude/scripts/linear/duplicate-detector.js \
+		--verbose \
+		--title-threshold=0.8 \
+		--combined-threshold=0.7
+
+# Validate Linear tasks against project standards
+linear-validate-tasks:
+	@echo "✅ Validating Linear tasks against project standards..."
+	@node .claude/scripts/linear/testing-task-validator.js \
+		--project-standards \
+		--generate-report
+
+# Create standardized Linear tasks from coverage gaps
+linear-create-coverage-tasks:
+	@echo "📝 Creating standardized Linear tasks from coverage analysis..."
+	@node .claude/scripts/coverage/spec-validator.js \
+		--create-linear-tasks \
+		--use-templates
+
+# Full Linear data quality pipeline
+linear-quality-pipeline:
+	@echo "🚀 Running complete Linear data quality pipeline..."
+	@$(MAKE) linear-duplicates
+	@$(MAKE) linear-standardize
+	@$(MAKE) linear-validate-tasks
+	@echo "📊 Linear data quality pipeline complete"
+
+# Combined coverage + Linear workflow
+coverage-linear-workflow:
+	@echo "🔄 Running combined coverage verification + Linear workflow..."
+	@$(MAKE) coverage-journey
+	@$(MAKE) linear-quality-pipeline
+	@echo "✅ Combined workflow complete"
+
+# Quick Linear standardization (dry run)
+ql-standard:
+	@node .claude/journeys/jr8-linear-standardization.js \
+		--dry-run \
+		--threshold 0.7
+
+# Quick duplicate detection
+ql-duplicates:
+	@node .claude/scripts/linear/duplicate-detector.js \
+		--title-threshold=0.8
+
+# ============================================================================
+# TESTING AND VALIDATION INTEGRATION
+# ============================================================================
+
+# Validate TDD compliance with Linear task creation
+tdd-validate-with-tasks:
+	@echo "🧪 Running TDD validation with Linear task creation..."
+	@$(MAKE) tdd-check
+	@if [ $$? -ne 0 ]; then \
+		echo "❌ TDD compliance issues found, creating Linear tasks..."; \
+		node .claude/scripts/linear/task-templates.js \
+			--create-tdd-tasks \
+			--priority high; \
+	fi
+
+# Coverage validation with automated Linear task creation
+coverage-validate-with-tasks: coverage-validate
+	@echo "📋 Creating Linear tasks for coverage gaps..."
+	@$(MAKE) linear-create-coverage-tasks
+
+# ============================================================================
+# REPORTING AND MONITORING
+# ============================================================================
+
+# Generate comprehensive quality report
+quality-report:
+	@echo "📊 Generating comprehensive quality report..."
+	@mkdir -p reports
+	@echo "# Quality Report - $(shell date)" > reports/quality-report-$(shell date +%Y%m%d-%H%M%S).md
+	@echo "" >> reports/quality-report-$(shell date +%Y%m%d-%H%M%S).md
+	@echo "## Test Coverage" >> reports/quality-report-$(shell date +%Y%m%d-%H%M%S).md
+	@$(MAKE) coverage-validate >> reports/quality-report-$(shell date +%Y%m%d-%H%M%S).md 2>&1 || true
+	@echo "" >> reports/quality-report-$(shell date +%Y%m%d-%H%M%S).md
+	@echo "## Linear Task Quality" >> reports/quality-report-$(shell date +%Y%m%d-%H%M%S).md
+	@$(MAKE) linear-validate-tasks >> reports/quality-report-$(shell date +%Y%m%d-%H%M%S).md 2>&1 || true
+	@echo "" >> reports/quality-report-$(shell date +%Y%m%d-%H%M%S).md
+	@echo "## Duplicate Detection" >> reports/quality-report-$(shell date +%Y%m%d-%H%M%S).md
+	@$(MAKE) linear-duplicates >> reports/quality-report-$(shell date +%Y%m%d-%H%M%S).md 2>&1 || true
+	@echo "✅ Quality report generated in reports/"
+
+# Monitor workflow health
+workflow-health:
+	@echo "🏥 Checking workflow system health..."
+	@echo "Linear standardization:"
+	@test -f .claude/journeys/jr8-linear-standardization.js && echo "  ✅ JR-8 available" || echo "  ❌ JR-8 missing"
+	@echo "Duplicate detection:"
+	@test -f .claude/scripts/linear/duplicate-detector.js && echo "  ✅ Duplicate detector available" || echo "  ❌ Duplicate detector missing"
+	@echo "Task templates:"
+	@test -f .claude/scripts/linear/task-templates.js && echo "  ✅ Task templates available" || echo "  ❌ Task templates missing"
+	@echo "Testing validator:"
+	@test -f .claude/scripts/linear/testing-task-validator.js && echo "  ✅ Testing validator available" || echo "  ❌ Testing validator missing"
 
 .SILENT: help status check-install
