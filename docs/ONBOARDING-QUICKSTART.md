@@ -1,64 +1,76 @@
 # Quick Start Guide - Claude Agentic Workflow System
 
-This is the fastest way to get started with the Claude Agentic Workflow System. Choose your path:
+This is the fastest way to get started with the Claude Agentic Workflow System using our autonomous journey system.
 
-## 🚀 New Project (5 minutes)
+## 🚀 Automatic Onboarding (3 minutes)
 
-```bash
-# Clone workflow system to your workspace
-cd ~/workspace  # or your projects directory
-git clone https://github.com/your-org/claude-workflow
-
-# Create new project and install workflow
-mkdir my-project && cd my-project
-../claude-workflow/scripts/install.sh
-```
-
-**Done!** Your project now has:
-- ✅ TDD enforcement
-- ✅ 20-agent quality management
-- ✅ Universal commands via Makefile
-- ✅ CI/CD templates
-
-## 🔧 Existing Project (10 minutes)
+The system now includes a fully autonomous onboarding journey (JR-1) that handles all setup:
 
 ```bash
-# Clone workflow system (parallel to your projects)
-cd ~/workspace  # or parent directory of existing project
-git clone https://github.com/your-org/claude-workflow
+# Clone the workflow system
+git clone https://github.com/your-org/linear-tdd-workflow
+cd linear-tdd-workflow
 
-# Navigate to existing project
-cd my-existing-project
+# Install dependencies
+npm install
 
-# Backup current state
-git stash push -m "Before Claude integration"
+# Configure Linear API key
+cp .env.example .env
+# Edit .env with your LINEAR_API_KEY
 
-# Install workflow system
-../claude-workflow/scripts/install.sh
-
-# Verify integration
-make validate
+# Run autonomous onboarding
+make onboard
 ```
 
-**Done!** Your existing project is now enhanced with autonomous code quality management.
+**The onboarding journey automatically:**
+- ✅ Detects project type (Python/JS/TS)
+- ✅ Validates prerequisites
+- ✅ Initializes GitFlow
+- ✅ Configures 20-agent system
+- ✅ Sets up Linear integration
+- ✅ Creates TDD structure
+- ✅ Runs initial validation
+
+## 🔧 For Existing Projects
+
+```bash
+# Copy .claude directory to your project
+cp -r linear-tdd-workflow/.claude your-project/
+cp linear-tdd-workflow/Makefile your-project/
+
+# Navigate to your project
+cd your-project
+
+# Run autonomous onboarding
+make onboard
+```
+
+**The system will:**
+- Auto-detect your project type
+- Preserve existing structure
+- Enhance with TDD workflow
+- Configure agents appropriately
 
 ## 📋 Essential Commands
 
 ```bash
-# Core workflow
-make assess              # Run code quality assessment
-make fix TASK=CLEAN-123  # Implement fix pack
-make test               # Run TDD cycle
-make status             # Show system status
+# Autonomous Journeys
+make onboard            # Run onboarding journey (JR-1)
+make assess             # Run assessment journey (JR-2)
+make fix-pack           # Execute TDD fix pack (JR-3)
+make ci-recovery        # Recover CI/CD pipeline (JR-4)
+make pattern-mining     # Mine successful patterns (JR-5)
+make release           # Manage release (JR-6)
 
 # Development
-make lint               # Lint all code
-make format             # Format all code
-make validate           # Validate configuration
+make test              # Run TDD tests
+make lint              # Lint all code
+make format            # Format all code
+make build             # Build the project
 
-# Diagnostics
-make doctor             # Diagnose issues
-make help               # Show all commands
+# Status & Help
+make status            # Show system status
+make help              # Show all commands
 ```
 
 ## 🎯 First TDD Cycle
@@ -98,6 +110,36 @@ make test  # Ensure tests still pass after refactoring
 ```
 
 ## 🤖 Agent Quick Start
+
+The system includes 20 specialized agents managed through autonomous journeys:
+
+```bash
+# Run assessment with AUDITOR agent
+make assess
+
+# Check agent status
+npm run agents:status
+
+# Direct agent invocation
+npm run agent:invoke AUDITOR:assess-code -- --scope full
+npm run agent:invoke EXECUTOR:implement-fix -- --task-id CLEAN-123
+npm run agent:invoke GUARDIAN:analyze-failure -- --auto-fix
+```
+
+## 🔄 Autonomous Journeys
+
+The system operates through 6 autonomous journeys:
+
+| Journey | Purpose | Command |
+|---------|---------|---------|
+| **JR-1** | Automatic onboarding | `make onboard` |
+| **JR-2** | Code assessment | `make assess` |
+| **JR-3** | Fix implementation | `make fix-pack` |
+| **JR-4** | CI/CD recovery | `make ci-recovery` |
+| **JR-5** | Pattern mining | `make pattern-mining` |
+| **JR-6** | Release management | `make release` |
+
+Each journey combines multiple agents with decision engines for autonomous operation.
 
 ```bash
 # Check agent status

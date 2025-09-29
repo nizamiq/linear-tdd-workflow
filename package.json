@@ -49,7 +49,19 @@
     "fil:classify": "node scripts/fil-classifier.js",
     "cleanup:processes": "node .claude/scripts/cleanup-processes.js",
     "cleanup:processes:force": "node .claude/scripts/cleanup-processes.js --force",
-    "cleanup:processes:check": "node .claude/scripts/cleanup-processes.js --check"
+    "cleanup:processes:check": "node .claude/scripts/cleanup-processes.js --check",
+    "journey:onboard": "node .claude/journeys/jr1-onboarding.js",
+    "journey:assess": "node .claude/journeys/jr2-assessment.js",
+    "journey:fix-pack": "node .claude/journeys/jr3-fix-pack.js",
+    "journey:ci-recovery": "node .claude/journeys/jr4-ci-recovery.js",
+    "journey:pattern": "node .claude/journeys/jr5-pattern-mining.js",
+    "journey:release": "node .claude/journeys/jr6-release.js",
+    "journey:list": "node .claude/cli.js journey list",
+    "journey:status": "node .claude/cli.js journey status",
+    "guardian": "node .claude/cli.js guardian",
+    "scholar": "node .claude/cli.js scholar",
+    "release": "node .claude/cli.js release",
+    "validator": "node .claude/cli.js validator"
   },
   "keywords": [
     "tdd",

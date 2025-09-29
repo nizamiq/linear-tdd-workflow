@@ -2,6 +2,31 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## 🚀 IMPORTANT: Autonomous Workflow System Detected
+
+This project has the **Linear TDD Workflow System** installed. You have access to powerful autonomous capabilities:
+
+### Quick Discovery
+```bash
+# Check if system is active
+test -d .claude && echo "✅ TDD Workflow System Available" || echo "❌ System not found"
+
+# View system capabilities
+cat .claude/README.md
+
+# Activate if needed
+make onboard
+```
+
+### Primary Commands Available to You
+- `make assess` - Scan code quality and create Linear tasks
+- `make fix-pack` - Implement fixes with TDD enforcement
+- `make test` - Run comprehensive test suite
+- `make ci-recovery` - Fix broken pipelines
+- `make release` - Manage releases
+
+**For detailed instructions:** See `.claude/DISCOVERY.md`
+
 ## Project Context
 
 **Linear TDD Workflow System** - Multi-agent autonomous code quality management system that enforces strict Test-Driven Development.

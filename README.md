@@ -57,7 +57,7 @@ Before you begin, ensure you have:
 
 ## 🚀 Quick Start (5 Minutes)
 
-Get up and running with the Linear TDD Workflow System:
+Get up and running with the Linear TDD Workflow System using our autonomous journey system:
 
 ```bash
 # 1. Clone the repository
@@ -74,11 +74,14 @@ cp .env.example .env
 # LINEAR_TEAM_ID=a-coders
 # LINEAR_PROJECT_ID=ai-coding
 
-# 4. Initialize the system
-npm run setup
+# 4. Run automatic onboarding journey (JR-1)
+make onboard
+# OR using the journey system directly:
+# node .claude/journeys/jr1-onboarding.js
 
-# 5. Run your first code assessment
-npm run assess
+# 5. Run your first assessment (JR-2)
+make assess
+# This runs the autonomous assessment journey
 
 # 6. Check Linear for automatically created tasks
 ```
