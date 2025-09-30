@@ -30,6 +30,7 @@ make status
 | `/release <version>` | Manage release | STRATEGIST |
 | `/status` | Check workflow status | STRATEGIST |
 | `/cycle` | Sprint planning | PLANNER |
+| `/docs` | Documentation validation | DOC-KEEPER |
 | `/deploy` | Production deployment | DEPLOYMENT-ENGINEER |
 | `/optimize-db` | Database optimization | DATABASE-OPTIMIZER |
 | `/django` | Django development | DJANGO-PRO |
@@ -127,7 +128,7 @@ Agents are now natively discoverable by Claude Code through:
 - **Agent Definitions**: `.claude/agents/*.md` files with YAML frontmatter
 - **Automatic Selection**: Claude Code selects appropriate agents based on task
 
-### Available Agents (22 Total)
+### Available Agents (23 Total)
 
 **Core Workflow Agents:**
 - **AUDITOR** (`auditor.md`) - Code quality scanner
@@ -155,6 +156,9 @@ Agents are now natively discoverable by Claude Code through:
 - **VALIDATOR** (`validator.md`) - Code review and quality gates
 - **LINTER** (`linter.md`) - Code style enforcement
 - **TYPECHECKER** (`typechecker.md`) - Type safety validation
+
+**Documentation:**
+- **DOC-KEEPER** (`doc-keeper.md`) - Documentation validation and generation
 
 **Monitoring & Security:**
 - **OBSERVABILITY-ENGINEER** (`observability-engineer.md`) - OpenTelemetry & Prometheus

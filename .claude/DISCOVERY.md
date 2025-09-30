@@ -28,7 +28,7 @@ node .claude/journeys/jr1-onboarding.js
    - `make pattern-mining` - Learn from patterns
    - `make release` - Release management
 
-2. **Native Claude Code Agents** - Automatically discovered (22 agents total):
+2. **Native Claude Code Agents** - Automatically discovered (23 agents total):
    - Core workflow agents for TDD enforcement
    - Tech stack specialists (Django, Python, TypeScript)
    - Infrastructure experts (Kubernetes, deployment, database)
@@ -60,6 +60,7 @@ When the user asks you to:
 5. **"Deploy"** → Use `/release <version>` command
 6. **"Check status"** → Use `/status` command
 7. **"Plan sprint"** → Use `/cycle` command
+8. **"Validate documentation"** → Use `/docs` command
 
 **Development Tasks:**
 8. **"Django help"** → Use `/django` command

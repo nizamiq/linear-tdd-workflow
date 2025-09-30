@@ -28,6 +28,7 @@ make onboard
 - `/release <version>` - Manage production deployment (STRATEGIST)
 - `/status` - Current workflow & Linear status (STRATEGIST)
 - `/cycle [plan|status|execute|review]` - Sprint planning (PLANNER)
+- `/docs` - Documentation validation and generation (DOC-KEEPER)
 
 **Development & Framework Commands** - Tech stack specific:
 - `/django` - Django development assistance (DJANGO-PRO)
@@ -147,18 +148,19 @@ STRATEGIST (Orchestration) ← → PLANNER (Cycle Planning)
 │ (Assessment)│ (Fix Impl.)  │ (CI/CD Guard)  │ (Learning)   │
 └─────────────┴──────────────┴────────────────┴──────────────┘
        ↓              ↓               ↓                ↓
-[16 Specialized Agents for tech stack coverage]
+[17 Specialized Agents for tech stack coverage]
 
 Tech Stack Specialists:
 • DJANGO-PRO, PYTHON-PRO, TYPESCRIPT-PRO
 • KUBERNETES-ARCHITECT, DEPLOYMENT-ENGINEER
 • DATABASE-OPTIMIZER, OBSERVABILITY-ENGINEER
 • CODE-REVIEWER, TEST-AUTOMATOR, LEGACY-MODERNIZER
+• DOC-KEEPER (Documentation validation & generation)
 ```
 
 **Agent Usage:**
 Claude Code natively discovers and uses agents through:
-- **Slash Commands**: `/assess`, `/fix`, `/recover`, `/learn`, `/release`, `/status`, `/cycle`
+- **Slash Commands**: `/assess`, `/fix`, `/recover`, `/learn`, `/release`, `/status`, `/cycle`, `/docs`
 - **Agent Files**: `.claude/agents/*.md` - Each agent has comprehensive system prompts
 - **Direct Invocation**: Agents are automatically selected based on the task
 
@@ -171,7 +173,7 @@ Claude Code natively discovers and uses agents through:
 
 ```
 .claude/
-├── agents/         # 20 agent specifications
+├── agents/         # 23 agent specifications
 │   └── CLAUDE.md  # Detailed agent reference
 ├── commands/      # Command templates
 └── mcp.json      # MCP server configuration
@@ -186,6 +188,7 @@ docs/             # Project documentation
 **STRATEGIST is the PRIMARY Linear manager**. Other agents have limited roles:
 - **STRATEGIST**: Full CRUD - manages all tasks, sprints, assignments
 - **AUDITOR**: CREATE only - quality issues (CLEAN-XXX)
+- **DOC-KEEPER**: CREATE only - documentation issues (DOC-XXX)
 - **MONITOR**: CREATE only - incidents (INCIDENT-XXX)
 - **SCHOLAR**: READ only - pattern analysis
 - **Others**: UPDATE only for specific status changes
