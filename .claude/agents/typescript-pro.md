@@ -45,6 +45,7 @@ tools:
 mcp_servers:
   - context7
   - sequential-thinking
+  - linear-server
 ---
 
 # TYPESCRIPT-PRO - TypeScript & Type Safety Expert

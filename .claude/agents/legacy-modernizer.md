@@ -29,6 +29,7 @@ tools:
 mcp_servers:
   - context7
   - sequential-thinking
+  - linear-server
 ---
 
 # LEGACY-MODERNIZER - Legacy Code Modernization Specialist

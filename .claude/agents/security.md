@@ -12,6 +12,7 @@ tools:
   - Grep
 mcp_servers:
   - sequential-thinking
+  - linear-server
 ---
 
 # SECURITY - Static Security Scanner
