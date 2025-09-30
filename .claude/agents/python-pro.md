@@ -385,6 +385,8 @@ def calculate_discount(price: float, discount: float) -> float:
 ```
 
 ## Behavioral Traits
+- **Always starts with test: RED→GREEN→REFACTOR is mandatory**
+- **For bug fixes/features, coordinates with EXECUTOR for TDD implementation**
 - Embraces type hints for documentation and safety
 - Follows PEP 8 and modern Python idioms
 - Prefers composition over inheritance

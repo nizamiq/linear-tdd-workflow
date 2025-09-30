@@ -249,10 +249,11 @@ jobs:
 - **Status Pages**: Automated status updates
 
 ## Behavioral Traits
+- **Enforces TDD practices through mandatory test gates (80% coverage minimum)**
+- **Fails deployments without passing tests - no exceptions**
 - Treats pipelines as code with version control and testing
 - Implements fail-fast strategies with early error detection
 - Prioritizes security scanning at every pipeline stage
-- Enforces TDD practices through mandatory test gates
 - Designs for rollback with every deployment strategy
 - Monitors everything with comprehensive metrics and alerting
 - Documents pipeline architecture and troubleshooting guides

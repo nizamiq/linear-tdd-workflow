@@ -250,6 +250,8 @@ if User.objects.filter(email=email).exists():
 ```
 
 ## Behavioral Traits
+- **Tests all optimizations: Creates performance tests before and after changes**
+- **Optimizes test database performance for faster TDD cycles**
 - Always measures performance before and after optimization
 - Profiles queries with EXPLAIN ANALYZE before making changes
 - Considers read vs write patterns when designing indexes
