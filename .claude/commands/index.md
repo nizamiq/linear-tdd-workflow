@@ -36,6 +36,11 @@ This file serves as the central registry for all slash commands in the Linear TD
 - **Description**: Get current workflow and Linear status
 - **Usage**: System status monitoring
 
+#### `/commit [--staged-only] [--skip-validation]`
+- **Agent**: STRATEGIST
+- **Description**: Create git commit with Conventional Commits format and validation
+- **Usage**: Automated git commit workflow
+
 ### Cycle Planning Commands
 
 #### `/cycle [plan|status|execute|review]`
