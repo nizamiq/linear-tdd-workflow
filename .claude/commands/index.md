@@ -44,6 +44,19 @@ This file serves as the central registry for all slash commands in the Linear TD
 - **Description**: Automated sprint/cycle planning and management
 - **Usage**: Sprint planning automation
 
+### Infrastructure & Deployment Commands
+
+#### `/deploy [--environment=<env>] [--strategy=<canary|blue-green|rolling>] [--target=<gke|aks|eks|fly>]`
+- **Agent**: DEPLOYMENT-ENGINEER
+- **Supporting Agents**: KUBERNETES-ARCHITECT, GUARDIAN
+- **Description**: Orchestrate production deployments with progressive delivery
+- **Usage**: Production deployment orchestration
+
+#### `/optimize-db [--scope=<queries|indexes|cache|all>] [--target=<local|supabase|neon>] [--profile=<duration>]`
+- **Agent**: DATABASE-OPTIMIZER
+- **Description**: Analyze and optimize PostgreSQL database performance
+- **Usage**: Database performance optimization
+
 ## Command Structure
 
 All commands follow this standard format:

@@ -80,6 +80,29 @@ This file serves as the central registry for all agents in the Linear TDD Workfl
 - **Capabilities**: legacy_code_refactoring, framework_migration, technical_debt_reduction, monolith_decomposition, incremental_migration
 - **Use Proactively**: Legacy system updates, dependency upgrades, monolith decomposition
 
+## Infrastructure & Deployment Agents
+
+### KUBERNETES-ARCHITECT
+- **Role**: Cloud-Native Infrastructure & Kubernetes Expert
+- **Model**: opus
+- **Capabilities**: kubernetes_orchestration, gitops_workflows, multi_cloud_architecture, service_mesh_istio_linkerd, cost_optimization
+- **Primary Command**: `/deploy` (shared with DEPLOYMENT-ENGINEER)
+- **Use Proactively**: K8s manifests, deployment strategies, cloud-native architecture
+
+### DEPLOYMENT-ENGINEER
+- **Role**: CI/CD Pipeline & Deployment Automation Expert
+- **Model**: sonnet
+- **Capabilities**: github_actions_mastery, gitops_workflows, progressive_delivery, zero_downtime_deployments, tdd_pipeline_enforcement
+- **Primary Command**: `/deploy`
+- **Use Proactively**: Pipeline design, deployment automation, CI/CD optimization
+
+### DATABASE-OPTIMIZER
+- **Role**: PostgreSQL Performance & Optimization Expert
+- **Model**: opus
+- **Capabilities**: postgresql_query_optimization, django_orm_optimization, n_plus_one_resolution, advanced_indexing_strategies, supabase_neon_optimization
+- **Primary Command**: `/optimize-db`
+- **Use Proactively**: Database performance issues, slow queries, scaling challenges
+
 ## Agent Coordination
 
 - **STRATEGIST** serves as the central orchestrator
