@@ -54,17 +54,31 @@ Agents are specialized AI workers, each with specific expertise and responsibili
 - Multi-phase workflow orchestration
 **Slash Command:** `/cycle`
 
-## Supporting Agents
+## Specialist Agents (16 Total)
 
-### Development Agents
-- **TESTER** - Creates and runs tests
-- **LINTER** - Code style enforcement
-- **TYPECHECKER** - Type safety validation
-- **VALIDATOR** - PR and code review
+### Development Specialists
+- **DJANGO-PRO** (`django-pro.md`) - Django 5.x with async views, DRF, Celery
+- **PYTHON-PRO** (`python-pro.md`) - Python 3.12+ with uv, ruff, mypy
+- **TYPESCRIPT-PRO** (`typescript-pro.md`) - TypeScript 5.x and React/Next.js
 
-### Infrastructure Agents
-- **ROUTER** - Request routing
-- **SECURITY** - Security scanning
+### Infrastructure & DevOps
+- **KUBERNETES-ARCHITECT** (`kubernetes-architect.md`) - K8s orchestration, GitOps
+- **DEPLOYMENT-ENGINEER** (`deployment-engineer.md`) - CI/CD with GitHub Actions
+- **DATABASE-OPTIMIZER** (`database-optimizer.md`) - PostgreSQL performance
+
+### Quality Engineering
+- **CODE-REVIEWER** (`code-reviewer.md`) - AI-powered code review
+- **TEST-AUTOMATOR** (`test-automator.md`) - Test generation and optimization
+- **LEGACY-MODERNIZER** (`legacy-modernizer.md`) - Code migration specialist
+- **TESTER** (`tester.md`) - Creates and runs tests
+- **VALIDATOR** (`validator.md`) - PR and code review
+- **LINTER** (`linter.md`) - Code style enforcement
+- **TYPECHECKER** (`typechecker.md`) - Type safety validation
+
+### Monitoring & Security
+- **OBSERVABILITY-ENGINEER** (`observability-engineer.md`) - OpenTelemetry, Prometheus
+- **SECURITY** (`security.md`) - Security scanning
+- **ROUTER** (`router.md`) - Request routing
 
 ## Agent File Structure
 
@@ -173,6 +187,7 @@ To add an agent:
 
 ## Quick Agent Selection
 
+### Core Workflow
 | Task | Use Agent | Slash Command |
 |------|-----------|---------------|
 | Scan code | AUDITOR | `/assess` |
@@ -182,5 +197,24 @@ To add an agent:
 | Release code | STRATEGIST | `/release <version>` |
 | Check status | STRATEGIST | `/status` |
 | Plan cycles | PLANNER | `/cycle` |
-| Create tests | TESTER | (via EXECUTOR in TDD) |
-| Review code | VALIDATOR | (automatic in PR) |
+
+### Development
+| Task | Use Agent | Slash Command |
+|------|-----------|---------------|
+| Django development | DJANGO-PRO | `/django` |
+| Python optimization | PYTHON-PRO | `/python` |
+| TypeScript work | TYPESCRIPT-PRO | `/typescript` |
+
+### Infrastructure
+| Task | Use Agent | Slash Command |
+|------|-----------|---------------|
+| Deploy to production | DEPLOYMENT-ENGINEER | `/deploy` |
+| Database performance | DATABASE-OPTIMIZER | `/optimize-db` |
+| Set up monitoring | OBSERVABILITY-ENGINEER | `/monitor` |
+
+### Quality
+| Task | Use Agent | Usage |
+|------|-----------|-------|
+| Review code | CODE-REVIEWER | Proactive on PRs |
+| Create tests | TEST-AUTOMATOR | Proactive for features |
+| Modernize legacy | LEGACY-MODERNIZER | On refactoring |

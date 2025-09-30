@@ -29,6 +29,13 @@ make status
 | `/learn` | Extract patterns | SCHOLAR |
 | `/release <version>` | Manage release | STRATEGIST |
 | `/status` | Check workflow status | STRATEGIST |
+| `/cycle` | Sprint planning | PLANNER |
+| `/deploy` | Production deployment | DEPLOYMENT-ENGINEER |
+| `/optimize-db` | Database optimization | DATABASE-OPTIMIZER |
+| `/django` | Django development | DJANGO-PRO |
+| `/python` | Python optimization | PYTHON-PRO |
+| `/typescript` | TypeScript development | TYPESCRIPT-PRO |
+| `/monitor` | Observability setup | OBSERVABILITY-ENGINEER |
 
 **Alternative Makefile Commands:**
 | Command | Purpose | When to Use |
@@ -120,16 +127,37 @@ Agents are now natively discoverable by Claude Code through:
 - **Agent Definitions**: `.claude/agents/*.md` files with YAML frontmatter
 - **Automatic Selection**: Claude Code selects appropriate agents based on task
 
-### Available Agents
+### Available Agents (22 Total)
+
+**Core Workflow Agents:**
 - **AUDITOR** (`auditor.md`) - Code quality scanner
 - **EXECUTOR** (`executor.md`) - Fix implementation with TDD
 - **GUARDIAN** (`guardian.md`) - CI/CD monitoring and recovery
 - **STRATEGIST** (`strategist.md`) - Workflow orchestration
 - **SCHOLAR** (`scholar.md`) - Pattern learning and mining
+- **PLANNER** (`planner.md`) - Sprint/cycle planning
+
+**Development Specialists:**
+- **DJANGO-PRO** (`django-pro.md`) - Django 5.x expert with async views, DRF
+- **PYTHON-PRO** (`python-pro.md`) - Python 3.12+ with modern tooling
+- **TYPESCRIPT-PRO** (`typescript-pro.md`) - TypeScript 5.x and React/Next.js
+
+**Infrastructure & Deployment:**
+- **KUBERNETES-ARCHITECT** (`kubernetes-architect.md`) - K8s orchestration
+- **DEPLOYMENT-ENGINEER** (`deployment-engineer.md`) - CI/CD with GitHub Actions
+- **DATABASE-OPTIMIZER** (`database-optimizer.md`) - PostgreSQL performance
+
+**Quality Engineering:**
+- **CODE-REVIEWER** (`code-reviewer.md`) - AI-powered code review
+- **TEST-AUTOMATOR** (`test-automator.md`) - Test generation and optimization
+- **LEGACY-MODERNIZER** (`legacy-modernizer.md`) - Code migration specialist
 - **TESTER** (`tester.md`) - Test creation and validation
 - **VALIDATOR** (`validator.md`) - Code review and quality gates
 - **LINTER** (`linter.md`) - Code style enforcement
 - **TYPECHECKER** (`typechecker.md`) - Type safety validation
+
+**Monitoring & Security:**
+- **OBSERVABILITY-ENGINEER** (`observability-engineer.md`) - OpenTelemetry & Prometheus
 - **SECURITY** (`security.md`) - Security scanning
 
 ## 🔧 Configuration

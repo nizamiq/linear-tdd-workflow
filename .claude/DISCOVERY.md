@@ -28,10 +28,13 @@ node .claude/journeys/jr1-onboarding.js
    - `make pattern-mining` - Learn from patterns
    - `make release` - Release management
 
-2. **Native Claude Code Agents** - Automatically discovered:
-   - Agents defined in `.claude/agents/*.md` with frontmatter
+2. **Native Claude Code Agents** - Automatically discovered (22 agents total):
+   - Core workflow agents for TDD enforcement
+   - Tech stack specialists (Django, Python, TypeScript)
+   - Infrastructure experts (Kubernetes, deployment, database)
+   - Observability and monitoring specialists
+   - All defined in `.claude/agents/*.md` with frontmatter
    - Slash commands in `.claude/commands/*.md`
-   - Claude Code natively discovers and uses these agents
 
 3. **Strict TDD Enforcement** - Automatic validation:
    - RED→GREEN→REFACTOR cycle enforcement
@@ -49,12 +52,24 @@ node .claude/journeys/jr1-onboarding.js
 
 When the user asks you to:
 
+**Core Workflow:**
 1. **"Check code quality"** → Use `/assess` command
 2. **"Fix issues"** → Use `/fix <TASK-ID>` command
 3. **"Fix pipeline"** → Use `/recover` command
 4. **"Learn patterns"** → Use `/learn` command
 5. **"Deploy"** → Use `/release <version>` command
 6. **"Check status"** → Use `/status` command
+7. **"Plan sprint"** → Use `/cycle` command
+
+**Development Tasks:**
+8. **"Django help"** → Use `/django` command
+9. **"Python optimization"** → Use `/python` command
+10. **"TypeScript migration"** → Use `/typescript` command
+
+**Infrastructure:**
+11. **"Deploy to production"** → Use `/deploy` command
+12. **"Fix database performance"** → Use `/optimize-db` command
+13. **"Set up monitoring"** → Use `/monitor` command
 
 ### For Autonomous Operation
 

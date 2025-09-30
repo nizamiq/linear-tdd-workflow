@@ -103,6 +103,38 @@ This file serves as the central registry for all agents in the Linear TDD Workfl
 - **Primary Command**: `/optimize-db`
 - **Use Proactively**: Database performance issues, slow queries, scaling challenges
 
+## Development Framework Specialists
+
+### DJANGO-PRO
+- **Role**: Django Framework & Architecture Expert
+- **Model**: sonnet
+- **Capabilities**: django_5x_async_views, django_rest_framework_mastery, django_orm_optimization, celery_task_processing, django_channels_websockets
+- **Primary Command**: `/django`
+- **Use Proactively**: Django feature development, API design, ORM optimization, async views
+
+### PYTHON-PRO
+- **Role**: Modern Python Development Expert
+- **Model**: sonnet
+- **Capabilities**: python_312_features, async_await_mastery, uv_package_management, ruff_code_quality, mypy_type_checking
+- **Primary Command**: `/python`
+- **Use Proactively**: Python optimization, async programming, modern tooling setup
+
+### TYPESCRIPT-PRO
+- **Role**: TypeScript & Type Safety Expert
+- **Model**: opus
+- **Capabilities**: typescript_5x_features, advanced_type_system_design, react_nextjs_architecture, nodejs_backend_patterns, type_safe_api_design
+- **Primary Command**: `/typescript`
+- **Use Proactively**: TypeScript development, type system design, React architecture, migration from JavaScript
+
+## Monitoring & Observability
+
+### OBSERVABILITY-ENGINEER
+- **Role**: Observability & Monitoring Expert
+- **Model**: sonnet
+- **Capabilities**: opentelemetry_implementation, prometheus_metrics_design, grafana_dashboard_creation, distributed_tracing_setup, log_aggregation_architecture
+- **Primary Command**: `/monitor`
+- **Use Proactively**: Production monitoring, incident detection, performance tracking, SLI/SLO definition
+
 ## Agent Coordination
 
 - **STRATEGIST** serves as the central orchestrator

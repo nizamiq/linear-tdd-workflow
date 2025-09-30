@@ -215,12 +215,39 @@ validate:
 		--test-cmd "$(TEST_CMD)" \
 		--lint-cmd "$(LINT_CMD)"
 
-# Monitor (universal dashboard)
+# ============================================================================
+# TECH STACK SPECIFIC COMMANDS
+# ============================================================================
+
+# Django development assistance
+django:
+	@echo "🎯 Django Development Assistant..."
+	@node .claude/cli.js agent:invoke DJANGO-PRO:assist $(ARGS)
+
+# Python optimization and modern patterns
+python:
+	@echo "🐍 Python Optimization Assistant..."
+	@node .claude/cli.js agent:invoke PYTHON-PRO:optimize $(ARGS)
+
+# TypeScript development and migration
+typescript:
+	@echo "📘 TypeScript Development Assistant..."
+	@node .claude/cli.js agent:invoke TYPESCRIPT-PRO:develop $(ARGS)
+
+# Deploy to production environments
+deploy:
+	@echo "🚀 Production Deployment..."
+	@node .claude/cli.js agent:invoke DEPLOYMENT-ENGINEER:deploy $(ARGS)
+
+# Database performance optimization
+optimize-db:
+	@echo "🗄️ Database Performance Optimization..."
+	@node .claude/cli.js agent:invoke DATABASE-OPTIMIZER:analyze $(ARGS)
+
+# Set up observability and monitoring
 monitor:
-	@echo "📊 Starting monitoring dashboard..."
-	@node .claude/monitoring/dashboard.js \
-		--project-type $(PROJECT_TYPE) &
-	@echo "✅ Dashboard at http://localhost:3001"
+	@echo "📊 Observability Setup..."
+	@node .claude/cli.js agent:invoke OBSERVABILITY-ENGINEER:setup $(ARGS)
 
 # Status (shows all agents and journeys)
 status:

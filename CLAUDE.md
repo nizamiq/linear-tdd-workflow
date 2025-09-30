@@ -18,16 +18,26 @@ cat .claude/README.md
 make onboard
 ```
 
-### Primary Commands Available to You (Native Claude Code Commands)
+### Primary Commands Available to You (Slash Commands)
 
-**Slash Commands** - Direct Claude Code integration:
-- `/assess` - Scan code quality → Create Linear tasks (uses AUDITOR agent)
-- `/fix <TASK-ID>` - Implement fix with TDD enforcement (uses EXECUTOR agent)
-- `/recover` - Auto-fix broken CI/CD pipeline (uses GUARDIAN agent)
-- `/learn` - Mine patterns from successful PRs (uses SCHOLAR agent)
-- `/release <version>` - Manage production deployment (uses STRATEGIST agent)
-- `/status` - Current workflow & Linear status (uses STRATEGIST agent)
-- `/cycle [plan|status|execute|review]` - Automated sprint/cycle planning (uses PLANNER agent)
+**Core Workflow Commands** - TDD enforcement and quality management:
+- `/assess` - Scan code quality → Create Linear tasks (AUDITOR)
+- `/fix <TASK-ID>` - Implement fix with TDD enforcement (EXECUTOR)
+- `/recover` - Auto-fix broken CI/CD pipeline (GUARDIAN)
+- `/learn` - Mine patterns from successful PRs (SCHOLAR)
+- `/release <version>` - Manage production deployment (STRATEGIST)
+- `/status` - Current workflow & Linear status (STRATEGIST)
+- `/cycle [plan|status|execute|review]` - Sprint planning (PLANNER)
+
+**Development & Framework Commands** - Tech stack specific:
+- `/django` - Django development assistance (DJANGO-PRO)
+- `/python` - Python optimization and modern patterns (PYTHON-PRO)
+- `/typescript` - TypeScript and React development (TYPESCRIPT-PRO)
+
+**Infrastructure & Operations Commands** - Deployment and monitoring:
+- `/deploy` - Progressive deployment orchestration (DEPLOYMENT-ENGINEER)
+- `/optimize-db` - Database performance analysis (DATABASE-OPTIMIZER)
+- `/monitor` - Observability and alerting setup (OBSERVABILITY-ENGINEER)
 
 **Alternative Script Entrypoints:**
 ```bash
@@ -125,7 +135,7 @@ npm run cycle:full       # Run all 4 phases sequentially
 
 ### Multi-Agent System
 
-The system operates through 21 specialized agents coordinated via Linear.app:
+The system operates through 22 specialized agents coordinated via Linear.app:
 
 ```
 Linear.app (Task Management)
@@ -137,7 +147,13 @@ STRATEGIST (Orchestration) ← → PLANNER (Cycle Planning)
 │ (Assessment)│ (Fix Impl.)  │ (CI/CD Guard)  │ (Learning)   │
 └─────────────┴──────────────┴────────────────┴──────────────┘
        ↓              ↓               ↓                ↓
-[15 Specialized Agents for specific tasks]
+[16 Specialized Agents for tech stack coverage]
+
+Tech Stack Specialists:
+• DJANGO-PRO, PYTHON-PRO, TYPESCRIPT-PRO
+• KUBERNETES-ARCHITECT, DEPLOYMENT-ENGINEER
+• DATABASE-OPTIMIZER, OBSERVABILITY-ENGINEER
+• CODE-REVIEWER, TEST-AUTOMATOR, LEGACY-MODERNIZER
 ```
 
 **Agent Usage:**
