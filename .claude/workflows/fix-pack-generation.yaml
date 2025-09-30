@@ -1,0 +1,205 @@
+---
+name: fix-pack-generation
+description: Structured generation of atomic fix packs from assessment findings
+version: 1.0.0
+type: workflow
+
+# Deterministic fix pack creation from AUDITOR findings
+# Ensures all fix packs meet FIL-0/1 criteria
+
+metadata:
+  owner: AUDITOR
+  cost_profile: minimal
+  deterministic: true
+  sla_seconds: 300
+
+inputs:
+  required:
+    - assessment_report_path  # JSON report from AUDITOR
+    - linear_team_id
+  optional:
+    - max_fix_packs  # default: 10 per run
+    - priority_filter  # critical, high, medium, low
+
+steps:
+  - name: load_assessment_report
+    tool: Read
+    params:
+      file_path: "{{ assessment_report_path }}"
+    output:
+      - issues: []
+      - metrics: {}
+
+  - name: filter_issues
+    description: Select issues suitable for fix packs
+    logic:
+      - filter_by_priority: "{{ priority_filter }}"
+      - filter_by_fil_level: [0, 1]  # Only auto-approvable
+      - filter_by_complexity: low_to_medium
+      - sort_by: [priority_desc, impact_desc]
+      - limit: "{{ max_fix_packs }}"
+
+  - name: group_related_issues
+    description: Cluster similar issues into single fix packs
+    clustering_rules:
+      - same_file_and_type: true
+      - similar_fix_strategy: true
+      - combined_loc_lte_300: true
+    output:
+      - fix_pack_groups: []
+
+  - name: generate_fix_packs
+    for_each: fix_pack_group
+    steps:
+      - action: create_fix_pack_spec
+        fields:
+          id: "CLEAN-{{ next_linear_id }}"
+          title: "{{ generate_descriptive_title }}"
+          description: |
+            ## Issue Summary
+            {{ issues | map('description') | join('\n') }}
+
+            ## Fix Strategy
+            {{ determine_fix_strategy }}
+
+            ## Scope
+            - Files affected: {{ files | length }}
+            - Estimated LOC: {{ estimated_loc }}
+            - FIL Level: {{ fil_level }}
+            - Risk: Low (automated approval)
+
+            ## Acceptance Criteria
+            {{ generate_acceptance_criteria }}
+
+            ## Test Requirements
+            {{ generate_test_requirements }}
+
+            ## Rollback Plan
+            {{ generate_rollback_plan }}
+
+      - action: validate_fix_pack_constraints
+        validation:
+          - estimated_loc_lte_300
+          - fil_level_in: [0, 1]
+          - single_responsibility: true
+          - has_acceptance_criteria: true
+          - has_test_requirements: true
+          - has_rollback_plan: true
+
+      - action: estimate_effort
+        method: historic_data_analysis
+        output:
+          - effort_points: 0
+          - estimated_minutes: 0
+          - complexity: ""
+
+fix_pack_templates:
+  lint_format_fix:
+    title: "Fix linting/formatting issues in {{ file_path }}"
+    fil_level: 0
+    max_loc: 100
+    test_strategy: "Verify existing tests still pass"
+
+  dead_code_removal:
+    title: "Remove unused {{ code_type }} from {{ file_path }}"
+    fil_level: 0
+    max_loc: 200
+    test_strategy: "Verify no test breakage, confirm no references"
+
+  simple_refactor:
+    title: "Refactor {{ function_name }} for clarity"
+    fil_level: 1
+    max_loc: 300
+    test_strategy: "Verify behavioral equivalence via existing tests"
+
+  type_annotation:
+    title: "Add type annotations to {{ module_name }}"
+    fil_level: 1
+    max_loc: 200
+    test_strategy: "Type check passes, existing tests pass"
+
+  test_coverage:
+    title: "Add tests for {{ uncovered_code }}"
+    fil_level: 1
+    max_loc: 300
+    test_strategy: "Achieve 80%+ coverage for target code"
+
+quality_validation:
+  - name: verify_atomicity
+    validation:
+      - fix_pack_addresses_single_concern
+      - no_mixed_responsibilities
+
+  - name: verify_reversibility
+    validation:
+      - rollback_plan_is_complete
+      - rollback_is_safe
+
+  - name: verify_testability
+    validation:
+      - test_strategy_is_clear
+      - acceptance_criteria_are_measurable
+
+  - name: verify_effort_estimate
+    validation:
+      - effort_is_reasonable
+      - estimate_based_on_data
+
+outputs:
+  - fix_packs_generated: []
+  - linear_tasks_created: []
+  - total_estimated_effort: 0
+  - generation_report_path: ""
+
+linear_integration:
+  - name: create_linear_tasks
+    for_each: fix_pack
+    tool: mcp__linear-server__create_issue
+    params:
+      team: "{{ linear_team_id }}"
+      title: "{{ fix_pack.title }}"
+      description: "{{ fix_pack.description }}"
+      labels: ["clean-code", "fix-pack", "fil-{{ fix_pack.fil_level }}"]
+      priority: "{{ fix_pack.priority }}"
+      estimate: "{{ fix_pack.effort_points }}"
+
+  - name: link_related_tasks
+    description: Cross-reference related fix packs
+    for_each: related_group
+    action: add_task_links
+
+success_criteria:
+  all_of:
+    - all_fix_packs_valid
+    - all_within_300_loc
+    - all_fil_0_or_1
+    - linear_tasks_created
+
+failure_handling:
+  on_invalid_fix_pack:
+    - log_validation_errors
+    - skip_invalid_pack
+    - continue_with_valid_packs
+
+  on_linear_api_failure:
+    - retry_with_backoff
+    - if_still_failing:
+        - save_fix_packs_locally
+        - notify_operator
+
+monitoring:
+  metrics:
+    - fix_packs_per_assessment
+    - average_effort_estimate
+    - fil_distribution
+    - linear_creation_success_rate
+
+  sla_tracking:
+    - target_seconds: 300
+    - alert_threshold: 420
+
+notes:
+  - Deterministic fix pack generation from assessments
+  - Ensures all fix packs meet quality and size constraints
+  - Auto-creates Linear tasks with full metadata
+  - Groups related issues to minimize churn

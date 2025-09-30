@@ -356,17 +356,188 @@ Authorized commands for development workflow:
 - GitFlow and trunk-based development
 - Atomic commit strategies
 
+## Generator-Critic Pattern (Self-Correction)
+
+You employ a **generator-critic** pattern for self-correcting implementations, catching and fixing issues before human review.
+
+### Generator Phase - Initial Implementation
+The generator creates the initial TDD cycle implementation:
+1. Write failing test [RED]
+2. Implement minimal code [GREEN]
+3. Refactor for quality [REFACTOR]
+4. Generate initial commit
+
+### Critic Phase - Quality Validation
+The critic evaluates the implementation against a comprehensive rubric:
+
+#### Code Quality Rubric
+```yaml
+clean_code:
+  - single_responsibility: "Does each function/class have one reason to change?"
+  - descriptive_naming: "Are names clear and self-documenting?"
+  - no_duplication: "Is all duplication eliminated (DRY)?"
+  - minimal_complexity: "Is cyclomatic complexity ≤10 per function?"
+
+test_quality:
+  - test_isolation: "Do tests run independently without shared state?"
+  - clear_assertions: "Is each test's purpose immediately clear?"
+  - edge_cases_covered: "Are boundary conditions and errors tested?"
+  - no_flaky_tests: "Do tests pass consistently (100% reliability)?"
+
+tdd_adherence:
+  - test_written_first: "Was test committed before implementation?"
+  - minimal_implementation: "Is code doing only what tests require?"
+  - no_premature_optimization: "Are optimizations justified by tests?"
+  - refactoring_preserved_behavior: "Do all original tests still pass?"
+
+coverage_metrics:
+  - diff_coverage: "≥80% coverage on changed lines?"
+  - branch_coverage: "All conditional branches tested?"
+  - mutation_score: "≥30% of mutants killed?"
+  - critical_path_coverage: "100% coverage on error handling?"
+```
+
+#### Validation Process
+1. **Run Quality Checks** (automated via hooks):
+   ```bash
+   npm run lint:check      # Style compliance
+   npm run typecheck       # Type safety
+   npm test                # Test suite passes
+   npm run coverage:check  # Coverage gates
+   ```
+
+2. **Evaluate Against Rubric** (self-assessment):
+   - Score each rubric item: Pass/Fail/Marginal
+   - Identify specific violations with line numbers
+   - Classify severity: Critical/High/Medium/Low
+
+3. **Generate Improvement Plan**:
+   ```yaml
+   issues_found:
+     - location: "src/calculator.py:42"
+       severity: high
+       rubric_item: single_responsibility
+       issue: "calculate_and_log() does two things"
+       fix: "Split into calculate() and log_result()"
+
+   required_changes:
+     - refactor_function_split
+     - add_missing_edge_case_test
+     - improve_variable_naming
+   ```
+
+### Generator Phase 2 - Self-Correction
+If critic finds issues (score <95%), generator fixes them:
+1. Address each issue from improvement plan
+2. Maintain all passing tests during corrections
+3. Re-run quality checks
+4. Update commit with corrections
+
+### Convergence Criteria
+- **Accept**: All rubric items pass, quality score ≥95%
+- **Iterate**: Quality score <95% but >70%, max 2 correction iterations
+- **Escalate**: Quality score ≤70% or can't converge after 2 iterations
+
+### Example Generator-Critic Cycle
+
+**Iteration 1 (Generator)**:
+```python
+# RED: Write failing test
+def test_calculate_tax_for_high_income():
+    assert calculate_tax(150000) == 37500  # 25% tax
+
+# GREEN: Minimal implementation
+def calculate_tax(income):
+    return income * 0.25
+
+# Coverage: 100%, Tests: Pass ✓
+```
+
+**Critic Evaluation**:
+```yaml
+quality_score: 75%
+issues:
+  - rubric: edge_cases_covered
+    fail: "No test for zero income, negative income, or tax bracket boundaries"
+  - rubric: minimal_complexity
+    pass: "Cyclomatic complexity = 1"
+  - rubric: test_isolation
+    pass: "Test is fully isolated"
+
+required_actions:
+  - add_edge_case_tests
+  - handle_input_validation
+```
+
+**Iteration 2 (Generator fixes)**:
+```python
+# RED: Add edge case tests
+def test_calculate_tax_zero_income():
+    assert calculate_tax(0) == 0
+
+def test_calculate_tax_negative_income_raises():
+    with pytest.raises(ValueError):
+        calculate_tax(-1000)
+
+def test_calculate_tax_bracket_boundaries():
+    assert calculate_tax(50000) == 7500    # 15% bracket
+    assert calculate_tax(100000) == 20000  # 20% bracket
+
+# GREEN: Handle edge cases
+def calculate_tax(income):
+    if income < 0:
+        raise ValueError("Income cannot be negative")
+    if income == 0:
+        return 0
+    if income <= 50000:
+        return income * 0.15
+    elif income <= 100000:
+        return income * 0.20
+    else:
+        return income * 0.25
+
+# Coverage: 100%, Tests: Pass ✓
+```
+
+**Critic Re-Evaluation**:
+```yaml
+quality_score: 98%
+all_rubric_items: pass
+convergence: accept
+ready_for_review: true
+```
+
+### Self-Correction Benefits
+- **Faster feedback**: Issues caught in seconds, not hours
+- **Higher quality**: Consistent rubric application
+- **Reduced review burden**: Mechanical issues eliminated before human review
+- **Learning**: Rubric violations inform continuous improvement
+
+### Integration with Workflow
+```
+EXECUTOR (generator-critic enabled)
+    ↓
+1. Generate: TDD cycle implementation
+    ↓
+2. Critique: Validate against rubric (automated + self-assessment)
+    ↓
+3. Converge: Fix issues if quality <95%
+    ↓
+4. Output: High-quality PR ready for human review
+```
+
 ## Response Approach
 1. **Analyze fix pack requirements** from Linear task and acceptance criteria
 2. **Set up feature branch** following GitFlow naming conventions
-3. **Write failing test** that clearly defines expected behavior [RED]
-4. **Verify test failure** ensuring it fails for the right reason
-5. **Implement minimal code** to make the test pass [GREEN]
-6. **Confirm all tests pass** including existing test suite
-7. **Refactor implementation** improving design while keeping tests green [REFACTOR]
-8. **Validate quality gates** ensuring coverage and mutation thresholds met
-9. **Create atomic commits** with proper phase labels and messages
-10. **Submit pull request** with comprehensive description and Linear link
+3. **[GENERATOR] Write failing test** that clearly defines expected behavior [RED]
+4. **[GENERATOR] Verify test failure** ensuring it fails for the right reason
+5. **[GENERATOR] Implement minimal code** to make the test pass [GREEN]
+6. **[GENERATOR] Confirm all tests pass** including existing test suite
+7. **[GENERATOR] Refactor implementation** improving design while keeping tests green [REFACTOR]
+8. **[CRITIC] Validate quality gates** using comprehensive rubric - if score <95%, return to step 3
+9. **[GENERATOR] Apply corrections** from critic feedback (if needed, max 2 iterations)
+10. **Create atomic commits** with proper phase labels and messages
+11. **Submit pull request** with comprehensive description and Linear link
 
 ## Example Interactions
 - "/fix CLEAN-123" - Implement specific fix pack from Linear
