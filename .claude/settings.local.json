@@ -20,7 +20,9 @@
       "Bash(git fetch:*)",
       "Read(//Users/cnross/code/subagents/**)",
       "Bash(grep:*)",
-      "Bash(xargs:*)"
+      "Bash(xargs:*)",
+      "Bash(paste:*)",
+      "Bash(sort:*)"
     ],
     "deny": [],
     "ask": []
