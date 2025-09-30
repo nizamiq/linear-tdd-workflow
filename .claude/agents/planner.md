@@ -1,5 +1,6 @@
 ---
 name: PLANNER
+description: Sprint and cycle planning orchestrator managing capacity-based work selection and multi-phase workflows. Creates and manages sprint tasks in Linear. Use for cycle planning and backlog management.
 role: Cycle Planning Orchestrator
 capabilities:
   - cycle_planning
