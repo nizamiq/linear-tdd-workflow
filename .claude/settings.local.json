@@ -28,7 +28,11 @@
       "Bash([ \"$file\" != \"index.md\" ])",
       "Bash(then echo -n \"$file: \")",
       "Bash(fi)",
-      "Bash(do echo -n \"$file: \")"
+      "Bash(do echo -n \"$file: \")",
+      "Bash(find:*)",
+      "Bash(git log:*)",
+      "Bash(while read f)",
+      "Bash(awk:*)"
     ],
     "deny": [],
     "ask": []

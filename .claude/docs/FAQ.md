@@ -86,7 +86,7 @@ Absolutely! The system integrates with your existing pipeline:
 
 ## Agent System
 
-### What do the 20 agents do?
+### What do the 23 agents do?
 
 **Core Agents (Always Active):**
 - **AUDITOR**: Finds code quality issues, creates Linear tasks

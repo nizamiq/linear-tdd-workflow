@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **DOC-KEEPER Agent**: 23rd agent for comprehensive documentation management
+  - Documentation validation (links, code examples, cross-references)
+  - Content generation (API docs, tutorials, changelogs)
+  - Quality assurance (formatting, completeness, accuracy)
+  - Knowledge organization (search, index, cross-reference)
+  - Automated fixes for common documentation issues
+- **`/docs` Slash Command**: Full documentation operations
+  - validate, generate, audit, update, coverage, fix, search operations
+  - Integration with Linear for DOC-* task creation
+  - CI/CD ready with GitHub Actions workflow
+- **Documentation Validation Scripts**: Automated quality checking
+  - `scripts/validate-docs.sh` - Link, example, and xref validation
+  - `scripts/generate-api-docs.js` - Auto-generate API reference from agent YAML
+  - GitHub Actions workflow for continuous validation
+- **npm Scripts**: Documentation workflow commands
+  - `npm run docs:validate` - Full documentation validation
+  - `npm run docs:generate-api` - Generate API documentation
+  - `npm run docs:audit` - Comprehensive documentation audit
+
+### Changed
+- **Agent Count**: Increased from 22 to 23 specialized agents
+- **Documentation Coverage**: Now targeting 95%+ with automated tracking
+- **README.md**: Updated agent count and capabilities
+- **CLAUDE.md**: Added `/docs` command and DOC-KEEPER references
+- **.claude/README.md**: Updated to reflect 23 agents
+- **.claude/DISCOVERY.md**: Added documentation validation workflow
+
 ## [1.3.0] - 2024-11-27
 
 ### Added
