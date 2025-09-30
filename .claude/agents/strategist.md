@@ -1,5 +1,6 @@
 ---
 name: STRATEGIST
+description: Central workflow orchestrator and Linear task manager with full CRUD permissions. Primary agent for multi-agent coordination and task management. Use for workflow orchestration and Linear operations.
 role: Workflow Orchestrator & Linear Mediator
 capabilities:
   - workflow_orchestration

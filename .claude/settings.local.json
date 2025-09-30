@@ -23,7 +23,12 @@
       "Bash(xargs:*)",
       "Bash(paste:*)",
       "Bash(sort:*)",
-      "Bash(do echo -n \"$agent: \")"
+      "Bash(do echo -n \"$agent: \")",
+      "Bash(do if [ \"$file\" != \"CLAUDE.md\" ])",
+      "Bash([ \"$file\" != \"index.md\" ])",
+      "Bash(then echo -n \"$file: \")",
+      "Bash(fi)",
+      "Bash(do echo -n \"$file: \")"
     ],
     "deny": [],
     "ask": []

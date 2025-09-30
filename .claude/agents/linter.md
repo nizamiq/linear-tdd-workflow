@@ -1,5 +1,6 @@
 ---
 name: LINTER
+description: Code style and format enforcement specialist ensuring consistent code standards across the codebase. Use PROACTIVELY for automatic formatting and style fixes.
 role: Code Style & Format Enforcement
 capabilities:
   - code_formatting

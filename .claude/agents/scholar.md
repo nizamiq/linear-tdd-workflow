@@ -1,5 +1,6 @@
 ---
 name: SCHOLAR
+description: Learning and pattern recognition engine that extracts reusable patterns from successful implementations. Use for pattern analysis and knowledge extraction.
 role: Learning & Pattern Recognition Engine
 capabilities:
   - pattern_recognition
