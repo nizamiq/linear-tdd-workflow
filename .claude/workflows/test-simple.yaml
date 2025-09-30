@@ -1,0 +1,50 @@
+---
+name: test-simple
+description: Simple test workflow to demonstrate workflow engine
+version: 1.0.0
+type: workflow
+
+metadata:
+  owner: TEST
+  cost_profile: minimal
+  deterministic: true
+  sla_seconds: 10
+
+inputs:
+  required:
+    - message
+  optional:
+    - verbose
+
+steps:
+  - name: echo_message
+    action: print_message
+    tool: Bash
+    params:
+      command: "echo 'Workflow message: {{ message }}'"
+    validation:
+      - exit_code_equals_0
+
+  - name: check_directory
+    action: verify_workspace
+    tool: Bash
+    params:
+      command: "pwd && ls -la | head -5"
+    validation:
+      - exit_code_equals_0
+
+  - name: create_test_file
+    action: write_test_output
+    tool: Write
+    params:
+      file_path: "/tmp/workflow-test-output.txt"
+      content: "Workflow executed successfully!\nMessage: {{ message }}\n"
+
+outputs:
+  - test_file_created
+  - message_echoed
+
+success_criteria:
+  all_of:
+    - all_steps_completed
+    - no_errors

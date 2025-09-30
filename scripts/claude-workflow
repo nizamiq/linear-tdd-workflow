@@ -1,0 +1,336 @@
+#!/usr/bin/env python3
+"""
+Claude Workflow CLI
+
+Command-line interface for executing deterministic workflow YAML files.
+
+Usage:
+    claude-workflow run <workflow-name> [options]
+    claude-workflow list
+    claude-workflow describe <workflow-name>
+    claude-workflow validate <workflow-file>
+"""
+
+import argparse
+import json
+import sys
+from pathlib import Path
+
+# Add scripts directory to path
+sys.path.insert(0, str(Path(__file__).parent))
+
+from workflow_engine import WorkflowEngine
+
+
+def cmd_run(args):
+    """Run a workflow"""
+    # Parse parameters from --param flags
+    params = {}
+    if args.param:
+        for param_str in args.param:
+            if '=' in param_str:
+                key, value = param_str.split('=', 1)
+                params[key] = value
+            else:
+                print(f"Warning: Invalid parameter format: {param_str} (expected key=value)")
+
+    # Create engine
+    engine = WorkflowEngine(workflow_dir=args.workflow_dir, verbose=args.verbose)
+
+    try:
+        # Execute workflow
+        state = engine.execute(args.workflow, params)
+
+        # Output results
+        if args.json:
+            result = {
+                'status': 'success',
+                'workflow': state.workflow_name,
+                'duration_seconds': state.duration_seconds,
+                'steps_completed': len(state.steps_completed),
+                'steps_failed': len(state.steps_failed),
+                'outputs': state.outputs
+            }
+            print(json.dumps(result, indent=2))
+        else:
+            print(f"\n✅ Workflow '{state.workflow_name}' completed successfully")
+            print(f"   Duration: {state.duration_seconds:.1f}s")
+            print(f"   Steps completed: {len(state.steps_completed)}")
+            if state.steps_failed:
+                print(f"   Steps failed: {len(state.steps_failed)}")
+
+        return 0
+
+    except Exception as e:
+        if args.json:
+            result = {
+                'status': 'error',
+                'error': str(e)
+            }
+            print(json.dumps(result, indent=2))
+        else:
+            print(f"\n❌ Workflow failed: {str(e)}", file=sys.stderr)
+
+        return 1
+
+
+def cmd_list(args):
+    """List all available workflows"""
+    workflow_dir = Path(args.workflow_dir)
+
+    if not workflow_dir.exists():
+        print(f"Error: Workflow directory not found: {workflow_dir}", file=sys.stderr)
+        return 1
+
+    # Find all .yaml files
+    workflows = sorted(workflow_dir.glob('*.yaml'))
+
+    if not workflows:
+        print(f"No workflows found in {workflow_dir}")
+        return 0
+
+    print(f"\n📋 Available Workflows ({len(workflows)})")
+    print("=" * 60)
+
+    # Load and display each workflow
+    for workflow_file in workflows:
+        try:
+            import yaml
+            with open(workflow_file, 'r') as f:
+                workflow = yaml.safe_load(f)
+
+            name = workflow.get('name', workflow_file.stem)
+            description = workflow.get('description', 'No description')
+            sla = workflow.get('metadata', {}).get('sla_seconds', 'N/A')
+
+            print(f"\n  {workflow_file.stem}")
+            print(f"  {description}")
+            if sla != 'N/A':
+                print(f"  SLA: {sla}s ({sla/60:.1f} min)")
+
+        except Exception as e:
+            print(f"\n  {workflow_file.stem} (error loading: {e})")
+
+    print()
+    return 0
+
+
+def cmd_describe(args):
+    """Describe a specific workflow"""
+    workflow_dir = Path(args.workflow_dir)
+    workflow_file = workflow_dir / f"{args.workflow}.yaml"
+
+    if not workflow_file.exists():
+        print(f"Error: Workflow not found: {workflow_file}", file=sys.stderr)
+        return 1
+
+    try:
+        import yaml
+        with open(workflow_file, 'r') as f:
+            workflow = yaml.safe_load(f)
+
+        # Display workflow details
+        print(f"\n{'='*60}")
+        print(f"Workflow: {workflow.get('name', args.workflow)}")
+        print(f"{'='*60}")
+
+        print(f"\nDescription:")
+        print(f"  {workflow.get('description', 'No description')}")
+
+        print(f"\nType: {workflow.get('type', 'N/A')}")
+        print(f"Version: {workflow.get('version', 'N/A')}")
+
+        # Metadata
+        if 'metadata' in workflow:
+            meta = workflow['metadata']
+            print(f"\nMetadata:")
+            print(f"  Owner: {meta.get('owner', 'N/A')}")
+            print(f"  Cost Profile: {meta.get('cost_profile', 'N/A')}")
+            print(f"  Deterministic: {meta.get('deterministic', 'N/A')}")
+            print(f"  SLA: {meta.get('sla_seconds', 'N/A')}s")
+
+        # Inputs
+        if 'inputs' in workflow:
+            inputs = workflow['inputs']
+            print(f"\nInputs:")
+            if 'required' in inputs:
+                print(f"  Required: {', '.join(inputs['required'])}")
+            if 'optional' in inputs:
+                print(f"  Optional: {', '.join(inputs['optional'])}")
+
+        # Phases or Steps
+        if 'phases' in workflow:
+            print(f"\nPhases ({len(workflow['phases'])}):")
+            for i, phase in enumerate(workflow['phases'], 1):
+                phase_name = phase.get('name', f'Phase {i}')
+                description = phase.get('description', '')
+                max_attempts = phase.get('max_attempts', 1)
+                print(f"  {i}. {phase_name}")
+                if description:
+                    print(f"     {description}")
+                if max_attempts > 1:
+                    print(f"     Max attempts: {max_attempts}")
+
+        elif 'steps' in workflow:
+            print(f"\nSteps ({len(workflow['steps'])}):")
+            for i, step in enumerate(workflow['steps'], 1):
+                step_name = step.get('action', step.get('name', f'Step {i}'))
+                print(f"  {i}. {step_name}")
+
+        # Success Criteria
+        if 'success_criteria' in workflow:
+            print(f"\nSuccess Criteria:")
+            criteria = workflow['success_criteria']
+            if isinstance(criteria, dict) and 'all_of' in criteria:
+                for criterion in criteria['all_of']:
+                    print(f"  ✓ {criterion}")
+            elif isinstance(criteria, list):
+                for criterion in criteria:
+                    print(f"  ✓ {criterion}")
+
+        # Outputs
+        if 'outputs' in workflow:
+            print(f"\nOutputs:")
+            for output in workflow['outputs']:
+                print(f"  • {output}")
+
+        print()
+        return 0
+
+    except Exception as e:
+        print(f"Error loading workflow: {e}", file=sys.stderr)
+        return 1
+
+
+def cmd_validate(args):
+    """Validate a workflow file"""
+    workflow_file = Path(args.workflow_file)
+
+    if not workflow_file.exists():
+        print(f"Error: File not found: {workflow_file}", file=sys.stderr)
+        return 1
+
+    try:
+        import yaml
+        with open(workflow_file, 'r') as f:
+            workflow = yaml.safe_load(f)
+
+        # Basic validation
+        errors = []
+        warnings = []
+
+        # Required fields
+        required_fields = ['name', 'description', 'type', 'version']
+        for field in required_fields:
+            if field not in workflow:
+                errors.append(f"Missing required field: {field}")
+
+        # Type must be 'workflow'
+        if workflow.get('type') != 'workflow':
+            errors.append(f"Invalid type: {workflow.get('type')} (expected 'workflow')")
+
+        # Must have phases or steps
+        if 'phases' not in workflow and 'steps' not in workflow:
+            errors.append("Workflow must have either 'phases' or 'steps'")
+
+        # Metadata checks
+        if 'metadata' not in workflow:
+            warnings.append("Missing metadata section")
+
+        # Display results
+        print(f"\nValidating: {workflow_file}")
+        print(f"Workflow: {workflow.get('name', 'N/A')}\n")
+
+        if errors:
+            print(f"❌ Validation Failed\n")
+            print(f"Errors ({len(errors)}):")
+            for error in errors:
+                print(f"  • {error}")
+            if warnings:
+                print(f"\nWarnings ({len(warnings)}):")
+                for warning in warnings:
+                    print(f"  • {warning}")
+            return 1
+        else:
+            print(f"✅ Validation Passed")
+            if warnings:
+                print(f"\nWarnings ({len(warnings)}):")
+                for warning in warnings:
+                    print(f"  • {warning}")
+            print()
+            return 0
+
+    except yaml.YAMLError as e:
+        print(f"❌ YAML Parse Error: {e}", file=sys.stderr)
+        return 1
+    except Exception as e:
+        print(f"❌ Error: {e}", file=sys.stderr)
+        return 1
+
+
+def main():
+    """Main CLI entry point"""
+    parser = argparse.ArgumentParser(
+        description='Claude Workflow CLI - Execute deterministic workflow YAML files',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  # Run a workflow
+  claude-workflow run tdd-cycle --param test_file=tests/test_calc.py
+
+  # List all workflows
+  claude-workflow list
+
+  # Describe a workflow
+  claude-workflow describe lint-and-format
+
+  # Validate a workflow file
+  claude-workflow validate .claude/workflows/tdd-cycle.yaml
+        """
+    )
+
+    subparsers = parser.add_subparsers(dest='command', help='Command to execute')
+
+    # Run command
+    run_parser = subparsers.add_parser('run', help='Run a workflow')
+    run_parser.add_argument('workflow', help='Workflow name (without .yaml extension)')
+    run_parser.add_argument('--param', action='append', help='Parameter in key=value format (can be used multiple times)')
+    run_parser.add_argument('--workflow-dir', default='.claude/workflows', help='Workflow directory (default: .claude/workflows)')
+    run_parser.add_argument('--verbose', '-v', action='store_true', help='Verbose output')
+    run_parser.add_argument('--json', action='store_true', help='Output results as JSON')
+
+    # List command
+    list_parser = subparsers.add_parser('list', help='List all available workflows')
+    list_parser.add_argument('--workflow-dir', default='.claude/workflows', help='Workflow directory (default: .claude/workflows)')
+
+    # Describe command
+    describe_parser = subparsers.add_parser('describe', help='Describe a specific workflow')
+    describe_parser.add_argument('workflow', help='Workflow name (without .yaml extension)')
+    describe_parser.add_argument('--workflow-dir', default='.claude/workflows', help='Workflow directory (default: .claude/workflows)')
+
+    # Validate command
+    validate_parser = subparsers.add_parser('validate', help='Validate a workflow file')
+    validate_parser.add_argument('workflow_file', help='Path to workflow YAML file')
+
+    args = parser.parse_args()
+
+    if not args.command:
+        parser.print_help()
+        return 1
+
+    # Route to command handler
+    if args.command == 'run':
+        return cmd_run(args)
+    elif args.command == 'list':
+        return cmd_list(args)
+    elif args.command == 'describe':
+        return cmd_describe(args)
+    elif args.command == 'validate':
+        return cmd_validate(args)
+    else:
+        print(f"Unknown command: {args.command}", file=sys.stderr)
+        return 1
+
+
+if __name__ == '__main__':
+    sys.exit(main())
