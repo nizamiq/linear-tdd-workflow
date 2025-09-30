@@ -1,0 +1,235 @@
+---
+name: pr-review-checklist
+description: Automated PR readiness validation checklist
+version: 1.0.0
+type: workflow
+
+# Deterministic PR validation - replaces parts of VALIDATOR
+# Checks objective criteria before human review
+
+metadata:
+  owner: VALIDATOR
+  cost_profile: minimal
+  deterministic: true
+  sla_seconds: 300
+
+inputs:
+  required:
+    - pr_number
+    - base_branch
+    - head_branch
+  optional:
+    - enforce_coverage  # default: true
+    - require_tests  # default: true
+    - max_pr_size  # default: 400 LOC
+
+steps:
+  - name: fetch_pr_details
+    tool: Bash
+    command: |
+      gh pr view {{ pr_number }} --json files,additions,deletions,title,body,commits
+    output:
+      - pr_files
+      - pr_size
+      - pr_title
+      - pr_body
+      - commit_count
+
+  - name: validate_pr_size
+    validation:
+      - additions_plus_deletions_lte: "{{ max_pr_size }}"
+    on_failure:
+      warning: "PR exceeds {{ max_pr_size }} LOC - consider splitting"
+
+  - name: validate_conventional_commits
+    steps:
+      - action: check_commit_messages
+        tool: Bash
+        command: |
+          git log {{ base_branch }}..{{ head_branch }} --format='%s' | \
+          grep -E '^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\(.+\))?: .+'
+        validation:
+          - all_commits_conventional
+
+  - name: run_test_suite
+    condition: "{{ require_tests }}"
+    tool: Bash
+    command: |
+      git checkout {{ head_branch }}
+      {% if 'package.json' in repo_files %}
+      npm test
+      {% elif 'pytest.ini' in repo_files or 'pyproject.toml' in repo_files %}
+      pytest -v
+      {% endif %}
+    validation:
+      - exit_code_equals_0
+      - test_count_gt_0
+
+  - name: check_test_coverage
+    condition: "{{ enforce_coverage }}"
+    steps:
+      - action: run_coverage_check
+        tool: Bash
+        command: |
+          {% if 'package.json' in repo_files %}
+          npm run coverage:check
+          {% elif 'pytest.ini' in repo_files %}
+          pytest --cov --cov-report=json
+          {% endif %}
+        output:
+          - coverage_percentage
+          - diff_coverage_percentage
+
+      - action: validate_coverage_gates
+        validation:
+          - diff_coverage_gte_80
+          - overall_coverage_gte_80
+
+  - name: run_linting_checks
+    tool: Bash
+    command: |
+      {% if 'package.json' in repo_files %}
+      npm run lint:check
+      {% elif 'pyproject.toml' in repo_files %}
+      ruff check .
+      {% endif %}
+    validation:
+      - exit_code_equals_0
+
+  - name: run_type_checks
+    tool: Bash
+    command: |
+      {% if 'tsconfig.json' in repo_files %}
+      npx tsc --noEmit
+      {% elif 'mypy.ini' in repo_files or 'pyproject.toml' in repo_files %}
+      mypy .
+      {% endif %}
+    validation:
+      - exit_code_equals_0
+
+  - name: check_for_conflicts
+    tool: Bash
+    command: |
+      git fetch origin {{ base_branch }}
+      git merge-base --is-ancestor origin/{{ base_branch }} {{ head_branch }}
+    validation:
+      - no_merge_conflicts
+      - branch_is_up_to_date
+
+  - name: validate_pr_description
+    validation:
+      - pr_body_not_empty
+      - pr_body_contains_summary
+      - pr_body_contains_test_plan
+
+  - name: check_breaking_changes
+    tool: Bash
+    command: |
+      git diff {{ base_branch }}...{{ head_branch }} | \
+      grep -E '(BREAKING|BREAKING CHANGE|API change)'
+    output:
+      - has_breaking_changes
+
+  - name: security_scan
+    tool: Bash
+    command: |
+      {% if 'package.json' in repo_files %}
+      npm audit --audit-level=moderate
+      {% elif 'requirements.txt' in repo_files or 'pyproject.toml' in repo_files %}
+      pip-audit || safety check
+      {% endif %}
+    validation:
+      - no_critical_vulnerabilities
+      - no_high_vulnerabilities
+
+quality_checklist:
+  code_quality:
+    - name: tests_pass
+      required: true
+      automated: true
+    - name: coverage_gte_80
+      required: true
+      automated: true
+    - name: lint_passes
+      required: true
+      automated: true
+    - name: type_check_passes
+      required: true
+      automated: true
+
+  git_hygiene:
+    - name: conventional_commits
+      required: true
+      automated: true
+    - name: no_merge_conflicts
+      required: true
+      automated: true
+    - name: branch_up_to_date
+      required: false
+      automated: true
+
+  security:
+    - name: no_secrets_in_code
+      required: true
+      automated: true
+    - name: no_vulnerable_dependencies
+      required: true
+      automated: true
+
+  documentation:
+    - name: pr_description_complete
+      required: true
+      automated: true
+    - name: breaking_changes_documented
+      required: conditional
+      automated: true
+
+  human_review:
+    - name: code_review_approval
+      required: true
+      automated: false
+    - name: design_review
+      required: conditional
+      automated: false
+
+outputs:
+  - checklist_status: {}  # Pass/Fail for each item
+  - blocking_issues: []
+  - warnings: []
+  - ready_for_merge: false
+  - report_path: ""
+
+success_criteria:
+  all_of:
+    - all_required_checks_pass
+    - no_blocking_issues
+    - human_approval_obtained
+
+failure_handling:
+  on_check_failure:
+    - action: generate_detailed_report
+      path: .claude/reports/pr-{{ pr_number }}-validation.md
+    - action: comment_on_pr
+      template: pr-validation-failed.md
+    - block_merge: true
+
+  on_warnings:
+    - action: comment_on_pr
+      template: pr-validation-warnings.md
+    - block_merge: false
+
+monitoring:
+  metrics:
+    - validation_time
+    - pass_rate
+    - common_failure_reasons
+
+  sla_tracking:
+    - target_seconds: 300
+    - alert_threshold: 420
+
+notes:
+  - Automated objective validation before human review
+  - Reduces reviewer burden for mechanical checks
+  - Clear blocking vs warning distinction
+  - Integrates with GitHub PR workflow

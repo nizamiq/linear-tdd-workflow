@@ -1,6 +1,7 @@
 ---
 name: SCHOLAR
 description: Learning and pattern recognition engine that extracts reusable patterns from successful implementations. Use for pattern analysis and knowledge extraction.
+model: sonnet
 role: Learning & Pattern Recognition Engine
 capabilities:
   - pattern_recognition
@@ -15,6 +16,25 @@ tools:
 mcp_servers:
   - sequential-thinking
   - linear-server
+loop_controls:
+  max_iterations: 20
+  max_time_seconds: 3600
+  max_cost_tokens: 300000
+  success_criteria:
+    - "≥5 patterns extracted and validated"
+    - "Each pattern has ≥2 supporting examples"
+    - "Pattern catalog updated with new entries"
+  ground_truth_checks:
+    - tool: Read
+      file: ".claude/patterns/catalog.json"
+      verify: pattern_count_gte_5
+  stop_conditions:
+    - type: success
+      check: min_patterns_extracted
+    - type: diminishing_returns
+      check: new_patterns_per_iteration_less_than_0.5
+    - type: budget
+      check: token_usage_greater_than_270000
 ---
 
 # SCHOLAR - Learning & Pattern Recognition Engine

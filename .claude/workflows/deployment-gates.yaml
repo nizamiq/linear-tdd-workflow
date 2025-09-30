@@ -1,0 +1,257 @@
+---
+name: deployment-gates
+description: Pre-deployment validation gates and safety checks
+version: 1.0.0
+type: workflow
+
+# Deterministic deployment readiness validation
+# Part of VALIDATOR agent responsibilities
+
+metadata:
+  owner: VALIDATOR
+  cost_profile: minimal
+  deterministic: true
+  sla_seconds: 600
+
+inputs:
+  required:
+    - environment  # staging, production
+    - commit_sha
+    - deployment_type  # release, hotfix, rollback
+  optional:
+    - skip_smoke_tests  # default: false
+    - force_deploy  # default: false
+
+pre_flight_checks:
+  - name: verify_branch_protection
+    description: Ensure deploying from correct branch
+    validation:
+      - if_production_then_main_branch
+      - if_staging_then_develop_branch
+      - branch_is_protected
+
+  - name: verify_ci_status
+    tool: Bash
+    command: |
+      gh run list --commit {{ commit_sha }} --json conclusion --jq '.[0].conclusion'
+    validation:
+      - ci_status_is_success
+      - all_checks_passed
+
+  - name: check_test_coverage
+    tool: Bash
+    command: |
+      gh run view --commit {{ commit_sha }} --log | grep -E '(coverage|Coverage)'
+    validation:
+      - coverage_gte_80
+
+  - name: verify_no_failing_tests
+    tool: Bash
+    command: |
+      gh run view --commit {{ commit_sha }} --log | grep -E '(FAILED|ERROR)'
+    validation:
+      - no_test_failures
+      - no_test_errors
+
+security_gates:
+  - name: vulnerability_scan
+    tool: Bash
+    command: |
+      {% if environment == 'production' %}
+      # Production requires strict security validation
+      npm audit --audit-level=moderate || \
+      pip-audit --strict || \
+      docker scan {{ image_name }}:{{ commit_sha }}
+      {% endif %}
+    validation:
+      - no_critical_vulnerabilities
+      - no_high_vulnerabilities_in_production
+
+  - name: secret_scan
+    tool: Bash
+    command: |
+      git diff-tree --no-commit-id --name-only -r {{ commit_sha }} | \
+      xargs grep -E '(api[_-]?key|password|secret|token|credential)' || true
+    validation:
+      - no_hardcoded_secrets
+
+  - name: dependency_check
+    tool: Bash
+    command: |
+      {% if 'package-lock.json' in changed_files %}
+      npm audit signatures
+      {% elif 'requirements.txt' in changed_files %}
+      pip-audit -r requirements.txt
+      {% endif %}
+    validation:
+      - dependencies_are_secure
+      - no_deprecated_packages
+
+performance_gates:
+  - name: smoke_tests
+    condition: "{{ not skip_smoke_tests }}"
+    tool: Bash
+    command: |
+      {% if environment == 'staging' %}
+      # Run smoke tests against staging
+      npm run test:smoke || pytest -m smoke
+      {% endif %}
+    validation:
+      - smoke_tests_pass
+    timeout_seconds: 180
+
+  - name: database_migration_dry_run
+    condition: "{{ has_migrations }}"
+    tool: Bash
+    command: |
+      {% if environment == 'production' %}
+      # Dry run migrations in production-like environment
+      python manage.py migrate --plan || \
+      npm run migrate:plan
+      {% endif %}
+    validation:
+      - migrations_are_safe
+      - no_data_loss_risk
+
+  - name: check_bundle_size
+    condition: "{{ has_frontend_changes }}"
+    tool: Bash
+    command: |
+      npm run build --json | jq '.assets[] | select(.size > 500000)'
+    validation:
+      - bundle_size_acceptable
+      - no_excessive_asset_growth
+
+operational_readiness:
+  - name: verify_rollback_plan
+    validation:
+      - rollback_procedure_documented
+      - rollback_tested_in_staging
+
+  - name: check_monitoring_setup
+    tool: Bash
+    command: |
+      # Verify monitoring and alerting configured
+      grep -r "prometheus\|datadog\|newrelic" infrastructure/ || \
+      test -f monitoring/alerts.yaml
+    validation:
+      - monitoring_configured
+      - alerts_defined
+
+  - name: verify_database_backup
+    condition: "{{ environment == 'production' }}"
+    tool: Bash
+    command: |
+      # Check last backup timestamp
+      psql -c "SELECT pg_backup_stop_time FROM pg_stat_archiver;" || \
+      aws rds describe-db-snapshots --db-instance-identifier {{ db_instance }}
+    validation:
+      - backup_within_24_hours
+
+  - name: capacity_check
+    condition: "{{ environment == 'production' }}"
+    description: Verify infrastructure capacity for deployment
+    validation:
+      - sufficient_compute_resources
+      - sufficient_storage
+      - no_resource_constraints
+
+deployment_checklist:
+  required_approvals:
+    - name: technical_lead_approval
+      required: true
+      automated: false
+      check_via: gh_pr_reviews
+
+    - name: product_owner_approval
+      required: "{{ deployment_type == 'release' }}"
+      automated: false
+
+  automated_checks:
+    - ci_passing
+    - tests_passing
+    - coverage_gte_80
+    - no_security_vulnerabilities
+    - smoke_tests_passing
+
+  documentation:
+    - deployment_notes_present
+    - breaking_changes_documented
+    - runbook_updated
+
+go_no_go_decision:
+  gates:
+    - name: all_checks_pass
+      weight: critical
+      validation:
+        - pre_flight_checks_all_pass
+        - security_gates_all_pass
+        - performance_gates_all_pass
+
+    - name: approvals_obtained
+      weight: critical
+      condition: "{{ not force_deploy }}"
+      validation:
+        - required_approvals_obtained
+
+    - name: operational_readiness
+      weight: high
+      validation:
+        - rollback_plan_ready
+        - monitoring_configured
+        - recent_backup_exists
+
+  decision:
+    if_all_critical_pass: proceed
+    if_any_critical_fail: block
+    if_high_warnings_exist: require_manual_approval
+
+outputs:
+  - gate_results: {}
+  - blocking_issues: []
+  - warnings: []
+  - ready_for_deployment: false
+  - go_no_go_decision: ""
+  - report_path: ""
+
+success_criteria:
+  all_of:
+    - all_critical_gates_pass
+    - all_required_approvals_obtained
+    - no_blocking_security_issues
+    - operational_readiness_confirmed
+
+failure_handling:
+  on_gate_failure:
+    - action: generate_detailed_report
+      path: .claude/reports/deployment-gates-{{ environment }}-{{ timestamp }}.md
+
+    - action: block_deployment
+      notify:
+        - deployment_team
+        - on_call_engineer
+
+    - escalate_to: DEPLOYMENT-ENGINEER
+      reason: "Deployment gates failed - manual intervention required"
+
+  on_security_failure:
+    - action: halt_immediately
+    - escalate_to: SECURITY
+    - notify: security_team
+
+monitoring:
+  metrics:
+    - gate_validation_time
+    - gate_pass_rate
+    - common_failure_reasons
+    - deployment_frequency
+
+  sla_tracking:
+    - target_seconds: 600
+    - alert_threshold: 900
+
+notes:
+  - Implements pre-flight deployment checklist from CLAUDE.md
+  - All gates must pass for production deployments
+  - Staging allows more flexibility
+  - Force deploy available for emergencies (with approval)

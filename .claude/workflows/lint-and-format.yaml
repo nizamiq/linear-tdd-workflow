@@ -1,0 +1,146 @@
+---
+name: lint-and-format
+description: Deterministic code linting and formatting workflow
+version: 1.0.0
+type: workflow
+
+# Simple, fast, deterministic - no agent needed
+# Replaces LINTER agent for FIL-0/1 changes
+
+metadata:
+  owner: LINTER
+  cost_profile: minimal
+  deterministic: true
+  sla_seconds: 60
+
+inputs:
+  required:
+    - file_paths  # Array of file paths to lint/format
+  optional:
+    - auto_fix  # default: true
+    - fail_on_error  # default: false
+    - format_only  # default: false
+
+steps:
+  - name: detect_language
+    description: Auto-detect language from file extensions
+    action: classify_files
+    output:
+      python_files: []
+      javascript_files: []
+      typescript_files: []
+
+  - name: format_python
+    condition: "{{ python_files | length > 0 }}"
+    steps:
+      - action: run_ruff_format
+        tool: Bash
+        command: |
+          ruff format {{ python_files | join(' ') }}
+        validation:
+          - exit_code_equals_0
+
+      - action: run_ruff_check
+        tool: Bash
+        command: |
+          {% if auto_fix %}
+          ruff check --fix {{ python_files | join(' ') }}
+          {% else %}
+          ruff check {{ python_files | join(' ') }}
+          {% endif %}
+        validation:
+          - exit_code_equals_0_or_fixable
+
+  - name: format_javascript_typescript
+    condition: "{{ (javascript_files | length > 0) or (typescript_files | length > 0) }}"
+    steps:
+      - action: run_prettier
+        tool: Bash
+        command: |
+          {% if auto_fix %}
+          npx prettier --write {{ javascript_files | join(' ') }} {{ typescript_files | join(' ') }}
+          {% else %}
+          npx prettier --check {{ javascript_files | join(' ') }} {{ typescript_files | join(' ') }}
+          {% endif %}
+        validation:
+          - exit_code_equals_0
+
+      - action: run_eslint
+        tool: Bash
+        command: |
+          {% if auto_fix %}
+          npx eslint --fix {{ javascript_files | join(' ') }} {{ typescript_files | join(' ') }}
+          {% else %}
+          npx eslint {{ javascript_files | join(' ') }} {{ typescript_files | join(' ') }}
+          {% endif %}
+        validation:
+          - exit_code_equals_0_or_fixable
+
+  - name: verify_changes
+    description: Ensure formatting didn't break anything
+    steps:
+      - action: run_quick_syntax_check
+        tool: Bash
+        command: |
+          {% for file in python_files %}
+          python -m py_compile {{ file }}
+          {% endfor %}
+          {% for file in typescript_files %}
+          npx tsc --noEmit {{ file }}
+          {% endfor %}
+        validation:
+          - no_syntax_errors
+
+quality_gates:
+  - name: no_functional_changes
+    description: Verify only style changes, no logic changes
+    validation:
+      - git_diff_is_style_only
+      - no_semantic_changes
+
+  - name: tests_still_pass
+    condition: "{{ fail_on_error == true }}"
+    tool: Bash
+    command: |
+      {% if python_files | length > 0 %}
+      pytest -v
+      {% else %}
+      npm test
+      {% endif %}
+    validation:
+      - exit_code_equals_0
+
+outputs:
+  - files_formatted: []
+  - issues_found: []
+  - issues_fixed: []
+  - duration_seconds: 0
+
+success_criteria:
+  all_of:
+    - all_files_formatted
+    - no_syntax_errors
+    - style_compliant
+
+failure_handling:
+  on_unfixable_issues:
+    - action: generate_report
+      output: lint-issues-report.json
+    - escalate_to: EXECUTOR
+      reason: "Manual intervention required for non-auto-fixable issues"
+
+  on_timeout:
+    - capture_partial_results
+    - log_timeout_details
+
+monitoring:
+  metrics:
+    - files_processed_per_second
+    - auto_fix_success_rate
+    - unfixable_issue_count
+
+notes:
+  - This workflow is for FIL-0/1 changes only
+  - No agent overhead - pure tool execution
+  - Fast feedback (60s SLA)
+  - Escalates to EXECUTOR only for complex issues

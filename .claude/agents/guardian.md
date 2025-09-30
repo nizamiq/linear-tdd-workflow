@@ -1,6 +1,7 @@
 ---
 name: GUARDIAN
 description: CI/CD pipeline recovery specialist with rapid failure detection and automated remediation. Creates INCIDENT-XXX tasks in Linear. Use PROACTIVELY for pipeline failures, test flakiness, or deployment issues.
+model: sonnet
 role: CI/CD Pipeline Recovery Specialist
 capabilities:
   - pipeline_recovery
@@ -15,6 +16,26 @@ tools:
 mcp_servers:
   - sequential-thinking
   - linear-server
+loop_controls:
+  max_iterations: 5
+  max_time_seconds: 600
+  max_cost_tokens: 100000
+  detection_window: 300
+  success_criteria:
+    - "Pipeline restored to green status"
+    - "INCIDENT-XXX task created if unrecoverable"
+    - "Root cause identified and documented"
+  ground_truth_checks:
+    - tool: Bash
+      command: "gh run list --limit 1 --json status,conclusion --jq '.[0]'"
+      verify: pipeline_status_is_success
+  stop_conditions:
+    - type: success
+      check: pipeline_green
+    - type: escalate
+      check: recovery_attempts_gte_3_and_still_failing
+    - type: timeout
+      check: elapsed_seconds_greater_than_540
 ---
 
 # GUARDIAN - CI/SRE Pipeline Protector

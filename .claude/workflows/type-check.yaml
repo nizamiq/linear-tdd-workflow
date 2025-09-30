@@ -1,0 +1,151 @@
+---
+name: type-check
+description: Fast, targeted type checking workflow for changed files
+version: 1.0.0
+type: workflow
+
+# Replaces TYPECHECKER agent with deterministic workflow
+# Focuses on differential type checking for speed
+
+metadata:
+  owner: TYPECHECKER
+  cost_profile: minimal
+  deterministic: true
+  sla_seconds: 120
+
+inputs:
+  required:
+    - changed_files  # Array of changed file paths
+  optional:
+    - full_check  # default: false (incremental only)
+    - fail_fast  # default: true
+
+steps:
+  - name: classify_files
+    description: Separate TypeScript/Python files
+    action: filter_by_extension
+    output:
+      typescript_files: []
+      python_files: []
+
+  - name: typescript_type_check
+    condition: "{{ typescript_files | length > 0 }}"
+    steps:
+      - action: run_tsc_incremental
+        tool: Bash
+        command: |
+          {% if full_check %}
+          npx tsc --noEmit
+          {% else %}
+          npx tsc --noEmit {{ typescript_files | join(' ') }}
+          {% endif %}
+        timeout_seconds: 90
+        validation:
+          - exit_code_equals_0
+
+      - action: collect_type_errors
+        condition: "{{ previous_step.exit_code != 0 }}"
+        parser: typescript_error_parser
+        output:
+          - error_count
+          - error_details
+
+  - name: python_type_check
+    condition: "{{ python_files | length > 0 }}"
+    steps:
+      - action: run_mypy_incremental
+        tool: Bash
+        command: |
+          {% if full_check %}
+          mypy .
+          {% else %}
+          mypy {{ python_files | join(' ') }}
+          {% endif %}
+        timeout_seconds: 90
+        validation:
+          - exit_code_equals_0
+
+      - action: collect_type_errors
+        condition: "{{ previous_step.exit_code != 0 }}"
+        parser: mypy_error_parser
+        output:
+          - error_count
+          - error_details
+
+  - name: generate_error_report
+    condition: "{{ (typescript_errors | length > 0) or (python_errors | length > 0) }}"
+    action: create_report
+    output_format: json
+    fields:
+      - total_errors
+      - errors_by_file
+      - errors_by_severity
+      - suggested_fixes
+
+quality_gates:
+  - name: no_type_errors
+    validation:
+      - typescript_errors_equals_0
+      - python_errors_equals_0
+
+  - name: no_new_type_errors
+    description: Allow existing errors, block new ones
+    condition: "{{ full_check == false }}"
+    validation:
+      - new_error_count_equals_0
+
+outputs:
+  - typescript_error_count: 0
+  - python_error_count: 0
+  - total_duration_seconds: 0
+  - files_checked: []
+  - error_report_path: null
+
+success_criteria:
+  any_of:
+    - no_type_errors_found
+    - no_new_errors_introduced  # For incremental checks
+
+failure_handling:
+  on_type_errors:
+    - action: save_error_report
+      path: .claude/reports/type-errors-{{ timestamp }}.json
+    - if: fail_fast
+      action: halt_workflow
+    - if: not fail_fast
+      action: continue_with_warnings
+
+  on_timeout:
+    - log_partial_results
+    - suggest_full_check: false
+
+escalation:
+  conditions:
+    - type_error_count_gt_10
+    - critical_type_errors_found
+  action: escalate_to
+  agent: TYPESCRIPT-PRO or PYTHON-PRO
+  reason: "Complex type errors require expert analysis"
+
+monitoring:
+  metrics:
+    - average_check_time
+    - error_detection_rate
+    - false_positive_rate
+
+  sla_tracking:
+    - target_seconds: 120
+    - alert_threshold: 180  # 3 minutes
+
+performance_optimization:
+  - use_incremental_builds: true
+  - parallel_checks: true
+  - cache_type_info: true
+  - skip_node_modules: true
+  - skip_venv: true
+
+notes:
+  - This workflow provides fast type safety feedback
+  - Incremental by default for speed
+  - Full checks available via flag
+  - Escalates to expert agents only for complex errors

@@ -1,6 +1,7 @@
 ---
 name: VALIDATOR
 description: Quality gate and deployment readiness enforcer with comprehensive validation checks. Use for final reviews and deployment validation.
+model: haiku
 role: Quality Gate & Deployment Readiness Enforcer
 capabilities:
   - quality_validation

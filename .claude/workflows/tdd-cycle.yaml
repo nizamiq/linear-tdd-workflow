@@ -1,0 +1,248 @@
+---
+name: tdd-cycle
+description: Strict RED→GREEN→REFACTOR TDD cycle enforcement workflow
+version: 1.0.0
+type: workflow
+
+# This is a deterministic workflow, not an autonomous agent
+# Use this for enforcing TDD discipline without agent overhead
+
+metadata:
+  owner: EXECUTOR
+  cost_profile: minimal
+  deterministic: true
+  sla_seconds: 300
+
+inputs:
+  required:
+    - test_file_path
+    - implementation_file_path
+  optional:
+    - test_framework  # default: auto-detect from file extension
+    - coverage_target  # default: 80
+
+phases:
+  - name: RED
+    description: Write failing test that defines desired behavior
+    max_attempts: 2
+    steps:
+      - action: verify_test_file_exists
+        tool: Read
+        params:
+          file_path: "{{ test_file_path }}"
+        validation:
+          - test_file_contains_new_test_case
+
+      - action: run_test_suite
+        tool: Bash
+        params:
+          command: |
+            {% if test_file_path.endswith('.py') %}
+            pytest {{ test_file_path }} -v
+            {% elif test_file_path.endsWith('.ts') or test_file_path.endsWith('.js') %}
+            npm test -- {{ test_file_path }}
+            {% endif %}
+        expected_result: failure
+        validation:
+          - exit_code_not_equals_0
+          - failure_reason_is_expected  # Not syntax error
+
+      - action: confirm_red_phase
+        gate: true
+        criteria:
+          - test_fails_for_expected_reason
+          - no_syntax_errors
+          - test_name_is_descriptive
+
+    success_criteria:
+      - test_exists
+      - test_fails_correctly
+      - ready_for_implementation
+
+    failure_actions:
+      - escalate_to: EXECUTOR
+        reason: "Cannot write valid failing test after 2 attempts"
+
+  - name: GREEN
+    description: Write minimal code to make test pass
+    max_attempts: 3
+    steps:
+      - action: implement_minimal_code
+        tool: Edit
+        params:
+          file_path: "{{ implementation_file_path }}"
+          # Code implementation happens here
+        validation:
+          - changes_are_minimal
+          - no_premature_optimization
+
+      - action: run_test_suite
+        tool: Bash
+        params:
+          command: |
+            {% if test_file_path.endswith('.py') %}
+            pytest {{ test_file_path }} -v
+            {% else %}
+            npm test -- {{ test_file_path }}
+            {% endif %}
+        expected_result: success
+        validation:
+          - exit_code_equals_0
+          - all_tests_pass
+
+      - action: verify_existing_tests
+        tool: Bash
+        params:
+          command: |
+            {% if test_file_path.endswith('.py') %}
+            pytest -v
+            {% else %}
+            npm test
+            {% endif %}
+        validation:
+          - no_regression
+          - all_tests_still_pass
+
+      - action: confirm_green_phase
+        gate: true
+        criteria:
+          - new_test_passes
+          - existing_tests_pass
+          - implementation_is_minimal
+
+    success_criteria:
+      - test_passes
+      - no_regressions
+      - minimal_implementation
+
+    failure_actions:
+      - if: attempts_gte_2
+        action: analyze_failure
+        tool: Bash
+        command: |
+          {% if test_file_path.endswith('.py') %}
+          pytest {{ test_file_path }} -vv --tb=long
+          {% else %}
+          npm test -- {{ test_file_path }} --verbose
+          {% endif %}
+      - if: attempts_gte_3
+        action: escalate_to
+        agent: EXECUTOR
+        reason: "Cannot make test pass after 3 attempts"
+
+  - name: REFACTOR
+    description: Improve design while keeping tests green
+    max_attempts: 2
+    optional: true  # Can skip if no refactoring needed
+    steps:
+      - action: analyze_refactoring_opportunities
+        checklist:
+          - duplication_exists
+          - naming_could_improve
+          - structure_could_simplify
+        skip_if_none: true
+
+      - action: apply_refactoring
+        tool: Edit
+        params:
+          file_path: "{{ implementation_file_path }}"
+        validation:
+          - no_behavior_change
+          - improves_readability
+
+      - action: verify_tests_still_pass
+        tool: Bash
+        params:
+          command: |
+            {% if test_file_path.endswith('.py') %}
+            pytest -v
+            {% else %}
+            npm test
+            {% endif %}
+        validation:
+          - exit_code_equals_0
+          - no_test_changes_needed
+
+      - action: confirm_refactor_phase
+        gate: true
+        criteria:
+          - all_tests_pass
+          - code_quality_improved
+          - no_behavior_changed
+
+    success_criteria:
+      - tests_still_pass
+      - code_improved
+      - ready_for_commit
+
+    failure_actions:
+      - action: revert_refactoring
+        tool: Bash
+        command: git checkout -- {{ implementation_file_path }}
+      - escalate_to: EXECUTOR
+        reason: "Refactoring broke tests"
+
+quality_gates:
+  - name: coverage_check
+    tool: Bash
+    command: |
+      {% if test_file_path.endswith('.py') %}
+      pytest --cov={{ implementation_file_path }} --cov-report=json
+      {% else %}
+      npm run coverage:check
+      {% endif %}
+    validation:
+      - coverage_gte: "{{ coverage_target | default(80) }}"
+
+  - name: lint_check
+    tool: Bash
+    command: |
+      {% if implementation_file_path.endswith('.py') %}
+      ruff check {{ implementation_file_path }}
+      {% else %}
+      npm run lint:check {{ implementation_file_path }}
+      {% endif %}
+    validation:
+      - exit_code_equals_0
+
+outputs:
+  - test_file_path
+  - implementation_file_path
+  - coverage_percentage
+  - cycle_duration_seconds
+  - phases_completed: [RED, GREEN, REFACTOR]
+
+success_criteria:
+  all_of:
+    - red_phase_completed
+    - green_phase_completed
+    - tests_pass
+    - coverage_gte_80
+    - lint_passes
+
+failure_handling:
+  on_phase_failure:
+    - log_failure_details
+    - preserve_state_for_debugging
+    - escalate_to_human_or_agent
+
+  on_timeout:
+    - capture_current_state
+    - escalate_to: EXECUTOR
+
+monitoring:
+  metrics:
+    - cycle_completion_time
+    - attempts_per_phase
+    - coverage_achieved
+    - escalation_rate
+
+  sla_tracking:
+    - target_seconds: 300
+    - alert_threshold: 420  # 7 minutes
+
+notes:
+  - This workflow enforces TDD without agent overhead
+  - Each phase has clear gates and validation
+  - Automatic escalation to EXECUTOR agent on failure
+  - Can be invoked directly or orchestrated by STRATEGIST
