@@ -17,7 +17,8 @@
       "Bash(make coverage-validate:*)",
       "Bash(npm run coverage:validate:*)",
       "Bash(git checkout:*)",
-      "Bash(git fetch:*)"
+      "Bash(git fetch:*)",
+      "Read(//Users/cnross/code/subagents/**)"
     ],
     "deny": [],
     "ask": []

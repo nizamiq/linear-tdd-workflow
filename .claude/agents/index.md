@@ -6,13 +6,17 @@ This file serves as the central registry for all agents in the Linear TDD Workfl
 
 ### AUDITOR
 - **Role**: Code Quality Assessment & Standards Enforcer
-- **Capabilities**: code_analysis, quality_assessment, technical_debt_detection, clean_code_principles, linear_integration
+- **Model**: sonnet
+- **Capabilities**: clean_code_principles, solid_architecture_analysis, technical_debt_detection, security_vulnerability_scanning, performance_bottleneck_identification
 - **Primary Command**: `/assess`
+- **Use Proactively**: Before releases, after major changes, weekly for continuous improvement
 
 ### EXECUTOR
 - **Role**: TDD Implementation Engine
-- **Capabilities**: tdd_implementation, test_driven_development, code_implementation, fix_pack_execution, linear_integration
+- **Model**: opus
+- **Capabilities**: strict_tdd_enforcement, red_green_refactor_cycle, test_driven_development, fix_pack_implementation, mutation_testing
 - **Primary Command**: `/fix`
+- **Use Proactively**: Any code implementation, bug fixes, or refactoring tasks
 
 ### GUARDIAN
 - **Role**: CI/CD Pipeline Recovery Specialist
@@ -55,6 +59,26 @@ This file serves as the central registry for all agents in the Linear TDD Workfl
 ### SECURITY
 - **Role**: Security & Vulnerability Scanner
 - **Capabilities**: security_scanning, vulnerability_detection, static_analysis, dependency_auditing
+
+## Specialized Agents
+
+### CODE-REVIEWER
+- **Role**: Elite Code Review & Analysis Expert
+- **Model**: opus
+- **Capabilities**: ai_powered_code_analysis, security_vulnerability_detection, performance_optimization_review, production_reliability_assessment
+- **Use Proactively**: Pull request reviews, security audits, code quality assessments
+
+### TEST-AUTOMATOR
+- **Role**: Test Automation & TDD Excellence Expert
+- **Model**: sonnet
+- **Capabilities**: strict_tdd_enforcement, ai_powered_test_generation, self_healing_test_automation, property_based_testing, mutation_testing
+- **Use Proactively**: Test creation, TDD enforcement, quality automation
+
+### LEGACY-MODERNIZER
+- **Role**: Legacy Code Modernization Specialist
+- **Model**: sonnet
+- **Capabilities**: legacy_code_refactoring, framework_migration, technical_debt_reduction, monolith_decomposition, incremental_migration
+- **Use Proactively**: Legacy system updates, dependency upgrades, monolith decomposition
 
 ## Agent Coordination
 

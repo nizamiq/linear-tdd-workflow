@@ -1,6 +1,6 @@
 ---
 name: fix
-description: Implement a fix from Linear using strict TDD
+description: Implement approved fix pack using strict TDD methodology (RED→GREEN→REFACTOR). Use PROACTIVELY when implementing any code changes, bug fixes, or improvements from Linear tasks.
 agent: EXECUTOR
 usage: "/fix <TASK-ID> [--branch=<branch-name>]"
 parameters:
