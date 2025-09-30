@@ -6,7 +6,7 @@
 [![TDD Compliant](https://img.shields.io/badge/TDD-Strict-brightgreen.svg)](docs/WORKFLOW-TDD-PROTOCOL.md)
 [![Linear Integrated](https://img.shields.io/badge/Linear-Connected-blue.svg)](docs/INTEGRATION-LINEAR.md)
 [![Clean Code](https://img.shields.io/badge/Clean%20Code-Enforced-green.svg)](docs/WORKFLOW-CLEAN-CODE-ASSESSMENT.md)
-[![Agents](https://img.shields.io/badge/Agents-20_Specialized-gold.svg)](.claude/agents/CLAUDE.md)
+[![Agents](https://img.shields.io/badge/Agents-23_Specialized-gold.svg)](.claude/agents/CLAUDE.md)
 [![Languages](https://img.shields.io/badge/Languages-JS%2FTS%2FPython-blue.svg)](docs/languages/)
 [![Installation](https://img.shields.io/badge/Install-Drop--in-purple.svg)](#installation-strategy)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -15,7 +15,7 @@
 
 ## What is Linear TDD Workflow System?
 
-An autonomous code quality management system that uses 20 specialized AI agents to continuously assess, improve, and maintain your codebase. The system enforces strict Test-Driven Development practices with **real coverage validation** and **production-ready deployment pipelines**.
+An autonomous code quality management system that uses 23 specialized AI agents to continuously assess, improve, and maintain your codebase. The system enforces strict Test-Driven Development practices with **real coverage validation** and **production-ready deployment pipelines**.
 
 ### Key Benefits
 - **50% faster** Mean Time to Recovery (MTTR)
@@ -208,9 +208,9 @@ Pre-approved, low-risk improvements that agents implement autonomously:
 
 ## 🏗️ Architecture Overview
 
-### 20-Agent System
+### 23-Agent System
 
-The system coordinates 20 specialized agents through Linear.app:
+The system coordinates 23 specialized agents through Linear.app:
 
 ```
 Linear.app (Task Management)
@@ -233,7 +233,7 @@ Linear.app (Task Management)
 - **STRATEGIST** - Multi-agent orchestration
 - **SCHOLAR** - Pattern learning & optimization
 
-**Specialized Agents:** Testing (3) • Development (3) • Infrastructure (3) • Architecture (3) • Security (3)
+**Specialized Agents:** Testing (3) • Development (3) • Infrastructure (3) • Architecture (3) • Documentation (1) • Security (4)
 
 ### Agent Invocation
 

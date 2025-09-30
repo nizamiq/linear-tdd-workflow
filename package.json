@@ -72,7 +72,14 @@
     "cycle:plan": "node .claude/scripts/cycle/cycle-planner.js",
     "cycle:align": "node .claude/scripts/cycle/work-aligner.js",
     "cycle:ready": "node .claude/scripts/cycle/readiness-checker.js",
-    "cycle:full": "npm run cycle:analyze && npm run cycle:plan && npm run cycle:align && npm run cycle:ready"
+    "cycle:full": "npm run cycle:analyze && npm run cycle:plan && npm run cycle:align && npm run cycle:ready",
+    "docs:validate": "bash scripts/validate-docs.sh",
+    "docs:validate:links": "bash scripts/validate-docs.sh --check-links",
+    "docs:validate:examples": "bash scripts/validate-docs.sh --check-examples",
+    "docs:validate:xrefs": "bash scripts/validate-docs.sh --check-xrefs",
+    "docs:fix": "bash scripts/validate-docs.sh --fix",
+    "docs:generate-api": "node scripts/generate-api-docs.js",
+    "docs:audit": "bash scripts/validate-docs.sh && node scripts/generate-api-docs.js"
   },
   "keywords": [
     "tdd",
