@@ -57,6 +57,30 @@ This file serves as the central registry for all slash commands in the Linear TD
 - **Description**: Analyze and optimize PostgreSQL database performance
 - **Usage**: Database performance optimization
 
+### Development & Framework Commands
+
+#### `/django [--task=<api|model|view|optimization|security>] [--async] [--drf]`
+- **Agent**: DJANGO-PRO
+- **Description**: Django development with async views, DRF APIs, and ORM optimization
+- **Usage**: Django feature development and optimization
+
+#### `/python [--task=<async|typing|optimization|testing|packaging>] [--modern-tools]`
+- **Agent**: PYTHON-PRO
+- **Description**: Modern Python development with 3.12+ features and cutting-edge tooling
+- **Usage**: Python optimization and modern patterns
+
+#### `/typescript [--task=<types|react|api|migration|testing>] [--strict] [--monorepo]`
+- **Agent**: TYPESCRIPT-PRO
+- **Description**: TypeScript development with advanced type system and React/Next.js
+- **Usage**: TypeScript migration and type safety
+
+### Observability Commands
+
+#### `/monitor [--scope=<metrics|traces|logs|all>] [--target=<local|kubernetes|cloud>] [--slo]`
+- **Agent**: OBSERVABILITY-ENGINEER
+- **Description**: Set up comprehensive observability with OpenTelemetry and Prometheus
+- **Usage**: Production monitoring and alerting
+
 ## Command Structure
 
 All commands follow this standard format:
