@@ -18,7 +18,9 @@
       "Bash(npm run coverage:validate:*)",
       "Bash(git checkout:*)",
       "Bash(git fetch:*)",
-      "Read(//Users/cnross/code/subagents/**)"
+      "Read(//Users/cnross/code/subagents/**)",
+      "Bash(grep:*)",
+      "Bash(xargs:*)"
     ],
     "deny": [],
     "ask": []
