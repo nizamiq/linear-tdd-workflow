@@ -27,6 +27,7 @@ make onboard
 - `/learn` - Mine patterns from successful PRs (SCHOLAR)
 - `/release <version>` - Manage production deployment (STRATEGIST)
 - `/status` - Current workflow & Linear status (STRATEGIST)
+- `/commit` - Git commit with Conventional Commits and validation (STRATEGIST)
 - `/cycle [plan|status|execute|review]` - Sprint planning (PLANNER)
 - `/docs` - Documentation validation and generation (DOC-KEEPER)
 

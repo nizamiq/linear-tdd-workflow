@@ -29,6 +29,7 @@ make status
 | `/learn` | Extract patterns | SCHOLAR |
 | `/release <version>` | Manage release | STRATEGIST |
 | `/status` | Check workflow status | STRATEGIST |
+| `/commit` | Git commit with validation | STRATEGIST |
 | `/cycle` | Sprint planning | PLANNER |
 | `/docs` | Documentation validation | DOC-KEEPER |
 | `/deploy` | Production deployment | DEPLOYMENT-ENGINEER |

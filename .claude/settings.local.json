@@ -32,7 +32,8 @@
       "Bash(find:*)",
       "Bash(git log:*)",
       "Bash(while read f)",
-      "Bash(awk:*)"
+      "Bash(awk:*)",
+      "Read(//Users/cnross/.claude/**)"
     ],
     "deny": [],
     "ask": []
