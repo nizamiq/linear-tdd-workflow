@@ -1,0 +1,196 @@
+name: Documentation Validation
+
+on:
+  pull_request:
+    paths:
+      - '**.md'
+      - '.claude/agents/**'
+      - '.claude/workflows/**'
+      - 'docs/**'
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - '**.md'
+      - '.claude/agents/**'
+      - '.claude/workflows/**'
+      - 'docs/**'
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  validate-documentation:
+    name: Validate Documentation Quality
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Need full history for freshness checks
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate documentation links
+        id: validate-links
+        run: |
+          bash scripts/validate-docs.sh --check-links --report
+          echo "exit_code=$?" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: Validate code examples
+        id: validate-examples
+        run: |
+          bash scripts/validate-docs.sh --check-examples --report
+          echo "exit_code=$?" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: Validate cross-references
+        id: validate-xrefs
+        run: |
+          bash scripts/validate-docs.sh --check-xrefs --report
+          echo "exit_code=$?" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: Generate API documentation
+        run: |
+          node scripts/generate-api-docs.js
+
+      - name: Check for API doc changes
+        run: |
+          if [[ -n $(git diff --name-only docs/api-reference/) ]]; then
+            echo "⚠️ API documentation is out of sync with agent specifications"
+            echo "Run: npm run docs:generate-api"
+            git diff docs/api-reference/
+            exit 1
+          fi
+
+      - name: Upload validation reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: validation-reports
+          path: docs/validation-reports/
+          retention-days: 30
+
+      - name: Create validation summary
+        if: always()
+        run: |
+          echo "## Documentation Validation Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [[ ${{ steps.validate-links.outputs.exit_code }} -eq 0 ]]; then
+            echo "✅ **Link Validation**: PASSED" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Link Validation**: FAILED" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [[ ${{ steps.validate-examples.outputs.exit_code }} -eq 0 ]]; then
+            echo "✅ **Example Validation**: PASSED" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Example Validation**: FAILED" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          if [[ ${{ steps.validate-xrefs.outputs.exit_code }} -eq 0 ]]; then
+            echo "✅ **Cross-Reference Validation**: PASSED" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Cross-Reference Validation**: FAILED" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Reports" >> $GITHUB_STEP_SUMMARY
+          echo "Validation reports are available as artifacts." >> $GITHUB_STEP_SUMMARY
+
+      - name: Fail if validation errors
+        if: |
+          steps.validate-links.outputs.exit_code != 0 ||
+          steps.validate-examples.outputs.exit_code != 0 ||
+          steps.validate-xrefs.outputs.exit_code != 0
+        run: |
+          echo "❌ Documentation validation failed"
+          exit 1
+
+  check-documentation-coverage:
+    name: Check Documentation Coverage
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Count agent specifications
+        id: count-agents
+        run: |
+          AGENT_COUNT=$(find .claude/agents -name "*.md" -not -name "index.md" -not -name "CLAUDE.md" | wc -l | tr -d ' ')
+          echo "count=$AGENT_COUNT" >> $GITHUB_OUTPUT
+          echo "Found $AGENT_COUNT agent specifications"
+
+      - name: Check README mentions correct agent count
+        run: |
+          AGENT_COUNT=${{ steps.count-agents.outputs.count }}
+          if ! grep -q "${AGENT_COUNT} specialized agents" README.md && \
+             ! grep -q "${AGENT_COUNT}_Specialized" README.md; then
+            echo "❌ README.md doesn't mention correct agent count ($AGENT_COUNT)"
+            echo "Current README references:"
+            grep -n "agents\|Agents" README.md | head -10
+            exit 1
+          fi
+          echo "✅ README.md mentions correct agent count"
+
+      - name: Verify all agents have documentation
+        run: |
+          echo "Checking agent documentation coverage..."
+          MISSING_DOCS=0
+
+          for agent_file in .claude/agents/*.md; do
+            [[ $(basename "$agent_file") == "index.md" ]] && continue
+            [[ $(basename "$agent_file") == "CLAUDE.md" ]] && continue
+
+            AGENT_NAME=$(basename "$agent_file" .md | tr '[:lower:]' '[:upper:]' | tr '-' '_')
+
+            # Check if agent has description
+            if ! grep -q "^description:" "$agent_file"; then
+              echo "❌ $AGENT_NAME missing description"
+              ((MISSING_DOCS++))
+            fi
+
+            # Check if agent has capabilities
+            if ! grep -q "^capabilities:" "$agent_file"; then
+              echo "⚠️  $AGENT_NAME missing capabilities list"
+            fi
+          done
+
+          if [[ $MISSING_DOCS -gt 0 ]]; then
+            echo "❌ Found $MISSING_DOCS agents with missing documentation"
+            exit 1
+          fi
+
+          echo "✅ All agents have required documentation"
+
+      - name: Create coverage summary
+        if: always()
+        run: |
+          echo "## Documentation Coverage" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Agent Specifications**: ${{ steps.count-agents.outputs.count }} files" >> $GITHUB_STEP_SUMMARY
+          echo "- **Documentation Files**: $(find docs -name "*.md" | wc -l) files" >> $GITHUB_STEP_SUMMARY
+          echo "- **Total Documentation**: $(find . -name "*.md" -not -path "./node_modules/*" | wc -l) files" >> $GITHUB_STEP_SUMMARY

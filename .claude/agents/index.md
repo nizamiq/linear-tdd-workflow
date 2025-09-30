@@ -60,6 +60,13 @@ This file serves as the central registry for all agents in the Linear TDD Workfl
 - **Role**: Security & Vulnerability Scanner
 - **Capabilities**: security_scanning, vulnerability_detection, static_analysis, dependency_auditing
 
+### DOC-KEEPER
+- **Role**: Documentation Excellence Specialist
+- **Model**: sonnet
+- **Capabilities**: documentation_validation, content_generation, quality_assurance, knowledge_organization, cross_reference_management
+- **Primary Command**: `/docs`
+- **Use Proactively**: Documentation validation, generation, and maintenance
+
 ## Specialized Agents
 
 ### CODE-REVIEWER
