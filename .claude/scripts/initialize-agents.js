@@ -3,7 +3,7 @@
 /**
  * Agent Initialization Script
  *
- * Initializes and validates all 20 specialized agents
+ * Initializes and validates all 22 specialized agents
  * in the Claude Agentic Workflow System
  */
 
@@ -34,112 +34,124 @@ class AgentInitializer {
    */
   loadAgentSpecs() {
     return {
-      // Core Workflow Agents
+      // Core Workflow Agents (6)
       STRATEGIST: {
-        role: 'Workflow orchestrator with advanced concurrency management',
-        capabilities: ['task-management', 'linear-integration', 'coordination'],
+        role: 'Multi-Agent Orchestrator',
+        capabilities: ['workflow-orchestration', 'multi-agent-coordination', 'linear-management'],
         priority: 1
       },
       AUDITOR: {
-        role: 'Code quality assessment specialist',
-        capabilities: ['code-analysis', 'pattern-detection', 'quality-metrics'],
+        role: 'Code Quality Assessment & Standards Enforcer',
+        capabilities: ['clean-code-principles', 'solid-architecture-analysis', 'technical-debt-detection'],
         priority: 2
       },
       EXECUTOR: {
-        role: 'Fix Pack implementation engine',
-        capabilities: ['tdd-implementation', 'code-fixes', 'testing'],
+        role: 'TDD Implementation Engine',
+        capabilities: ['strict-tdd-enforcement', 'red-green-refactor-cycle', 'fix-pack-implementation'],
         priority: 2
       },
       GUARDIAN: {
-        role: 'CI/CD pipeline health monitor',
-        capabilities: ['monitoring', 'failure-detection', 'recovery'],
+        role: 'CI/CD Pipeline Recovery Specialist',
+        capabilities: ['pipeline-recovery', 'ci-cd-monitoring', 'deployment-safety'],
         priority: 2
       },
       SCHOLAR: {
-        role: 'Learning and pattern recognition engine',
-        capabilities: ['pattern-learning', 'optimization', 'insights'],
+        role: 'Learning & Pattern Recognition Engine',
+        capabilities: ['pattern-recognition', 'success-analysis', 'knowledge-extraction'],
+        priority: 3
+      },
+      PLANNER: {
+        role: 'Cycle Planning Orchestrator',
+        capabilities: ['cycle-planning', 'sprint-orchestration', 'capacity-planning'],
+        priority: 2
+      },
+
+      // Development Specialists (3)
+      'DJANGO-PRO': {
+        role: 'Django Framework & Architecture Expert',
+        capabilities: ['django-5x-async-views', 'django-rest-framework', 'celery-task-processing'],
+        priority: 3
+      },
+      'PYTHON-PRO': {
+        role: 'Modern Python Development Expert',
+        capabilities: ['python-312-features', 'async-await-mastery', 'uv-package-management'],
+        priority: 3
+      },
+      'TYPESCRIPT-PRO': {
+        role: 'TypeScript & Type Safety Expert',
+        capabilities: ['typescript-5x-features', 'react-nextjs-architecture', 'type-safe-api-design'],
         priority: 3
       },
 
-      // Specialized Technical Agents
-      ANALYZER: {
-        role: 'Deep code analysis and insights specialist',
-        capabilities: ['ast-analysis', 'complexity-metrics', 'dependencies'],
+      // Infrastructure & Deployment (4)
+      'KUBERNETES-ARCHITECT': {
+        role: 'Cloud-Native Infrastructure Expert',
+        capabilities: ['kubernetes-orchestration', 'gitops-workflows', 'multi-cloud-architecture'],
         priority: 3
       },
+      'DEPLOYMENT-ENGINEER': {
+        role: 'CI/CD Pipeline & Deployment Expert',
+        capabilities: ['github-actions-mastery', 'progressive-delivery', 'zero-downtime-deployments'],
+        priority: 3
+      },
+      'DATABASE-OPTIMIZER': {
+        role: 'PostgreSQL Performance Expert',
+        capabilities: ['postgresql-query-optimization', 'django-orm-optimization', 'n-plus-one-resolution'],
+        priority: 3
+      },
+      'OBSERVABILITY-ENGINEER': {
+        role: 'Observability & Monitoring Expert',
+        capabilities: ['opentelemetry-implementation', 'prometheus-metrics', 'distributed-tracing'],
+        priority: 3
+      },
+
+      // Quality Engineering (7)
+      'CODE-REVIEWER': {
+        role: 'Elite Code Review Expert',
+        capabilities: ['ai-powered-code-analysis', 'security-vulnerability-detection', 'production-reliability'],
+        priority: 3
+      },
+      'TEST-AUTOMATOR': {
+        role: 'Test Automation Excellence Expert',
+        capabilities: ['strict-tdd-enforcement', 'ai-powered-test-generation', 'mutation-testing'],
+        priority: 3
+      },
+      'LEGACY-MODERNIZER': {
+        role: 'Legacy Code Modernization Specialist',
+        capabilities: ['legacy-code-refactoring', 'framework-migration', 'technical-debt-reduction'],
+        priority: 4
+      },
       TESTER: {
-        role: 'Test creation specialist for TDD RED phase',
-        capabilities: ['test-generation', 'tdd-validation', 'coverage'],
+        role: 'Test-First Engineering Specialist',
+        capabilities: ['test-creation', 'tdd-enforcement', 'test-automation'],
         priority: 3
       },
       VALIDATOR: {
-        role: 'Test execution specialist for TDD validation',
-        capabilities: ['test-execution', 'coverage-analysis', 'validation'],
+        role: 'Quality Gate Enforcement',
+        capabilities: ['quality-validation', 'deployment-readiness', 'acceptance-testing'],
         priority: 3
       },
-      REFACTORER: {
-        role: 'Specialized code refactoring and modernization expert',
-        capabilities: ['refactoring', 'modernization', 'optimization'],
+      LINTER: {
+        role: 'Code Style & Format Enforcement',
+        capabilities: ['code-formatting', 'style-enforcement', 'autofix-generation'],
         priority: 4
       },
-      RESEARCHER: {
-        role: 'Deep code understanding and documentation specialist',
-        capabilities: ['documentation', 'research', 'analysis'],
+      TYPECHECKER: {
+        role: 'Type Safety Validation',
+        capabilities: ['type-checking', 'static-analysis', 'typescript-validation'],
         priority: 4
       },
 
-      // Infrastructure & Operations Agents
-      DEPLOYER: {
-        role: 'Safe and reliable deployment automation specialist',
-        capabilities: ['deployment', 'automation', 'safety'],
-        priority: 4
+      // Security & Routing (2)
+      SECURITY: {
+        role: 'Security & Vulnerability Scanner',
+        capabilities: ['security-scanning', 'vulnerability-detection', 'dependency-auditing'],
+        priority: 2
       },
-      INTEGRATOR: {
-        role: 'External service integration management specialist',
-        capabilities: ['api-integration', 'webhooks', 'external-services'],
-        priority: 4
-      },
-      MONITOR: {
-        role: 'Real-time system observability and metrics specialist',
-        capabilities: ['monitoring', 'metrics', 'alerting'],
-        priority: 4
-      },
-      SECURITYGUARD: {
-        role: 'Security vulnerability detection and remediation specialist',
-        capabilities: ['security-analysis', 'vulnerability-detection', 'remediation'],
-        priority: 3
-      },
-
-      // Specialized Domain Agents
-      MIGRATOR: {
-        role: 'Code and data migration management specialist',
-        capabilities: ['migration', 'data-transformation', 'compatibility'],
+      ROUTER: {
+        role: 'Request Routing',
+        capabilities: ['request-routing', 'agent-selection', 'task-distribution'],
         priority: 5
-      },
-      OPTIMIZER: {
-        role: 'Performance and efficiency improvement specialist',
-        capabilities: ['performance-analysis', 'optimization', 'efficiency'],
-        priority: 5
-      },
-      DOCUMENTER: {
-        role: 'Comprehensive documentation management specialist',
-        capabilities: ['documentation', 'api-docs', 'guides'],
-        priority: 5
-      },
-      ARCHITECT: {
-        role: 'System design and architecture evolution specialist',
-        capabilities: ['architecture', 'design', 'evolution'],
-        priority: 5
-      },
-      CLEANER: {
-        role: 'Code cleanup and maintenance specialist',
-        capabilities: ['cleanup', 'maintenance', 'code-quality'],
-        priority: 5
-      },
-      REVIEWER: {
-        role: 'Automated code review and feedback specialist',
-        capabilities: ['code-review', 'feedback', 'quality-assurance'],
-        priority: 4
       }
     };
   }

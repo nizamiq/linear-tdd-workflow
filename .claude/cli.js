@@ -48,13 +48,24 @@ class ClaudeCLI {
       .action(async () => {
         console.log(colors.bold('\n🤖 Claude Code Native Integration\n'));
         console.log('This system now uses Claude Code\'s native agent discovery.');
-        console.log('\nAvailable Slash Commands:');
+        console.log('\nCore Workflow Commands:');
         console.log('  ' + colors.cyan('/assess') + ' - Code quality assessment (AUDITOR)');
         console.log('  ' + colors.cyan('/fix <TASK-ID>') + ' - Implement fix with TDD (EXECUTOR)');
         console.log('  ' + colors.cyan('/recover') + ' - Fix CI/CD pipeline (GUARDIAN)');
         console.log('  ' + colors.cyan('/learn') + ' - Extract patterns (SCHOLAR)');
         console.log('  ' + colors.cyan('/release <version>') + ' - Manage release (STRATEGIST)');
         console.log('  ' + colors.cyan('/status') + ' - Check workflow status (STRATEGIST)');
+        console.log('  ' + colors.cyan('/cycle') + ' - Sprint planning (PLANNER)');
+
+        console.log('\nDevelopment Commands:');
+        console.log('  ' + colors.cyan('/django') + ' - Django development (DJANGO-PRO)');
+        console.log('  ' + colors.cyan('/python') + ' - Python optimization (PYTHON-PRO)');
+        console.log('  ' + colors.cyan('/typescript') + ' - TypeScript development (TYPESCRIPT-PRO)');
+
+        console.log('\nInfrastructure Commands:');
+        console.log('  ' + colors.cyan('/deploy') + ' - Production deployment (DEPLOYMENT-ENGINEER)');
+        console.log('  ' + colors.cyan('/optimize-db') + ' - Database optimization (DATABASE-OPTIMIZER)');
+        console.log('  ' + colors.cyan('/monitor') + ' - Observability setup (OBSERVABILITY-ENGINEER)');
 
         console.log('\nAgent Files:');
         const agentFiles = await fs.readdir(path.join(this.claudeDir, 'agents'));
@@ -146,12 +157,22 @@ class ClaudeCLI {
       .option('--json', 'Output as JSON')
       .action(async (options) => {
         const commands = [
+          // Core workflow
           { command: '/assess', description: 'Code quality assessment', agent: 'auditor' },
           { command: '/fix', description: 'TDD fix implementation', agent: 'executor' },
           { command: '/recover', description: 'CI/CD recovery', agent: 'guardian' },
           { command: '/learn', description: 'Pattern extraction', agent: 'scholar' },
           { command: '/release', description: 'Release management', agent: 'strategist' },
-          { command: '/status', description: 'Workflow status', agent: 'strategist' }
+          { command: '/status', description: 'Workflow status', agent: 'strategist' },
+          { command: '/cycle', description: 'Sprint planning', agent: 'planner' },
+          // Development
+          { command: '/django', description: 'Django development', agent: 'django-pro' },
+          { command: '/python', description: 'Python optimization', agent: 'python-pro' },
+          { command: '/typescript', description: 'TypeScript development', agent: 'typescript-pro' },
+          // Infrastructure
+          { command: '/deploy', description: 'Production deployment', agent: 'deployment-engineer' },
+          { command: '/optimize-db', description: 'Database optimization', agent: 'database-optimizer' },
+          { command: '/monitor', description: 'Observability setup', agent: 'observability-engineer' }
         ];
 
         if (options.json) {
