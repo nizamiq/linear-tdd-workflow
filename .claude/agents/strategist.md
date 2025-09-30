@@ -1,6 +1,7 @@
 ---
 name: STRATEGIST
 description: Central workflow orchestrator and Linear task manager with full CRUD permissions. Primary agent for multi-agent coordination and task management. Use for workflow orchestration and Linear operations.
+model: opus
 role: Workflow Orchestrator & Linear Mediator
 capabilities:
   - workflow_orchestration
@@ -14,6 +15,41 @@ tools:
   - Bash
 mcp_servers:
   - linear-server
+loop_controls:
+  max_iterations: 10
+  max_time_seconds: 1800
+  max_cost_tokens: 500000
+  checkpoints:
+    - iteration: 1
+      action: confirm_workflow_plan
+      prompt: "Review workflow plan and agent selection before proceeding"
+    - iteration: 5
+      action: progress_report
+      prompt: "Workflow progress update - continue or adjust strategy?"
+    - after: linear_task_created
+      action: user_approval
+      prompt: "Review Linear tasks created - approve to continue"
+  success_criteria:
+    - "All assigned tasks completed or explicitly blocked"
+    - "Linear tasks updated with final status"
+    - "Evidence provided for all completions (PR links, test results)"
+  stop_conditions:
+    - type: success
+      check: all_tasks_completed
+    - type: budget
+      check: token_usage_exceeds_90_percent
+    - type: time
+      check: elapsed_seconds_exceeds_1500
+    - type: risk
+      check: error_count_greater_than_3
+    - type: user
+      check: halt_requested
+  escalate_to_human:
+    - "Ambiguous requirements detected"
+    - "Risk level assessed as High or Critical"
+    - "Linear API failure after 3 retries"
+    - "Conflicting agent recommendations"
+    - "Unable to select appropriate agent for task"
 ---
 
 # STRATEGIST - Professional Workflow Orchestrator & Linear Mediator

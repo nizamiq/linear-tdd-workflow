@@ -26,6 +26,29 @@ mcp_servers:
   - context7
   - sequential-thinking
   - linear-server
+loop_controls:
+  max_iterations: 3
+  max_time_seconds: 720
+  max_cost_tokens: 150000
+  success_criteria:
+    - "100% of files scanned (or scan timeout with >90% coverage)"
+    - "All critical issues have Linear tasks created (CLEAN-XXX)"
+    - "Assessment report generated with metrics"
+    - "Scan summary includes file count, issue count, severity breakdown"
+  ground_truth_checks:
+    - tool: Bash
+      command: "find . -name '*.ts' -o -name '*.js' -o -name '*.py' | wc -l"
+      verify: file_count_matches_scan
+    - tool: Bash
+      command: "test -f assessment-report.json && echo 'exists' || echo 'missing'"
+      verify: report_generated
+  stop_conditions:
+    - type: success
+      check: all_files_scanned
+    - type: partial_success
+      check: critical_files_scanned_and_timeout_reached
+    - type: error
+      check: scan_errors_greater_than_10
 ---
 
 # AUDITOR - Professional Code Quality Assessment & Standards Enforcer

@@ -1,0 +1,86 @@
+{
+  "$schema": "https://docs.claude.com/schemas/hooks-v1.json",
+  "version": "1.0.0",
+  "description": "Claude Code hooks for Linear TDD Workflow System - enforces quality gates and automation",
+  "hooks": {
+    "pre-tool-use": {
+      "git-commit": {
+        "command": "npm run lint && npm run typecheck && npm test",
+        "description": "Quality gates before commits - ensure lint, types, and tests pass",
+        "required": true,
+        "timeout": 120,
+        "on_failure": "block"
+      },
+      "Bash(git push)": {
+        "command": "git diff --exit-code || (echo '❌ Uncommitted changes detected. Commit or stash before pushing.' && exit 1)",
+        "description": "Prevent push with uncommitted changes",
+        "required": true,
+        "timeout": 10
+      }
+    },
+    "post-tool-use": {
+      "Write": {
+        "command": "npm run format ${file} 2>/dev/null || true && npm run lint:fix ${file} 2>/dev/null || true",
+        "description": "Auto-format and fix linting after file writes",
+        "timeout": 30,
+        "async": true
+      },
+      "Edit": {
+        "command": "npm run format ${file} 2>/dev/null || true",
+        "description": "Auto-format after file edits",
+        "timeout": 20,
+        "async": true
+      }
+    },
+    "on-file-write": {
+      "typescript_javascript": {
+        "pattern": "**/*.{ts,tsx,js,jsx}",
+        "command": "npm run lint:fix ${file} 2>/dev/null || echo 'Lint fix skipped'",
+        "description": "Auto-fix TypeScript/JavaScript files on write"
+      },
+      "python": {
+        "pattern": "**/*.py",
+        "command": "ruff format ${file} 2>/dev/null && ruff check --fix ${file} 2>/dev/null || echo 'Ruff format skipped'",
+        "description": "Auto-fix Python files with ruff"
+      },
+      "markdown": {
+        "pattern": "**/*.md",
+        "command": "prettier --write ${file} 2>/dev/null || echo 'Prettier skipped'",
+        "description": "Format markdown files"
+      }
+    },
+    "post-test": {
+      "update_coverage": {
+        "command": "./scripts/update-coverage-badge.sh 2>/dev/null || echo 'Coverage badge update skipped'",
+        "description": "Update coverage badge after test runs",
+        "async": true
+      }
+    },
+    "pre-deploy": {
+      "full_validation": {
+        "command": "npm run build && npm test && npm run security-scan",
+        "description": "Full validation pipeline before deployment",
+        "required": true,
+        "timeout": 600,
+        "on_failure": "block"
+      }
+    }
+  },
+  "policy": {
+    "enforce": true,
+    "allow_override": false,
+    "log_executions": true,
+    "log_file": ".claude/logs/hooks.log"
+  },
+  "environment": {
+    "NODE_ENV": "development",
+    "CI": "false"
+  },
+  "notes": [
+    "Hooks enforce TDD workflow and code quality automatically",
+    "Pre-commit hooks are REQUIRED - they will block commits if quality gates fail",
+    "Post-write hooks are async and won't block workflow",
+    "To temporarily disable (emergency only): Set allow_override: true",
+    "All hook executions are logged to .claude/logs/hooks.log"
+  ]
+}

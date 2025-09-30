@@ -1,0 +1,325 @@
+# Success Criteria and Verification Methods for All Agents
+# This file documents how to measure success for each agent in the Linear TDD Workflow System
+
+version: "1.0.0"
+description: "Agent success criteria based on Anthropic best practices"
+
+agents:
+  STRATEGIST:
+    quantitative:
+      - metric: task_completion_rate
+        target: 100
+        unit: percent
+        measurement: "completed_tasks / total_tasks"
+      - metric: agent_coordination_time
+        target: 30
+        unit: seconds
+        measurement: "time_to_select_and_assign_agent"
+      - metric: linear_task_accuracy
+        target: 95
+        unit: percent
+        measurement: "correctly_formatted_tasks / total_tasks"
+    qualitative:
+      - "All agents completed assigned work or explicitly blocked"
+      - "No duplicate or conflicting Linear tasks created"
+      - "Workflow followed logical sequence without backtracking"
+      - "User checkpoints occurred at appropriate decision points"
+    evidence:
+      - "Linear task status = Done"
+      - "PR merged or marked ready for review"
+      - "Agent execution logs show clear decision trail"
+      - "No error escalations during normal operation"
+
+  AUDITOR:
+    quantitative:
+      - metric: files_scanned
+        target: 100
+        unit: percent
+        measurement: "scanned_files / total_files"
+      - metric: scan_duration
+        target: 720
+        unit: seconds
+        measurement: "time_elapsed_during_scan"
+      - metric: false_positive_rate
+        target: 5
+        unit: percent
+        measurement: "false_positives / total_issues"
+      - metric: critical_issue_detection
+        target: 100
+        unit: percent
+        measurement: "found_critical_issues / actual_critical_issues"
+    qualitative:
+      - "All security vulnerabilities identified"
+      - "Fix recommendations are specific and actionable"
+      - "FIL classification is accurate"
+      - "Assessment report is comprehensive and clear"
+    evidence:
+      - "assessment-report.json exists and valid"
+      - "Linear tasks created (CLEAN-XXX format)"
+      - "Scan summary includes metrics (files, issues, severity)"
+      - "Code coverage data included if available"
+
+  EXECUTOR:
+    quantitative:
+      - metric: test_coverage_diff
+        target: 80
+        unit: percent
+        measurement: "new_covered_lines / new_total_lines"
+      - metric: mutation_score
+        target: 30
+        unit: percent
+        measurement: "killed_mutants / total_mutants"
+      - metric: implementation_time
+        target: 900
+        unit: seconds
+        measurement: "time_from_start_to_tests_pass"
+      - metric: tdd_cycle_adherence
+        target: 100
+        unit: percent
+        measurement: "followed_red_green_refactor"
+    qualitative:
+      - "TDD cycle strictly followed (RED→GREEN→REFACTOR)"
+      - "Code is maintainable and follows Clean Code principles"
+      - "Implementation is minimal (no gold plating)"
+      - "Refactoring improved design without changing behavior"
+    evidence:
+      - "Tests pass (npm test exit 0)"
+      - "Coverage report shows ≥80% diff coverage"
+      - "Git history shows test committed before implementation"
+      - "Lint and type checks pass"
+      - "Linear task status updated to Done"
+
+  GUARDIAN:
+    quantitative:
+      - metric: detection_time
+        target: 300
+        unit: seconds
+        measurement: "time_from_failure_to_detection"
+      - metric: recovery_time
+        target: 600
+        unit: seconds
+        measurement: "time_from_detection_to_recovery"
+      - metric: recovery_success_rate
+        target: 80
+        unit: percent
+        measurement: "successful_recoveries / total_attempts"
+      - metric: incident_documentation_completeness
+        target: 100
+        unit: percent
+        measurement: "has_root_cause_and_fix"
+    qualitative:
+      - "Pipeline restored to green if possible"
+      - "Root cause identified and documented"
+      - "INCIDENT-XXX task created for tracking"
+      - "Escalation occurred if unrecoverable"
+    evidence:
+      - "Pipeline status check returns success"
+      - "INCIDENT-XXX task in Linear (if created)"
+      - "Root cause analysis in incident report"
+      - "Recovery actions logged"
+
+  SCHOLAR:
+    quantitative:
+      - metric: patterns_extracted
+        target: 5
+        unit: count
+        measurement: "new_patterns_in_catalog"
+      - metric: pattern_validation_rate
+        target: 100
+        unit: percent
+        measurement: "validated_patterns / extracted_patterns"
+      - metric: examples_per_pattern
+        target: 2
+        unit: count
+        measurement: "supporting_examples / pattern"
+      - metric: analysis_time
+        target: 3600
+        unit: seconds
+        measurement: "time_to_extract_patterns"
+    qualitative:
+      - "Patterns are actionable and reusable"
+      - "Each pattern has clear applicability criteria"
+      - "Examples demonstrate pattern effectiveness"
+      - "Catalog is well-organized and searchable"
+    evidence:
+      - ".claude/patterns/catalog.json updated"
+      - "Each pattern has ≥2 examples"
+      - "Pattern validation tests pass"
+      - "Pattern documentation is complete"
+
+  PLANNER:
+    quantitative:
+      - metric: cycle_planning_time
+        target: 1800
+        unit: seconds
+        measurement: "time_for_complete_cycle_plan"
+      - metric: capacity_accuracy
+        target: 90
+        unit: percent
+        measurement: "actual_completion / planned_capacity"
+      - metric: sprint_task_count
+        target: 10
+        unit: count
+        measurement: "tasks_created_for_sprint"
+    qualitative:
+      - "Sprint goals are clear and achievable"
+      - "Task priorities reflect business value"
+      - "Capacity planning is realistic"
+      - "Dependencies are identified"
+    evidence:
+      - "Sprint tasks created in Linear"
+      - "Capacity analysis document generated"
+      - "Sprint plan approved by STRATEGIST"
+
+  CODE-REVIEWER:
+    quantitative:
+      - metric: review_time
+        target: 1800
+        unit: seconds
+        measurement: "time_to_complete_review"
+      - metric: issues_found
+        target: 5
+        unit: count
+        measurement: "critical_and_major_issues"
+      - metric: false_positive_rate
+        target: 10
+        unit: percent
+        measurement: "false_issues / total_issues"
+    qualitative:
+      - "Security vulnerabilities identified"
+      - "Performance issues noted"
+      - "Code quality feedback is actionable"
+      - "Positive patterns recognized"
+    evidence:
+      - "Review comments on PR"
+      - "Approval or changes requested"
+      - "Linear tasks reference review findings"
+
+  TEST-AUTOMATOR:
+    quantitative:
+      - metric: test_coverage_achieved
+        target: 80
+        unit: percent
+        measurement: "covered_lines / total_lines"
+      - metric: test_execution_time
+        target: 600
+        unit: seconds
+        measurement: "time_to_run_full_suite"
+      - metric: test_reliability
+        target: 99
+        unit: percent
+        measurement: "consistent_passes / total_runs"
+    qualitative:
+      - "Tests are maintainable and clear"
+      - "Test pyramid is balanced"
+      - "Property-based tests for complex logic"
+      - "Tests serve as documentation"
+    evidence:
+      - "Coverage report ≥80%"
+      - "All tests pass"
+      - "Test execution time acceptable"
+      - "No flaky tests detected"
+
+  DATABASE-OPTIMIZER:
+    quantitative:
+      - metric: query_performance_improvement
+        target: 50
+        unit: percent
+        measurement: "old_time - new_time / old_time"
+      - metric: n_plus_one_queries_eliminated
+        target: 100
+        unit: percent
+        measurement: "optimized_queries / total_n_plus_one"
+      - metric: index_recommendations
+        target: 5
+        unit: count
+        measurement: "indexes_suggested"
+    qualitative:
+      - "Query explain plans analyzed"
+      - "Performance benchmarks documented"
+      - "Optimization recommendations are actionable"
+      - "No performance regressions introduced"
+    evidence:
+      - "Before/after query times documented"
+      - "Index creation scripts provided"
+      - "Performance test results"
+      - "PERF-XXX Linear task if created"
+
+  DEPLOYMENT-ENGINEER:
+    quantitative:
+      - metric: deployment_success_rate
+        target: 95
+        unit: percent
+        measurement: "successful_deploys / total_deploys"
+      - metric: deployment_time
+        target: 600
+        unit: seconds
+        measurement: "time_from_trigger_to_live"
+      - metric: rollback_time
+        target: 300
+        unit: seconds
+        measurement: "time_to_revert_if_needed"
+    qualitative:
+      - "Zero-downtime deployment achieved"
+      - "All pre-flight checks passed"
+      - "Rollback plan documented and tested"
+      - "Deployment monitoring configured"
+    evidence:
+      - "Deployment pipeline logs"
+      - "Service health checks pass"
+      - "No increase in error rates"
+      - "Linear task updated with deploy status"
+
+  OBSERVABILITY-ENGINEER:
+    quantitative:
+      - metric: metrics_implemented
+        target: 10
+        unit: count
+        measurement: "metrics_added_to_system"
+      - metric: alert_response_time
+        target: 300
+        unit: seconds
+        measurement: "time_to_first_alert"
+      - metric: dashboard_completeness
+        target: 100
+        unit: percent
+        measurement: "required_panels / total_panels"
+    qualitative:
+      - "Metrics cover critical paths"
+      - "Alerts are actionable (not noisy)"
+      - "Dashboards tell a story"
+      - "Observability enables debugging"
+    evidence:
+      - "Prometheus metrics exposed"
+      - "Grafana dashboards created"
+      - "Alert rules configured"
+      - "Test metrics tracking TDD compliance"
+
+verification_protocol:
+  ground_truth_over_estimation:
+    description: "Always prefer actual tool output over agent estimation"
+    examples:
+      - "Use npm test exit code, not agent's judgment"
+      - "Check Linear API for task existence, not memory"
+      - "Verify coverage with report file, not guess"
+
+  evidence_requirements:
+    critical_decisions:
+      - "Must have tool output or API response"
+      - "Must be verifiable by human"
+      - "Must be timestamped"
+    standard_decisions:
+      - "Should have supporting evidence"
+      - "Can rely on agent analysis with spot checks"
+
+  escalation_triggers:
+    - "Success criteria not met after max_iterations"
+    - "Ground truth check fails"
+    - "User checkpoint required but not acknowledged"
+    - "Budget or time limit exceeded"
+
+notes:
+  - "Success criteria guide agent behavior and stop conditions"
+  - "Ground truth checks prevent agents from guessing"
+  - "Evidence requirements enable audit and learning"
+  - "Escalation triggers ensure human oversight at critical points"

@@ -28,6 +28,47 @@ tools:
 mcp_servers:
   - context7
   - linear-server
+loop_controls:
+  max_iterations: 5
+  max_time_seconds: 900
+  max_cost_tokens: 200000
+  tdd_cycle_enforcement: true
+  success_criteria:
+    - "Tests pass (GREEN phase achieved)"
+    - "Coverage ≥80% diff coverage"
+    - "Mutation score ≥30%"
+    - "No linting errors"
+    - "Linear task updated to Done status"
+  ground_truth_checks:
+    - tool: Bash
+      command: "npm test"
+      verify: exit_code_equals_0
+    - tool: Bash
+      command: "npm run coverage:check"
+      verify: coverage_gte_80
+    - tool: Bash
+      command: "npm run lint:check"
+      verify: exit_code_equals_0
+  workflow_phases:
+    - phase: RED
+      action: write_failing_test
+      verify: test_fails
+      max_attempts: 2
+    - phase: GREEN
+      action: implement_minimal_code
+      verify: test_passes
+      max_attempts: 3
+    - phase: REFACTOR
+      action: improve_design
+      verify: tests_still_pass
+      max_attempts: 2
+  stop_conditions:
+    - type: success
+      check: all_criteria_met
+    - type: blocked
+      check: cannot_make_test_pass_after_3_attempts
+    - type: quality_gate_failure
+      check: coverage_below_80_after_max_iterations
 ---
 
 # EXECUTOR - Professional TDD Implementation Engine
