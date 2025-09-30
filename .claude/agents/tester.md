@@ -14,6 +14,7 @@ tools:
   - Bash
 mcp_servers:
   - playwright
+  - linear-server
 ---
 
 # TESTER - Professional Test-First Engineering Specialist

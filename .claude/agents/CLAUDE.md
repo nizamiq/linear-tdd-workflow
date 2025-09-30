@@ -108,14 +108,24 @@ mcp_servers:
 
 ## Linear Permissions Matrix
 
-| Agent | Create | Read | Update | Delete |
-|-------|--------|------|--------|--------|
-| STRATEGIST | ✅ | ✅ | ✅ | ✅ |
-| PLANNER | ✅ | ✅ | ✅ | ❌ |
-| AUDITOR | ✅ | ✅ | ❌ | ❌ |
-| EXECUTOR | ❌ | ✅ | ✅ | ❌ |
-| GUARDIAN | ✅ | ✅ | ✅ | ❌ |
-| SCHOLAR | ❌ | ✅ | ❌ | ❌ |
+### Core Agents (Writers)
+| Agent | Create | Read | Update | Delete | Purpose |
+|-------|--------|------|--------|--------|---------|
+| STRATEGIST | ✅ | ✅ | ✅ | ✅ | Full orchestration |
+| PLANNER | ✅ | ✅ | ❌ | ❌ | Sprint/cycle creation only |
+| AUDITOR | ✅ | ✅ | ❌ | ❌ | Creates CLEAN-XXX issues |
+| EXECUTOR | ❌ | ✅ | ✅ | ❌ | Updates task status |
+| GUARDIAN | ✅ | ✅ | ❌ | ❌ | Creates INCIDENT-XXX |
+
+### All Other Agents (Readers)
+| Agent | Create | Read | Update | Delete | Purpose |
+|-------|--------|------|--------|--------|---------|
+| SCHOLAR | ❌ | ✅ | ❌ | ❌ | Pattern analysis |
+| All Dev Specialists | ❌ | ✅ | ❌ | ❌ | Context awareness |
+| All Infra Agents | ❌ | ✅ | ❌ | ❌ | Task tracking |
+| All Quality Agents | ❌ | ✅ | ❌ | ❌ | Issue reference |
+
+**Note**: 90% of agents have READ-ONLY Linear access to maintain consistency. Only STRATEGIST has full control.
 
 ## Agent Usage
 
@@ -153,11 +163,28 @@ Agents are automatically discovered and used through:
 /cycle review             # Post-cycle analysis
 ```
 
+## Linear Task Creation Protocol
+
+When agents identify issues requiring task creation:
+1. **Check Existing Tasks** - Use Linear READ access to check for duplicates
+2. **Request Creation** - Notify STRATEGIST with:
+   - Issue type and severity (P0-P3)
+   - Suggested title and description
+   - Affected components/files
+   - Recommended assignee
+3. **STRATEGIST Creates** - Ensures consistent formatting:
+   - CLEAN-XXX for quality issues (via AUDITOR)
+   - INCIDENT-XXX for failures (via GUARDIAN)
+   - FEAT-XXX for features (via STRATEGIST)
+   - BUG-XXX for bugs (via STRATEGIST)
+   - PERF-XXX for performance (via STRATEGIST)
+4. **Reference Task ID** - All agents reference task in commits/PRs
+
 ## Agent Coordination
 
 Agents work together through:
-1. **Linear Tasks** - Shared task management
-2. **STRATEGIST** - Central orchestration
+1. **Linear Tasks** - Shared task management (90% read-only)
+2. **STRATEGIST** - Central orchestration and task creation
 3. **PLANNER** - Cycle planning coordination
 4. **Journeys** - Pre-defined workflows
 

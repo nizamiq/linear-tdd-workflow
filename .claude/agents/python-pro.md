@@ -44,6 +44,7 @@ tools:
 mcp_servers:
   - context7
   - sequential-thinking
+  - linear-server
 ---
 
 # PYTHON-PRO - Modern Python Development Expert

@@ -13,6 +13,7 @@ tools:
   - Glob
 mcp_servers:
   - sequential-thinking
+  - linear-server
 ---
 
 # SCHOLAR - Learning & Pattern Recognition Engine

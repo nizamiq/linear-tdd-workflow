@@ -22,7 +22,8 @@
       "Bash(grep:*)",
       "Bash(xargs:*)",
       "Bash(paste:*)",
-      "Bash(sort:*)"
+      "Bash(sort:*)",
+      "Bash(do echo -n \"$agent: \")"
     ],
     "deny": [],
     "ask": []

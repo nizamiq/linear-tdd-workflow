@@ -13,6 +13,7 @@ tools:
   - Grep
 mcp_servers:
   - sequential-thinking
+  - linear-server
 ---
 
 # GUARDIAN - CI/SRE Pipeline Protector

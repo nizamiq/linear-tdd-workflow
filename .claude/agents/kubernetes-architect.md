@@ -40,6 +40,7 @@ tools:
 mcp_servers:
   - kubernetes
   - context7
+  - linear-server
 ---
 
 # KUBERNETES-ARCHITECT - Cloud-Native Infrastructure & Kubernetes Expert
