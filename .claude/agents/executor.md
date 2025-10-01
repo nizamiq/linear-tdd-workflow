@@ -27,7 +27,6 @@ tools:
   - Bash
 mcp_servers:
   - context7
-  - linear-server
 loop_controls:
   max_iterations: 5
   max_time_seconds: 900
@@ -69,6 +68,25 @@ loop_controls:
       check: cannot_make_test_pass_after_3_attempts
     - type: quality_gate_failure
       check: coverage_below_80_after_max_iterations
+definition_of_done:
+  - task: "[RED] Write failing test for target behavior"
+    verify: "Run test suite, confirm new test fails with expected error message"
+  - task: "[GREEN] Implement minimal code to make test pass"
+    verify: "Run test suite, confirm all tests pass (exit code 0)"
+  - task: "[REFACTOR] Improve design while maintaining passing tests"
+    verify: "Run test suite after refactoring, confirm all tests still pass"
+  - task: "Achieve ≥80% diff coverage on changed lines"
+    verify: "Run coverage tool, verify changed_lines_covered / changed_lines_total ≥ 0.80"
+  - task: "Achieve ≥30% mutation score"
+    verify: "Run mutation testing (if enabled), verify killed_mutants / total_mutants ≥ 0.30"
+  - task: "Pass all linting and formatting checks"
+    verify: "Run npm run lint:check, verify exit code 0"
+  - task: "Create atomic commit with descriptive message"
+    verify: "Git log shows commit with TDD cycle label and Claude co-author"
+  - task: "Create or update PR with implementation details"
+    verify: "PR exists with description, linked Linear task, passing CI checks"
+  - task: "Update Linear task to Done status"
+    verify: "Linear API confirms task status = 'Done' and PR linked"
 ---
 
 # EXECUTOR - Professional TDD Implementation Engine

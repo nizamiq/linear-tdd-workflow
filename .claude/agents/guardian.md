@@ -15,7 +15,6 @@ tools:
   - Grep
 mcp_servers:
   - sequential-thinking
-  - linear-server
 loop_controls:
   max_iterations: 5
   max_time_seconds: 600
@@ -36,6 +35,21 @@ loop_controls:
       check: recovery_attempts_gte_3_and_still_failing
     - type: timeout
       check: elapsed_seconds_greater_than_540
+definition_of_done:
+  - task: "Detect CI/CD pipeline failure within 5 minutes"
+    verify: "Pipeline failure timestamp within 300 seconds of failure event"
+  - task: "Analyze failure logs and identify root cause"
+    verify: "Root cause documented in INCIDENT-XXX task with evidence"
+  - task: "Attempt automated remediation (max 2 retries)"
+    verify: "Remediation script executed, logs captured"
+  - task: "Verify pipeline recovery (all checks green)"
+    verify: "Run pipeline status check, confirm all jobs passing"
+  - task: "Create INCIDENT-XXX Linear task with details"
+    verify: "Linear task created with failure logs, root cause, remediation steps"
+  - task: "Update Linear task with resolution or escalation"
+    verify: "Task status = 'Done' (if recovered) or 'Blocked' (if manual intervention needed)"
+  - task: "Document prevention measures for future"
+    verify: "INCIDENT task includes 'Prevention' section with recommendations"
 ---
 
 # GUARDIAN - CI/SRE Pipeline Protector

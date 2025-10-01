@@ -26,7 +26,27 @@ tools:
 mcp_servers:
   - context7
   - sequential-thinking
-  - linear-server
+definition_of_done:
+  - task: "Review all changed files in the PR"
+    verify: "Every file in git diff has review comments or approval"
+  - task: "Run security scanners (Semgrep, CodeQL)"
+    verify: "Security scan complete, no critical/high vulnerabilities unaddressed"
+  - task: "Validate test coverage on changed lines"
+    verify: "Coverage report shows ≥80% coverage on diff"
+  - task: "Check for code smells and anti-patterns"
+    verify: "No major code smells flagged (large functions, deep nesting, duplication)"
+  - task: "Verify SOLID principles adherence"
+    verify: "Architecture patterns validated, no SRP/DIP violations noted"
+  - task: "Assess performance implications"
+    verify: "No N+1 queries, memory leaks, or blocking operations introduced"
+  - task: "Validate error handling and resilience"
+    verify: "All error paths handled, no silent failures"
+  - task: "Check observability (logging, metrics)"
+    verify: "Adequate logging for debugging, metrics for monitoring"
+  - task: "Provide actionable feedback with severity levels"
+    verify: "All comments tagged as blocking/non-blocking with fix suggestions"
+  - task: "Approve or request changes with clear rationale"
+    verify: "PR status updated: Approved, Changes Requested, or Commented"
 ---
 
 # CODE-REVIEWER - Elite Code Review & Analysis Expert

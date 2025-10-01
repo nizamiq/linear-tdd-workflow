@@ -21,7 +21,8 @@ make onboard
 ### Primary Commands Available to You (Slash Commands)
 
 **Core Workflow Commands** - TDD enforcement and quality management:
-- `/assess` - Scan code quality → Create Linear tasks (AUDITOR)
+- `/assess` - Scan code quality → Generate task definitions (AUDITOR)
+- `/linear` - Create Linear tasks from latest assessment (STRATEGIST)
 - `/fix <TASK-ID>` - Implement fix with TDD enforcement (EXECUTOR)
 - `/recover` - Auto-fix broken CI/CD pipeline (GUARDIAN)
 - `/learn` - Mine patterns from successful PRs (SCHOLAR)
@@ -133,11 +134,120 @@ npm run cycle:ready      # Phase 4: Validate readiness
 npm run cycle:full       # Run all 4 phases sequentially
 ```
 
+## 🎯 The Simplicity Principle (CRITICAL)
+
+**IMPORTANT**: Following Anthropic's "Building Effective Agents" guidance, always prefer the **simplest approach** that achieves quality targets.
+
+### Decision Hierarchy
+
+```
+1. Direct Tool Call  →  2. Workflow  →  3. Autonomous Agent
+   (simplest, fastest)   (when needed)     (last resort)
+```
+
+**Cost/Complexity Impact**:
+- Direct call: ~1x cost, 100% deterministic, instant
+- Workflow: ~2-5x cost, 100% deterministic (if well-specified), fast
+- Agent: ~10-20x cost, 70-95% reliable, slow (LLM latency)
+
+**Decision Matrix**: See `.claude/docs/DECISION-MATRIX.md` for comprehensive guide on when to use each approach.
+
+### Quick Rules
+
+**Use Direct Tool Call** (via hooks or bash) for:
+✅ Linting (`npm run lint` via hook)
+✅ Type checking (`npx tsc --noEmit`)
+✅ Running tests (`npm test`)
+✅ Formatting (`prettier --write`)
+
+**Use Workflow** (deterministic orchestration) for:
+✅ TDD cycle (RED→GREEN→REFACTOR defined steps)
+✅ Multi-phase validation (lint + typecheck + tests in sequence)
+✅ Parallel batch operations (multiple independent assessments)
+
+**Use Agent** (autonomous loop) only for:
+✅ Unpredictable complexity (code quality assessment)
+✅ Requires judgment (fix implementation, architecture decisions)
+✅ Adaptive planning (pipeline recovery, pattern learning)
+
+**Available Workflows**:
+- `.claude/workflows/lint-workflow.yaml` - Replaces LINTER agent (95% cost reduction)
+- `.claude/workflows/typecheck-workflow.yaml` - Replaces TYPECHECKER agent (95% cost reduction)
+- `.claude/workflows/validation-workflow.yaml` - Replaces VALIDATOR agent (90% cost reduction)
+
+## Parallel Execution Strategy
+
+**IMPORTANT**: This system supports parallel subagent execution for maximum efficiency. When working with multiple independent tasks, leverage Claude Code's Task tool to run up to 10 subagents concurrently.
+
+### How to Execute Agents in Parallel
+
+**Critical Rule**: Send **a single message with multiple Task tool calls** to run subagents in parallel.
+
+**Example - Parallel Assessment**:
+```
+User: "Assess the entire codebase"
+
+You: I'll assess 3 areas in parallel for speed:
+[In ONE message, make 3 Task tool calls:]
+- Task 1: Assess backend (src/api/**)
+- Task 2: Assess frontend (src/ui/**)
+- Task 3: Assess tests (tests/**)
+
+[All 3 run concurrently, results merge after completion]
+Total time: ~10 minutes (vs ~30 minutes sequential)
+```
+
+**Example - Parallel Fix Implementation**:
+```
+User: "Implement these 5 Linear tasks"
+
+You: I'll implement all 5 fixes in parallel:
+[In ONE message, make 5 Task tool calls:]
+- Task 1: Fix CLEAN-123
+- Task 2: Fix CLEAN-124
+- Task 3: Fix CLEAN-125
+- Task 4: Fix CLEAN-126
+- Task 5: Fix CLEAN-127
+
+[All 5 run concurrently]
+Total time: ~15 minutes (vs ~75 minutes sequential)
+```
+
+### Key Principles
+
+1. **Single message = Parallel** - Multiple Task calls in one message run concurrently
+2. **Multiple messages = Sequential** - Each message waits for the previous to complete
+3. **Maximum 10 concurrent subagents** - Claude Code's limit
+4. **Independent scopes only** - No shared file writes between parallel agents
+5. **Result merging** - Wait for all completions, then aggregate results
+
+### When to Use Parallel Execution
+
+**✅ Use parallel execution for:**
+- Assessing multiple directories/files independently
+- Implementing multiple independent fix packs
+- Running different types of validation (security, types, tests, lint)
+- Analyzing separate modules or services
+- Processing batch operations (multiple PRs, multiple issues)
+
+**❌ Don't use parallel for:**
+- Tasks with dependencies (A depends on B's output)
+- Shared file modifications (merge conflicts)
+- Sequential workflows (RED→GREEN→REFACTOR must be ordered)
+- Single large tasks that can't be split
+
+### Performance Benefits
+
+- **5-10x faster** execution for independent tasks
+- **Better resource utilization** - max out 10-subagent limit
+- **Reduced wait time** - no idle periods between tasks
+- **Scalable** - handles large codebases efficiently
+
 ## Architecture
 
 ### Multi-Agent System
 
-The system operates through 22 specialized agents coordinated via Linear.app:
+The system operates through 23 specialized agents coordinated via Linear.app:
 
 ```
 Linear.app (Task Management)
@@ -186,20 +296,30 @@ docs/             # Project documentation
 
 ### Linear Task Management
 
-**STRATEGIST is the PRIMARY Linear manager**. Other agents have limited roles:
-- **STRATEGIST**: Full CRUD - manages all tasks, sprints, assignments
-- **AUDITOR**: CREATE only - quality issues (CLEAN-XXX)
-- **DOC-KEEPER**: CREATE only - documentation issues (DOC-XXX)
-- **MONITOR**: CREATE only - incidents (INCIDENT-XXX)
-- **SCHOLAR**: READ only - pattern analysis
-- **Others**: UPDATE only for specific status changes
+**STRATEGIST is the EXCLUSIVE Linear MCP manager**. Linear integration follows delegation pattern:
+
+**Permission Model**:
+- **STRATEGIST**: ONLY agent with `linear-server` MCP access - manages all Linear operations
+- **AUDITOR**: Generates Linear task definitions (in `linear_tasks` array) → delegates to STRATEGIST
+- **DOC-KEEPER**: Generates doc task definitions → delegates to STRATEGIST
+- **GUARDIAN**: Reports incidents → STRATEGIST creates INCIDENT-XXX tasks
+- **EXECUTOR**: Implements fixes → STRATEGIST updates task status and links PRs
+- **All Others**: No direct Linear access - work through STRATEGIST
+
+**IMPORTANT**: No agent except STRATEGIST can call `mcp__linear-server__*` tools. This prevents permission conflicts and ensures consistent task management.
+
+**Workflow**:
+1. Agent completes work (e.g., AUDITOR finishes assessment)
+2. Agent provides structured output with task definitions
+3. STRATEGIST reads output and creates Linear tasks via MCP
+4. User receives Linear task IDs for implementation
 
 When in doubt about Linear operations, use STRATEGIST.
 
 ### Key Workflows
 
 1. **Assessment → Linear → Execution**
-   - AUDITOR scans code → creates Linear tasks → EXECUTOR implements fixes
+   - AUDITOR scans code → generates task definitions → STRATEGIST creates Linear tasks → EXECUTOR implements fixes
 
 2. **TDD Enforcement (RED→GREEN→REFACTOR)**
    - Every change must: write failing test → minimal code to pass → refactor
@@ -288,11 +408,26 @@ The system uses Claude Code's built-in tools for seamless integration:
 For details, see `.claude/INTEGRATION-GUIDE.md`
 
 ### How It Works
-Tasks are automatically managed via Linear MCP:
-- Assessment results → Linear issues (via MCP)
-- Fix Packs → Linear tasks with estimates
-- PR status → GitHub CLI + Linear MCP updates
+Tasks are managed via STRATEGIST delegation pattern:
+- Assessment results → AUDITOR generates task definitions → STRATEGIST creates Linear issues via MCP
+- Fix Packs → Linear tasks with estimates (created by STRATEGIST)
+- PR status → STRATEGIST updates Linear via MCP + GitHub CLI
 
-Always check Linear for task context before implementing fixes.
+**Always check Linear for task context before implementing fixes.**
+
+**To create Linear tasks after assessment**:
+```bash
+# Quick command (auto-detects latest assessment)
+/linear
+
+# Or specify file explicitly
+/linear proposals/issues-TIMESTAMP.json
+
+# Alternative: Direct STRATEGIST invocation
+/invoke STRATEGIST:create-linear-tasks proposals/issues-TIMESTAMP.json
+
+# Fallback for CI/CD (no MCP available)
+.claude/scripts/linear/create-tasks-from-assessment.sh proposals/issues-TIMESTAMP.json
+```
 - This system must support python development
 - you need to ensure that all the aspects of the workflows are working properly with proper E2E testing! you can use this workflow to self improve this project!
