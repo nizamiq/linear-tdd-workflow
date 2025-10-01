@@ -255,7 +255,7 @@ status:
 	@echo "=================="
 	@echo "Project Type: $(PROJECT_TYPE)"
 	@echo ""
-	@node .claude/cli.js status --detailed
+	@node .claude/cli.js status
 
 # Clean (universal)
 clean:
