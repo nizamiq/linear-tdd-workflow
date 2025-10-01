@@ -95,6 +95,8 @@ class ComprehensiveWorkflowE2ETester {
 
   /**
    * E2E-001: AUDITOR → Linear → EXECUTOR Complete Workflow
+   * @feature assess-code-quality
+   * @user-story User runs /assess to scan code quality and generate Linear tasks
    */
   async testCompleteAuditorToExecutorWorkflow() {
     return this.runTest('E2E-001: AUDITOR → Linear → EXECUTOR Workflow', async () => {

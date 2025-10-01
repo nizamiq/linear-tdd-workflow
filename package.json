@@ -1,7 +1,7 @@
 {
   "name": "linear-tdd-workflow",
-  "version": "1.3.0",
-  "description": "Linear TDD Workflow System - Autonomous Clean Code Development with Test-Driven Excellence",
+  "version": "1.4.0",
+  "description": "Linear TDD Workflow System - Autonomous Clean Code Development with Test-Driven Excellence and Functional Release Management",
   "main": "index.js",
   "scripts": {
     "test": "jest --coverage --verbose --passWithNoTests",
@@ -79,7 +79,12 @@
     "docs:validate:xrefs": "bash scripts/validate-docs.sh --check-xrefs",
     "docs:fix": "bash scripts/validate-docs.sh --fix",
     "docs:generate-api": "node scripts/generate-api-docs.js",
-    "docs:audit": "bash scripts/validate-docs.sh && node scripts/generate-api-docs.js"
+    "docs:audit": "bash scripts/validate-docs.sh && node scripts/generate-api-docs.js",
+    "release:validate-functional": "node .claude/scripts/release/functional-gate.js",
+    "release:user-stories": "node .claude/scripts/user-stories/registry-helper.js coverage",
+    "release:add-story": "node .claude/scripts/user-stories/registry-helper.js add",
+    "e2e:validate": "node .claude/scripts/testing/e2e-parser.js validate",
+    "e2e:report": "node .claude/scripts/testing/e2e-parser.js report"
   },
   "keywords": [
     "tdd",

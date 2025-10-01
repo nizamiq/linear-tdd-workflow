@@ -13,7 +13,7 @@ RED='\033[0;31m'
 NC='\033[0m' # No Color
 
 # Configuration
-CLAUDE_VERSION="1.3.0"
+CLAUDE_VERSION="1.4.0"
 SOURCE_DIR="$(dirname "$0")"
 TARGET_DIR="${1:-$(pwd)}"
 
@@ -180,8 +180,9 @@ SYSTEM_VERSION=$CLAUDE_VERSION
 INSTALL_DATE=$(date +%Y-%m-%d)
 INSTALL_TYPE=full
 PROJECT_TYPE=$project_type
-JOURNEY_COUNT=6
-AGENT_COUNT=20
+JOURNEY_COUNT=7
+AGENT_COUNT=23
+FEATURES=functional_release_gate,user_story_registry,e2e_validation
 
 # To verify installation:
 # make status
@@ -206,6 +207,99 @@ init_npm_deps() {
             npm install --save-dev commander js-yaml dotenv
             echo -e "${GREEN}✓ Installed required npm packages${NC}"
         fi
+    fi
+}
+
+# Function to add npm scripts for functional release
+add_npm_scripts() {
+    if [ -f "$TARGET_DIR/package.json" ]; then
+        echo -e "${BLUE}📝 Adding functional release npm scripts...${NC}"
+
+        # Check if scripts already exist
+        if grep -q "release:validate-functional" "$TARGET_DIR/package.json"; then
+            echo -e "${YELLOW}⚠ Functional release scripts already exist, skipping${NC}"
+            return
+        fi
+
+        # Use Node.js to safely inject scripts into package.json
+        node -e "
+        const fs = require('fs');
+        const path = '$TARGET_DIR/package.json';
+        const pkg = JSON.parse(fs.readFileSync(path, 'utf8'));
+
+        pkg.scripts = pkg.scripts || {};
+
+        // Add functional release scripts
+        pkg.scripts['release:validate-functional'] = 'node .claude/scripts/release/functional-gate.js';
+        pkg.scripts['release:user-stories'] = 'node .claude/scripts/user-stories/registry-helper.js coverage';
+        pkg.scripts['release:add-story'] = 'node .claude/scripts/user-stories/registry-helper.js add';
+        pkg.scripts['e2e:validate'] = 'node .claude/scripts/testing/e2e-parser.js validate';
+        pkg.scripts['e2e:report'] = 'node .claude/scripts/testing/e2e-parser.js report';
+
+        fs.writeFileSync(path, JSON.stringify(pkg, null, 2) + '\n');
+        " 2>/dev/null
+
+        if [ $? -eq 0 ]; then
+            echo -e "${GREEN}✓ Added 5 functional release npm scripts${NC}"
+        else
+            echo -e "${YELLOW}⚠ Could not add npm scripts automatically${NC}"
+            echo -e "${YELLOW}  Add these manually to package.json:${NC}"
+            echo -e '    "release:validate-functional": "node .claude/scripts/release/functional-gate.js",'
+            echo -e '    "release:user-stories": "node .claude/scripts/user-stories/registry-helper.js coverage",'
+            echo -e '    "release:add-story": "node .claude/scripts/user-stories/registry-helper.js add",'
+            echo -e '    "e2e:validate": "node .claude/scripts/testing/e2e-parser.js validate",'
+            echo -e '    "e2e:report": "node .claude/scripts/testing/e2e-parser.js report"'
+        fi
+    fi
+}
+
+# Function to add make targets for functional release
+add_make_targets() {
+    if [ -f "$TARGET_DIR/Makefile" ]; then
+        echo -e "${BLUE}📝 Adding functional release make targets...${NC}"
+
+        # Check if targets already exist
+        if grep -q "release-check:" "$TARGET_DIR/Makefile"; then
+            echo -e "${YELLOW}⚠ Functional release targets already exist, skipping${NC}"
+            return
+        fi
+
+        # Append functional release targets to Makefile
+        cat >> "$TARGET_DIR/Makefile" << 'EOF'
+
+# ========================================
+# Functional Release Management
+# ========================================
+
+# Validate functional release readiness
+release-check:
+	@echo "🎯 Validating functional release readiness..."
+	@node .claude/scripts/release/functional-gate.js
+
+# Show user story coverage report
+release-stories:
+	@echo "📊 User Story Coverage Report"
+	@node .claude/scripts/user-stories/registry-helper.js coverage
+
+# Run E2E test suite
+release-e2e:
+	@echo "🧪 Running E2E test suite..."
+	@$(RUN_PREFIX) test:e2e
+
+# Add new user story to registry
+add-story:
+	@node .claude/scripts/user-stories/registry-helper.js add
+
+# Validate E2E test metadata
+validate-e2e:
+	@node .claude/scripts/testing/e2e-parser.js validate
+
+# Generate E2E coverage report
+report-e2e:
+	@node .claude/scripts/testing/e2e-parser.js report
+
+EOF
+        echo -e "${GREEN}✓ Added 6 functional release make targets${NC}"
     fi
 }
 
@@ -240,7 +334,11 @@ main() {
     # Initialize dependencies if needed
     if [ "$project_type" = "javascript" ]; then
         init_npm_deps
+        add_npm_scripts
     fi
+
+    # Add make targets
+    add_make_targets
 
     echo
     echo -e "${GREEN}╔══════════════════════════════════════════════════════╗${NC}"

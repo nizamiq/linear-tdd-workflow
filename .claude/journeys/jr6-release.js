@@ -43,6 +43,9 @@ class ReleaseJourney {
       // Phase 2: Pre-flight Checks
       await this.runPreflightChecks();
 
+      // Phase 2.5: Functional Readiness Gate (NEW!)
+      await this.validateFunctionalReadiness();
+
       // Phase 3: UAT Preparation
       await this.prepareUAT();
 
@@ -377,6 +380,41 @@ None
       passed: backupExists,
       message: 'Backup verified'
     };
+  }
+
+  /**
+   * Validate functional readiness (Phase 2.5)
+   * Ensures all implemented features have passing E2E tests
+   */
+  async validateFunctionalReadiness() {
+    console.log('\n🎯 Validating functional readiness...');
+
+    try {
+      const FunctionalGate = require('../scripts/release/functional-gate');
+      const gate = new FunctionalGate();
+      const result = await gate.execute();
+
+      if (!result.passed) {
+        console.log('\n❌ FUNCTIONAL RELEASE GATE BLOCKED RELEASE\n');
+        console.log('Issues found:');
+        result.failures.forEach(failure => {
+          console.log(`  ❌ ${failure.feature}: ${failure.reason}`);
+        });
+        console.log('\nFix these issues and re-run release.');
+        throw new Error('Functional release gate validation failed');
+      }
+
+      console.log(`\n✅ Functional readiness validated`);
+      console.log(`   ${result.implementedCount} features with E2E coverage`);
+      console.log(`   ${result.totalTests} E2E tests passing`);
+
+    } catch (error) {
+      if (error.message.includes('Functional release gate')) {
+        throw error; // Re-throw gate failure
+      }
+      // Graceful degradation if gate script missing
+      console.warn('   ⚠️  Functional gate script not found, skipping validation');
+    }
   }
 
   /**

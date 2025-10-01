@@ -1,5 +1,7 @@
 /**
  * E2E Test: Linear Integration Workflow
+ * @feature create-linear-tasks
+ * @user-story User creates Linear tasks from assessment via /linear command
  *
  * Tests the complete flow:
  * 1. AUDITOR generates assessment with linear_tasks definitions

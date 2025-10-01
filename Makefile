@@ -168,11 +168,23 @@ learn:
 
 # JR-6: Release Management
 VERSION ?= $(shell cat VERSION 2>/dev/null || echo "0.1.0")
-release:
-	@echo "🚀 Starting JR-6: Release v$(VERSION)..."
-	@node .claude/cli.js release prepare \
-		--version $(VERSION) \
-		--project-type $(PROJECT_TYPE)
+
+# Functional release management
+release-check:
+	@echo "🎯 Validating functional release readiness..."
+	@node .claude/scripts/release/functional-gate.js
+
+release-stories:
+	@echo "📊 User Story Coverage Report"
+	@node .claude/scripts/user-stories/registry-helper.js coverage
+
+release-e2e:
+	@echo "🧪 Running E2E test suite..."
+	@$(RUN_PREFIX) test:e2e
+
+release: release-check
+	@echo "🚀 Starting JR-6: Release v$(VERSION) with functional validation..."
+	@node .claude/journeys/jr6-release.js $(VERSION)
 
 # ============================================================================
 # LANGUAGE-ADAPTIVE COMMANDS
