@@ -233,6 +233,17 @@
   },
   "hooks": {
     "enabled": true,
+    "UserPromptSubmit": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/inject-linear-config.sh"
+          }
+        ]
+      }
+    ],
     "onSubagentStop": ".claude/hooks/on-subagent-stop.sh",
     "onStop": ".claude/hooks/on-stop.sh",
     "timeout": 30,
