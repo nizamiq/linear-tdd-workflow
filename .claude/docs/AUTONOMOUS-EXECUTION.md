@@ -276,18 +276,45 @@ The system uses parallel execution for maximum efficiency:
 ### AUDITOR Agent
 
 For large codebases (>100k LOC):
-- Partitions codebase by directory
-- Launches up to 10 parallel assessment subagents
-- Each subagent scans independent scope
-- Results merged into unified report
+- Analyzes codebase size using Bash commands
+- **Partitions by directory** (e.g., src/api, src/ui, src/core, tests)
+- **Launches parallel AUDITOR subagents via Task tool**:
+  ```
+  In a SINGLE message, makes multiple Task tool calls:
+  - Task call 1: AUDITOR for src/api
+  - Task call 2: AUDITOR for src/ui
+  - Task call 3: AUDITOR for src/core
+  - Task call 4: AUDITOR for tests
+  ```
+- Each subagent scans its scope independently
+- Parent AUDITOR merges all results into unified report
+
+**Critical**: All Task calls MUST be in a single message for concurrent execution
 
 **Speedup**: 5-10x faster for independent scopes
 
 ### PLANNER Agent
 
-In Phases 1 and 4:
-- Phase 1: Launch 4 parallel analyzers (cycle health, velocity, backlog, dependencies)
-- Phase 4: Launch 3 parallel validators (pipeline, environment, quality gates)
+**Phase 1 - Parallel Analysis**:
+```
+In a SINGLE message, makes 4 Task tool calls:
+- Task call 1: general-purpose for cycle health
+- Task call 2: SCHOLAR for velocity calculation
+- Task call 3: AUDITOR for backlog analysis
+- Task call 4: general-purpose for dependency mapping
+```
+Waits for all 4 to complete, then merges results
+
+**Phase 4 - Parallel Validation**:
+```
+In a SINGLE message, makes 3 Task tool calls:
+- Task call 1: GUARDIAN for pipeline health
+- Task call 2: general-purpose for environment config
+- Task call 3: general-purpose for quality gates
+```
+Waits for all 3 to complete, then merges results
+
+**Critical**: All Task calls within each phase MUST be in a single message
 
 **Speedup**: 2x overall planning time (40 min vs 80 min)
 

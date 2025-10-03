@@ -43,14 +43,15 @@ Use Task tool with:
 - description: "Execute complete cycle planning workflow (all 4 phases)"
 - prompt: "You are the PLANNER agent. Execute the complete 4-phase cycle planning workflow autonomously:
 
-**Phase 1: Comprehensive Linear State Analysis** (10 min)
-1. Use Linear MCP to fetch current cycle data, backlog, team capacity
-2. Calculate velocity from last 3 cycles using SCHOLAR patterns
-3. Identify blockers and dependencies
-4. Analyze technical debt vs feature ratio
-5. **Use parallel execution** for independent analysis tasks:
-   - Launch 4 analyzers concurrently (cycle health, velocity, backlog, dependencies)
-   - Merge results into unified state analysis
+**Phase 1: Comprehensive Linear State Analysis** (10 min with parallelization)
+1. Use Linear MCP to fetch basic cycle data
+2. **Launch 4 parallel analyzers using Task tool IN A SINGLE MESSAGE**:
+   * Task tool call 1: subagent_type='general-purpose', task='Analyze current cycle health and metrics from Linear'
+   * Task tool call 2: subagent_type='SCHOLAR', task='Calculate velocity from last 3 cycles'
+   * Task tool call 3: subagent_type='AUDITOR', task='Analyze backlog composition and technical debt ratio'
+   * Task tool call 4: subagent_type='general-purpose', task='Map dependencies and identify blockers'
+3. Wait for all 4 parallel subagents to complete
+4. Merge results into unified state analysis
 
 **Phase 2: Intelligent Cycle Planning** (15 min)
 6. Apply multi-factor scoring algorithm to all backlog issues:
@@ -73,15 +74,23 @@ Use Task tool with:
 10. Map test coverage requirements to each task
 11. Prepare pre-implementation analysis
 
-**Phase 4: Execution Readiness Validation** (5 min)
-12. **Use parallel execution** for validation checks:
-    - Pipeline health (GUARDIAN)
-    - Environment config
-    - Quality gate status
-13. Generate comprehensive kickoff report
-14. Return complete planning report to parent
+**Phase 4: Execution Readiness Validation** (5 min with parallelization)
+12. **Launch 3 parallel validators using Task tool IN A SINGLE MESSAGE**:
+    * Task tool call 1: subagent_type='GUARDIAN', task='Validate CI/CD pipeline health'
+    * Task tool call 2: subagent_type='general-purpose', task='Check environment configuration'
+    * Task tool call 3: subagent_type='general-purpose', task='Verify quality gate status'
+13. Wait for all 3 parallel validators to complete
+14. Merge validation results
+15. Generate comprehensive kickoff report
+16. Return complete planning report to parent
 
-Execute all 4 phases in sequence WITHOUT pausing between phases. Total runtime: ~40 minutes with parallelization."
+Execute all 4 phases in sequence WITHOUT pausing between phases. Total runtime: ~40 minutes with parallelization.
+
+CRITICAL FOR PARALLEL EXECUTION:
+- In Phase 1: Send all 4 Task tool calls in a SINGLE message to run concurrently
+- In Phase 4: Send all 3 Task tool calls in a SINGLE message to run concurrently
+- Do NOT send Task calls in separate messages or they will run sequentially
+- Wait for all parallel tasks to complete before proceeding to next phase"
 ```
 
 ### Step 2: Present Planning Report

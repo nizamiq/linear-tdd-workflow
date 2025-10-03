@@ -54,9 +54,25 @@ Execute immediately:
    - If scope specified: assess that directory only
    - If no scope: assess entire project (exclude node_modules, .git, dist, build)
 
-2. Scan files using Glob and Read tools:
-   - Find all source files (*.ts, *.js, *.py, *.java, etc.)
-   - For each file: analyze for Clean Code violations, technical debt, security issues
+2. Analyze codebase size:
+   - Use Bash: find . -name '*.ts' -o -name '*.js' -o -name '*.py' | wc -l
+   - If >100k LOC: Use parallel execution (Step 2a)
+   - If <100k LOC: Use sequential scan (Step 2b)
+
+2a. PARALLEL EXECUTION (for large codebases >100k LOC):
+   - Partition codebase by directory (e.g., src/api, src/ui, src/core, tests)
+   - Launch multiple AUDITOR subagents using Task tool IN A SINGLE MESSAGE:
+     * Use Task tool call 1: subagent_type='AUDITOR', scope='src/api'
+     * Use Task tool call 2: subagent_type='AUDITOR', scope='src/ui'
+     * Use Task tool call 3: subagent_type='AUDITOR', scope='src/core'
+     * Use Task tool call 4: subagent_type='AUDITOR', scope='tests'
+   - Wait for all parallel subagents to complete
+   - Merge results from all subagents into unified report
+
+2b. SEQUENTIAL SCAN (for small codebases <100k LOC):
+   - Use Glob to find all source files (*.ts, *.js, *.py, etc.)
+   - Use Read tool to analyze each file
+   - Identify Clean Code violations, technical debt, security issues
 
 3. Generate assessment report:
    - Categorize issues by severity (Critical/High/Medium/Low)
@@ -68,6 +84,8 @@ Execute immediately:
    - Format: title, description, FIL classification, effort estimate
 
 5. Return comprehensive report to parent
+
+CRITICAL: If using parallel execution (Step 2a), you MUST send all Task tool calls in a SINGLE message to run them concurrently. Do not send them in separate messages or they will run sequentially.
 
 Complete all steps autonomously. Do not ask for confirmation between steps."
 ```
