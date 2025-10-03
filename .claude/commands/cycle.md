@@ -1,7 +1,6 @@
 ---
 name: cycle
-description: Automated sprint/cycle planning and management
-agent: PLANNER
+description: Automated sprint/cycle planning and management using orchestrator-workers pattern for parallel execution
 usage: "/cycle [plan|status|execute|review]"
 allowed-tools: [Task, Read, Grep, Glob, Bash, mcp__linear-server__*]
 argument-hint: "[plan|status|execute|review]"
@@ -13,428 +12,349 @@ parameters:
     required: false
     default: plan
 supporting_agents:
-  - STRATEGIST
-  - AUDITOR
-  - SCHOLAR
-  - GUARDIAN
+  - PLANNER (data processor)
+  - STRATEGIST (Linear operations)
+  - AUDITOR (backlog analysis)
+  - SCHOLAR (velocity calculation)
+  - GUARDIAN (pipeline validation)
 ---
 
 # /cycle - Sprint/Cycle Planning Command
 
 ## Overview
 
-Comprehensive cycle planning automation that analyzes backlog, calculates capacity, selects optimal work items, and prepares the team for sprint execution.
+Comprehensive cycle planning automation using **orchestrator-workers pattern** where YOU (main agent) orchestrate parallel execution and delegate data processing to PLANNER.
+
+**CRITICAL ARCHITECTURE CHANGE:** Subagents spawned via Task tool CANNOT spawn more subagents. Therefore:
+- **YOU orchestrate** (spawn parallel workers via Task tool)
+- **PLANNER processes** (analyzes data using available tools)
 
 ## Usage
 
 ```bash
-/cycle plan      # Run full 4-phase planning workflow
-/cycle status    # Check current cycle health and metrics
-/cycle execute   # Begin cycle execution with prepared work
-/cycle review    # Post-cycle retrospective and learning
+/cycle plan      # Run full 4-phase planning workflow (YOU orchestrate)
+/cycle status    # Quick cycle health check
+/cycle execute   # Begin cycle execution
+/cycle review    # Post-cycle retrospective
 ```
 
 ## 🤖 Execution Instructions for Claude Code
 
-**When user invokes `/cycle plan`, execute all 4 phases autonomously in a single workflow.**
+**When user invokes `/cycle plan`, execute all 4 phases autonomously. YOU are the orchestrator.**
 
-### Step 1: Invoke PLANNER Agent for Full Cycle Planning
+### **PHASE 1: Comprehensive Linear State Analysis (10 min)**
+
+**YOU spawn 4 parallel analyzers DIRECTLY using Task tool in a SINGLE message:**
+
+#### Task Call 1 - Current Cycle Health
+```
+Use Task tool with:
+- subagent_type: "general-purpose"
+- description: "Analyze current cycle health and metrics"
+- prompt: "Use Linear MCP to analyze current cycle state:
+
+1. Get current cycle: mcp__linear-server__list_cycles with teamId from injected config
+2. If no current cycle exists, return: {status: 'no_active_cycle'}
+3. If cycle exists:
+   - Get all issues in cycle: mcp__linear-server__list_issues filtered by cycle
+   - Calculate completion rate: (completed issues / total issues) * 100
+   - Calculate current velocity: completed points / days elapsed
+   - Identify at-risk issues (due soon, high priority, incomplete)
+4. Return JSON: {cycle_id, cycle_name, completion_rate, current_velocity, at_risk_count, total_issues, completed_issues, days_elapsed, days_remaining, status}
+
+Use available tools: Linear MCP only. Do NOT try to spawn subagents."
+```
+
+#### Task Call 2 - Historical Velocity
+```
+Use Task tool with:
+- subagent_type: "SCHOLAR"
+- description: "Calculate team velocity from last 3 cycles"
+- prompt: "Calculate historical velocity trends using Linear MCP:
+
+1. Get last 3 completed cycles: mcp__linear-server__list_cycles with teamId from injected config
+2. For each cycle, get completed issues and calculate points
+3. Calculate average velocity: sum(points) / sum(days)
+4. Determine trend: increasing (>10% improvement), stable (±10%), or decreasing (<-10%)
+5. Calculate confidence level based on consistency
+
+Return JSON: {avg_velocity_points_per_day, last_3_velocities, trend, confidence_level, historical_data}
+
+Use available tools: Linear MCP, sequential-thinking for analysis. Do NOT spawn subagents."
+```
+
+#### Task Call 3 - Backlog Analysis
+```
+Use Task tool with:
+- subagent_type: "AUDITOR"
+- description: "Analyze backlog composition and technical debt ratio"
+- prompt: "Assess backlog using Linear MCP:
+
+1. Get all backlog issues: mcp__linear-server__list_issues with teamId, NO cycle filter
+2. Categorize by labels/tags: Features, Technical debt, Bugs
+3. Analyze priority distribution: urgent/high/medium/low
+4. Calculate technical debt ratio: tech_debt_issues / total_issues
+5. Identify top priorities (urgent + high priority issues)
+
+Return JSON: {total_issues, by_type, by_priority, tech_debt_ratio, top_priorities}
+
+Use available tools: Linear MCP only. Do NOT spawn subagents."
+```
+
+#### Task Call 4 - Dependency Mapping
+```
+Use Task tool with:
+- subagent_type: "general-purpose"
+- description: "Map issue dependencies and identify blockers"
+- prompt: "Identify dependencies and blockers using Linear MCP:
+
+1. Get all issues with parent/child relationships: mcp__linear-server__list_issues with teamId
+2. Build dependency graph: which issues have parent dependencies, which block others
+3. Identify blocked issues (cannot start until dependencies resolve)
+4. Find circular dependencies if any (A blocks B blocks A)
+5. Calculate critical path length (longest dependency chain)
+
+Return JSON: {blocked_issues_count, blocking_issues, critical_path_length, circular_deps, dependency_summary}
+
+Use available tools: Linear MCP, sequential-thinking. Do NOT spawn subagents."
+```
+
+**CRITICAL:** Send all 4 Task calls in a SINGLE message to run concurrently. Wait for all 4 results before proceeding.
+
+---
+
+### **PHASE 2: Intelligent Cycle Planning (15 min)**
+
+After receiving all 4 Phase 1 results, invoke PLANNER with the data:
+
 ```
 Use Task tool with:
 - subagent_type: "PLANNER"
-- description: "Execute complete cycle planning workflow (all 4 phases)"
-- prompt: "You are the PLANNER agent. Execute the complete 4-phase cycle planning workflow autonomously:
+- description: "Analyze data and generate optimal cycle plan"
+- prompt: "You are PLANNER. Analyze this pre-fetched data and generate cycle plan:
 
-**Phase 1: Comprehensive Linear State Analysis** (10 min with parallelization)
-1. Use Linear MCP to fetch basic cycle data
-2. **Launch 4 parallel analyzers using Task tool IN A SINGLE MESSAGE**:
-   * Task tool call 1: subagent_type='general-purpose', task='Analyze current cycle health and metrics from Linear'
-   * Task tool call 2: subagent_type='SCHOLAR', task='Calculate velocity from last 3 cycles'
-   * Task tool call 3: subagent_type='AUDITOR', task='Analyze backlog composition and technical debt ratio'
-   * Task tool call 4: subagent_type='general-purpose', task='Map dependencies and identify blockers'
-3. Wait for all 4 parallel subagents to complete
-4. Merge results into unified state analysis
+**Phase 1 Results:**
 
-**Phase 2: Intelligent Cycle Planning** (15 min)
-6. Apply multi-factor scoring algorithm to all backlog issues:
-   - Business value (0-10)
-   - Technical complexity (0-10)
-   - Risk level (0-10)
-   - Dependencies (0-10)
-   - Age in backlog (0-10)
-7. Select optimal work items based on:
-   - Available capacity
+Current Cycle Health:
+[Insert JSON from Task 1]
+
+Historical Velocity:
+[Insert JSON from Task 2]
+
+Backlog Analysis:
+[Insert JSON from Task 3]
+
+Dependencies:
+[Insert JSON from Task 4]
+
+**Your Tasks:**
+
+1. Apply multi-factor scoring algorithm to all backlog issues:
+   - Business value (0-10 from Linear priority)
+   - Technical complexity (0-10 from estimates)
+   - Risk level (0-10 from dependencies)
+   - Age in backlog (0-10 from created date)
+
+2. Select optimal work items based on:
+   - Available capacity (from velocity calculation)
    - 30/70 technical debt/feature balance
    - Risk mitigation priorities
-8. Generate recommended cycle composition
 
-**Phase 3: Claude Code Work Alignment** (10 min)
-9. Create work queues for agents:
-   - EXECUTOR: Implementation tasks (FIL-0/1)
+3. Generate recommended cycle composition with:
+   - Selected issues (IDs, titles, estimates)
+   - Total effort hours
+   - Technical debt ratio
+   - Risk assessment
+
+4. Create work queues for agents:
+   - EXECUTOR: Implementation tasks (FIL-0/1 only)
    - GUARDIAN: Pipeline and CI/CD tasks
    - AUDITOR: Quality review tasks
-10. Map test coverage requirements to each task
-11. Prepare pre-implementation analysis
 
-**Phase 4: Execution Readiness Validation** (5 min with parallelization)
-12. **Launch 3 parallel validators using Task tool IN A SINGLE MESSAGE**:
-    * Task tool call 1: subagent_type='GUARDIAN', task='Validate CI/CD pipeline health'
-    * Task tool call 2: subagent_type='general-purpose', task='Check environment configuration'
-    * Task tool call 3: subagent_type='general-purpose', task='Verify quality gate status'
-13. Wait for all 3 parallel validators to complete
-14. Merge validation results
-15. Generate comprehensive kickoff report
-16. Return complete planning report to parent
+5. Return comprehensive planning report
 
-Execute all 4 phases in sequence WITHOUT pausing between phases. Total runtime: ~40 minutes with parallelization.
-
-CRITICAL FOR PARALLEL EXECUTION:
-- In Phase 1: Send all 4 Task tool calls in a SINGLE message to run concurrently
-- In Phase 4: Send all 3 Task tool calls in a SINGLE message to run concurrently
-- Do NOT send Task calls in separate messages or they will run sequentially
-- Wait for all parallel tasks to complete before proceeding to next phase"
+**Available Tools:** Linear MCP (for additional queries), Bash, Read, Grep
+**Do NOT:** Try to spawn subagents via Task tool (you don't have access)"
 ```
 
-### Step 2: Present Planning Report
-After PLANNER completes:
-- Display cycle composition (selected issues, effort estimates)
-- Show capacity analysis (available vs planned hours)
-- Present risk assessment
-- Summarize work queue assignments
-- Display pre-cycle checklist status
+---
 
-### Step 3: Pause for Approval (ONLY Human Intervention Point)
+### **PHASE 3: Claude Code Work Alignment (5 min)**
+
+YOU process PLANNER's recommendations:
+1. Extract work queue assignments from PLANNER report
+2. Map test coverage requirements to each task
+3. Prepare pre-implementation analysis
+4. Format for presentation
+
+No Task tool calls needed - process PLANNER output directly.
+
+---
+
+### **PHASE 4: Execution Readiness Validation (5 min)**
+
+**YOU spawn 3 parallel validators DIRECTLY using Task tool in a SINGLE message:**
+
+#### Task Call 1 - Pipeline Validation
+```
+Use Task tool with:
+- subagent_type: "GUARDIAN"
+- description: "Validate CI/CD pipeline health"
+- prompt: "Check pipeline status:
+
+1. Use Bash: gh run list --limit 10 --json status,conclusion
+2. Identify failing or flaky tests
+3. Verify latest build passed
+4. Check for deployment readiness
+
+Return JSON: {status, last_10_runs, failures, flaky_tests, deployment_ready}
+
+Use available tools: Bash, Grep. Do NOT spawn subagents."
+```
+
+#### Task Call 2 - Environment Check
+```
+Use Task tool with:
+- subagent_type: "general-purpose"
+- description: "Validate environment configuration readiness"
+- prompt: "Check environment readiness:
+
+1. Verify required env vars: LINEAR_TEAM_ID, LINEAR_API_KEY (use Bash to check .env)
+2. Check dependency versions: npm list --depth=0
+3. Validate test suite health: npm test -- --listTests
+4. Check disk space and resources
+
+Return JSON: {env_status, missing_vars, outdated_deps, test_suite_health, resources_ok}
+
+Use available tools: Bash, Read. Do NOT spawn subagents."
+```
+
+#### Task Call 3 - Quality Gates
+```
+Use Task tool with:
+- subagent_type: "general-purpose"
+- description: "Verify quality gate status"
+- prompt: "Validate quality gates:
+
+1. Check test coverage: npm test -- --coverage --silent
+2. Verify linting passes: npm run lint:check
+3. Check type safety: npm run typecheck
+4. Verify build succeeds: npm run build
+
+Return JSON: {coverage_percent, lint_errors, type_errors, build_status, gates_passing}
+
+Use available tools: Bash. Do NOT spawn subagents."
+```
+
+**CRITICAL:** Send all 3 Task calls in a SINGLE message to run concurrently. Wait for all 3 results.
+
+---
+
+### **FINAL STEP: Present Planning Report**
+
+After all phases complete:
+
+1. **Synthesize Results:**
+   - Merge Phase 1 analysis data
+   - Include PLANNER's cycle recommendations (Phase 2)
+   - Add work queue assignments (Phase 3)
+   - Include validation results (Phase 4)
+
+2. **Present to User:**
+   - Display cycle composition (selected issues, effort estimates)
+   - Show capacity analysis (available vs planned hours)
+   - Present risk assessment
+   - Summarize work queue assignments
+   - Display pre-cycle checklist status
+
+3. **Pause for Approval (ONLY Human Intervention Point):**
+
 Ask user: "I've created a complete cycle plan with [N] issues totaling [M] hours. Would you like me to create/update the Linear cycle with this work?"
 
 If user confirms:
-- Invoke Task tool with subagent_type "STRATEGIST"
-- STRATEGIST will create/update Linear cycle via MCP
-- STRATEGIST will assign issues to cycle
-- Report cycle URL back to user
-
-### Alternative Subcommands
-
-**`/cycle status`** - Quick health check (no execution required)
 ```
 Use Task tool with:
-- subagent_type: "PLANNER"
-- description: "Generate current cycle status report"
-- prompt: "Analyze current cycle progress, velocity, and blockers. Generate status report. Execute immediately."
+- subagent_type: "STRATEGIST"
+- description: "Create/update Linear cycle with selected work"
+- prompt: "You are STRATEGIST. Create Linear cycle:
+
+Selected Issues: [list from PLANNER]
+Cycle Duration: [calculated]
+Team ID: [from injected config]
+
+1. Create or update cycle in Linear
+2. Assign selected issues to cycle
+3. Update issue states to 'Ready for Development'
+4. Return cycle URL and summary
+
+Use Linear MCP. Complete autonomously."
 ```
 
-**`/cycle review`** - Post-cycle retrospective
+---
+
+## Alternative Subcommands
+
+### `/cycle status` - Quick Health Check
+
+```
+Use Task tool with:
+- subagent_type: "general-purpose"
+- description: "Generate current cycle status report"
+- prompt: "Analyze current cycle progress using Linear MCP:
+
+1. Get current cycle and all issues
+2. Calculate completion percentage
+3. Compare actual vs planned velocity
+4. Identify blockers
+
+Return status report with progress metrics."
+```
+
+### `/cycle review` - Post-Cycle Retrospective
+
 ```
 Use Task tool with:
 - subagent_type: "PLANNER"
 - description: "Generate cycle retrospective"
-- prompt: "Analyze completed cycle: actual vs planned velocity, completed vs planned work, blocker impact. Extract learnings for SCHOLAR. Execute immediately."
+- prompt: "Analyze completed cycle using Linear MCP:
+
+1. Get completed cycle data
+2. Calculate actual vs planned velocity
+3. Analyze completed vs planned work
+4. Assess blocker impact
+5. Extract learnings for SCHOLAR
+
+Return retrospective report."
 ```
 
-### Completion Criteria
+---
+
+## Completion Criteria
+
 - ✅ All 4 phases completed sequentially
-- ✅ Parallel execution used in Phases 1 and 4
-- ✅ Comprehensive planning report generated
-- ✅ Work queues prepared for all agents
-- ✅ Readiness validation passed
+- ✅ Phase 1: 4 parallel analyzers spawned by YOU (not PLANNER)
+- ✅ Phase 2: PLANNER analyzes data (doesn't spawn subagents)
+- ✅ Phase 3: Work queues created
+- ✅ Phase 4: 3 parallel validators spawned by YOU
+- ✅ Comprehensive planning report presented
 - ✅ Linear cycle created/updated (if user approves)
 
-### Expected Timeline
-- **With Parallelization**: 40 minutes total
-  - Phase 1: 10 min (parallel analysis)
-  - Phase 2: 15 min (scoring and selection)
-  - Phase 3: 10 min (work alignment)
-  - Phase 4: 5 min (parallel validation)
-- **Without Parallelization**: 80 minutes
+## Expected Timeline
 
-**DO NOT:**
-- Ask "should I proceed to Phase 2?" - execute all 4 phases automatically
-- Wait for confirmation between phases - run sequentially
-- Skip parallel execution opportunities - use them in Phases 1 and 4
-- Ask to create Linear cycle before showing plan - present plan first, then ask
+- **With Parallelization (Correct Architecture)**: 40 minutes total
+  - Phase 1: 10 min (4 parallel analyzers)
+  - Phase 2: 15 min (PLANNER analysis)
+  - Phase 3: 5 min (work queue creation)
+  - Phase 4: 5 min (3 parallel validators)
+  - Final: 5 min (report synthesis)
 
-## Subcommands
+- **Without Parallelization (Sequential)**: 80 minutes
 
-### `/cycle plan`
-Executes the complete 4-phase planning workflow:
-
-**Phase 1: Comprehensive Linear State Analysis (10 min)**
-- Current cycle velocity and health metrics
-- Backlog composition and depth analysis
-- Dependency mapping and blocker identification
-- Team capacity calculation
-
-**Phase 2: Intelligent Cycle Planning (15 min)**
-- Multi-factor issue scoring algorithm
-- Optimal work selection based on capacity
-- Technical debt vs feature balancing (30/70)
-- Risk mitigation prioritization
-
-**Phase 3: Claude Code Work Alignment (10 min)**
-- Work queue generation for agents
-- Pre-implementation analysis
-- Test coverage requirement mapping
-- Task assignment optimization
-
-**Phase 4: Execution Readiness (5 min)**
-- CI/CD pipeline validation
-- Environment configuration checks
-- Quality gate verification
-- Kickoff report generation
-
-### `/cycle status`
-Quick health check of current cycle:
-- Progress against planned work
-- Velocity tracking vs historical
-- Blocker and risk identification
-- Remaining capacity analysis
-
-### `/cycle execute`
-Begin cycle execution:
-- Activate work queues for agents
-- Initialize tracking dashboards
-- Set up monitoring alerts
-- Start daily standup automation
-
-### `/cycle review`
-Post-cycle analysis and learning:
-- Actual vs planned velocity
-- Completed vs planned work
-- Blocker impact analysis
-- Pattern extraction for SCHOLAR
-
-## Output Format
-
-### Planning Report
-```markdown
-# Cycle Planning Report - Sprint 2024.Q1.3
-
-## Metrics
-- Available Capacity: 320 hours
-- Selected Issues: 18
-- Estimated Effort: 285 hours
-- Technical Debt Ratio: 33%
-
-## Selected Work Items
-
-### Critical Path (Must Complete)
-1. [TASK-123] Authentication refactor (21 points)
-2. [BUG-456] Payment processing fix (13 points)
-
-### Technical Debt
-1. [DEBT-789] Test coverage gaps (8 points)
-2. [DEBT-101] Legacy API cleanup (13 points)
-
-### Features
-1. [FEAT-234] User dashboard v2 (34 points)
-2. [FEAT-567] Export functionality (21 points)
-
-## Risk Assessment
-- High: Payment system dependencies
-- Medium: Third-party API changes
-- Low: Minor UI updates
-
-## Pre-Cycle Checklist
-✅ CI/CD pipeline healthy
-✅ Test suites passing (98.2%)
-✅ Environments configured
-✅ Team availability confirmed
-
-## Work Queue Assignments
-- EXECUTOR: 12 implementation tasks
-- GUARDIAN: 3 pipeline fixes
-- AUDITOR: 3 quality reviews
-```
-
-### Status Report
-```markdown
-# Cycle Status - Day 5 of 10
-
-## Progress
-- Completed: 8/18 issues (44%)
-- In Progress: 4 issues
-- Blocked: 1 issue
-- Not Started: 5 issues
-
-## Velocity
-- Current: 67 points/day
-- Required: 71 points/day
-- Historical: 69 points/day
-
-## Alerts
-⚠️ TASK-456 blocked by external dependency
-⚠️ Behind schedule by 0.5 days
-```
-
-## Agent Coordination
-
-The command coordinates multiple agents:
-
-1. **PLANNER** (Primary)
-   - Orchestrates entire workflow
-   - Runs scoring algorithms
-   - Generates reports
-
-2. **STRATEGIST**
-   - Linear API operations
-   - Issue updates and assignments
-   - Cycle configuration
-
-3. **AUDITOR**
-   - Technical debt assessment
-   - Quality metrics gathering
-   - Risk evaluation
-
-4. **SCHOLAR**
-   - Historical pattern analysis
-   - Velocity calculation
-   - Learning extraction
-
-5. **GUARDIAN**
-   - CI/CD health validation
-   - Environment checks
-   - Pipeline readiness
-
-## Configuration
-
-### Required Settings
-```bash
-# .env configuration
-LINEAR_TEAM_ID=your-team-id
-LINEAR_API_KEY=your-api-key
-CYCLE_PLANNING_MODE=auto  # auto|semi|manual
-VELOCITY_LOOKBACK=3       # cycles to analyze
-TECH_DEBT_RATIO=0.3       # 30% technical debt target
-```
-
-### Optional Settings
-```bash
-CYCLE_DURATION_DAYS=14    # Sprint length
-FOCUS_FACTOR=0.7          # Team availability
-BUFFER_PERCENTAGE=0.15    # Capacity buffer
-AUTO_ASSIGN=true          # Automatic task assignment
-```
-
-## Integration Points
-
-### Linear
-- Reads: Issues, cycles, projects, team members
-- Writes: Issue updates, cycle composition, assignments
-
-### GitHub
-- Reads: PR history, code metrics, test coverage
-- Writes: None (read-only for planning)
-
-### CI/CD
-- Reads: Pipeline status, test results, deployment history
-- Writes: None (validation only)
-
-## Error Handling
-
-### Common Issues
-
-**Insufficient Capacity**
-```
-Warning: Selected work (320h) exceeds capacity (280h)
-Recommended actions:
-1. Defer 2 low-priority items
-2. Reduce scope of FEAT-234
-3. Add team member capacity
-```
-
-**Blocked Dependencies**
-```
-Error: Critical path blocked by external team
-Affected issues: TASK-123 → TASK-456 → TASK-789
-Resolution: Escalating to Engineering Manager
-```
-
-**Linear API Limits**
-```
-Warning: Approaching API rate limit (950/1000)
-Switching to cached data for non-critical queries
-```
-
-## Best Practices
-
-1. **Run planning 2 days before cycle start**
-   - Allows time for clarification
-   - Enables pre-work preparation
-
-2. **Review with team before execution**
-   - Validate assignments
-   - Confirm availability
-   - Address concerns
-
-3. **Monitor daily during cycle**
-   - Track velocity trends
-   - Identify blockers early
-   - Adjust scope if needed
-
-4. **Always run review after cycle**
-   - Capture learnings
-   - Update velocity calculations
-   - Improve planning accuracy
-
-## Parallel Execution Support
-
-The PLANNER agent leverages **parallel execution** in Phases 1 and 4 for dramatic speedup:
-
-**Phase 1: Analysis (Parallelized)**
-```bash
-# Sequential approach (slow)
-- Cycle health analysis: 10 min
-- Velocity calculation: 10 min
-- Backlog assessment: 10 min
-- Dependency mapping: 10 min
-# Total: 40 minutes
-
-# Parallel approach (fast)
-# PLANNER launches 4 analyzers concurrently
-# Total: ~10 minutes (4x speedup)
-```
-
-**Phase 4: Validation (Parallelized)**
-```bash
-# Sequential approach (slow)
-- Pipeline validation: 5 min
-- Environment checks: 5 min
-- Report generation: 5 min
-# Total: 15 minutes
-
-# Parallel approach (fast)
-# PLANNER launches 3 validators concurrently
-# Total: ~5 minutes (3x speedup)
-```
-
-**Overall Performance Improvement:**
-- **Without parallelization**: 80 minutes (40+15+10+15)
-- **With parallelization**: 40 minutes (10+15+10+5)
-- **Speedup**: 2x faster
-
-**How It Works:**
-1. PLANNER detects independent analysis tasks in Phase 1
-2. Launches parallel subagents via Task tool (max 10)
-3. Agents analyze different aspects concurrently:
-   - Cycle health (SCHOLAR)
-   - Velocity trends (SCHOLAR)
-   - Backlog composition (AUDITOR)
-   - Dependencies (general-purpose)
-4. Results merge into unified planning report
-5. Phase 4 repeats parallel pattern for validation
-
-**Automatic Parallelization:**
-The PLANNER automatically uses parallel execution when:
-- Backlog has >50 issues
-- Multiple teams involved
-- Complex dependency graphs
-- Large codebases requiring assessment
-
-See `.claude/docs/PARALLEL-EXECUTION.md` and `.claude/agents/planner.md` for implementation details.
+- **Simulation (Broken Architecture)**: 24 seconds (WRONG - not actually executing)
 
 ## Performance SLAs
 
-- Planning execution (sequential): < 80 minutes
-- Planning execution (parallel): < 40 minutes ⚡
+- Planning execution with parallelization: < 45 minutes
 - Status check: < 2 minutes
 - Review generation: < 10 minutes
 - API calls: < 100 per planning run
