@@ -69,6 +69,65 @@ Linear Configuration:
 - Project: Configured via `LINEAR_PROJECT_ID` environment variable (optional)
 - Task Prefix: Configured via `LINEAR_TASK_PREFIX` environment variable (optional)
 
+## ⚠️ NON-NEGOTIABLE: Test-Driven Development
+
+**Every code change follows strict TDD. This is enforced automatically.**
+
+```
+[RED] → [GREEN] → [REFACTOR]
+  ↓         ↓           ↓
+Test    Minimal    Improve
+First     Code     Design
+```
+
+### Quality Gates (Blocking - CI Fails If Not Met)
+- **≥80% diff coverage** - Every changed line must be tested
+- **≥30% mutation score** - Tests must validate actual behavior
+- **NO production code without failing test first** - Zero exceptions
+
+### The EXECUTOR Agent Enforces TDD
+
+When you run `/fix CLEAN-XXX`, the EXECUTOR agent automatically:
+1. ✅ Refuses to write production code before tests exist
+2. ✅ Verifies RED phase (test fails for expected reason)
+3. ✅ Verifies GREEN phase (minimal code to pass)
+4. ✅ Verifies REFACTOR phase (improvements with passing tests)
+5. ✅ Checks coverage gates (≥80% diff, ≥30% mutation)
+6. ✅ Blocks commits that don't meet quality standards
+7. ✅ Labels commits with TDD phase: [RED], [GREEN], [REFACTOR]
+
+**You cannot bypass this. It's built into the system.**
+
+### TDD Quick Reference
+
+**[RED Phase]** - Write failing test FIRST:
+```javascript
+test('calculates tax for high income', () => {
+  expect(calculateTax(100000)).toBe(25000);
+});
+// ❌ FAILS - calculateTax doesn't exist yet
+```
+
+**[GREEN Phase]** - Minimal code to pass:
+```javascript
+function calculateTax(income) {
+  return income * 0.25;
+}
+// ✅ PASSES
+```
+
+**[REFACTOR Phase]** - Improve design:
+```javascript
+const TAX_RATE = 0.25;
+function calculateTax(income) {
+  validateIncome(income);
+  return income * TAX_RATE;
+}
+// ✅ STILL PASSES - refactored safely
+```
+
+**Learn more:** `.claude/docs/TDD-REMINDER.md` - Complete TDD reference card
+
 ## Essential Commands
 
 ### Testing
@@ -126,12 +185,19 @@ npm run execute:fixpack
 # Sync with Linear
 npm run linear:sync
 
-# Cycle Planning (NEW!)
+# Cycle Planning
 npm run cycle:analyze    # Phase 1: Analyze current state
 npm run cycle:plan       # Phase 2: Select and score issues
 npm run cycle:align      # Phase 3: Map work to agents
 npm run cycle:ready      # Phase 4: Validate readiness
 npm run cycle:full       # Run all 4 phases sequentially
+
+# Functional Release Management
+npm run release:validate-functional  # Run functional gate
+npm run release:user-stories         # Show E2E coverage report
+npm run release:add-story            # Add feature to registry
+npm run e2e:validate                 # Validate @feature tags
+npm run e2e:report                   # Generate E2E coverage report
 ```
 
 ## 🎯 The Simplicity Principle (CRITICAL)
@@ -382,6 +448,50 @@ GitFlow branches:
 - `develop` - Integration branch
 - `feature/*` - New features
 - `hotfix/*` - Emergency fixes
+
+## 🎯 Functional Release Management
+
+**Critical Concept**: Only release features that are truly functional and validated via E2E tests.
+
+### User Story Registry
+All features tracked in `.claude/user-stories/registry.yaml` with three statuses:
+- **`implemented`**: Feature built + E2E test passing → ✅ **Allows release**
+- **`partial`**: Feature built but NO E2E test → ❌ **BLOCKS release**
+- **`planned`**: Not yet built → ⚪ Doesn't affect release
+
+### Functional Release Gate
+Automated validator (Phase 2.5 in release journey) that:
+1. ✅ Checks all `implemented` features have E2E tests
+2. ✅ Runs all E2E tests to verify they pass
+3. ❌ **BLOCKS** release if any `partial` status features exist
+4. ❌ **BLOCKS** release if any E2E test fails
+
+### Quick Commands
+```bash
+# Check if ready for release
+npm run release:validate-functional
+
+# View current coverage
+npm run release:user-stories
+
+# Add new feature to registry
+npm run release:add-story
+
+# Validate E2E test metadata
+npm run e2e:validate
+```
+
+### Release Workflow
+1. **Build feature** with TDD (RED→GREEN→REFACTOR)
+2. **Add to registry** with `status: planned`
+3. **Write E2E test** simulating user story with `@feature` tag
+4. **Update registry** to `status: implemented` with `e2e_test` path
+5. **Verify tests pass**: `npm test:e2e`
+6. **Run release**: `/release 1.2.0` (gate runs automatically in Phase 2.5)
+
+**If gate blocks**: Fix missing E2E tests, update registry, re-run validation.
+
+**Documentation**: `.claude/docs/FUNCTIONAL-RELEASE.md` - Complete guide
 
 ## Agent-Specific Notes
 
