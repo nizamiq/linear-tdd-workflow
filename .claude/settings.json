@@ -232,27 +232,47 @@
     "smartPrioritization": true
   },
   "hooks": {
-    "enabled": true,
     "UserPromptSubmit": [
       {
         "matcher": "*",
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/inject-linear-config.sh"
+            "command": "${PROJECT_ROOT}/.claude/hooks/inject-linear-config.sh",
+            "timeout": 30,
+            "environment": {
+              "CLAUDE_PROJECT_ROOT": "${PROJECT_ROOT}",
+              "CLAUDE_AGENTS_DIR": ".claude/agents",
+              "CLAUDE_QUEUE_DIR": ".claude/queue"
+            }
           }
         ]
       }
     ],
-    "onSubagentStop": ".claude/hooks/on-subagent-stop.sh",
-    "onStop": ".claude/hooks/on-stop.sh",
-    "timeout": 30,
-    "environment": {
-      "CLAUDE_PROJECT_ROOT": "${PROJECT_ROOT}",
-      "CLAUDE_AGENTS_DIR": ".claude/agents",
-      "CLAUDE_QUEUE_DIR": ".claude/queue"
-    },
-    "description": "Workflow automation hooks for agent coordination and next-step suggestions"
+    "SubagentStop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${PROJECT_ROOT}/.claude/hooks/on-subagent-stop.sh",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${PROJECT_ROOT}/.claude/hooks/on-stop.sh",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
   },
   "queue": {
     "enabled": true,
