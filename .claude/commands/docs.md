@@ -3,6 +3,8 @@ name: docs
 description: Documentation validation, generation, and maintenance operations
 agent: DOC-KEEPER
 category: documentation
+allowed-tools: [Read, Write, Edit, Grep, Glob, Bash]
+argument-hint: "<validate|generate|update|fix> [--scope=<path>]"
 ---
 
 # /docs - Documentation Operations

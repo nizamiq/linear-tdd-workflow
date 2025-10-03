@@ -3,6 +3,8 @@ name: deploy
 description: Orchestrate production deployments with progressive delivery, rollback automation, and multi-cloud support. Use PROACTIVELY for any production deployment, release coordination, or deployment automation needs.
 agent: DEPLOYMENT-ENGINEER
 usage: "/deploy [--environment=<env>] [--strategy=<canary|blue-green|rolling>] [--target=<gke|aks|eks|fly>]"
+allowed-tools: [Read, Bash, mcp__kubernetes__*]
+argument-hint: "[--environment=development|staging|production] [--strategy=canary|blue-green|rolling] [--target=gke|aks|eks|fly]"
 parameters:
   - name: environment
     description: Target environment (development, staging, production)

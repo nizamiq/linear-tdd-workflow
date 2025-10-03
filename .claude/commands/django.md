@@ -3,6 +3,8 @@ name: django
 description: Django development assistance including async views, DRF APIs, ORM optimization, and architectural patterns. Use PROACTIVELY for Django feature development, API design, or performance issues.
 agent: DJANGO-PRO
 usage: "/django [--task=<api|model|view|optimization|security>] [--async] [--drf]"
+allowed-tools: [Read, Write, Edit, Grep, Glob, Bash, mcp__context7__*]
+argument-hint: "[--task=api|model|view|migration|admin|optimization|security|channels|all] [--async] [--drf]"
 parameters:
   - name: task
     description: Django task type

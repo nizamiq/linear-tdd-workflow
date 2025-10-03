@@ -3,6 +3,8 @@ name: status
 description: Get current workflow and Linear status
 agent: STRATEGIST
 usage: "/status [--detailed] [--format=<json|table>]"
+allowed-tools: [Read, Grep, Bash, mcp__linear-server__*]
+argument-hint: "[--detailed] [--format=json|table]"
 parameters:
   - name: detailed
     description: Include detailed agent and task information

@@ -3,6 +3,8 @@ name: commit
 description: Create a new git commit with Conventional Commits format. Stages files, runs pre-commit validation, suggests commit messages, and creates commit after confirmation.
 agent: STRATEGIST
 usage: "/commit [--staged-only] [--skip-validation]"
+allowed-tools: [Read, Grep, Bash]
+argument-hint: "[--staged-only] [--skip-validation]"
 parameters:
   - name: staged-only
     description: Use only pre-staged files instead of staging all changes

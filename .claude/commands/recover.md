@@ -3,6 +3,8 @@ name: recover
 description: Auto-recover broken CI/CD pipeline
 agent: GUARDIAN
 usage: "/recover [--auto-revert] [--force]"
+allowed-tools: [Read, Grep, Glob, Bash, Task]
+argument-hint: "[--auto-revert] [--force]"
 parameters:
   - name: auto-revert
     description: Automatically revert if recovery fails

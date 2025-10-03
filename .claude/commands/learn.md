@@ -3,6 +3,8 @@ name: learn
 description: Mine patterns from successful PRs and implementations
 agent: SCHOLAR
 usage: "/learn [--scope=<timeframe>] [--type=<pattern-type>]"
+allowed-tools: [Read, Grep, Glob, Bash]
+argument-hint: "[--scope=last-week|last-month] [--type=fixes|features|tests|refactors|all]"
 parameters:
   - name: scope
     description: Time frame for analysis (e.g., last-week, last-month)

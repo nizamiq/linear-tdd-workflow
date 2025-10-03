@@ -3,6 +3,8 @@ name: monitor
 description: Set up comprehensive observability with OpenTelemetry, Prometheus, and Grafana. Use PROACTIVELY when deploying new services, experiencing performance issues, or needing visibility into production systems.
 agent: OBSERVABILITY-ENGINEER
 usage: "/monitor [--scope=<metrics|traces|logs|all>] [--target=<local|kubernetes|cloud>] [--slo]"
+allowed-tools: [Read, Write, Edit, Bash, mcp__kubernetes__*]
+argument-hint: "[--scope=metrics|traces|logs|dashboards|alerts|all] [--target=local|kubernetes|cloud] [--slo]"
 parameters:
   - name: scope
     description: Observability scope

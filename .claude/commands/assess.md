@@ -3,6 +3,8 @@ name: assess
 description: Perform comprehensive code quality assessment to identify technical debt, security issues, and improvement opportunities. Use PROACTIVELY before releases, after major changes, or weekly for continuous improvement.
 agent: AUDITOR
 usage: "/assess [--scope=<directory>] [--format=<json|markdown>] [--depth=<shallow|deep>]"
+allowed-tools: [Task, Read, Grep, Glob, Bash]
+argument-hint: "[--scope=<directory>] [--format=json|markdown] [--depth=shallow|deep]"
 parameters:
   - name: scope
     description: Directory to assess (default: entire project)

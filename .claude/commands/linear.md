@@ -3,6 +3,8 @@ name: linear
 description: Create Linear tasks from assessment results
 agent: STRATEGIST
 priority: high
+allowed-tools: [Read, mcp__linear-server__*]
+argument-hint: "[proposals/issues-*.json]"
 ---
 
 # /linear - Create Linear Tasks from Assessment

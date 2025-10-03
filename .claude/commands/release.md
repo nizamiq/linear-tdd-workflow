@@ -3,6 +3,8 @@ name: release
 description: Manage production release with comprehensive validation
 agent: STRATEGIST
 usage: "/release <version> [--dry-run] [--force]"
+allowed-tools: [Read, Bash, mcp__linear-server__*, mcp__playwright__*]
+argument-hint: "<version> [--dry-run] [--force]"
 parameters:
   - name: version
     description: Version number (semver format, e.g., 1.2.3)

@@ -3,6 +3,8 @@ name: optimize-db
 description: Analyze and optimize PostgreSQL database performance, resolve slow queries, and implement caching strategies. Use PROACTIVELY when experiencing database performance issues, high query times, or scaling challenges.
 agent: DATABASE-OPTIMIZER
 usage: "/optimize-db [--scope=<queries|indexes|cache|all>] [--target=<local|supabase|neon>] [--profile=<duration>]"
+allowed-tools: [Read, Grep, Glob, Bash]
+argument-hint: "[--scope=queries|indexes|cache|connections|all] [--target=local|supabase|neon|cloud-sql] [--profile=<minutes>]"
 parameters:
   - name: scope
     description: Optimization scope

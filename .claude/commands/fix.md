@@ -3,6 +3,8 @@ name: fix
 description: Implement approved fix pack using strict TDD methodology (RED→GREEN→REFACTOR). Use PROACTIVELY when implementing any code changes, bug fixes, or improvements from Linear tasks.
 agent: EXECUTOR
 usage: "/fix <TASK-ID> [--branch=<branch-name>]"
+allowed-tools: [Read, Write, Edit, Bash, mcp__linear-server__*]
+argument-hint: "<TASK-ID> [--branch=<branch-name>]"
 parameters:
   - name: TASK-ID
     description: The Linear task ID (e.g., CLEAN-123)

@@ -3,6 +3,8 @@ name: cycle
 description: Automated sprint/cycle planning and management
 agent: PLANNER
 usage: "/cycle [plan|status|execute|review]"
+allowed-tools: [Task, Read, Grep, Glob, Bash, mcp__linear-server__*]
+argument-hint: "[plan|status|execute|review]"
 parameters:
   - name: subcommand
     description: Cycle planning operation

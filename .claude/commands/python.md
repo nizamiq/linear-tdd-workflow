@@ -3,6 +3,8 @@ name: python
 description: Modern Python development with Python 3.12+ features, uv package management, and advanced patterns. Use PROACTIVELY for Python optimization, async programming, or modern tooling setup.
 agent: PYTHON-PRO
 usage: "/python [--task=<async|typing|optimization|testing|packaging>] [--modern-tools]"
+allowed-tools: [Read, Write, Edit, Grep, Glob, Bash, mcp__context7__*]
+argument-hint: "[--task=async|typing|optimization|testing|packaging|refactor|all] [--modern-tools]"
 parameters:
   - name: task
     description: Python task type

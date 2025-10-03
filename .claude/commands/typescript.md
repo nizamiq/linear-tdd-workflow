@@ -3,6 +3,8 @@ name: typescript
 description: TypeScript development with advanced type system, React/Next.js, and end-to-end type safety. Use PROACTIVELY for TypeScript migration, type system design, or React architecture.
 agent: TYPESCRIPT-PRO
 usage: "/typescript [--task=<types|react|api|migration|testing>] [--strict] [--monorepo]"
+allowed-tools: [Read, Write, Edit, Grep, Glob, Bash, mcp__context7__*]
+argument-hint: "[--task=types|react|api|migration|testing|optimization|all] [--strict] [--monorepo]"
 parameters:
   - name: task
     description: TypeScript task type
