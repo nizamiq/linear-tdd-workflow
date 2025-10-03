@@ -13,7 +13,7 @@ RED='\033[0;31m'
 NC='\033[0m' # No Color
 
 # Configuration
-CLAUDE_VERSION="1.4.0"
+CLAUDE_VERSION="1.5.0"
 SOURCE_DIR="$(cd "$(dirname "$0")/.." && pwd)/.claude"
 TARGET_DIR="${1:-$(pwd)}"
 
@@ -101,7 +101,7 @@ This file provides guidance to Claude Code when working with this repository.
 
 ## 🚀 Linear TDD Workflow System Detected
 
-**Version:** 1.4.0 - Multi-agent autonomous code quality with functional release gates
+**Version:** 1.5.0 - Multi-agent autonomous code quality with immediate execution
 
 📚 **Complete system documentation:** `.claude/CLAUDE.md`
 
@@ -122,7 +122,7 @@ EOF
 
 ## 🚀 Linear TDD Workflow System Detected
 
-**Version:** 1.4.0 - Multi-agent autonomous code quality with functional release gates
+**Version:** 1.5.0 - Multi-agent autonomous code quality with immediate execution
 
 📚 **Complete system documentation:** `.claude/CLAUDE.md`
 

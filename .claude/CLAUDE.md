@@ -6,10 +6,10 @@ This is the comprehensive reference for Claude Code when working with projects u
 
 You are working in a project with the **Linear TDD Workflow System** installed - a multi-agent autonomous code quality management system that enforces strict Test-Driven Development and functional release practices.
 
-**Version:** 1.4.0
+**Version:** 1.5.0
 **Agents:** 23 specialized agents
 **Journeys:** 7 autonomous workflows
-**Key Features:** TDD enforcement, functional release gates, parallel execution, cycle planning
+**Key Features:** Autonomous execution, TDD enforcement, functional release gates, parallel execution, cycle planning
 
 ## Quick Discovery
 
@@ -61,6 +61,97 @@ make status                  # System status
 ls .claude/agents/*.md       # List all agents
 ls .claude/commands/*.md     # List all commands
 ```
+
+## 🤖 Autonomous Execution (NEW in v1.5.0)
+
+**Slash commands now execute immediately without manual Task tool invocations.**
+
+### How It Works
+
+When you invoke a slash command (e.g., `/assess`, `/fix CLEAN-123`), the system:
+
+1. **Reads command specification** from `.claude/commands/<command>.md`
+2. **Finds execution instructions** in "🤖 Execution Instructions for Claude Code" section
+3. **Invokes agent via Task tool** automatically with specified parameters
+4. **Agent executes immediately** following "⚡ IMMEDIATE EXECUTION INSTRUCTIONS"
+5. **Returns results** to you without unnecessary pauses
+
+### Key Principles
+
+**✅ Agents execute autonomously:**
+- No manual Task tool invocations required
+- No confirmation needed for standard operations
+- Complete workflows without pausing between phases
+- Only stop at defined approval gates
+
+**🚦 Human intervention points:**
+- Creating Linear tasks (after assessment)
+- Creating Linear cycles (after planning)
+- Deploying to production (after pre-flight checks)
+- Creating incident tasks (after recovery, optional)
+
+### Example: /assess Command
+
+```
+You: /assess --scope=src/api
+
+[Automatic execution]:
+1. Command file triggers AUDITOR agent invocation
+2. AUDITOR scans all files in src/api
+3. Categorizes issues by severity
+4. Generates assessment report
+5. Prepares Linear task definitions
+6. Returns report to you
+
+[Approval gate]:
+Me: "I've identified 12 critical and 8 high severity issues.
+    Would you like me to create Linear tasks for these findings?"
+
+You: "Yes"
+
+[Automatic execution]:
+7. STRATEGIST creates CLEAN-XXX tasks in Linear
+8. Returns task IDs
+```
+
+### No More Manual Task Tool Calls
+
+**Before v1.5.0** (Manual):
+```
+You: /assess
+Me: "Would you like me to assess the code?"
+You: "Yes"
+Me: [Manually invokes Task tool with AUDITOR]
+AUDITOR: "Should I scan files?"
+...
+```
+
+**v1.5.0** (Autonomous):
+```
+You: /assess
+Me: [Immediately invokes AUDITOR, scans complete, presents report]
+Me: "Assessment complete. Create Linear tasks?"
+```
+
+### Performance Improvements
+
+With immediate execution:
+- **5-10x faster** for large assessments (parallel execution)
+- **2x faster** for cycle planning (parallel phases)
+- **Zero manual steps** for TDD implementation
+- **10-15 min** pipeline recovery (fully automated)
+
+### Detailed Documentation
+
+**Complete guide:** `.claude/docs/AUTONOMOUS-EXECUTION.md`
+
+**Topics covered:**
+- Execution flow diagrams for each command
+- Human intervention points (approval gates)
+- Parallel execution strategies
+- Troubleshooting autonomous execution
+- Performance SLAs
+- Best practices
 
 ## ⚠️ NON-NEGOTIABLE: Test-Driven Development
 

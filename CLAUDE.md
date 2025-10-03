@@ -4,7 +4,7 @@ This file provides guidance to Claude Code when working with this repository.
 
 ## 🚀 Linear TDD Workflow System Detected
 
-**Version:** 1.4.0 - Multi-agent autonomous code quality with functional release gates
+**Version:** 1.5.0 - Multi-agent autonomous code quality with immediate execution
 
 📚 **Complete system documentation:** `.claude/CLAUDE.md`
 
@@ -15,7 +15,7 @@ This file provides guidance to Claude Code when working with this repository.
 This is the **Linear TDD Workflow System** itself - a self-contained multi-agent framework that can be installed in any project.
 
 **Repository purpose:** Development and maintenance of the workflow system
-**Key features:** 23 agents, 7 journeys, functional release gates, TDD enforcement
+**Key features:** 23 agents, 7 journeys, autonomous execution, functional release gates, TDD enforcement
 **Installation:** Copy `.claude/` directory to target project and run `.claude/install.sh`
 
 ### For Development

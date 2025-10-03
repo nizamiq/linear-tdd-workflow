@@ -32,6 +32,115 @@ Comprehensive cycle planning automation that analyzes backlog, calculates capaci
 /cycle review    # Post-cycle retrospective and learning
 ```
 
+## 🤖 Execution Instructions for Claude Code
+
+**When user invokes `/cycle plan`, execute all 4 phases autonomously in a single workflow.**
+
+### Step 1: Invoke PLANNER Agent for Full Cycle Planning
+```
+Use Task tool with:
+- subagent_type: "PLANNER"
+- description: "Execute complete cycle planning workflow (all 4 phases)"
+- prompt: "You are the PLANNER agent. Execute the complete 4-phase cycle planning workflow autonomously:
+
+**Phase 1: Comprehensive Linear State Analysis** (10 min)
+1. Use Linear MCP to fetch current cycle data, backlog, team capacity
+2. Calculate velocity from last 3 cycles using SCHOLAR patterns
+3. Identify blockers and dependencies
+4. Analyze technical debt vs feature ratio
+5. **Use parallel execution** for independent analysis tasks:
+   - Launch 4 analyzers concurrently (cycle health, velocity, backlog, dependencies)
+   - Merge results into unified state analysis
+
+**Phase 2: Intelligent Cycle Planning** (15 min)
+6. Apply multi-factor scoring algorithm to all backlog issues:
+   - Business value (0-10)
+   - Technical complexity (0-10)
+   - Risk level (0-10)
+   - Dependencies (0-10)
+   - Age in backlog (0-10)
+7. Select optimal work items based on:
+   - Available capacity
+   - 30/70 technical debt/feature balance
+   - Risk mitigation priorities
+8. Generate recommended cycle composition
+
+**Phase 3: Claude Code Work Alignment** (10 min)
+9. Create work queues for agents:
+   - EXECUTOR: Implementation tasks (FIL-0/1)
+   - GUARDIAN: Pipeline and CI/CD tasks
+   - AUDITOR: Quality review tasks
+10. Map test coverage requirements to each task
+11. Prepare pre-implementation analysis
+
+**Phase 4: Execution Readiness Validation** (5 min)
+12. **Use parallel execution** for validation checks:
+    - Pipeline health (GUARDIAN)
+    - Environment config
+    - Quality gate status
+13. Generate comprehensive kickoff report
+14. Return complete planning report to parent
+
+Execute all 4 phases in sequence WITHOUT pausing between phases. Total runtime: ~40 minutes with parallelization."
+```
+
+### Step 2: Present Planning Report
+After PLANNER completes:
+- Display cycle composition (selected issues, effort estimates)
+- Show capacity analysis (available vs planned hours)
+- Present risk assessment
+- Summarize work queue assignments
+- Display pre-cycle checklist status
+
+### Step 3: Pause for Approval (ONLY Human Intervention Point)
+Ask user: "I've created a complete cycle plan with [N] issues totaling [M] hours. Would you like me to create/update the Linear cycle with this work?"
+
+If user confirms:
+- Invoke Task tool with subagent_type "STRATEGIST"
+- STRATEGIST will create/update Linear cycle via MCP
+- STRATEGIST will assign issues to cycle
+- Report cycle URL back to user
+
+### Alternative Subcommands
+
+**`/cycle status`** - Quick health check (no execution required)
+```
+Use Task tool with:
+- subagent_type: "PLANNER"
+- description: "Generate current cycle status report"
+- prompt: "Analyze current cycle progress, velocity, and blockers. Generate status report. Execute immediately."
+```
+
+**`/cycle review`** - Post-cycle retrospective
+```
+Use Task tool with:
+- subagent_type: "PLANNER"
+- description: "Generate cycle retrospective"
+- prompt: "Analyze completed cycle: actual vs planned velocity, completed vs planned work, blocker impact. Extract learnings for SCHOLAR. Execute immediately."
+```
+
+### Completion Criteria
+- ✅ All 4 phases completed sequentially
+- ✅ Parallel execution used in Phases 1 and 4
+- ✅ Comprehensive planning report generated
+- ✅ Work queues prepared for all agents
+- ✅ Readiness validation passed
+- ✅ Linear cycle created/updated (if user approves)
+
+### Expected Timeline
+- **With Parallelization**: 40 minutes total
+  - Phase 1: 10 min (parallel analysis)
+  - Phase 2: 15 min (scoring and selection)
+  - Phase 3: 10 min (work alignment)
+  - Phase 4: 5 min (parallel validation)
+- **Without Parallelization**: 80 minutes
+
+**DO NOT:**
+- Ask "should I proceed to Phase 2?" - execute all 4 phases automatically
+- Wait for confirmation between phases - run sequentially
+- Skip parallel execution opportunities - use them in Phases 1 and 4
+- Ask to create Linear cycle before showing plan - present plan first, then ask
+
 ## Subcommands
 
 ### `/cycle plan`
@@ -255,9 +364,66 @@ Switching to cached data for non-critical queries
    - Update velocity calculations
    - Improve planning accuracy
 
+## Parallel Execution Support
+
+The PLANNER agent leverages **parallel execution** in Phases 1 and 4 for dramatic speedup:
+
+**Phase 1: Analysis (Parallelized)**
+```bash
+# Sequential approach (slow)
+- Cycle health analysis: 10 min
+- Velocity calculation: 10 min
+- Backlog assessment: 10 min
+- Dependency mapping: 10 min
+# Total: 40 minutes
+
+# Parallel approach (fast)
+# PLANNER launches 4 analyzers concurrently
+# Total: ~10 minutes (4x speedup)
+```
+
+**Phase 4: Validation (Parallelized)**
+```bash
+# Sequential approach (slow)
+- Pipeline validation: 5 min
+- Environment checks: 5 min
+- Report generation: 5 min
+# Total: 15 minutes
+
+# Parallel approach (fast)
+# PLANNER launches 3 validators concurrently
+# Total: ~5 minutes (3x speedup)
+```
+
+**Overall Performance Improvement:**
+- **Without parallelization**: 80 minutes (40+15+10+15)
+- **With parallelization**: 40 minutes (10+15+10+5)
+- **Speedup**: 2x faster
+
+**How It Works:**
+1. PLANNER detects independent analysis tasks in Phase 1
+2. Launches parallel subagents via Task tool (max 10)
+3. Agents analyze different aspects concurrently:
+   - Cycle health (SCHOLAR)
+   - Velocity trends (SCHOLAR)
+   - Backlog composition (AUDITOR)
+   - Dependencies (general-purpose)
+4. Results merge into unified planning report
+5. Phase 4 repeats parallel pattern for validation
+
+**Automatic Parallelization:**
+The PLANNER automatically uses parallel execution when:
+- Backlog has >50 issues
+- Multiple teams involved
+- Complex dependency graphs
+- Large codebases requiring assessment
+
+See `.claude/docs/PARALLEL-EXECUTION.md` and `.claude/agents/planner.md` for implementation details.
+
 ## Performance SLAs
 
-- Planning execution: < 40 minutes
+- Planning execution (sequential): < 80 minutes
+- Planning execution (parallel): < 40 minutes ⚡
 - Status check: < 2 minutes
 - Review generation: < 10 minutes
 - API calls: < 100 per planning run
