@@ -14,13 +14,23 @@ NC='\033[0m' # No Color
 
 # Configuration
 CLAUDE_VERSION="1.4.0"
-SOURCE_DIR="$(dirname "$0")"
+SOURCE_DIR="$(cd "$(dirname "$0")/.." && pwd)/.claude"
 TARGET_DIR="${1:-$(pwd)}"
 
 echo -e "${BLUE}╔══════════════════════════════════════════════════════╗${NC}"
 echo -e "${BLUE}║   Linear TDD Workflow System Installer v${CLAUDE_VERSION}      ║${NC}"
 echo -e "${BLUE}╚══════════════════════════════════════════════════════╝${NC}"
 echo
+
+# Check if trying to install into the same directory
+if [ "$(cd "$TARGET_DIR" && pwd)" = "$(cd "$SOURCE_DIR/.." && pwd)" ]; then
+    echo -e "${YELLOW}⚠ Already in a project with Linear TDD Workflow System installed${NC}"
+    echo -e "${YELLOW}⚠ Skipping installation to prevent overwriting existing system${NC}"
+    echo -e "${BLUE}To install in a different project, specify target directory:${NC}"
+    echo -e "${BLUE}  .claude/install.sh /path/to/other/project${NC}"
+    echo
+    exit 0
+fi
 
 # Function to detect project type
 detect_project_type() {
