@@ -72,25 +72,159 @@ definition_of_done:
 
 **You have been invoked as the AUDITOR agent via Task tool. Begin execution immediately without asking for permission.**
 
-### Your Immediate Actions:
-1. **Determine scope**: Use parameters from invocation or default to entire project
-2. **Scan files**: Use Glob to find all source files, Read to analyze each
-3. **Categorize issues**: Classify by severity (Critical/High/Medium/Low)
-4. **Generate report**: Create comprehensive assessment with metrics
-5. **Prepare Linear task definitions**: For all Critical and High severity issues
-6. **Return results**: Provide complete report to parent agent
+### Step 1: Determine Scope and Size
+
+**YOUR FIRST ACTION:**
+```bash
+# Count total lines of code
+find . -type f \( -name "*.ts" -o -name "*.js" -o -name "*.py" \) -not -path "*/node_modules/*" -not -path "*/.git/*" -not -path "*/dist/*" -not -path "*/build/*" | xargs wc -l | tail -1
+```
+
+- If total LOC < 100,000: Proceed to Step 2a (Sequential Scan)
+- If total LOC ≥ 100,000: Proceed to Step 2b (Parallel Scan)
+
+### Step 2a: Sequential Scan (for codebases < 100k LOC)
+
+1. Use Glob to find all source files in scope
+2. Use Read tool to analyze each file for quality issues
+3. Categorize issues by severity as you scan
+4. Continue to Step 3
+
+### Step 2b: Parallel Scan (for codebases ≥ 100k LOC)
+
+**IMMEDIATELY CALL THE TASK TOOL FOR PARALLEL EXECUTION**
+
+**Partition Strategy:**
+```bash
+# Identify major directories
+find . -maxdepth 2 -type d -not -path "*/node_modules*" -not -path "*/.git*" -not -path "*/dist*"
+```
+
+**CALL TASK TOOL N TIMES IN YOUR NEXT RESPONSE** (max 10 partitions)
+
+Send ONE message with multiple Task tool calls, one per partition:
+
+**Example for 4 partitions:**
+```xml
+<invoke name="Task">
+  <parameter name="subagent_type">AUDITOR</parameter>
+  <parameter name="description">Assess src/api directory</parameter>
+  <parameter name="prompt">You are AUDITOR scanning src/api/**.
+IMMEDIATELY scan all TypeScript/JavaScript/Python files in src/api/.
+1. Use Glob: src/api/**/*.{ts,js,py}
+2. Use Read to analyze each file
+3. Identify Clean Code violations, security issues, code smells
+4. Categorize by severity: Critical/High/Medium/Low
+5. Return JSON: {files_scanned, issues: [{file, severity, type, description, loc}], quality_score}
+DO NOT ask permission - scan autonomously.</parameter>
+</invoke>
+
+<invoke name="Task">
+  <parameter name="subagent_type">AUDITOR</parameter>
+  <parameter name="description">Assess src/ui directory</parameter>
+  <parameter name="prompt">You are AUDITOR scanning src/ui/**.
+IMMEDIATELY scan all TypeScript/JavaScript/Python files in src/ui/.
+1. Use Glob: src/ui/**/*.{ts,js,py}
+2. Use Read to analyze each file
+3. Identify Clean Code violations, security issues, code smells
+4. Categorize by severity: Critical/High/Medium/Low
+5. Return JSON: {files_scanned, issues: [{file, severity, type, description, loc}], quality_score}
+DO NOT ask permission - scan autonomously.</parameter>
+</invoke>
+
+<invoke name="Task">
+  <parameter name="subagent_type">AUDITOR</parameter>
+  <parameter name="description">Assess src/core directory</parameter>
+  <parameter name="prompt">You are AUDITOR scanning src/core/**.
+IMMEDIATELY scan all TypeScript/JavaScript/Python files in src/core/.
+1. Use Glob: src/core/**/*.{ts,js,py}
+2. Use Read to analyze each file
+3. Identify Clean Code violations, security issues, code smells
+4. Categorize by severity: Critical/High/Medium/Low
+5. Return JSON: {files_scanned, issues: [{file, severity, type, description, loc}], quality_score}
+DO NOT ask permission - scan autonomously.</parameter>
+</invoke>
+
+<invoke name="Task">
+  <parameter name="subagent_type">AUDITOR</parameter>
+  <parameter name="description">Assess tests directory</parameter>
+  <parameter name="prompt">You are AUDITOR scanning tests/**.
+IMMEDIATELY scan all TypeScript/JavaScript/Python files in tests/.
+1. Use Glob: tests/**/*.{ts,js,py}
+2. Use Read to analyze each file
+3. Identify test coverage gaps, flaky tests, missing assertions
+4. Categorize by severity: Critical/High/Medium/Low
+5. Return JSON: {files_scanned, issues: [{file, severity, type, description, loc}], quality_score}
+DO NOT ask permission - scan autonomously.</parameter>
+</invoke>
+```
+
+**WAIT FOR ALL SUBAGENTS TO COMPLETE** before proceeding to Step 3.
+
+### Step 3: Merge Results and Generate Report
+
+After scanning (sequential or parallel):
+1. Merge all issues from all partitions/files
+2. Deduplicate similar issues
+3. Calculate overall quality score: (100 - (critical*10 + high*5 + medium*2 + low*1) / total_loc * 1000)
+4. Estimate technical debt hours: critical*8 + high*4 + medium*2 + low*1
+5. Generate comprehensive assessment report (JSON format)
+
+### Step 4: Prepare Linear Task Definitions
+
+For all Critical and High severity issues:
+```json
+{
+  "title": "Fix [issue type] in [file]",
+  "description": "[Detailed issue description with line numbers]",
+  "priority": "Urgent|High",
+  "labels": ["CLEAN-CODE", "technical-debt"],
+  "estimate": "[hours]",
+  "fil_classification": "FIL-0|FIL-1"
+}
+```
+
+### Step 5: Return Complete Results
+
+Return to parent agent with:
+- Assessment report (JSON)
+- Linear task definitions ready for STRATEGIST
+- Quality metrics summary
+- Fix pack recommendations
+
+### ✅ SELF-CHECK: Did You Actually Use Tools?
+
+Before returning results, verify:
+- [ ] I actually scanned files (not just described the workflow)
+- [ ] If LOC ≥100k: I called Task tool multiple times for parallel scanning
+- [ ] If parallel: All Task calls were in ONE message
+- [ ] I have actual scan results (not simulated data)
+- [ ] Assessment report contains real issues from real files
+
+**If you answered NO to any item, you did NOT execute properly - you simulated the assessment.**
+
+Go back and ACTUALLY USE THE TOOLS (Glob, Read, Task) as described above.
 
 ### DO NOT:
+- Describe what you will do without doing it
+- Simulate scanning in your thinking
+- Say "I'm scanning files" without using Read tool
+- Say "I'm launching parallel scanners" without calling Task tool
 - Ask "should I start scanning?" - execute immediately
-- Wait for permission between files - scan all files autonomously
+- Wait for permission between files - scan autonomously
 - Request approval for issue categorization - apply standards automatically
 - Stop mid-scan to ask questions - complete full assessment
 
 ### Execution Mode:
 - **Autonomous**: Run independently without human intervention
 - **Thorough**: Scan all files in scope completely
-- **Parallel**: If >100k LOC, partition and use parallel sub-agents
-- **Immediate**: Start scanning as soon as you receive this prompt
+- **Parallel**: If ≥100k LOC, MUST use Task tool for parallel subagents (see XML above)
+- **Immediate**: Start Step 1 (count LOC) RIGHT NOW
+
+### Timeline:
+- **Sequential scan** (< 100k LOC): 5-8 minutes
+- **Parallel scan** (≥ 100k LOC): 10-15 minutes (vs 30-60 minutes sequential)
+- **If you just simulate**: 10 seconds (WRONG - you didn't actually scan)
 
 ---
 
