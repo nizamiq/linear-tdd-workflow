@@ -9,6 +9,21 @@ priority: high
 
 Creates Linear issues from AUDITOR assessment results using STRATEGIST.
 
+## ⚠️ CRITICAL: TDD Requirement
+
+**After creating Linear tasks, ALL implementations MUST follow strict Test-Driven Development:**
+
+1. **[RED]** - Write failing test FIRST (no exceptions)
+2. **[GREEN]** - Write minimal code to pass test
+3. **[REFACTOR]** - Improve design with passing tests
+
+**Non-Negotiable Quality Gates:**
+- ≥80% diff coverage (blocking)
+- ≥30% mutation score (blocking)
+- **NO production code without failing test first**
+
+**The `/fix` command enforces TDD automatically through the EXECUTOR agent.**
+
 ## Usage
 
 ```bash

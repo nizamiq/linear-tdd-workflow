@@ -17,6 +17,55 @@
 
 An autonomous code quality management system that uses 23 specialized AI agents to continuously assess, improve, and maintain your codebase. The system enforces strict Test-Driven Development practices with **real coverage validation** and **production-ready deployment pipelines**.
 
+## ⚠️ Non-Negotiable: Test-Driven Development
+
+**Every code change follows strict TDD. This is not optional.**
+
+```
+[RED] → [GREEN] → [REFACTOR]
+  ↓         ↓           ↓
+Test    Minimal    Improve
+First     Code     Design
+```
+
+**The EXECUTOR agent enforces TDD automatically through the `/fix` command.**
+
+### Quality Gates (Blocking)
+- **≥80% diff coverage** - Every changed line must be tested
+- **≥30% mutation score** - Tests must validate actual behavior
+- **NO production code without failing test first** - Zero exceptions
+
+### Why This Matters
+1. **Tests as Documentation** - Your tests explain what code should do
+2. **Confidence to Change** - Refactor fearlessly with test safety net
+3. **Better Design** - TDD forces testable, loosely-coupled code
+4. **Automatic Coverage** - TDD gives you ≥80% coverage for free
+
+### TDD Cycle Example
+```javascript
+// [RED] Write failing test FIRST
+test('calculates tax for high income', () => {
+  expect(calculateTax(100000)).toBe(25000);
+});
+// ❌ FAILS - calculateTax doesn't exist yet
+
+// [GREEN] Minimal code to pass
+function calculateTax(income) {
+  return income * 0.25;
+}
+// ✅ PASSES
+
+// [REFACTOR] Improve design
+const TAX_RATE = 0.25;
+function calculateTax(income) {
+  validateIncome(income);
+  return income * TAX_RATE;
+}
+// ✅ STILL PASSES - refactored safely
+```
+
+**Learn more:** `.claude/docs/TDD-REMINDER.md` - Quick reference card for TDD requirements
+
 ### Key Benefits
 - **50% faster** Mean Time to Recovery (MTTR)
 - **30-35% improvement** in PR cycle time

@@ -230,5 +230,35 @@
     "patternLearning": true,
     "autoRebase": true,
     "smartPrioritization": true
+  },
+  "hooks": {
+    "enabled": true,
+    "onSubagentStop": ".claude/hooks/on-subagent-stop.sh",
+    "onStop": ".claude/hooks/on-stop.sh",
+    "timeout": 30,
+    "environment": {
+      "CLAUDE_PROJECT_ROOT": "${PROJECT_ROOT}",
+      "CLAUDE_AGENTS_DIR": ".claude/agents",
+      "CLAUDE_QUEUE_DIR": ".claude/queue"
+    },
+    "description": "Workflow automation hooks for agent coordination and next-step suggestions"
+  },
+  "queue": {
+    "enabled": true,
+    "file": ".claude/queue/enhancements.json",
+    "statuses": [
+      "BACKLOG",
+      "READY_FOR_DESIGN",
+      "READY_FOR_ARCH",
+      "READY_FOR_BUILD",
+      "READY_FOR_REVIEW",
+      "READY_FOR_TEST",
+      "READY_FOR_DEPLOY",
+      "DONE",
+      "BLOCKED",
+      "ON_HOLD"
+    ],
+    "autoUpdate": true,
+    "description": "Enhancement queue for multi-phase workflow tracking"
   }
 }

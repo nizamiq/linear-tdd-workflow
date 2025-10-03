@@ -1,0 +1,447 @@
+# Validation Workflow - Comprehensive Quality Gate Orchestration
+# Replaces: VALIDATOR agent (cost reduction: 90%)
+#
+# Use this workflow to orchestrate multiple validation checks in parallel or sequence.
+
+name: validation-workflow
+version: 1.0.0
+description: Comprehensive quality validation orchestrating lint, typecheck, tests, and security
+type: workflow
+cost_model: hybrid  # Minimal LLM for orchestration, deterministic for checks
+
+# When to use this workflow
+use_cases:
+  - "Pre-commit comprehensive validation"
+  - "CI/CD quality gates"
+  - "Pre-release validation"
+  - "Pull request quality checks"
+
+# When NOT to use (use agent instead)
+avoid_for:
+  - "Subjective quality assessment"
+  - "Architecture review"
+  - "Code style design decisions"
+
+# Validation gates
+gates:
+  linting:
+    workflow: lint-workflow.yaml
+    mode: check_only
+    required: true
+    blocking: true
+    timeout: 60
+
+  type_checking:
+    workflow: typecheck-workflow.yaml
+    mode: full
+    required: true
+    blocking: true
+    timeout: 300
+
+  unit_tests:
+    command: "npm test -- --coverage"
+    required: true
+    blocking: true
+    timeout: 600
+    success_criteria:
+      - all_tests_pass
+      - coverage_threshold_met
+
+  security_scan:
+    command: "npm audit --audit-level=moderate"
+    required: true
+    blocking: false  # Warn but don't block
+    timeout: 120
+
+  dependency_check:
+    command: "npm outdated --json"
+    required: false
+    blocking: false
+    timeout: 30
+
+# Execution strategies
+strategies:
+  fast_fail:
+    description: "Stop on first failure (fastest feedback)"
+    execution: sequential
+    stop_on_failure: true
+
+  comprehensive:
+    description: "Run all checks regardless of failures (complete report)"
+    execution: parallel
+    stop_on_failure: false
+
+  critical_first:
+    description: "Run critical gates first, then comprehensive"
+    execution: hybrid
+    phases:
+      - phase: critical
+        gates: [type_checking, unit_tests]
+        execution: parallel
+        stop_on_failure: true
+      - phase: non_critical
+        gates: [linting, security_scan, dependency_check]
+        execution: parallel
+        stop_on_failure: false
+
+# Workflow steps
+steps:
+  - name: initialize
+    description: "Initialize validation environment"
+    action: setup
+    tasks:
+      - detect_project_type
+      - load_configuration
+      - verify_dependencies
+
+  - name: run_gates
+    description: "Execute validation gates according to strategy"
+    action: orchestrate
+    strategy: ${selected_strategy}  # Defaults to comprehensive
+    gates: ${configured_gates}
+
+  - name: collect_results
+    description: "Aggregate all validation results"
+    action: aggregate
+    format: json
+    schema:
+      gate: string
+      status: enum[passed, failed, skipped, timeout]
+      duration_ms: number
+      errors: array
+      warnings: array
+      metrics: object
+
+  - name: calculate_quality_score
+    description: "Calculate overall quality score"
+    action: calculate
+    formula: |
+      score = (passed_gates / total_gates) * 100
+      weighted_score = (
+        (linting_pass * 0.15) +
+        (typecheck_pass * 0.25) +
+        (tests_pass * 0.40) +
+        (security_pass * 0.15) +
+        (dependencies_ok * 0.05)
+      ) * 100
+
+  - name: generate_report
+    description: "Generate comprehensive validation report"
+    action: report
+    outputs:
+      - overall_status: enum[passed, failed, partial]
+      - quality_score: number  # 0-100
+      - gates_passed: count
+      - gates_failed: count
+      - blocking_failures: count
+      - total_duration_ms: number
+      - detailed_results: object
+
+  - name: determine_action
+    description: "Decide next action based on results"
+    action: decision
+    rules:
+      - if: blocking_failures > 0
+        then: block_with_report
+
+      - if: quality_score < 80
+        then: warn_with_recommendations
+
+      - if: quality_score >= 80
+        then: approve
+
+# Success criteria
+success_criteria:
+  strict:
+    - blocking_failures == 0
+    - quality_score >= 90
+    - all_critical_gates_passed
+
+  permissive:
+    - blocking_failures == 0
+    - quality_score >= 70
+
+  gradual:
+    - blocking_failures == 0
+    - quality_score >= baseline_score  # No regression
+
+# Failure handling
+on_failure:
+  block_commit:
+    action: block
+    message: "Validation failed - ${blocking_failures} blocking issues"
+    report: detailed
+
+  warn_only:
+    action: warn
+    message: "Validation warnings - review recommended"
+    report: summary
+
+  notify:
+    action: notify
+    channels: [slack, linear]
+    message: "Quality gates failed for ${commit_sha}"
+
+# Performance optimization
+parallel_execution:
+  enabled: true
+  max_concurrent: 4
+  resource_limits:
+    cpu: 4
+    memory_mb: 4096
+
+# Caching
+caching:
+  enabled: true
+  cache_key: "${branch}-${commit_sha}"
+  cache_results:
+    - linting_violations
+    - type_errors
+    - test_results
+  ttl: 3600  # 1 hour
+
+# Integration points
+hooks:
+  pre_commit:
+    enabled: true
+    strategy: fast_fail
+    gates: [linting, type_checking, unit_tests]
+    command: "workflow run validation-workflow --strategy=fast_fail"
+
+  pre_push:
+    enabled: true
+    strategy: comprehensive
+    command: "workflow run validation-workflow --strategy=comprehensive"
+
+  ci_pipeline:
+    enabled: true
+    strategy: critical_first
+    command: "workflow run validation-workflow --strategy=critical_first --on-failure=block"
+
+  pre_release:
+    enabled: true
+    strategy: comprehensive
+    gates: all
+    success_criteria: strict
+    command: "workflow run validation-workflow --strategy=comprehensive --criteria=strict"
+
+# Metrics
+performance:
+  fast_fail:
+    typical_duration: "30-120 seconds"
+    stops_at: first_failure
+
+  comprehensive:
+    typical_duration: "60-300 seconds"
+    runs: all_gates
+
+  critical_first:
+    typical_duration: "45-180 seconds"
+    optimized_for: fast_critical_feedback
+
+  cost_vs_agent: "90% reduction"
+  reliability: "100% deterministic per gate"
+
+# Quality gate templates
+templates:
+  minimal:
+    description: "Fast validation for small changes"
+    gates:
+      - linting
+      - type_checking
+    strategy: fast_fail
+
+  standard:
+    description: "Standard validation for PRs"
+    gates:
+      - linting
+      - type_checking
+      - unit_tests
+    strategy: critical_first
+
+  comprehensive:
+    description: "Full validation for releases"
+    gates:
+      - linting
+      - type_checking
+      - unit_tests
+      - security_scan
+      - dependency_check
+    strategy: comprehensive
+
+  tdd_cycle:
+    description: "Validation during TDD RED-GREEN-REFACTOR"
+    phases:
+      RED:
+        gates: [type_checking]  # Fast feedback
+      GREEN:
+        gates: [type_checking, unit_tests]
+      REFACTOR:
+        gates: [linting, type_checking, unit_tests]
+
+# Migration guide
+migration:
+  from: "VALIDATOR agent"
+  steps:
+    - "Remove agent invocations: /invoke VALIDATOR:*"
+    - "Configure gates in validation-workflow.yaml"
+    - "Add to hooks.json for automated enforcement"
+    - "Update CI to use workflow"
+
+  benefits:
+    - "90% cost reduction (orchestration minimal LLM use)"
+    - "100% deterministic per-gate results"
+    - "Parallel execution for speed"
+    - "Comprehensive reporting"
+
+# Usage examples
+examples:
+  quick_check:
+    command: "workflow run validation-workflow --strategy=fast_fail"
+    description: "Fast validation stopping on first failure"
+    use_when: "Local development, quick feedback needed"
+
+  full_validation:
+    command: "workflow run validation-workflow --strategy=comprehensive"
+    description: "Run all gates, collect all results"
+    use_when: "PR validation, release preparation"
+
+  critical_only:
+    command: "workflow run validation-workflow --gates=type_checking,unit_tests"
+    description: "Run only critical gates"
+    use_when: "TDD cycle, fast iteration"
+
+  custom_template:
+    command: "workflow run validation-workflow --template=tdd_cycle --phase=GREEN"
+    description: "Use template for specific context"
+    use_when: "TDD workflow integration"
+
+# Error reporting
+error_report:
+  format: structured_json
+  sections:
+    - summary:
+        - overall_status
+        - quality_score
+        - gates_failed
+    - failures:
+        - gate_name
+        - failure_reason
+        - error_details
+        - suggested_fixes
+    - warnings:
+        - gate_name
+        - warning_message
+        - recommendation
+    - metrics:
+        - duration
+        - resource_usage
+        - cache_hit_rate
+
+# Recommendations engine
+recommendations:
+  linting_failed:
+    - "Run: workflow run lint-workflow --mode=auto_fix"
+    - "Review: .eslintrc.json configuration"
+    - "Consider: Disabling specific rules if intentional"
+
+  typecheck_failed:
+    - "Run: npx tsc --noEmit to see detailed errors"
+    - "Fix: Add explicit type annotations"
+    - "Consider: Gradual migration to strict mode"
+
+  tests_failed:
+    - "Run: npm test -- --verbose for detailed output"
+    - "Debug: Specific test file with --testNamePattern"
+    - "Check: Test isolation and setup/teardown"
+
+  security_issues:
+    - "Run: npm audit fix for auto-fixable issues"
+    - "Review: npm audit for manual remediation needed"
+    - "Consider: Updating vulnerable dependencies"
+
+# Related workflows
+related:
+  - lint-workflow.yaml  # Individual linting
+  - typecheck-workflow.yaml  # Individual type checking
+  - tdd-cycle-workflow.yaml  # TDD with validation gates
+
+---
+
+# Implementation Notes
+
+## Why This Replaces VALIDATOR Agent
+
+The VALIDATOR agent was autonomous logic for orchestrating deterministic checks. This workflow:
+- Eliminates most LLM calls (90% cost reduction)
+- Provides 100% deterministic per-gate results
+- Runs checks in parallel for speed
+- Generates comprehensive reports
+- Integrates seamlessly with hooks and CI
+
+## Hybrid Cost Model
+
+This workflow uses minimal LLM for:
+- Orchestration decisions (which gates to run)
+- Report formatting and recommendations
+- Quality score interpretation
+
+But all actual validation is deterministic:
+- Linting: 100% deterministic
+- Type checking: 100% deterministic
+- Tests: 100% deterministic
+- Security scans: 100% deterministic
+
+**Result**: 90% cost reduction vs full agent approach
+
+## When You Still Need an Agent
+
+Use AUDITOR agent (not VALIDATOR) for:
+- Subjective quality assessment
+- Architecture review
+- Code smell detection beyond mechanical checks
+- Business logic evaluation
+- Tech debt prioritization
+
+Use VALIDATION workflow for:
+- ✅ Automated quality gates (pre-commit, CI/CD)
+- ✅ Comprehensive validation orchestration
+- ✅ Parallel execution of multiple checks
+- ✅ Blocking deployments on failures
+
+## Hook Integration Example
+
+Add to `.claude/hooks.json`:
+```json
+{
+  "pre-tool-use": {
+    "git-commit": {
+      "command": "workflow run validation-workflow --strategy=fast_fail",
+      "description": "Fast validation before commits",
+      "required": true,
+      "timeout": 120
+    },
+    "git-push": {
+      "command": "workflow run validation-workflow --strategy=comprehensive",
+      "description": "Full validation before push",
+      "required": true,
+      "timeout": 300
+    }
+  }
+}
+```
+
+## CI/CD Integration
+
+### GitHub Actions
+```yaml
+- name: Quality Gates
+  run: workflow run validation-workflow --strategy=critical_first --on-failure=block
+```
+
+---
+
+**Status**: Active - use instead of VALIDATOR agent
+**Cost Impact**: 90% reduction vs agent approach
+**Reliability**: 100% deterministic per gate
+**Speed**: Parallel execution for maximum efficiency

@@ -427,6 +427,45 @@ Following Anthropic's "Building Effective Agents" guidance:
 - **MCP Specification**: Model Context Protocol v1.0
 - **Linear API Docs**: https://developers.linear.app/docs/graphql/working-with-the-graphql-api
 
+## TDD Compliance
+
+**CRITICAL**: The Linear integration fixes the task creation workflow, but does NOT change TDD requirements.
+
+### Non-Negotiable TDD Requirements
+
+ALL code changes MUST follow strict Test-Driven Development, regardless of how tasks are created:
+
+1. **[RED]** - Write failing test BEFORE any production code
+2. **[GREEN]** - Write minimal code to make test pass
+3. **[REFACTOR]** - Improve design while keeping tests green
+
+### Coverage & Quality Gates
+
+- **≥80% diff coverage** (blocking - CI fails if not met)
+- **≥30% mutation score** (blocking - ensures tests validate behavior)
+- **NO production code without failing test first** (enforced by EXECUTOR)
+
+### Why This Matters
+
+Linear integration makes it EASIER to track work, but the fundamental principle remains:
+
+**NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST**
+
+The `/fix` command enforces this automatically through the EXECUTOR agent. The Linear integration simply improves task management - it does not bypass or reduce TDD requirements.
+
+### TDD Workflow Integration
+
+```
+Assessment → Linear Tasks → TDD Implementation
+   ↓              ↓                ↓
+/assess  →   /linear   →   /fix CLEAN-123
+                              ↓
+                         [RED→GREEN→REFACTOR]
+                         Enforced by EXECUTOR
+```
+
+The Linear integration happens BEFORE implementation, not during or after. Once you run `/fix`, strict TDD takes over.
+
 ## Conclusion
 
 The Linear integration issue has been **fully resolved** through:
@@ -435,5 +474,6 @@ The Linear integration issue has been **fully resolved** through:
 3. ✅ Added comprehensive testing
 4. ✅ Updated all documentation
 5. ✅ Created helper scripts for CI/CD
+6. ✅ **Maintained strict TDD requirements** (not weakened)
 
-The system now correctly maintains and uses Linear issues via the STRATEGIST delegation pattern.
+The system now correctly maintains and uses Linear issues via the STRATEGIST delegation pattern **while preserving unwavering TDD enforcement**.
