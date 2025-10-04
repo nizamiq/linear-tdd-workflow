@@ -92,3 +92,6 @@ releases/
 insights/
 ci-recovery/
 patterns/
+
+# E2E test results
+tests/e2e/results/*.json

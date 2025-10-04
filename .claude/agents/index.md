@@ -1,3 +1,9 @@
+---
+name: INDEX
+description: Central registry for all agents in the Linear TDD Workflow System
+role: Registry
+---
+
 # Agent Registry
 
 This file serves as the central registry for all agents in the Linear TDD Workflow System.
