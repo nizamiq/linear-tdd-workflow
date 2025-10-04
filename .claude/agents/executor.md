@@ -48,6 +48,12 @@ loop_controls:
     - tool: Bash
       command: "npm run lint:check"
       verify: exit_code_equals_0
+    - tool: Bash
+      command: "git status | grep -q 'Your branch is up to date with' || git status | grep -q 'Your branch is ahead of'"
+      verify: branch_pushed_or_ready_to_push
+    - tool: Bash
+      command: "gh pr view --json number,title,url 2>/dev/null || echo 'NO_PR'"
+      verify: pr_exists_or_explicitly_absent
   workflow_phases:
     - phase: RED
       action: write_failing_test
@@ -68,6 +74,9 @@ loop_controls:
       check: cannot_make_test_pass_after_3_attempts
     - type: quality_gate_failure
       check: coverage_below_80_after_max_iterations
+    - type: git_operation_failure
+      check: push_or_pr_creation_failed
+      action: stop_immediately_return_error_to_parent
 definition_of_done:
   - task: "[RED] Write failing test for target behavior"
     verify: "Run test suite, confirm new test fails with expected error message"
@@ -118,11 +127,86 @@ definition_of_done:
    - VERIFY ≥80% diff coverage
    - Commit: `[REFACTOR] <TASK-ID>: Improve code design`
 
-4. **PR CREATION**:
-   - Push branch: `git push -u origin <branch>`
-   - Create PR: `gh pr create --title "..." --body "..."`
-   - Link to Linear task
-   - Return PR URL to parent
+4. **PR CREATION WITH VERIFICATION**:
+
+   a. **Push branch and verify success**:
+   ```bash
+   git push -u origin <branch-name> || {
+     echo "ERROR: Failed to push branch to remote"
+     echo "Check: git remote -v, git status, git credentials"
+     exit 1
+   }
+
+   # Verify branch exists on remote
+   git ls-remote origin <branch-name> || {
+     echo "ERROR: Branch not found on remote after push"
+     exit 1
+   }
+   ```
+
+   b. **Create PR and capture URL**:
+   ```bash
+   PR_URL=$(gh pr create \
+     --title "[TASK-ID] Feature description" \
+     --body "Implements TASK-ID with TDD cycle. See commits for RED/GREEN/REFACTOR phases." \
+     --base develop \
+     --head <branch-name>) || {
+     echo "ERROR: Failed to create PR"
+     echo "Check: gh auth status, gh repo view"
+     exit 1
+   }
+   echo "PR created: $PR_URL"
+   ```
+
+   c. **Verify PR is accessible**:
+   ```bash
+   gh pr view "$PR_URL" --json number,title,state,url || {
+     echo "ERROR: Created PR but cannot verify it exists"
+     exit 1
+   }
+   ```
+
+   d. **Return verified PR URL** to parent (MUST be actual URL from gh output)
+
+### WHAT TO DO IF PR CREATION FAILS:
+
+**GitHub CLI Not Authenticated:**
+```bash
+gh auth status  # Check authentication
+```
+- If not authenticated: **STOP IMMEDIATELY**
+- Return error to parent: "ERROR: Cannot create PR - GitHub CLI not authenticated. User must run: gh auth login"
+- **DO NOT** claim PR was created
+- **DO NOT** continue to next step
+
+**Git Push Failures:**
+```bash
+git remote -v   # Verify remote exists
+git status      # Verify commits exist locally
+```
+- If remote not configured: Return error: "ERROR: No git remote configured. Cannot push."
+- If authentication fails: Return error: "ERROR: Git push failed - check credentials (SSH key or token)"
+- If network error: Return error: "ERROR: Network failure during push. Retry when connection restored."
+- **DO NOT** claim work was committed to remote
+
+**PR Creation Command Fails:**
+- Capture exact error from `gh pr create`
+- Return full error message to parent
+- Include: command that failed, exit code, stderr output
+- **DO NOT** proceed to verification step
+- **DO NOT** return success status
+
+**Repository Permission Issues:**
+- Error: "Resource not accessible by integration" → Return: "ERROR: Insufficient GitHub permissions to create PR"
+- Error: "Not Found" → Return: "ERROR: Repository not found or no access"
+- Always return the specific GitHub API error message
+
+**CRITICAL:** If ANY git or gh operation fails:
+1. STOP execution immediately
+2. Return detailed error message to parent
+3. Include exact command and exit code
+4. Suggest remediation steps
+5. NEVER claim success when operations failed
 
 ### DO NOT:
 - **Write production code before test exists** - This is the #1 violation
@@ -130,6 +214,8 @@ definition_of_done:
 - Combine phases in single commit - Each phase gets separate commit
 - Bypass 80% coverage gate - Non-negotiable
 - Ask permission between phases - Execute full TDD cycle autonomously
+- **Claim PR created without verification** - Must verify with `gh pr view`
+- **Continue after git/gh errors** - Stop immediately on failure
 
 ### Execution Mode:
 - **TDD-Strict**: RED→GREEN→REFACTOR mandatory, no exceptions
