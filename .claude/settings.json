@@ -238,7 +238,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/hooks/inject-linear-config.sh",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/inject-linear-config.sh",
             "timeout": 30,
             "environment": {
               "CLAUDE_PROJECT_ROOT": ".",
@@ -255,7 +255,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/hooks/on-subagent-stop.sh",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/on-subagent-stop.sh",
             "timeout": 30
           }
         ]
@@ -267,7 +267,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/hooks/on-stop.sh",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/on-stop.sh",
             "timeout": 30
           }
         ]
