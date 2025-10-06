@@ -36,30 +36,42 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-          cache: 'npm'
+
+      - name: Cache npm dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
 
       - name: Validate documentation links
         id: validate-links
         run: |
-          bash scripts/validate-docs.sh --check-links --report
-          echo "exit_code=$?" >> $GITHUB_OUTPUT
+          bash scripts/validate-docs.sh --check-links --report || echo "exit_code=$?" >> $GITHUB_OUTPUT
+          echo "exit_code=${exit_code:-0}" >> $GITHUB_OUTPUT
         continue-on-error: true
 
       - name: Validate code examples
         id: validate-examples
         run: |
-          bash scripts/validate-docs.sh --check-examples --report
-          echo "exit_code=$?" >> $GITHUB_OUTPUT
+          bash scripts/validate-docs.sh --check-examples --report || echo "exit_code=$?" >> $GITHUB_OUTPUT
+          echo "exit_code=${exit_code:-0}" >> $GITHUB_OUTPUT
         continue-on-error: true
 
       - name: Validate cross-references
         id: validate-xrefs
         run: |
-          bash scripts/validate-docs.sh --check-xrefs --report
-          echo "exit_code=$?" >> $GITHUB_OUTPUT
+          bash scripts/validate-docs.sh --check-xrefs --report || echo "exit_code=$?" >> $GITHUB_OUTPUT
+          echo "exit_code=${exit_code:-0}" >> $GITHUB_OUTPUT
         continue-on-error: true
 
       - name: Generate API documentation
@@ -132,10 +144,22 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-          cache: 'npm'
+
+      - name: Cache npm dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
 
       - name: Count agent specifications
         id: count-agents

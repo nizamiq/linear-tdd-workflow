@@ -66,6 +66,8 @@
     "journey:status": "node .claude/cli.js journey status",
     "guardian": "node .claude/cli.js guardian",
     "scholar": "node .claude/cli.js scholar",
+    "scholar:update": "node scripts/scholar-update.js",
+    "scholar:recommend": "node scripts/scholar-recommend.js",
     "release": "node .claude/cli.js release",
     "validator": "node .claude/cli.js validator",
     "cycle:analyze": "node .claude/scripts/cycle/cycle-analyzer.js",
