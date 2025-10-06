@@ -1,7 +1,8 @@
 ---
 name: cycle
-description: Automated sprint/cycle planning and management
+description: Automated sprint/cycle planning and management using orchestrator-workers pattern
 agent: PLANNER
+execution_mode: ORCHESTRATOR  # Main agent spawns READ-ONLY analysis workers
 usage: "/cycle [plan|status|execute|review]"
 parameters:
   - name: subcommand
@@ -15,9 +16,31 @@ supporting_agents:
   - AUDITOR
   - SCHOLAR
   - GUARDIAN
+subprocess_usage: READ_ONLY_ANALYSIS  # ⚠️ Subprocesses do NOT make state changes
 ---
 
 # /cycle - Sprint/Cycle Planning Command
+
+## ⚠️ IMPORTANT: Subprocess Architecture
+
+This command uses the **orchestrator-workers pattern** where:
+- **Main agent (YOU)** orchestrates workflow and makes decisions
+- **Worker subprocesses** perform READ-ONLY analysis tasks (fetch data, calculate metrics)
+- **NO subprocess writes** - all Linear updates happen in main context
+
+**Safe subprocess usage (READ-ONLY):**
+- ✅ Fetching Linear issues and cycles
+- ✅ Analyzing git history
+- ✅ Calculating metrics and scoring
+- ✅ Generating recommendations
+
+**Prohibited in subprocesses (WRITE operations):**
+- ❌ Creating Linear cycles
+- ❌ Updating issue states
+- ❌ Making git commits
+- ❌ Creating PRs
+
+**Rule:** Subprocesses return DATA, main context makes CHANGES.
 
 ## Overview
 

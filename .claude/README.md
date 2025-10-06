@@ -1,6 +1,6 @@
 # 🤖 Claude Code Workflow System
 
-## System Active: Linear TDD Workflow v1.3.0
+## System Active: Linear TDD Workflow v1.4.0
 
 This directory contains an autonomous multi-agent workflow system designed to help Claude Code maintain code quality through strict Test-Driven Development.
 
@@ -231,10 +231,19 @@ make ci-recovery
 
 ## 📚 Additional Resources
 
+### Core Documentation
 - **Full Documentation**: `/docs/JOURNEYS.md`
 - **Agent Reference**: `/docs/ARCHITECTURE-AGENTS.md`
 - **Project Instructions**: `/CLAUDE.md`
 - **Troubleshooting**: `/docs/TROUBLESHOOTING.md`
+
+### Agent Development & Subprocess Handling
+- **⚠️ Subprocess Best Practices** (MANDATORY): `.claude/docs/SUBPROCESS-BEST-PRACTICES.md`
+- **Subprocess Quick Reference**: `.claude/docs/SUBPROCESS-QUICK-REFERENCE.md`
+- **Ground Truth Verification**: `.claude/agents/success-criteria.yaml`
+
+**Critical for Agent Developers:**
+If you're creating or modifying agents that perform state-changing operations (file writes, git commits, PR creation, Linear tasks), you MUST read the subprocess best practices guide to ensure work persists correctly.
 
 ## 🔍 System Detection
 

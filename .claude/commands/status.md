@@ -2,6 +2,8 @@
 name: status
 description: Get current workflow and Linear status
 agent: STRATEGIST
+execution_mode: ORCHESTRATOR  # May spawn parallel metric collection workers
+subprocess_usage: READ_ONLY_ANALYSIS  # Subprocesses fetch metrics, main context displays status
 usage: "/status [--detailed] [--format=<json|table>]"
 parameters:
   - name: detailed
@@ -18,6 +20,28 @@ parameters:
 # /status - Workflow Status
 
 Get comprehensive status of the current workflow, Linear tasks, and agent activities using the STRATEGIST agent.
+
+## ⚠️ IMPORTANT: Read-Only Status Query
+
+This command performs **READ-ONLY queries** and does NOT make state changes:
+- **Main agent (STRATEGIST)** orchestrates data collection and display
+- **Worker subprocesses** fetch metrics from Linear, GitHub, CI/CD in parallel
+- **NO writes** - purely informational command
+
+**Safe operations (READ-ONLY):**
+- ✅ Querying Linear API for task status
+- ✅ Fetching GitHub PR status
+- ✅ Reading CI/CD pipeline results
+- ✅ Calculating velocity metrics
+- ✅ Displaying status reports
+
+**Prohibited operations (none expected):**
+- ❌ Updating Linear tasks
+- ❌ Creating branches or PRs
+- ❌ Modifying any files
+- ❌ Making git commits
+
+**Rule:** This command only READS state, never WRITES.
 
 ## Usage
 ```

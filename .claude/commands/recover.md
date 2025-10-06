@@ -2,6 +2,8 @@
 name: recover
 description: Auto-recover broken CI/CD pipeline
 agent: GUARDIAN
+execution_mode: DIRECT  # ⚠️ CRITICAL: GUARDIAN runs in main context for state changes
+subprocess_usage: ANALYSIS_THEN_ACTION  # Read-only analysis, then direct action in main context
 usage: "/recover [--auto-revert] [--force]"
 parameters:
   - name: auto-revert
@@ -17,6 +19,35 @@ parameters:
 # /recover - Pipeline Recovery
 
 Automatically detect and recover from CI/CD pipeline failures using the GUARDIAN agent.
+
+## ⚠️ IMPORTANT: Direct Execution Required
+
+This command performs **STATE-CHANGING operations** and must run in main context:
+- **Analysis phase** may use subprocesses to parse logs (read-only)
+- **Recovery phase** MUST run in main context (writes git commits, PRs)
+- **NO subprocess writes** - all git operations in main context
+
+**Analysis phase (safe for subprocess):**
+- ✅ Reading CI/CD logs
+- ✅ Analyzing failure patterns
+- ✅ Identifying root causes
+- ✅ Generating recovery plans
+
+**Recovery phase (MUST be in main context):**
+- ⚠️ Creating revert commits
+- ⚠️ Quarantining flaky tests (file modifications)
+- ⚠️ Creating revert PRs
+- ⚠️ Creating Linear INCIDENT tasks
+- ⚠️ Updating pipeline configuration
+
+**Architecture:**
+```
+Main Context (GUARDIAN)
+  ├─> Subprocess: Analyze logs (read-only) → Return findings
+  └─> Main Context: Execute recovery (git commits, PRs, Linear tasks)
+```
+
+**Rule:** Analysis can be delegated, ACTIONS must be in main context.
 
 ## Usage
 ```
@@ -66,3 +97,54 @@ The GUARDIAN agent will:
 - Recovery: ≤10 minutes (p95)
 - Revert creation: ≤2 minutes
 - Incident documentation: ≤5 minutes
+
+## Ground Truth Verification (Mandatory)
+
+After completing recovery, GUARDIAN **MUST** verify actions persisted using actual tool calls:
+
+### Required Verification Steps:
+
+1. **Verify Revert Commit Created (if applicable):**
+   ```bash
+   git log --oneline -5 | grep -i revert
+   ```
+   Expected: Revert commit appears in git log
+
+2. **Verify Revert PR Created (if applicable):**
+   ```bash
+   gh pr list --state open | grep -i revert
+   ```
+   Expected: PR number and URL visible
+
+3. **Verify Linear Incident Created:**
+   ```bash
+   # Use Linear MCP to verify incident task exists
+   mcp__linear__search_issues "identifier:INCIDENT"
+   ```
+   Expected: INCIDENT-XXX task visible in Linear
+
+4. **Verify Pipeline Status Improved:**
+   ```bash
+   gh run list --limit 1 --json conclusion
+   ```
+   Expected: Latest run shows "success" or at least better than before
+
+5. **Verify Quarantined Tests (if applicable):**
+   ```bash
+   git diff HEAD~1 | grep -A5 "skip\|disable"
+   ```
+   Expected: Test files show skip/disable markers
+
+### If ANY Verification Fails:
+
+```markdown
+❌ GROUND TRUTH VERIFICATION FAILED
+
+Expected: Revert PR created with link to INCIDENT task
+Actual: gh pr list shows no open PRs, Linear shows no INCIDENT tasks
+
+RECOVERY INCOMPLETE - DO NOT REPORT SUCCESS
+Manual intervention required: User must manually revert or escalate.
+```
+
+**Rule:** NEVER report successful recovery without verified evidence of actions taken.

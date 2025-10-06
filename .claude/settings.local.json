@@ -33,7 +33,12 @@
       "Bash(git log:*)",
       "Bash(while read f)",
       "Bash(awk:*)",
-      "Read(//Users/cnross/.claude/**)"
+      "Read(//Users/cnross/.claude/**)",
+      "Bash(gh run list:*)",
+      "Bash(gh run view:*)",
+      "Bash(test:*)",
+      "Read(//home/cnross/.claude/**)",
+      "Bash(npm test:*)"
     ],
     "deny": [],
     "ask": []

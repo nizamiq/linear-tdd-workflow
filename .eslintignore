@@ -7,3 +7,10 @@ scripts/*.js
 .github/
 docs/
 claude_scaffold/
+
+# E2E test runners (standalone scripts, not Jest tests)
+tests/e2e/comprehensive-workflow-e2e.js
+
+# Test utilities and mocks (using relaxed JS patterns)
+tests/mocks/
+tests/fixtures/

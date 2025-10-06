@@ -2,7 +2,7 @@
 
 > **Enterprise-grade multi-agent AI framework for autonomous code quality management**
 
-[![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.4.0-blue.svg)](CHANGELOG.md)
 [![TDD Compliant](https://img.shields.io/badge/TDD-Strict-brightgreen.svg)](docs/WORKFLOW-TDD-PROTOCOL.md)
 [![Linear Integrated](https://img.shields.io/badge/Linear-Connected-blue.svg)](docs/INTEGRATION-LINEAR.md)
 [![Clean Code](https://img.shields.io/badge/Clean%20Code-Enforced-green.svg)](docs/WORKFLOW-CLEAN-CODE-ASSESSMENT.md)
@@ -11,7 +11,7 @@
 [![Installation](https://img.shields.io/badge/Install-Drop--in-purple.svg)](#installation-strategy)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-*Last Updated: January 2025 | Version: 1.3.0*
+*Last Updated: October 2025 | Version: 1.4.0*
 
 ## What is Linear TDD Workflow System?
 
@@ -134,6 +134,24 @@ cp ../linear-tdd-workflow/Makefile .
 - **`Makefile`** - Universal commands that work for any language
 - **`.env`** - Your configuration (Linear API keys, etc.)
 - **Enhanced `package.json`** - Additional scripts for the workflow (if applicable)
+
+### ⚠️ Important: Agent Execution Patterns (v1.4.0+)
+
+When creating custom agents or workflows, be aware of **subprocess isolation**:
+
+**The Issue:** Agents spawned via subprocess cannot persist state changes (file writes, git commits, PR creation) to your actual workspace.
+
+**The Solution:** Follow documented execution patterns:
+- **Direct Execution** - For commands that modify state (files, git, PRs, Linear)
+- **Orchestrator-Workers** - For parallel read-only analysis
+- **Validation-Then-Action** - For hybrid workflows
+
+**Documentation:**
+- 📖 **Best Practices Guide**: `.claude/docs/SUBPROCESS-BEST-PRACTICES.md`
+- 📝 **Quick Reference**: `.claude/docs/SUBPROCESS-QUICK-REFERENCE.md`
+- 🚶 **Migration Guide**: `.claude/docs/MIGRATION-SUBPROCESS-PATTERNS.md`
+
+**This is critical** if you're creating custom agents or modifying existing commands. See the guides above before making changes that write files, create commits, or modify Linear tasks.
 
 ## 🎯 How It Works
 

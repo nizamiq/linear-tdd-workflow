@@ -2,12 +2,36 @@
 name: docs
 description: Documentation validation, generation, and maintenance operations
 agent: DOC-KEEPER
+execution_mode: DIRECT  # DOC-KEEPER runs in main context for file operations
+subprocess_usage: VALIDATION_THEN_ACTION  # Read-only validation, then direct file writes in main context
 category: documentation
 ---
 
 # /docs - Documentation Operations
 
 Invokes the DOC-KEEPER agent for documentation validation, generation, and maintenance tasks.
+
+## ⚠️ IMPORTANT: Direct Execution for File Operations
+
+This command performs **FILE-MODIFYING operations** and must run in main context:
+- **Validation phase** may use subprocesses to check links (read-only)
+- **Generation/fix phase** MUST run in main context (writes documentation files)
+- **NO subprocess writes** - all file operations in main context
+
+**Validation phase (safe for subprocess):**
+- ✅ Reading documentation files
+- ✅ Checking internal/external links
+- ✅ Analyzing code examples
+- ✅ Calculating coverage metrics
+
+**Write operations (MUST be in main context):**
+- ⚠️ Generating documentation files
+- ⚠️ Fixing broken links
+- ⚠️ Updating cross-references
+- ⚠️ Creating Linear DOC tasks
+- ⚠️ Committing documentation changes
+
+**Rule:** Validation can be delegated, FILE WRITES must be in main context.
 
 ## Usage
 

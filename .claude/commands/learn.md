@@ -2,6 +2,8 @@
 name: learn
 description: Mine patterns from successful PRs and implementations
 agent: SCHOLAR
+execution_mode: ORCHESTRATOR  # May spawn parallel git analysis workers
+subprocess_usage: READ_ONLY_ANALYSIS  # Subprocesses analyze git history, main context stores patterns
 usage: "/learn [--scope=<timeframe>] [--type=<pattern-type>]"
 parameters:
   - name: scope
@@ -19,6 +21,27 @@ parameters:
 # /learn - Pattern Learning
 
 Extract reusable patterns and insights from successful implementations using the SCHOLAR agent.
+
+## ⚠️ IMPORTANT: Read-Only Analysis Pattern
+
+This command performs **READ-ONLY git history analysis**:
+- **Main agent (SCHOLAR)** orchestrates pattern extraction and storage
+- **Worker subprocesses** analyze git commits and PRs in parallel (read-only)
+- **Pattern storage** happens in main context only
+
+**Safe subprocess usage (READ-ONLY):**
+- ✅ Reading git commit history
+- ✅ Analyzing PR metadata
+- ✅ Parsing code diffs
+- ✅ Calculating pattern metrics
+- ✅ Generating pattern reports
+
+**Must happen in main context:**
+- ⚠️ Writing pattern files to `.claude/patterns/`
+- ⚠️ Updating pattern catalog
+- ⚠️ Creating validation reports
+
+**Rule:** Subprocesses ANALYZE history, main context STORES patterns.
 
 ## Usage
 ```

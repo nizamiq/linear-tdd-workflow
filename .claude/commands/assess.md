@@ -2,6 +2,8 @@
 name: assess
 description: Perform comprehensive code quality assessment to identify technical debt, security issues, and improvement opportunities. Use PROACTIVELY before releases, after major changes, or weekly for continuous improvement.
 agent: AUDITOR
+execution_mode: ORCHESTRATOR  # May spawn parallel analysis workers
+subprocess_usage: READ_ONLY_ANALYSIS  # Subprocesses analyze code, main context creates Linear tasks
 usage: "/assess [--scope=<directory>] [--format=<json|markdown>] [--depth=<shallow|deep>]"
 parameters:
   - name: scope
@@ -23,6 +25,27 @@ parameters:
 # /assess - Code Quality Assessment
 
 Perform a comprehensive code quality assessment of the current codebase using the AUDITOR agent.
+
+## ⚠️ IMPORTANT: Subprocess Architecture for Parallel Analysis
+
+This command may use the **orchestrator-workers pattern** for large codebases:
+- **Main agent (AUDITOR)** orchestrates analysis and creates Linear tasks
+- **Worker subprocesses** perform READ-ONLY code analysis in parallel
+- **NO subprocess writes** - all Linear task creation happens in main context
+
+**Safe subprocess usage (READ-ONLY):**
+- ✅ Reading and analyzing code files
+- ✅ Running static analysis tools (eslint, ruff, mypy)
+- ✅ Calculating complexity and metrics
+- ✅ Generating assessment reports
+
+**Prohibited in subprocesses (WRITE operations):**
+- ❌ Creating Linear tasks (CLEAN-XXX)
+- ❌ Modifying code files
+- ❌ Running code formatters
+- ❌ Making git commits
+
+**Rule:** Subprocesses return FINDINGS, main context creates TASKS.
 
 ## Usage
 ```
@@ -66,3 +89,42 @@ The AUDITOR agent will:
 - Quick scan: ≤5 minutes
 - Deep scan: ≤12 minutes for 150k LOC
 - Task creation: ≤2 minutes
+
+## Ground Truth Verification (Mandatory)
+
+After completing assessment, AUDITOR **MUST** verify Linear task creation using actual tool calls:
+
+### Required Verification Steps:
+
+1. **Verify Tasks Created:**
+   ```bash
+   # Use Linear MCP to verify tasks exist
+   mcp__linear__search_issues "project:<project> state:Backlog"
+   ```
+   Expected: CLEAN-XXX tasks visible in Linear
+
+2. **Verify Assessment Report Generated:**
+   ```bash
+   ls -la proposals/issues-*.json
+   ```
+   Expected: JSON file with timestamp exists
+
+3. **Verify Report Contains Valid Data:**
+   ```bash
+   cat proposals/issues-*.json | jq '.issues | length'
+   ```
+   Expected: Non-zero issue count
+
+### If ANY Verification Fails:
+
+```markdown
+❌ GROUND TRUTH VERIFICATION FAILED
+
+Expected: 5 CLEAN tasks created in Linear
+Actual: Linear API shows 0 tasks with CLEAN prefix
+
+ASSESSMENT INCOMPLETE - DO NOT REPORT SUCCESS
+Investigation needed: Check Linear API credentials and permissions.
+```
+
+**Rule:** NEVER report successful task creation without verified Linear API evidence.

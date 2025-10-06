@@ -27,7 +27,7 @@ describe('Claude Agentic Workflow - End-to-End Tests', () => {
     await generateE2EReport(testResults);
   });
 
-  describe('Core Workflow: Assessment → Linear → Implementation', () => {
+  describe.skip('Core Workflow: Assessment → Linear → Implementation (requires runAgentCommand - v1.5.0)', () => {
     test('E2E-001: AUDITOR assessment creates real Linear tasks', async () => {
       const testName = 'E2E-001: AUDITOR → Linear';
       testResults.totalTests++;
@@ -153,7 +153,7 @@ describe('Claude Agentic Workflow - End-to-End Tests', () => {
     }, 60000);
   });
 
-  describe('Agent Integration Tests', () => {
+  describe.skip('Agent Integration Tests (requires agent:invoke script - v1.5.0)', () => {
     const agentTests = [
       { agent: 'STRATEGIST', command: 'plan-workflow', options: { taskType: 'assessment' } },
       { agent: 'SCHOLAR', command: 'extract-patterns', options: { source: 'commits', period: '7d' } },

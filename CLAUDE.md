@@ -137,7 +137,7 @@ npm run cycle:full       # Run all 4 phases sequentially
 
 ### Multi-Agent System
 
-The system operates through 22 specialized agents coordinated via Linear.app:
+The system operates through 23 specialized agents coordinated via Linear.app:
 
 ```
 Linear.app (Task Management)
@@ -149,14 +149,19 @@ STRATEGIST (Orchestration) ← → PLANNER (Cycle Planning)
 │ (Assessment)│ (Fix Impl.)  │ (CI/CD Guard)  │ (Learning)   │
 └─────────────┴──────────────┴────────────────┴──────────────┘
        ↓              ↓               ↓                ↓
-[17 Specialized Agents for tech stack coverage]
+[17 Specialized Agents for tech stack & quality coverage]
 
 Tech Stack Specialists:
 • DJANGO-PRO, PYTHON-PRO, TYPESCRIPT-PRO
 • KUBERNETES-ARCHITECT, DEPLOYMENT-ENGINEER
 • DATABASE-OPTIMIZER, OBSERVABILITY-ENGINEER
-• CODE-REVIEWER, TEST-AUTOMATOR, LEGACY-MODERNIZER
-• DOC-KEEPER (Documentation validation & generation)
+
+Quality & Testing Specialists:
+• CODE-REVIEWER, TEST-AUTOMATOR, TESTER
+• LINTER, TYPECHECKER, VALIDATOR
+
+Migration & Documentation:
+• LEGACY-MODERNIZER, DOC-KEEPER, SECURITY
 ```
 
 **Agent Usage:**
