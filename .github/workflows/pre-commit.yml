@@ -49,6 +49,11 @@ jobs:
         run: |
           commits=$(git log --format=%s origin/${{ github.base_ref }}..HEAD)
           while IFS= read -r commit; do
+            # Skip merge commits (e.g., "Merge abc123 into def456")
+            if echo "$commit" | grep -qE '^Merge [0-9a-f]+ into [0-9a-f]+$'; then
+              echo "Skipping merge commit: $commit"
+              continue
+            fi
             if ! echo "$commit" | grep -E '^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\(.+\))?: .+$'; then
               echo "Commit message does not follow Conventional Commits specification:"
               echo "$commit"
