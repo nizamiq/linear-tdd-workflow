@@ -306,3 +306,51 @@ jobs:
           draft: false
           prerelease: false
           generate_release_notes: true
+  # Status check aggregators for branch protection
+  # Branch protection rules require checks named: test, lint, typecheck, build
+  status-test:
+    name: test
+    runs-on: ubuntu-latest
+    needs: [test]
+    if: always()
+    steps:
+      - run: |
+          if [ "${{ needs.test.result }}" == "success" ] || [ "${{ needs.test.result }}" == "skipped" ]; then
+            echo "✅ Test check passed"
+            exit 0
+          else
+            echo "❌ Test check failed"
+            exit 1
+          fi
+
+  status-lint:
+    name: lint
+    runs-on: ubuntu-latest
+    needs: [test]
+    if: always()
+    steps:
+      - run: |
+          # Lint runs as part of test job
+          if [ "${{ needs.test.result }}" == "success" ] || [ "${{ needs.test.result }}" == "skipped" ]; then
+            echo "✅ Lint check passed"
+            exit 0
+          else
+            echo "❌ Lint check failed"
+            exit 1
+          fi
+
+  status-typecheck:
+    name: typecheck
+    runs-on: ubuntu-latest
+    needs: [test]
+    if: always()
+    steps:
+      - run: |
+          # Typecheck runs as part of test job
+          if [ "${{ needs.test.result }}" == "success" ] || [ "${{ needs.test.result }}" == "skipped" ]; then
+            echo "✅ Typecheck passed"
+            exit 0
+          else
+            echo "❌ Typecheck failed"
+            exit 1
+          fi
