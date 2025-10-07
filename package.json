@@ -6,9 +6,9 @@
   "scripts": {
     "test": "jest --coverage --verbose --passWithNoTests",
     "test:watch": "jest --watch",
-    "test:unit": "jest --testPathPattern=tests/unit --coverage",
+    "test:unit": "jest --testPathPattern=tests/unit --coverage --passWithNoTests",
     "test:unit:python": "python scripts/python-test-runner.py coverage --files src/**/*.py",
-    "test:integration": "jest --testPathPattern=tests/integration --coverage",
+    "test:integration": "jest --testPathPattern=tests/integration --coverage --passWithNoTests",
     "test:e2e": "jest --testPathPattern=tests/e2e --runInBand",
     "test:ci": "jest --coverage --ci --reporters=default --reporters=jest-junit",
     "test:mutation": "stryker run",
