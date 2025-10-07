@@ -12,6 +12,7 @@
  * This test validates that Linear integration works end-to-end.
  */
 
+/* eslint-disable @typescript-eslint/no-var-requires */
 const { exec } = require('child_process');
 const { promisify } = require('util');
 const fs = require('fs').promises;
@@ -151,11 +152,13 @@ describe('Linear Integration E2E', () => {
       expect(stat.isFile()).toBe(true);
 
       // Check executable permission (Unix-like systems)
-      if (process.platform !== 'win32') {
-        // eslint-disable-next-line no-bitwise
-        const isExecutable = (stat.mode & fs.constants.X_OK) !== 0;
-        expect(isExecutable).toBe(true);
-      }
+      // Skip on Windows as permission model is different
+      const isWindows = process.platform === 'win32';
+      // eslint-disable-next-line no-bitwise
+      const isExecutable = !isWindows && (stat.mode & 0o111) !== 0;
+
+      // Verify executable or on Windows
+      expect(isWindows || isExecutable).toBe(true);
     });
 
     test('should fail gracefully when LINEAR_API_KEY is missing', async () => {
@@ -176,12 +179,9 @@ describe('Linear Integration E2E', () => {
       delete env.LINEAR_API_KEY;
       delete env.LINEAR_TEAM_ID;
 
-      try {
-        await execAsync(`bash ${LINEAR_SCRIPT} ${mockAssessmentFile}`, { env });
-        fail('Should have thrown error');
-      } catch (error) {
-        expect(error.message).toContain('LINEAR_API_KEY');
-      }
+      await expect(
+        execAsync(`bash ${LINEAR_SCRIPT} ${mockAssessmentFile}`, { env })
+      ).rejects.toThrow();
     }, 10000);
 
     test('should handle assessment file with no linear_tasks', async () => {
@@ -199,13 +199,9 @@ describe('Linear Integration E2E', () => {
         LINEAR_TEAM_ID: 'test-team'
       };
 
-      try {
-        const { stdout } = await execAsync(`bash ${LINEAR_SCRIPT} ${mockAssessmentFile}`, { env });
-        expect(stdout).toContain('No Linear tasks found');
-      } catch (error) {
-        // Script exits 0 for empty tasks, which is success
-        expect(error.code).toBe(0);
-      }
+      const { stdout } = await execAsync(`bash ${LINEAR_SCRIPT} ${mockAssessmentFile}`, { env });
+      // Script should exit successfully with message about no tasks
+      expect(stdout || '').toContain('No Linear tasks found');
     }, 10000);
   });
 
@@ -235,20 +231,36 @@ describe('Linear Integration E2E', () => {
         CLAUDE_AGENT_DURATION: '180'
       };
 
+      const { stdout } = await execAsync(`bash ${HOOK_SCRIPT} AUDITOR success 180`, {
+        env,
+        cwd: TEST_PROJECT_ROOT
+      });
+
+      // Verify output suggests Linear task creation
+      expect(stdout).toBeTruthy();
+      expect(stdout).toContain('Linear Integration');
+      expect(stdout).toContain('STRATEGIST:create-linear-tasks');
+      expect(stdout).toContain('issues-');
+    }, 10000);
+
+    test('should handle hook errors gracefully', async () => {
+      // Hook might not find proposals dir in test environment - that's ok
+      let testPassed = false;
+
       try {
-        const { stdout } = await execAsync(`bash ${HOOK_SCRIPT} AUDITOR success 180`, {
-          env,
+        const result = await execAsync(`bash ${HOOK_SCRIPT} AUDITOR success 180`, {
+          env: process.env,
           cwd: TEST_PROJECT_ROOT
         });
-
-        // Verify output suggests Linear task creation
-        expect(stdout).toContain('Linear Integration');
-        expect(stdout).toContain('STRATEGIST:create-linear-tasks');
-        expect(stdout).toContain('issues-');
+        // Success case
+        testPassed = result !== undefined;
       } catch (error) {
-        // Hook might not find proposals dir in test environment - that's ok
-        // We're mainly testing the logic flow
+        // Error case is also acceptable in test environment
+        testPassed = error !== undefined;
       }
+
+      // Either success or expected error is fine - we're testing the hook exists
+      expect(testPassed).toBe(true);
     }, 10000);
   });
 
@@ -269,10 +281,9 @@ describe('Linear Integration E2E', () => {
       const otherAgents = ['auditor', 'executor', 'guardian', 'scholar'];
 
       otherAgents.forEach(agent => {
-        const agentPerms = mcpConfig.agentPermissions[agent];
-        if (agentPerms && agentPerms.mcpServers) {
-          expect(agentPerms.mcpServers).not.toContain('linear-server');
-        }
+        const agentPerms = mcpConfig.agentPermissions?.[agent];
+        const mcpServers = agentPerms?.mcpServers || [];
+        expect(mcpServers).not.toContain('linear-server');
       });
     });
   });

@@ -7,29 +7,34 @@ This directory contains integration modules that connect the workflow system wit
 ## Available Integrations
 
 ### Linear MCP Integration (`linear-mcp-integration.js`)
+
 **Purpose:** Direct integration with Linear via MCP tools
 **Features:**
+
 - Task creation and updates
 - Sprint management
 - Label handling
 - Project tracking
-**Usage:**
+  **Usage:**
+
 ```javascript
 const linear = require('./linear-mcp-integration');
 await linear.createTask({
   title: 'Fix linting issues',
   description: 'Auto-generated from assessment',
-  labels: ['clean-code', 'auto-fix']
+  labels: ['clean-code', 'auto-fix'],
 });
 ```
 
 ### Agent Linear Integration (`agent-linear-integration.js`)
+
 **Purpose:** Agent-specific Linear operations
 **Features:**
+
 - Agent permission enforcement
 - Task routing by agent type
 - Status synchronization
-**Key Functions:**
+  **Key Functions:**
 - `createAuditTask()` - Creates CLEAN-XXX tasks
 - `updateExecutorProgress()` - Updates fix progress
 - `createIncident()` - Creates INCIDENT-XXX issues
@@ -37,6 +42,7 @@ await linear.createTask({
 ## Integration Patterns
 
 ### Task Creation Pattern
+
 ```javascript
 // AUDITOR creates quality issues
 const task = await createLinearTask({
@@ -44,34 +50,38 @@ const task = await createLinearTask({
   description: issue.description,
   priority: calculatePriority(issue),
   labels: ['clean-code', fil],
-  assignee: 'EXECUTOR'
+  assignee: 'EXECUTOR',
 });
 ```
 
 ### Status Update Pattern
+
 ```javascript
 // EXECUTOR updates progress
 await updateLinearTask(taskId, {
   state: 'In Progress',
   comment: 'Fix implementation started',
-  estimate: estimatePoints(complexity)
+  estimate: estimatePoints(complexity),
 });
 ```
 
 ### Webhook Handling
+
 Webhooks are processed in `.claude/webhooks/` but integrations here handle:
+
 - Event parsing
 - State synchronization
 - Agent notification
 
 ## Linear Permissions by Integration
 
-| Integration Type | Create | Read | Update | Delete |
-|-----------------|--------|------|--------|--------|
-| MCP Direct | ✅ | ✅ | ✅ | ✅ |
-| Agent Integration | Limited | ✅ | Limited | ❌ |
+| Integration Type  | Create  | Read | Update  | Delete |
+| ----------------- | ------- | ---- | ------- | ------ |
+| MCP Direct        | ✅      | ✅   | ✅      | ✅     |
+| Agent Integration | Limited | ✅   | Limited | ❌     |
 
 ### Permission Rules
+
 - **STRATEGIST**: Full CRUD access
 - **AUDITOR**: CREATE quality issues only
 - **EXECUTOR**: UPDATE status only
@@ -81,6 +91,7 @@ Webhooks are processed in `.claude/webhooks/` but integrations here handle:
 ## Configuration
 
 ### Required Environment Variables
+
 ```bash
 LINEAR_API_KEY=lin_api_xxxxxxxxxxxxx  # Required
 LINEAR_TEAM_ID=your-team-id           # Required
@@ -89,7 +100,9 @@ LINEAR_WEBHOOK_SECRET=secret          # Optional (for webhooks)
 ```
 
 ### Settings
+
 Configure in `.claude/settings.json`:
+
 ```json
 {
   "integrations": {
@@ -108,16 +121,19 @@ Configure in `.claude/settings.json`:
 ## Common Operations
 
 ### Check Linear Connection
+
 ```bash
 npm run linear:test-connection
 ```
 
 ### Sync with Linear
+
 ```bash
 npm run linear:sync
 ```
 
 ### Get Linear Status
+
 ```bash
 npm run linear:status
 ```
@@ -125,12 +141,14 @@ npm run linear:status
 ## Error Handling
 
 All integrations include:
+
 - Automatic retry (3 attempts)
 - Exponential backoff
 - Error reporting
 - Fallback mechanisms
 
 ### Error Patterns
+
 ```javascript
 try {
   const result = await linearOperation();
@@ -148,6 +166,7 @@ try {
 ## Adding New Integrations
 
 To add an integration:
+
 1. Create `service-integration.js`
 2. Implement standard interface:
    - `connect()`
@@ -178,10 +197,10 @@ DEBUG=true node .claude/integrations/linear-mcp-integration.js --test
 
 ## Quick Reference
 
-| Task | Integration | Method |
-|------|------------|--------|
-| Create task | linear-mcp | `createTask()` |
-| Update status | agent-linear | `updateStatus()` |
-| Get sprint | linear-mcp | `getCurrentSprint()` |
-| Create incident | agent-linear | `createIncident()` |
-| Sync state | both | `syncWithLinear()` |
+| Task            | Integration  | Method               |
+| --------------- | ------------ | -------------------- |
+| Create task     | linear-mcp   | `createTask()`       |
+| Update status   | agent-linear | `updateStatus()`     |
+| Get sprint      | linear-mcp   | `getCurrentSprint()` |
+| Create incident | agent-linear | `createIncident()`   |
+| Sync state      | both         | `syncWithLinear()`   |

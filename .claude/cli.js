@@ -20,7 +20,7 @@ const colors = {
   yellow: (text) => `\x1b[33m${text}\x1b[0m`,
   blue: (text) => `\x1b[34m${text}\x1b[0m`,
   cyan: (text) => `\x1b[36m${text}\x1b[0m`,
-  bold: (text) => `\x1b[1m${text}\x1b[0m`
+  bold: (text) => `\x1b[1m${text}\x1b[0m`,
 };
 
 class ClaudeCLI {
@@ -47,7 +47,7 @@ class ClaudeCLI {
       .description('Show available agents and slash commands')
       .action(async () => {
         console.log(colors.bold('\n🤖 Claude Code Native Integration\n'));
-        console.log('This system now uses Claude Code\'s native agent discovery.');
+        console.log("This system now uses Claude Code's native agent discovery.");
         console.log('\nCore Workflow Commands:');
         console.log('  ' + colors.cyan('/assess') + ' - Code quality assessment (AUDITOR)');
         console.log('  ' + colors.cyan('/fix <TASK-ID>') + ' - Implement fix with TDD (EXECUTOR)');
@@ -60,17 +60,25 @@ class ClaudeCLI {
         console.log('\nDevelopment Commands:');
         console.log('  ' + colors.cyan('/django') + ' - Django development (DJANGO-PRO)');
         console.log('  ' + colors.cyan('/python') + ' - Python optimization (PYTHON-PRO)');
-        console.log('  ' + colors.cyan('/typescript') + ' - TypeScript development (TYPESCRIPT-PRO)');
+        console.log(
+          '  ' + colors.cyan('/typescript') + ' - TypeScript development (TYPESCRIPT-PRO)',
+        );
 
         console.log('\nInfrastructure Commands:');
-        console.log('  ' + colors.cyan('/deploy') + ' - Production deployment (DEPLOYMENT-ENGINEER)');
-        console.log('  ' + colors.cyan('/optimize-db') + ' - Database optimization (DATABASE-OPTIMIZER)');
-        console.log('  ' + colors.cyan('/monitor') + ' - Observability setup (OBSERVABILITY-ENGINEER)');
+        console.log(
+          '  ' + colors.cyan('/deploy') + ' - Production deployment (DEPLOYMENT-ENGINEER)',
+        );
+        console.log(
+          '  ' + colors.cyan('/optimize-db') + ' - Database optimization (DATABASE-OPTIMIZER)',
+        );
+        console.log(
+          '  ' + colors.cyan('/monitor') + ' - Observability setup (OBSERVABILITY-ENGINEER)',
+        );
 
         console.log('\nAgent Files:');
         const agentFiles = await fs.readdir(path.join(this.claudeDir, 'agents'));
-        const mdAgents = agentFiles.filter(f => f.endsWith('.md'));
-        mdAgents.forEach(agent => {
+        const mdAgents = agentFiles.filter((f) => f.endsWith('.md'));
+        mdAgents.forEach((agent) => {
           console.log('  ' + colors.green('✓') + ' .claude/agents/' + agent);
         });
 
@@ -90,11 +98,11 @@ class ClaudeCLI {
       .option('--task-id <id>', 'Linear task ID (for fix journey)')
       .action(async (name, options) => {
         const journeyMap = {
-          'assess': 'jr2-assessment.js',
-          'fix': 'jr3-fix-pack.js',
-          'recover': 'jr4-ci-recovery.js',
-          'learn': 'jr5-pattern-mining.js',
-          'release': 'jr6-release.js'
+          assess: 'jr2-assessment.js',
+          fix: 'jr3-fix-pack.js',
+          recover: 'jr4-ci-recovery.js',
+          learn: 'jr5-pattern-mining.js',
+          release: 'jr6-release.js',
         };
 
         const journeyFile = journeyMap[name];
@@ -132,12 +140,12 @@ class ClaudeCLI {
 
         // Check for agents
         const agentFiles = await fs.readdir(path.join(this.claudeDir, 'agents'));
-        const mdAgents = agentFiles.filter(f => f.endsWith('.md'));
+        const mdAgents = agentFiles.filter((f) => f.endsWith('.md'));
         console.log(colors.green('✓') + ` ${mdAgents.length} agents available`);
 
         // Check for commands
         const commandFiles = await fs.readdir(path.join(this.claudeDir, 'commands'));
-        const mdCommands = commandFiles.filter(f => f.endsWith('.md') && !f.includes('README'));
+        const mdCommands = commandFiles.filter((f) => f.endsWith('.md') && !f.includes('README'));
         console.log(colors.green('✓') + ` ${mdCommands.length} slash commands available`);
 
         // Check Linear config
@@ -168,17 +176,33 @@ class ClaudeCLI {
           // Development
           { command: '/django', description: 'Django development', agent: 'django-pro' },
           { command: '/python', description: 'Python optimization', agent: 'python-pro' },
-          { command: '/typescript', description: 'TypeScript development', agent: 'typescript-pro' },
+          {
+            command: '/typescript',
+            description: 'TypeScript development',
+            agent: 'typescript-pro',
+          },
           // Infrastructure
-          { command: '/deploy', description: 'Production deployment', agent: 'deployment-engineer' },
-          { command: '/optimize-db', description: 'Database optimization', agent: 'database-optimizer' },
-          { command: '/monitor', description: 'Observability setup', agent: 'observability-engineer' }
+          {
+            command: '/deploy',
+            description: 'Production deployment',
+            agent: 'deployment-engineer',
+          },
+          {
+            command: '/optimize-db',
+            description: 'Database optimization',
+            agent: 'database-optimizer',
+          },
+          {
+            command: '/monitor',
+            description: 'Observability setup',
+            agent: 'observability-engineer',
+          },
         ];
 
         if (options.json) {
           console.log(JSON.stringify(commands, null, 2));
         } else {
-          commands.forEach(cmd => {
+          commands.forEach((cmd) => {
             console.log(`${cmd.command} - ${cmd.description} (${cmd.agent})`);
           });
         }
@@ -188,7 +212,7 @@ class ClaudeCLI {
 
 // Run CLI
 const cli = new ClaudeCLI();
-cli.run().catch(error => {
+cli.run().catch((error) => {
   console.error(colors.red(`Error: ${error.message}`));
   process.exit(1);
 });

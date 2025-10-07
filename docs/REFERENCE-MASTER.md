@@ -67,49 +67,56 @@ npm run assess
 ## Core Documentation Map
 
 ### 🎯 Workflows (Process & Methodology)
-| Document | Purpose | Reading Time |
-|----------|---------|--------------|
-| [WORKFLOW-TDD-PROTOCOL.md](WORKFLOW-TDD-PROTOCOL.md) | Complete TDD methodology and testing standards | 15 min |
-| [WORKFLOW-PRODUCT-REQUIREMENTS.md](WORKFLOW-PRODUCT-REQUIREMENTS.md) | Product vision, requirements, success metrics | 20 min |
-| [WORKFLOW-CLEAN-CODE-ASSESSMENT.md](WORKFLOW-CLEAN-CODE-ASSESSMENT.md) | Code quality assessment framework | 20 min |
+
+| Document                                                               | Purpose                                        | Reading Time |
+| ---------------------------------------------------------------------- | ---------------------------------------------- | ------------ |
+| [WORKFLOW-TDD-PROTOCOL.md](WORKFLOW-TDD-PROTOCOL.md)                   | Complete TDD methodology and testing standards | 15 min       |
+| [WORKFLOW-PRODUCT-REQUIREMENTS.md](WORKFLOW-PRODUCT-REQUIREMENTS.md)   | Product vision, requirements, success metrics  | 20 min       |
+| [WORKFLOW-CLEAN-CODE-ASSESSMENT.md](WORKFLOW-CLEAN-CODE-ASSESSMENT.md) | Code quality assessment framework              | 20 min       |
 
 ### 🏗️ Architecture (System Design)
-| Document | Purpose | Reading Time |
-|----------|---------|--------------|
-| [ARCHITECTURE-AGENTS.md](ARCHITECTURE-AGENTS.md) | Complete 20-agent system specification | 30 min |
-| [JOURNEYS.md](JOURNEYS.md) | Autonomous journey system (JR-1 to JR-6) | 15 min |
-| [Agent System Reference](../.claude/agents/CLAUDE.md) | Agent quick reference and MCP matrix | 10 min |
-| [Agent Selection Guide](../.claude/agents/AGENT-SELECTION-GUIDE.md) | Decision trees for choosing agents | 5 min |
-| [Linear Operations Guide](../.claude/agents/LINEAR-OPERATIONS-GUIDE.md) | Linear task management clarity | 5 min |
+
+| Document                                                                | Purpose                                  | Reading Time |
+| ----------------------------------------------------------------------- | ---------------------------------------- | ------------ |
+| [ARCHITECTURE-AGENTS.md](ARCHITECTURE-AGENTS.md)                        | Complete 20-agent system specification   | 30 min       |
+| [JOURNEYS.md](JOURNEYS.md)                                              | Autonomous journey system (JR-1 to JR-6) | 15 min       |
+| [Agent System Reference](../.claude/agents/CLAUDE.md)                   | Agent quick reference and MCP matrix     | 10 min       |
+| [Agent Selection Guide](../.claude/agents/AGENT-SELECTION-GUIDE.md)     | Decision trees for choosing agents       | 5 min        |
+| [Linear Operations Guide](../.claude/agents/LINEAR-OPERATIONS-GUIDE.md) | Linear task management clarity           | 5 min        |
 
 ### 🔌 Integrations (External Systems)
-| Document | Purpose | Reading Time |
-|----------|---------|--------------|
-| [INTEGRATION-LINEAR.md](INTEGRATION-LINEAR.md) | Linear.app task management integration | 25 min |
-| [INTEGRATION-GITFLOW.md](INTEGRATION-GITFLOW.md) | GitFlow branching and version control | 10 min |
-| [INTEGRATION-MCP-TOOLS.md](INTEGRATION-MCP-TOOLS.md) | Model Context Protocol tools | 10 min |
+
+| Document                                             | Purpose                                | Reading Time |
+| ---------------------------------------------------- | -------------------------------------- | ------------ |
+| [INTEGRATION-LINEAR.md](INTEGRATION-LINEAR.md)       | Linear.app task management integration | 25 min       |
+| [INTEGRATION-GITFLOW.md](INTEGRATION-GITFLOW.md)     | GitFlow branching and version control  | 10 min       |
+| [INTEGRATION-MCP-TOOLS.md](INTEGRATION-MCP-TOOLS.md) | Model Context Protocol tools           | 10 min       |
 
 ### 📚 Reference (Guides & History)
-| Document | Purpose | Reading Time |
-|----------|---------|--------------|
-| **REFERENCE-MASTER.md** (this doc) | Complete reference hub and navigation | 10 min |
-| [PROJECT-HISTORY.md](PROJECT-HISTORY.md) | Project evolution and optimization history | 15 min |
+
+| Document                                 | Purpose                                    | Reading Time |
+| ---------------------------------------- | ------------------------------------------ | ------------ |
+| **REFERENCE-MASTER.md** (this doc)       | Complete reference hub and navigation      | 10 min       |
+| [PROJECT-HISTORY.md](PROJECT-HISTORY.md) | Project evolution and optimization history | 15 min       |
 
 ## Developer Journey Maps
 
 ### Journey 1: "Getting Started"
+
 1. Start here → Quick Start Guide (above)
 2. Understand vision → [WORKFLOW-PRODUCT-REQUIREMENTS.md](WORKFLOW-PRODUCT-REQUIREMENTS.md)
 3. Learn methodology → [WORKFLOW-TDD-PROTOCOL.md](WORKFLOW-TDD-PROTOCOL.md)
 4. Setup tools → [INTEGRATION-LINEAR.md](INTEGRATION-LINEAR.md)
 
 ### Journey 2: "Contributing Code"
+
 1. Setup Git → [INTEGRATION-GITFLOW.md](INTEGRATION-GITFLOW.md)
 2. Write tests → [WORKFLOW-TDD-PROTOCOL.md](WORKFLOW-TDD-PROTOCOL.md)
 3. Meet standards → [WORKFLOW-CLEAN-CODE-ASSESSMENT.md](WORKFLOW-CLEAN-CODE-ASSESSMENT.md)
 4. Use agents → [Agent Selection Guide](../.claude/agents/AGENT-SELECTION-GUIDE.md)
 
 ### Journey 3: "Working with AI Agents"
+
 1. Understand system → [ARCHITECTURE-AGENTS.md](ARCHITECTURE-AGENTS.md)
 2. Choose agents → [Agent Selection Guide](../.claude/agents/AGENT-SELECTION-GUIDE.md)
 3. Manage tasks → [Linear Operations Guide](../.claude/agents/LINEAR-OPERATIONS-GUIDE.md)
@@ -122,6 +129,7 @@ npm run assess
 ## Development Commands
 
 ### Testing
+
 ```bash
 npm test                          # Run all tests with coverage
 npm test:unit                     # Unit tests only
@@ -132,6 +140,7 @@ npm test -- path/to/test.spec.ts # Run specific test
 ```
 
 ### Code Quality
+
 ```bash
 npm run lint                      # Lint and auto-fix
 npm run lint:check                # Check without fixing
@@ -141,6 +150,7 @@ npm run precommit                 # All pre-commit checks
 ```
 
 ### Building
+
 ```bash
 npm run build                     # Compile TypeScript
 npm run build:watch               # Watch mode compilation
@@ -150,6 +160,7 @@ npm run clean                     # Clean build artifacts
 ## Agent Operations
 
 ### Core Operations
+
 ```bash
 npm run assess                    # Run code assessment
 npm run execute:fixpack           # Execute approved fixes
@@ -159,6 +170,7 @@ npm run agents:status             # Check agent status
 ```
 
 ### Agent Invocation
+
 ```bash
 # Standard pattern
 npm run agent:invoke <AGENT>:<COMMAND> -- [parameters]
@@ -173,6 +185,7 @@ npm run agent:invoke GUARDIAN:analyze-failure -- --auto-fix
 ## Linear Task Management
 
 ### Task Operations (STRATEGIST only)
+
 ```bash
 npm run linear:create-sprint      # Create new sprint
 npm run linear:assign-tasks       # Assign tasks to agents
@@ -181,6 +194,7 @@ npm run linear:close-cycle        # Close current cycle
 ```
 
 ### Task Creation by Type
+
 ```bash
 # Quality issues (AUDITOR)
 npm run agent:invoke AUDITOR:create-backlog -- --team ACO
@@ -199,6 +213,7 @@ npm run agent:invoke STRATEGIST:create-task -- --type feature
 ## Writing Guidelines
 
 ### Document Structure
+
 ```markdown
 ---
 title: CATEGORY-NAME
@@ -211,21 +226,25 @@ tags: [relevant, tags]
 # Document Title
 
 ## Table of Contents
+
 [Generated TOC]
 
 ## Section 1
+
 Content...
 ```
 
 ### Naming Conventions
-- **WORKFLOW-*.md**: Process and methodology documents
-- **ARCHITECTURE-*.md**: System design documents
-- **INTEGRATION-*.md**: External system integrations
-- **REFERENCE-*.md**: Reference materials
+
+- **WORKFLOW-\*.md**: Process and methodology documents
+- **ARCHITECTURE-\*.md**: System design documents
+- **INTEGRATION-\*.md**: External system integrations
+- **REFERENCE-\*.md**: Reference materials
 
 ### Content Standards
 
 #### Clarity Rules
+
 1. **One concept per paragraph**
 2. **Examples for every complex concept**
 3. **Clear headings hierarchy** (H1 → H2 → H3)
@@ -233,6 +252,7 @@ Content...
 5. **Tables for comparisons**
 
 #### Code Examples
+
 ```language
 # Always include:
 # 1. Context comment
@@ -241,18 +261,19 @@ Content...
 ```
 
 #### Cross-References
+
 - Use relative paths: `[Link Text](../path/to/doc.md)`
 - Include section anchors: `[Link Text](doc.md#section-name)`
 - Verify links before commit
 
 ### Maintenance Schedule
 
-| Document Type | Review Frequency | Owner |
-|--------------|------------------|-------|
-| Workflows | Monthly | Product Team |
-| Architecture | Quarterly | Tech Leads |
-| Integrations | On change | DevOps |
-| Reference | Weekly | All |
+| Document Type | Review Frequency | Owner        |
+| ------------- | ---------------- | ------------ |
+| Workflows     | Monthly          | Product Team |
+| Architecture  | Quarterly        | Tech Leads   |
+| Integrations  | On change        | DevOps       |
+| Reference     | Weekly           | All          |
 
 ---
 
@@ -303,6 +324,7 @@ Content...
 ## REST Endpoints
 
 ### Assessment API
+
 ```bash
 POST /api/assess
   Body: { scope: "full|incremental", depth: "shallow|deep" }
@@ -313,6 +335,7 @@ GET /api/assessment/:id
 ```
 
 ### Task Management API
+
 ```bash
 POST /api/tasks
   Body: { type, title, description, priority }
@@ -324,6 +347,7 @@ PUT /api/tasks/:id
 ```
 
 ### Agent Control API
+
 ```bash
 POST /api/agents/:name/invoke
   Body: { command, parameters }
@@ -336,6 +360,7 @@ GET /api/agents/status
 ## MCP Tool Specifications
 
 ### Available Tools
+
 - **sequential-thinking**: Complex reasoning chains
 - **context7**: Code context understanding
 - **playwright**: Browser automation for E2E testing
@@ -351,17 +376,20 @@ See [INTEGRATION-MCP-TOOLS.md](INTEGRATION-MCP-TOOLS.md) for detailed specificat
 ## External Resources
 
 ### Official Documentation
+
 - [Linear.app API](https://developers.linear.app)
 - [MCP Specification](https://modelcontextprotocol.org)
 - [GitFlow Guide](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow)
 - [Claude Code](https://claude.ai/code)
 
 ### Community Resources
+
 - [GitHub Repository](https://github.com/your-org/linear-tdd-workflow)
 - [Issue Tracker](https://github.com/your-org/linear-tdd-workflow/issues)
 - [Discussions](https://github.com/your-org/linear-tdd-workflow/discussions)
 
 ### Training Materials
+
 - TDD Workshop Materials
 - Clean Code Principles Guide
 - Agent System Tutorial Videos
@@ -369,12 +397,14 @@ See [INTEGRATION-MCP-TOOLS.md](INTEGRATION-MCP-TOOLS.md) for detailed specificat
 ## Internal Resources
 
 ### Configuration Files
+
 - `.env.example` - Environment template
 - `.claude/agents/` - Agent specifications
 - `package.json` - Dependencies and scripts
 - `tsconfig.json` - TypeScript configuration
 
 ### Key Directories
+
 ```
 /docs         # Documentation
 /.claude      # Agent configurations
@@ -441,4 +471,4 @@ A: Follow standards in Section 4, review on schedule, treat docs as code.
 
 ---
 
-*Last Updated: November 27, 2024 | Version 2.0.0 | Consolidated Reference*
+_Last Updated: November 27, 2024 | Version 2.0.0 | Consolidated Reference_

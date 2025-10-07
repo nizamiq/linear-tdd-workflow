@@ -20,12 +20,14 @@ Quick solutions for common installation and setup issues with the Claude Agentic
 ### 1. Installation Script Fails
 
 #### Problem: `../claude-workflow/scripts/install.sh` not found
+
 ```bash
 # Error: No such file or directory
 bash: ../claude-workflow/scripts/install.sh: No such file or directory
 ```
 
 **Solution:**
+
 ```bash
 # Check if you cloned to the right location
 ls ../claude-workflow/scripts/install.sh
@@ -40,12 +42,14 @@ cd your-project # Return to your project
 ```
 
 #### Problem: Permission denied during installation
+
 ```bash
 # Error: Permission denied
 bash: ../claude-workflow/scripts/install.sh: Permission denied
 ```
 
 **Solution:**
+
 ```bash
 # Make script executable
 chmod +x ../claude-workflow/scripts/install.sh
@@ -57,9 +61,11 @@ chmod +x ../claude-workflow/scripts/install.sh
 ### 2. Directory Structure Issues
 
 #### Problem: Nested `.claude/.claude/` directories
+
 This happens if you clone directly into `.claude` instead of using parallel installation.
 
 **Solution:**
+
 ```bash
 # Remove incorrect structure
 rm -rf .claude/
@@ -72,7 +78,9 @@ cd your-project
 ```
 
 #### Problem: Missing `.claude` directory after installation
+
 **Solution:**
+
 ```bash
 # Check if installation completed
 ls -la .claude/
@@ -87,11 +95,13 @@ ls -la .claude/
 ### 3. Node.js and npm Issues
 
 #### Problem: Node.js version too old
+
 ```bash
 # Error: Node.js version 16.x.x is too old (≥18.0.0 required)
 ```
 
 **Solution:**
+
 ```bash
 # Update Node.js using nvm (recommended)
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
@@ -104,11 +114,13 @@ nvm use 18
 ```
 
 #### Problem: npm install fails with permission errors
+
 ```bash
 # Error: EACCES: permission denied
 ```
 
 **Solution:**
+
 ```bash
 # Fix npm permissions (Linux/macOS)
 sudo chown -R $(whoami) ~/.npm
@@ -119,11 +131,13 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
 ```
 
 #### Problem: Package conflicts or lock file issues
+
 ```bash
 # Error: npm ERR! peer dep missing
 ```
 
 **Solution:**
+
 ```bash
 # Clear npm cache
 npm cache clean --force
@@ -138,11 +152,13 @@ npm install
 ### 4. CLI Not Working
 
 #### Problem: CLI script not responding
+
 ```bash
 # Error: node .claude/cli.js --version fails
 ```
 
 **Solution:**
+
 ```bash
 # Check if CLI exists
 ls -la .claude/cli.js
@@ -158,11 +174,13 @@ node .claude/cli.js --help
 ```
 
 #### Problem: "Cannot find module" errors
+
 ```bash
 # Error: Cannot find module 'some-package'
 ```
 
 **Solution:**
+
 ```bash
 # Install missing dependencies
 npm install
@@ -177,11 +195,13 @@ npm run validate
 ### 5. Test Configuration Problems
 
 #### Problem: Tests not running
+
 ```bash
 # Error: jest: command not found
 ```
 
 **Solution:**
+
 ```bash
 # Install Jest
 npm install --save-dev jest @types/jest ts-jest
@@ -200,11 +220,13 @@ npm test
 ```
 
 #### Problem: Test coverage too low
+
 ```bash
 # Error: Coverage threshold not met
 ```
 
 **Solution:**
+
 ```bash
 # Create sample tests to improve coverage
 mkdir -p tests/unit
@@ -225,11 +247,13 @@ npm run test:coverage
 ### 6. Git Configuration Issues
 
 #### Problem: Not a Git repository
+
 ```bash
 # Error: fatal: not a git repository
 ```
 
 **Solution:**
+
 ```bash
 # Initialize Git repository
 git init
@@ -242,11 +266,13 @@ git commit -m "feat: initialize project with Claude workflow"
 ```
 
 #### Problem: .env file tracked by Git
+
 ```bash
 # Error: .env should not be committed
 ```
 
 **Solution:**
+
 ```bash
 # Remove from Git tracking
 git rm --cached .env
@@ -262,7 +288,9 @@ git commit -m "fix: remove .env from Git tracking"
 ### 7. Environment Configuration
 
 #### Problem: Environment variables not loading
+
 **Solution:**
+
 ```bash
 # Create .env file
 cat > .env << 'EOF'
@@ -282,11 +310,13 @@ cp .env .env.example
 ### 8. Agent System Issues
 
 #### Problem: Agents not responding
+
 ```bash
 # Error: Agent invocation failed
 ```
 
 **Solution:**
+
 ```bash
 # Check agent specifications
 ls -la .claude/agents/
@@ -299,7 +329,9 @@ npm run agent:invoke AUDITOR:health-check
 ```
 
 #### Problem: Linear integration not working
+
 **Solution:**
+
 ```bash
 # Test Linear connection
 npm run linear:test-connection
@@ -315,6 +347,7 @@ npm run validate
 ## 🔍 Diagnostic Tools
 
 ### System Health Check
+
 ```bash
 # Comprehensive verification
 ./scripts/verify-installation.sh
@@ -327,6 +360,7 @@ cat .claude/installation-verification-*.log
 ```
 
 ### Interactive Troubleshooting
+
 ```bash
 # Start interactive menu
 ./scripts/troubleshoot.sh
@@ -339,6 +373,7 @@ cat .claude/installation-verification-*.log
 ```
 
 ### Manual Verification Commands
+
 ```bash
 # Check Node.js and npm
 node --version  # Should be ≥18.0.0
@@ -364,6 +399,7 @@ git log --oneline -5
 ## 🚨 Emergency Recovery
 
 ### Complete Reset
+
 If everything is broken, start fresh:
 
 ```bash
@@ -384,6 +420,7 @@ rm -rf node_modules/
 ```
 
 ### Rollback Installation
+
 ```bash
 # If you have Git history
 git log --oneline
@@ -400,6 +437,7 @@ rm -rf .claude/
 ## 📞 Getting Help
 
 ### Automated Diagnostics
+
 ```bash
 # Generate diagnostic report
 ./scripts/troubleshoot.sh --diagnostics > diagnosis.txt
@@ -408,6 +446,7 @@ rm -rf .claude/
 ```
 
 ### Manual Checks
+
 If automated tools don't work, collect this information:
 
 ```bash
@@ -428,6 +467,7 @@ cat .gitignore
 ```
 
 ### Log Files
+
 Check these files for detailed error information:
 
 ```bash
@@ -447,6 +487,7 @@ tail /var/log/system.log
 ## 🔧 Environment-Specific Issues
 
 ### macOS Issues
+
 ```bash
 # Xcode command line tools (if compilation fails)
 xcode-select --install
@@ -460,6 +501,7 @@ sudo chown -R $(whoami) /usr/local
 ```
 
 ### Linux Issues
+
 ```bash
 # Missing build tools
 sudo apt-get update
@@ -474,6 +516,7 @@ sudo chown -R $(whoami) ~/.npm
 ```
 
 ### Windows Issues
+
 ```bash
 # Use Git Bash or WSL for shell scripts
 # Install Node.js from nodejs.org

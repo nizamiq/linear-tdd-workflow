@@ -48,9 +48,7 @@
   "rollbackAvailable": false,
   "validation": {
     "ready": true,
-    "issues": [
-      "Security Scan check failed"
-    ],
+    "issues": ["Security Scan check failed"],
     "checks": {
       "Code Quality": {
         "passing": true,

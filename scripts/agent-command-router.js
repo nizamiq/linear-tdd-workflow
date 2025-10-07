@@ -28,7 +28,13 @@ class AgentCommandRouter {
    * Load agent configuration from .md frontmatter
    */
   async loadAgentConfig(agentName) {
-    const agentPath = path.join(__dirname, '..', '.claude', 'agents', `${agentName.toLowerCase()}.md`);
+    const agentPath = path.join(
+      __dirname,
+      '..',
+      '.claude',
+      'agents',
+      `${agentName.toLowerCase()}.md`,
+    );
 
     try {
       const content = await fs.readFile(agentPath, 'utf8');
@@ -91,7 +97,7 @@ class AgentCommandRouter {
     for (const lockPath of paths) {
       if (this.pathLocks.has(lockPath)) {
         // Release any locks we acquired so far
-        acquiredLocks.forEach(lock => this.pathLocks.delete(lock));
+        acquiredLocks.forEach((lock) => this.pathLocks.delete(lock));
         throw new Error(`Path ${lockPath} is locked by another agent`);
       }
 
@@ -106,7 +112,7 @@ class AgentCommandRouter {
    * Release path locks
    */
   releasePathLocks(locks) {
-    locks.forEach(lock => this.pathLocks.delete(lock));
+    locks.forEach((lock) => this.pathLocks.delete(lock));
   }
 
   /**
@@ -140,7 +146,7 @@ class AgentCommandRouter {
 
       // 3. Fan-out: Execute parallel assessments
       const assessmentPromises = partitions.map((partition, index) =>
-        this.executeAuditorPartition(auditorConfig, partition, index)
+        this.executeAuditorPartition(auditorConfig, partition, index),
       );
 
       const results = await Promise.all(assessmentPromises);
@@ -153,7 +159,6 @@ class AgentCommandRouter {
 
       spinner.succeed(`Assessment complete: ${mergedFindings.length} findings`);
       return mergedFindings;
-
     } catch (error) {
       spinner.fail(`Assessment failed: ${error.message}`);
       throw error;
@@ -193,9 +198,9 @@ class AgentCommandRouter {
           type: 'complexity',
           severity: 'medium',
           path: partition.path,
-          effort: 'small'
-        }
-      ]
+          effort: 'small',
+        },
+      ],
     };
   }
 
@@ -203,11 +208,11 @@ class AgentCommandRouter {
    * Merge assessment results and deduplicate
    */
   mergeAssessmentResults(results) {
-    const allFindings = results.flatMap(r => r.findings);
+    const allFindings = results.flatMap((r) => r.findings);
 
     // Deduplicate by path + type
     const unique = new Map();
-    allFindings.forEach(finding => {
+    allFindings.forEach((finding) => {
       const key = `${finding.path}:${finding.type}`;
       if (!unique.has(key)) {
         unique.set(key, finding);
@@ -248,11 +253,9 @@ class AgentCommandRouter {
         await this.executeTDDCycle(task, executorConfig);
 
         spinner.succeed(`Fix Pack ${taskId} implemented successfully`);
-
       } finally {
         this.releasePathLocks(locks);
       }
-
     } catch (error) {
       spinner.fail(`Fix Pack ${taskId} failed: ${error.message}`);
       throw error;
@@ -267,21 +270,21 @@ class AgentCommandRouter {
     await this.executeAgent('tester', {
       command: 'generate-failing-test',
       task: task,
-      diffCoverageTarget: 80
+      diffCoverageTarget: 80,
     });
 
     // GREEN: Minimal implementation
     await this.executeAgent('executor', {
       command: 'implement-minimal-fix',
       task: task,
-      maxLOC: executorConfig.fil?.maxLinesOfCode || 300
+      maxLOC: executorConfig.fil?.maxLinesOfCode || 300,
     });
 
     // Validate GREEN phase
     const coverage = await this.executeAgent('validator', {
       command: 'validate-coverage',
       task: task,
-      threshold: 80
+      threshold: 80,
     });
 
     if (coverage.diffCoverage < 80) {
@@ -291,7 +294,7 @@ class AgentCommandRouter {
     // REFACTOR: Improve with test safety
     await this.executeAgent('executor', {
       command: 'refactor-with-tests',
-      task: task
+      task: task,
     });
   }
 
@@ -312,13 +315,15 @@ class AgentCommandRouter {
       console.log(`Executing ${agentName}:${params.command}`);
 
       // Simulate execution time
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       return { success: true, data: params };
-
     } finally {
       // Decrement concurrency counter
-      this.concurrencyLimits.set(agentName, Math.max(0, (this.concurrencyLimits.get(agentName) || 0) - 1));
+      this.concurrencyLimits.set(
+        agentName,
+        Math.max(0, (this.concurrencyLimits.get(agentName) || 0) - 1),
+      );
     }
   }
 
@@ -331,7 +336,7 @@ class AgentCommandRouter {
       id: taskId,
       description: 'Fix complexity issue',
       files: ['src/utils.js'],
-      type: 'FIL-1'
+      type: 'FIL-1',
     };
   }
 

@@ -20,7 +20,7 @@ class AssessmentJourney {
       metrics: {},
       issues: [],
       proposals: [],
-      actions: []
+      actions: [],
     };
     this.decisions = [];
   }
@@ -53,7 +53,6 @@ class AssessmentJourney {
 
       console.log('✅ Assessment complete!');
       return this.results;
-
     } catch (error) {
       console.error('❌ Assessment failed:', error.message);
       await this.generateFailureReport(error);
@@ -68,40 +67,37 @@ class AssessmentJourney {
     console.log('📋 Determining assessment scope...');
 
     // Check last assessment time
-    const lastAssessmentPath = path.join(
-      this.projectRoot,
-      'assessments',
-      'last-assessment.json'
-    );
+    const lastAssessmentPath = path.join(this.projectRoot, 'assessments', 'last-assessment.json');
 
     let scope = 'full';
 
     try {
-      const lastAssessment = JSON.parse(
-        await fs.readFile(lastAssessmentPath, 'utf8')
-      );
+      const lastAssessment = JSON.parse(await fs.readFile(lastAssessmentPath, 'utf8'));
 
       const hoursSinceLastAssessment =
         (Date.now() - new Date(lastAssessment.timestamp)) / (1000 * 60 * 60);
 
       if (hoursSinceLastAssessment < 24) {
         scope = 'incremental';
-        console.log(`   📊 Using incremental scope (last assessment ${Math.round(hoursSinceLastAssessment)}h ago)`);
+        console.log(
+          `   📊 Using incremental scope (last assessment ${Math.round(hoursSinceLastAssessment)}h ago)`,
+        );
       } else {
-        console.log(`   📊 Using full scope (last assessment ${Math.round(hoursSinceLastAssessment)}h ago)`);
+        console.log(
+          `   📊 Using full scope (last assessment ${Math.round(hoursSinceLastAssessment)}h ago)`,
+        );
       }
 
       this.logDecision('scope_selection', {
         scope,
         reason: 'time-based',
-        hoursSince: hoursSinceLastAssessment
+        hoursSince: hoursSinceLastAssessment,
       });
-
     } catch {
       console.log('   📊 Using full scope (first assessment)');
       this.logDecision('scope_selection', {
         scope: 'full',
-        reason: 'first-run'
+        reason: 'first-run',
       });
     }
 
@@ -114,7 +110,7 @@ class AssessmentJourney {
     return {
       type: scope,
       files: await this.getScopeFiles(scope),
-      depth: options.depth || 'deep'
+      depth: options.depth || 'deep',
     };
   }
 
@@ -126,7 +122,7 @@ class AssessmentJourney {
       try {
         const changedFiles = execSync('git diff --name-only HEAD~1', { encoding: 'utf8' })
           .split('\n')
-          .filter(f => f && (f.endsWith('.js') || f.endsWith('.ts') || f.endsWith('.py')));
+          .filter((f) => f && (f.endsWith('.js') || f.endsWith('.ts') || f.endsWith('.py')));
 
         return changedFiles.length > 0 ? changedFiles : null;
       } catch {
@@ -149,12 +145,15 @@ class AssessmentJourney {
       security: await this.assessSecurity(scope),
       performance: await this.assessPerformance(scope),
       dependencies: await this.assessDependencies(scope),
-      documentation: await this.assessDocumentation(scope)
+      documentation: await this.assessDocumentation(scope),
     };
 
     // Aggregate issues from all dimensions
     const allIssues = [];
-    let criticalCount = 0, highCount = 0, mediumCount = 0, lowCount = 0;
+    let criticalCount = 0,
+      highCount = 0,
+      mediumCount = 0,
+      lowCount = 0;
 
     for (const [dimension, result] of Object.entries(dimensions)) {
       if (result.issues) {
@@ -163,10 +162,18 @@ class AssessmentJourney {
           allIssues.push(issue);
 
           switch (issue.severity) {
-            case 'critical': criticalCount++; break;
-            case 'high': highCount++; break;
-            case 'medium': mediumCount++; break;
-            case 'low': lowCount++; break;
+            case 'critical':
+              criticalCount++;
+              break;
+            case 'high':
+              highCount++;
+              break;
+            case 'medium':
+              mediumCount++;
+              break;
+            case 'low':
+              lowCount++;
+              break;
           }
         }
       }
@@ -189,8 +196,8 @@ class AssessmentJourney {
         critical: criticalCount,
         high: highCount,
         medium: mediumCount,
-        low: lowCount
-      }
+        low: lowCount,
+      },
     };
   }
 
@@ -222,7 +229,7 @@ class AssessmentJourney {
       { pattern: /class\s+\w+[\s\S]{2000,}/, type: 'large-class', severity: 'high' },
       { pattern: /if\s*\([\s\S]{200,}\)/, type: 'complex-condition', severity: 'medium' },
       { pattern: /(TODO|FIXME|HACK)/, type: 'technical-debt-marker', severity: 'low' },
-      { pattern: /console\.(log|warn|error)/, type: 'debug-code', severity: 'low' }
+      { pattern: /console\.(log|warn|error)/, type: 'debug-code', severity: 'low' },
     ];
 
     // Quick pattern-based detection
@@ -233,7 +240,7 @@ class AssessmentJourney {
         severity: smell.severity,
         category: 'code-smell',
         file: 'various',
-        message: `Detected ${smell.type.replace('-', ' ')}`
+        message: `Detected ${smell.type.replace('-', ' ')}`,
       });
     }
 
@@ -241,8 +248,8 @@ class AssessmentJourney {
       issues,
       metrics: {
         totalIssues: issues.length,
-        complexity: this.calculateAverageComplexity()
-      }
+        complexity: this.calculateAverageComplexity(),
+      },
     };
   }
 
@@ -268,7 +275,7 @@ class AssessmentJourney {
             severity: 'high',
             category: 'testing',
             metric: coveragePercent,
-            message: `Overall coverage is ${coveragePercent}% (target: 80%)`
+            message: `Overall coverage is ${coveragePercent}% (target: 80%)`,
           });
         } else if (coveragePercent < 80) {
           issues.push({
@@ -276,7 +283,7 @@ class AssessmentJourney {
             severity: 'medium',
             category: 'testing',
             metric: coveragePercent,
-            message: `Overall coverage is ${coveragePercent}% (target: 80%)`
+            message: `Overall coverage is ${coveragePercent}% (target: 80%)`,
           });
         }
 
@@ -284,8 +291,8 @@ class AssessmentJourney {
           issues,
           metrics: {
             overall: coveragePercent,
-            target: 80
-          }
+            target: 80,
+          },
         };
       }
     } catch (e) {
@@ -293,13 +300,15 @@ class AssessmentJourney {
     }
 
     return {
-      issues: [{
-        type: 'coverage-unknown',
-        severity: 'low',
-        category: 'testing',
-        message: 'Unable to determine test coverage'
-      }],
-      metrics: {}
+      issues: [
+        {
+          type: 'coverage-unknown',
+          severity: 'low',
+          category: 'testing',
+          message: 'Unable to determine test coverage',
+        },
+      ],
+      metrics: {},
     };
   }
 
@@ -314,23 +323,23 @@ class AssessmentJourney {
       {
         pattern: /api[_-]?key\s*=\s*["'][^"']+["']/i,
         type: 'hardcoded-api-key',
-        severity: 'critical'
+        severity: 'critical',
       },
       {
         pattern: /password\s*=\s*["'][^"']+["']/i,
         type: 'hardcoded-password',
-        severity: 'critical'
+        severity: 'critical',
       },
       {
         pattern: /eval\s*\(/,
         type: 'eval-usage',
-        severity: 'high'
+        severity: 'high',
       },
       {
         pattern: /innerHTML\s*=/,
         type: 'unsafe-dom-manipulation',
-        severity: 'medium'
-      }
+        severity: 'medium',
+      },
     ];
 
     // Quick security scan
@@ -339,15 +348,15 @@ class AssessmentJourney {
         type: pattern.type,
         severity: pattern.severity,
         category: 'security',
-        message: `Potential security issue: ${pattern.type.replace('-', ' ')}`
+        message: `Potential security issue: ${pattern.type.replace('-', ' ')}`,
       });
     }
 
     return {
       issues: issues.slice(0, 3), // Limit for demo
       metrics: {
-        criticalFindings: issues.filter(i => i.severity === 'critical').length
-      }
+        criticalFindings: issues.filter((i) => i.severity === 'critical').length,
+      },
     };
   }
 
@@ -362,18 +371,18 @@ class AssessmentJourney {
       {
         type: 'n-plus-one-query',
         severity: 'high',
-        category: 'performance'
+        category: 'performance',
       },
       {
         type: 'synchronous-io-in-loop',
         severity: 'medium',
-        category: 'performance'
+        category: 'performance',
       },
       {
         type: 'missing-index',
         severity: 'medium',
-        category: 'performance'
-      }
+        category: 'performance',
+      },
     ];
 
     // Simplified detection
@@ -384,8 +393,8 @@ class AssessmentJourney {
     return {
       issues,
       metrics: {
-        performanceScore: 85
-      }
+        performanceScore: 85,
+      },
     };
   }
 
@@ -403,7 +412,7 @@ class AssessmentJourney {
           type: 'outdated-dependencies',
           severity: 'medium',
           category: 'dependencies',
-          message: 'Some dependencies may be outdated'
+          message: 'Some dependencies may be outdated',
         });
       }
 
@@ -413,7 +422,7 @@ class AssessmentJourney {
           type: 'unpinned-dependencies',
           severity: 'low',
           category: 'dependencies',
-          message: 'Some Python dependencies are not pinned to specific versions'
+          message: 'Some Python dependencies are not pinned to specific versions',
         });
       }
     } catch (e) {
@@ -423,8 +432,8 @@ class AssessmentJourney {
     return {
       issues,
       metrics: {
-        totalDependencies: 0
-      }
+        totalDependencies: 0,
+      },
     };
   }
 
@@ -435,12 +444,12 @@ class AssessmentJourney {
     const issues = [];
 
     // Check for README
-    if (!await this.fileExists('README.md')) {
+    if (!(await this.fileExists('README.md'))) {
       issues.push({
         type: 'missing-readme',
         severity: 'medium',
         category: 'documentation',
-        message: 'Project lacks README.md documentation'
+        message: 'Project lacks README.md documentation',
       });
     }
 
@@ -449,14 +458,14 @@ class AssessmentJourney {
       type: 'insufficient-inline-docs',
       severity: 'low',
       category: 'documentation',
-      message: 'Code lacks comprehensive inline documentation'
+      message: 'Code lacks comprehensive inline documentation',
     });
 
     return {
       issues,
       metrics: {
-        documentationCoverage: 60
-      }
+        documentationCoverage: 60,
+      },
     };
   }
 
@@ -475,7 +484,7 @@ class AssessmentJourney {
         critical: 0,
         high: 1,
         medium: 2,
-        low: 3
+        low: 3,
       };
 
       const aScore = severityScore[a.severity] || 4;
@@ -490,7 +499,7 @@ class AssessmentJourney {
         testing: 2,
         'code-smell': 3,
         dependencies: 4,
-        documentation: 5
+        documentation: 5,
       };
 
       const aCat = categoryScore[a.category] || 6;
@@ -501,10 +510,10 @@ class AssessmentJourney {
 
     // Batch by priority
     const batches = {
-      immediate: prioritized.filter(i => i.severity === 'critical'),
-      currentSprint: prioritized.filter(i => i.severity === 'high').slice(0, 10),
-      nextSprint: prioritized.filter(i => i.severity === 'medium').slice(0, 20),
-      backlog: prioritized.filter(i => i.severity === 'low').slice(0, 30)
+      immediate: prioritized.filter((i) => i.severity === 'critical'),
+      currentSprint: prioritized.filter((i) => i.severity === 'high').slice(0, 10),
+      nextSprint: prioritized.filter((i) => i.severity === 'medium').slice(0, 20),
+      backlog: prioritized.filter((i) => i.severity === 'low').slice(0, 30),
     };
 
     console.log(`   📊 Priority batches:`);
@@ -515,7 +524,7 @@ class AssessmentJourney {
 
     this.logDecision('prioritization', {
       strategy: 'severity-first',
-      batches: Object.entries(batches).map(([k, v]) => ({ batch: k, count: v.length }))
+      batches: Object.entries(batches).map(([k, v]) => ({ batch: k, count: v.length })),
     });
 
     return batches;
@@ -531,10 +540,7 @@ class AssessmentJourney {
     let packId = 1;
 
     // Focus on immediate and current sprint issues
-    const targetIssues = [
-      ...priorities.immediate,
-      ...priorities.currentSprint
-    ];
+    const targetIssues = [...priorities.immediate, ...priorities.currentSprint];
 
     for (const issue of targetIssues) {
       // Determine FIL level
@@ -551,7 +557,7 @@ class AssessmentJourney {
           estimatedLOC: this.estimateLOC(issue),
           estimatedEffort: this.estimateEffort(issue),
           testStrategy: this.generateTestStrategy(issue),
-          implementation: this.generateImplementationPlan(issue)
+          implementation: this.generateImplementationPlan(issue),
         };
 
         // Ensure it meets constraints
@@ -562,8 +568,8 @@ class AssessmentJourney {
     }
 
     console.log(`   ✅ Generated ${fixPacks.length} Fix Packs`);
-    console.log(`      FIL-0: ${fixPacks.filter(f => f.fil === 0).length}`);
-    console.log(`      FIL-1: ${fixPacks.filter(f => f.fil === 1).length}`);
+    console.log(`      FIL-0: ${fixPacks.filter((f) => f.fil === 0).length}`);
+    console.log(`      FIL-1: ${fixPacks.filter((f) => f.fil === 1).length}`);
 
     this.results.proposals = fixPacks;
 
@@ -582,7 +588,7 @@ class AssessmentJourney {
     }
 
     // Prepare task data
-    const taskData = fixPacks.map(pack => ({
+    const taskData = fixPacks.map((pack) => ({
       type: 'fix-pack',
       title: pack.title,
       description: pack.description,
@@ -592,16 +598,12 @@ class AssessmentJourney {
       metadata: {
         issueType: pack.issue.type,
         dimension: pack.issue.dimension,
-        loc: pack.estimatedLOC
-      }
+        loc: pack.estimatedLOC,
+      },
     }));
 
     // Save for STRATEGIST to process
-    const tasksPath = path.join(
-      this.projectRoot,
-      'assessments',
-      `tasks-${Date.now()}.json`
-    );
+    const tasksPath = path.join(this.projectRoot, 'assessments', `tasks-${Date.now()}.json`);
 
     await this.ensureDirectory(path.dirname(tasksPath));
     await fs.writeFile(tasksPath, JSON.stringify(taskData, null, 2));
@@ -613,7 +615,7 @@ class AssessmentJourney {
     this.results.actions.push({
       type: 'linear-tasks-prepared',
       count: taskData.length,
-      file: tasksPath
+      file: tasksPath,
     });
   }
 
@@ -628,36 +630,31 @@ class AssessmentJourney {
       summary: {
         totalIssues: this.results.issues.length,
         proposedFixes: this.results.proposals.length,
-        dimensions: Object.keys(this.results.metrics)
+        dimensions: Object.keys(this.results.metrics),
       },
       metrics: this.results.metrics,
       issues: this.results.issues,
       proposals: this.results.proposals,
       decisions: this.decisions,
-      actions: this.results.actions
+      actions: this.results.actions,
     };
 
     // Save report
-    const reportPath = path.join(
-      this.projectRoot,
-      'assessments',
-      `assessment-${Date.now()}.json`
-    );
+    const reportPath = path.join(this.projectRoot, 'assessments', `assessment-${Date.now()}.json`);
 
     await this.ensureDirectory(path.dirname(reportPath));
     await fs.writeFile(reportPath, JSON.stringify(report, null, 2));
 
     // Update last assessment marker
-    const lastAssessmentPath = path.join(
-      this.projectRoot,
-      'assessments',
-      'last-assessment.json'
-    );
+    const lastAssessmentPath = path.join(this.projectRoot, 'assessments', 'last-assessment.json');
 
-    await fs.writeFile(lastAssessmentPath, JSON.stringify({
-      timestamp: this.timestamp,
-      reportFile: path.basename(reportPath)
-    }));
+    await fs.writeFile(
+      lastAssessmentPath,
+      JSON.stringify({
+        timestamp: this.timestamp,
+        reportFile: path.basename(reportPath),
+      }),
+    );
 
     console.log(`   ✅ Report saved to: ${path.relative(this.projectRoot, reportPath)}`);
 
@@ -679,13 +676,16 @@ class AssessmentJourney {
 - **Dimensions Analyzed:** ${report.summary.dimensions.join(', ')}
 
 ## Issue Breakdown
-- 🔴 Critical: ${report.issues.filter(i => i.severity === 'critical').length}
-- 🟠 High: ${report.issues.filter(i => i.severity === 'high').length}
-- 🟡 Medium: ${report.issues.filter(i => i.severity === 'medium').length}
-- 🟢 Low: ${report.issues.filter(i => i.severity === 'low').length}
+- 🔴 Critical: ${report.issues.filter((i) => i.severity === 'critical').length}
+- 🟠 High: ${report.issues.filter((i) => i.severity === 'high').length}
+- 🟡 Medium: ${report.issues.filter((i) => i.severity === 'medium').length}
+- 🟢 Low: ${report.issues.filter((i) => i.severity === 'low').length}
 
 ## Top Priorities
-${report.proposals.slice(0, 5).map(p => `- ${p.title} (FIL-${p.fil}, ~${p.estimatedEffort}h)`).join('\n')}
+${report.proposals
+  .slice(0, 5)
+  .map((p) => `- ${p.title} (FIL-${p.fil}, ~${p.estimatedEffort}h)`)
+  .join('\n')}
 
 ## Next Steps
 1. Review generated Fix Packs in Linear
@@ -695,11 +695,7 @@ ${report.proposals.slice(0, 5).map(p => `- ${p.title} (FIL-${p.fil}, ~${p.estima
 Generated by JR-2 Assessment Journey
 `;
 
-    const summaryPath = path.join(
-      this.projectRoot,
-      'assessments',
-      `summary-${Date.now()}.md`
-    );
+    const summaryPath = path.join(this.projectRoot, 'assessments', `summary-${Date.now()}.md`);
 
     await fs.writeFile(summaryPath, summary);
     console.log(`   ✅ Summary saved to: ${path.relative(this.projectRoot, summaryPath)}`);
@@ -733,25 +729,29 @@ Generated by JR-2 Assessment Journey
   async runComplexityAnalysis(scope) {
     // Simplified complexity analysis
     return {
-      issues: [{
-        type: 'high-complexity',
-        severity: 'medium',
-        category: 'code-smell',
-        file: 'src/complex.js',
-        message: 'Function has cyclomatic complexity of 15'
-      }]
+      issues: [
+        {
+          type: 'high-complexity',
+          severity: 'medium',
+          category: 'code-smell',
+          file: 'src/complex.js',
+          message: 'Function has cyclomatic complexity of 15',
+        },
+      ],
     };
   }
 
   async runDuplicationDetection(scope) {
     // Simplified duplication detection
     return {
-      issues: [{
-        type: 'code-duplication',
-        severity: 'low',
-        category: 'code-smell',
-        message: 'Duplicate code block detected'
-      }]
+      issues: [
+        {
+          type: 'code-duplication',
+          severity: 'low',
+          category: 'code-smell',
+          message: 'Duplicate code block detected',
+        },
+      ],
     };
   }
 
@@ -761,14 +761,12 @@ Generated by JR-2 Assessment Journey
 
   determineFIL(issue) {
     // FIL-0: Formatting, dead code removal
-    if (issue.type === 'formatting' || issue.type === 'dead-code' ||
-        issue.type === 'debug-code') {
+    if (issue.type === 'formatting' || issue.type === 'dead-code' || issue.type === 'debug-code') {
       return 0;
     }
 
     // FIL-1: Simple renames, comment updates
-    if (issue.type === 'naming' || issue.type === 'documentation' ||
-        issue.severity === 'low') {
+    if (issue.type === 'naming' || issue.type === 'documentation' || issue.severity === 'low') {
       return 1;
     }
 
@@ -788,7 +786,7 @@ Generated by JR-2 Assessment Journey
       'hardcoded-api-key': 'Secure API key',
       'low-coverage': 'Improve test coverage',
       'outdated-dependencies': 'Update dependencies',
-      'missing-readme': 'Add documentation'
+      'missing-readme': 'Add documentation',
     };
 
     return actionMap[issue.type] || `Fix ${issue.type.replace('-', ' ')}`;
@@ -813,10 +811,10 @@ ${issue.file ? `- Location: ${issue.file}` : ''}
 
   estimateLOC(issue) {
     const locMap = {
-      'low': 50,
-      'medium': 100,
-      'high': 200,
-      'critical': 250
+      low: 50,
+      medium: 100,
+      high: 200,
+      critical: 250,
     };
 
     return locMap[issue.severity] || 100;
@@ -824,10 +822,10 @@ ${issue.file ? `- Location: ${issue.file}` : ''}
 
   estimateEffort(issue) {
     const effortMap = {
-      'low': 0.5,
-      'medium': 2,
-      'high': 4,
-      'critical': 8
+      low: 0.5,
+      medium: 2,
+      high: 4,
+      critical: 8,
     };
 
     return effortMap[issue.severity] || 2;
@@ -840,29 +838,24 @@ ${issue.file ? `- Location: ${issue.file}` : ''}
         'Write test for current (broken) behavior',
         'Write test for expected behavior',
         'Implement fix',
-        'Verify tests pass'
-      ]
+        'Verify tests pass',
+      ],
     };
   }
 
   generateImplementationPlan(issue) {
     return {
       approach: 'incremental',
-      steps: [
-        'Isolate issue',
-        'Minimal fix',
-        'Add tests',
-        'Refactor if needed'
-      ]
+      steps: ['Isolate issue', 'Minimal fix', 'Add tests', 'Refactor if needed'],
     };
   }
 
   mapSeverityToPriority(severity) {
     const map = {
-      'critical': 1,
-      'high': 2,
-      'medium': 3,
-      'low': 4
+      critical: 1,
+      high: 2,
+      medium: 3,
+      low: 4,
     };
 
     return map[severity] || 3;
@@ -873,7 +866,7 @@ ${issue.file ? `- Location: ${issue.file}` : ''}
       timestamp: new Date().toISOString(),
       type,
       data,
-      autonomous: true
+      autonomous: true,
     });
   }
 
@@ -882,17 +875,13 @@ ${issue.file ? `- Location: ${issue.file}` : ''}
       timestamp: this.timestamp,
       error: {
         message: error.message,
-        stack: error.stack
+        stack: error.stack,
       },
       partialResults: this.results,
-      decisions: this.decisions
+      decisions: this.decisions,
     };
 
-    const reportPath = path.join(
-      this.projectRoot,
-      'assessments',
-      `failure-${Date.now()}.json`
-    );
+    const reportPath = path.join(this.projectRoot, 'assessments', `failure-${Date.now()}.json`);
 
     await this.ensureDirectory(path.dirname(reportPath));
     await fs.writeFile(reportPath, JSON.stringify(failureReport, null, 2));

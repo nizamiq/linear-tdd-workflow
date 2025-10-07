@@ -27,6 +27,7 @@ make onboard
 ## Slash Commands Available
 
 ### Core Workflow Commands
+
 - `/assess` - Scan code quality → Generate task definitions (AUDITOR)
 - `/linear` - Create Linear tasks from latest assessment (STRATEGIST)
 - `/fix <TASK-ID>` - Implement fix with TDD enforcement (EXECUTOR)
@@ -39,16 +40,19 @@ make onboard
 - `/docs` - Documentation validation and generation (DOC-KEEPER)
 
 ### Tech Stack Commands
+
 - `/django` - Django development assistance (DJANGO-PRO)
 - `/python` - Python optimization and modern patterns (PYTHON-PRO)
 - `/typescript` - TypeScript and React development (TYPESCRIPT-PRO)
 
 ### Infrastructure Commands
+
 - `/deploy` - Progressive deployment orchestration (DEPLOYMENT-ENGINEER)
 - `/optimize-db` - Database performance analysis (DATABASE-OPTIMIZER)
 - `/monitor` - Observability and alerting setup (OBSERVABILITY-ENGINEER)
 
 ### Alternative Access
+
 ```bash
 # Via Makefile
 make assess                  # Code assessment
@@ -79,12 +83,14 @@ When you invoke a slash command (e.g., `/assess`, `/fix CLEAN-123`), the system:
 ### Key Principles
 
 **✅ Agents execute autonomously:**
+
 - No manual Task tool invocations required
 - No confirmation needed for standard operations
 - Complete workflows without pausing between phases
 - Only stop at defined approval gates
 
 **🚦 Human intervention points:**
+
 - Creating Linear tasks (after assessment)
 - Creating Linear cycles (after planning)
 - Deploying to production (after pre-flight checks)
@@ -117,6 +123,7 @@ You: "Yes"
 ### No More Manual Task Tool Calls
 
 **Before v1.5.0** (Manual):
+
 ```
 You: /assess
 Me: "Would you like me to assess the code?"
@@ -127,6 +134,7 @@ AUDITOR: "Should I scan files?"
 ```
 
 **v1.5.0** (Autonomous):
+
 ```
 You: /assess
 Me: [Immediately invokes AUDITOR, scans complete, presents report]
@@ -136,6 +144,7 @@ Me: "Assessment complete. Create Linear tasks?"
 ### Performance Improvements
 
 With immediate execution:
+
 - **5-10x faster** for large assessments (parallel execution)
 - **2x faster** for cycle planning (parallel phases)
 - **Zero manual steps** for TDD implementation
@@ -146,6 +155,7 @@ With immediate execution:
 **Complete guide:** `.claude/docs/AUTONOMOUS-EXECUTION.md`
 
 **Topics covered:**
+
 - Execution flow diagrams for each command
 - Human intervention points (approval gates)
 - Parallel execution strategies
@@ -165,6 +175,7 @@ First     Code     Design
 ```
 
 ### Quality Gates (Blocking)
+
 - **≥80% diff coverage** - Every changed line must be tested
 - **≥30% mutation score** - Tests must validate actual behavior
 - **NO production code without failing test first** - Zero exceptions
@@ -172,6 +183,7 @@ First     Code     Design
 ### TDD Enforcement by EXECUTOR Agent
 
 When you run `/fix CLEAN-XXX`, the EXECUTOR agent automatically:
+
 1. ✅ Refuses to write production code before tests exist
 2. ✅ Verifies RED phase (test fails for expected reason)
 3. ✅ Verifies GREEN phase (minimal code to pass)
@@ -185,6 +197,7 @@ When you run `/fix CLEAN-XXX`, the EXECUTOR agent automatically:
 ### TDD Quick Reference
 
 **[RED Phase]** - Write failing test FIRST:
+
 ```javascript
 test('calculates tax for high income', () => {
   expect(calculateTax(100000)).toBe(25000);
@@ -193,6 +206,7 @@ test('calculates tax for high income', () => {
 ```
 
 **[GREEN Phase]** - Minimal code to pass:
+
 ```javascript
 function calculateTax(income) {
   return income * 0.25;
@@ -201,6 +215,7 @@ function calculateTax(income) {
 ```
 
 **[REFACTOR Phase]** - Improve design:
+
 ```javascript
 const TAX_RATE = 0.25;
 function calculateTax(income) {
@@ -223,13 +238,14 @@ All features tracked in `.claude/user-stories/registry.yaml`:
 ```yaml
 features:
   feature-slug:
-    name: "User-facing feature description"
+    name: 'User-facing feature description'
     status: implemented | partial | planned
-    e2e_test: "path/to/test.js::test-name"
-    notes: "Optional implementation notes"
+    e2e_test: 'path/to/test.js::test-name'
+    notes: 'Optional implementation notes'
 ```
 
 **Status Meanings:**
+
 - **`implemented`**: Feature built + E2E test passing → ✅ **Allows release**
 - **`partial`**: Feature built but NO E2E test → ❌ **BLOCKS release**
 - **`planned`**: Not yet built → ⚪ Doesn't affect release
@@ -239,12 +255,14 @@ features:
 Automated validator that runs as **Phase 2.5** in release journey:
 
 **What it checks:**
+
 1. ✅ All `implemented` features have `e2e_test` specified
 2. ✅ All E2E tests pass when executed
 3. ❌ **BLOCKS** if any `partial` status features exist
 4. ❌ **BLOCKS** if any E2E test fails
 
 **Commands:**
+
 ```bash
 # Check if ready for release
 npm run release:validate-functional
@@ -304,6 +322,7 @@ Following Anthropic's "Building Effective Agents" guidance, always prefer the **
 ```
 
 **Cost/Complexity Impact:**
+
 - Direct call: ~1x cost, 100% deterministic, instant
 - Workflow: ~2-5x cost, 100% deterministic, fast
 - Agent: ~10-20x cost, 70-95% reliable, slow
@@ -327,6 +346,7 @@ Following Anthropic's "Building Effective Agents" guidance, always prefer the **
 ✅ Adaptive planning (pipeline recovery)
 
 **Available Workflows:**
+
 - `.claude/workflows/lint-workflow.yaml` - Replaces LINTER agent (95% cost reduction)
 - `.claude/workflows/typecheck-workflow.yaml` - Replaces TYPECHECKER agent (95% cost reduction)
 - `.claude/workflows/validation-workflow.yaml` - Replaces VALIDATOR agent (90% cost reduction)
@@ -342,6 +362,7 @@ Following Anthropic's "Building Effective Agents" guidance, always prefer the **
 **Rule**: Send **a single message with multiple Task tool calls** to run subagents concurrently.
 
 **Example - Parallel Assessment:**
+
 ```
 User: "Assess the entire codebase"
 
@@ -356,6 +377,7 @@ Time: ~10min (vs ~30min sequential)
 ```
 
 **Example - Parallel Fixes:**
+
 ```
 User: "Implement these 5 Linear tasks"
 
@@ -381,6 +403,7 @@ Time: ~15min (vs ~75min sequential)
 ### When to Use Parallel
 
 **✅ Use for:**
+
 - Assessing multiple directories independently
 - Implementing multiple independent fix packs
 - Running different validations (security, types, tests, lint)
@@ -388,6 +411,7 @@ Time: ~15min (vs ~75min sequential)
 - Processing batch operations
 
 **❌ Don't use for:**
+
 - Tasks with dependencies
 - Shared file modifications
 - Sequential workflows (TDD cycle)
@@ -422,6 +446,7 @@ Specialists:
 ```
 
 **Agent discovery:**
+
 - Slash Commands: `/assess`, `/fix`, `/recover`, etc.
 - Agent Files: `.claude/agents/*.md`
 - Commands: `.claude/commands/*.md`
@@ -431,6 +456,7 @@ Specialists:
 **STRATEGIST is the EXCLUSIVE Linear MCP manager.**
 
 **Permission Model:**
+
 - **STRATEGIST**: ONLY agent with `linear-server` MCP access
 - **AUDITOR**: Generates task definitions → delegates to STRATEGIST
 - **DOC-KEEPER**: Generates doc tasks → delegates to STRATEGIST
@@ -439,6 +465,7 @@ Specialists:
 - **All Others**: No direct Linear access - work through STRATEGIST
 
 **Workflow:**
+
 1. Agent completes work (e.g., AUDITOR finishes assessment)
 2. Agent provides structured output with task definitions
 3. STRATEGIST reads output and creates Linear tasks via MCP
@@ -463,17 +490,21 @@ Specialists:
 ## Critical Constraints
 
 ### Test-Driven Development
+
 **Mandatory cycle:**
+
 1. **[RED]** - Write failing test first
 2. **[GREEN]** - Minimal code to pass
 3. **[REFACTOR]** - Improve with passing tests
 
 ### Fix Pack Limits
+
 - ≤300 LOC per PR
 - Diff coverage ≥80%
 - Only FIL-0/FIL-1 changes (no feature work)
 
 ### Feature Impact Levels (FIL)
+
 - **FIL-0/1**: Auto-approved (formatting, dead code, renames)
 - **FIL-2**: Tech Lead approval (utilities, configs)
 - **FIL-3**: Tech Lead + Product approval (APIs, migrations)
@@ -481,6 +512,7 @@ Specialists:
 ## Essential Commands
 
 ### Testing
+
 ```bash
 # Run all tests with coverage
 npm test
@@ -501,6 +533,7 @@ npm test -- --testNamePattern="should validate"
 ```
 
 ### Code Quality
+
 ```bash
 # Lint and auto-fix
 npm run lint
@@ -519,12 +552,14 @@ npm run precommit
 ```
 
 ### Build
+
 ```bash
 # TypeScript compilation
 npm run build
 ```
 
 ### Agent Operations
+
 ```bash
 # Assessment
 npm run assess
@@ -578,6 +613,7 @@ npm run e2e:report
 5. Merge to `develop` after review
 
 **GitFlow branches:**
+
 - `main` - Production releases only
 - `develop` - Integration branch
 - `feature/*` - New features
@@ -588,17 +624,20 @@ npm run e2e:report
 **Primary Integration:** MCP Tools + GitHub CLI (zero setup)
 
 **Tools:**
+
 - Linear MCP Server - Direct API access
 - GitHub CLI (`gh`) - Direct GitHub operations
 - No webhooks needed
 
 **How it works:**
+
 - AUDITOR generates task definitions
 - STRATEGIST creates Linear issues via MCP
 - STRATEGIST updates tasks via MCP + GitHub CLI
 - Always check Linear for task context before implementing
 
 **To create Linear tasks:**
+
 ```bash
 # Quick command
 /linear
@@ -613,6 +652,7 @@ npm run e2e:report
 ## Agent-Specific Notes
 
 When working with agents:
+
 1. Check `.claude/agents/CLAUDE.md` for detailed specs
 2. Use standardized CLI invocation
 3. All PRs require human review
@@ -621,6 +661,7 @@ When working with agents:
 ## Documentation
 
 **Core docs in `.claude/docs/`:**
+
 - `FUNCTIONAL-RELEASE.md` - Complete functional release guide
 - `TDD-REMINDER.md` - TDD reference card
 - `DECISION-MATRIX.md` - When to use agents vs workflows
@@ -633,15 +674,15 @@ When working with agents:
 
 ## Quick Reference
 
-| User Says | Command | What It Does |
-|-----------|---------|--------------|
-| "Check my code" | `/assess` | AUDITOR scans quality |
-| "Create Linear tasks" | `/linear` | STRATEGIST creates tasks from assessment |
-| "Fix CLEAN-123" | `/fix CLEAN-123` | EXECUTOR implements with TDD |
-| "Tests failing" | `/recover` | GUARDIAN fixes pipeline |
-| "Deploy v1.2.0" | `/release 1.2.0` | STRATEGIST manages release with functional gate |
-| "Plan sprint" | `/cycle plan` | PLANNER capacity-based planning |
-| "Check release readiness" | `npm run release:validate-functional` | Functional gate validation |
+| User Says                 | Command                               | What It Does                                    |
+| ------------------------- | ------------------------------------- | ----------------------------------------------- |
+| "Check my code"           | `/assess`                             | AUDITOR scans quality                           |
+| "Create Linear tasks"     | `/linear`                             | STRATEGIST creates tasks from assessment        |
+| "Fix CLEAN-123"           | `/fix CLEAN-123`                      | EXECUTOR implements with TDD                    |
+| "Tests failing"           | `/recover`                            | GUARDIAN fixes pipeline                         |
+| "Deploy v1.2.0"           | `/release 1.2.0`                      | STRATEGIST manages release with functional gate |
+| "Plan sprint"             | `/cycle plan`                         | PLANNER capacity-based planning                 |
+| "Check release readiness" | `npm run release:validate-functional` | Functional gate validation                      |
 
 ## Important Notes
 
@@ -657,6 +698,7 @@ When working with agents:
 
 **Version:** 1.4.0
 **Features:**
+
 - 23 specialized agents
 - 7 autonomous journeys
 - Functional release gate

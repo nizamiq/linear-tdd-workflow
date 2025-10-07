@@ -58,6 +58,7 @@ make onboard
 ```
 
 This autonomous journey will:
+
 - Detect your project type (Python/JS/TS)
 - Verify prerequisites
 - Initialize GitFlow
@@ -75,6 +76,7 @@ make assess
 ```
 
 The assessment journey will autonomously:
+
 - Scan your codebase with AUDITOR
 - Create Linear tasks for improvements
 - Generate Fix Packs for FIL-0/FIL-1 issues
@@ -95,6 +97,7 @@ Every change follows the RED-GREEN-REFACTOR cycle:
 The system uses 20 specialized agents coordinated through autonomous journeys:
 
 **Core Agents:**
+
 1. **AUDITOR** - Scans code for quality issues
 2. **EXECUTOR** - Implements approved fixes
 3. **GUARDIAN** - Monitors and recovers pipelines
@@ -102,6 +105,7 @@ The system uses 20 specialized agents coordinated through autonomous journeys:
 5. **SCHOLAR** - Learns from successful patterns
 
 **Autonomous Journeys:**
+
 - **JR-1 Onboarding** - Automatic project setup and configuration
 - **JR-2 Assessment** - Comprehensive code quality evaluation
 - **JR-3 Fix Pack** - TDD-enforced fix implementation
@@ -112,6 +116,7 @@ The system uses 20 specialized agents coordinated through autonomous journeys:
 ### Fix Packs
 
 Pre-approved, low-risk improvements that agents can implement autonomously:
+
 - Linting and formatting fixes
 - Dead code removal
 - Documentation updates
@@ -121,6 +126,7 @@ Pre-approved, low-risk improvements that agents can implement autonomously:
 ### FIL Classification
 
 Feature Impact Levels categorize changes by risk:
+
 - **FIL-0**: No risk (formatting)
 - **FIL-1**: Low risk (variable renames)
 - **FIL-2**: Medium risk (needs Tech Lead approval)
@@ -244,6 +250,7 @@ linear-tdd-workflow/
    - [Linear Setup Guide](../linear-setup.md)
 
 2. **Run Your First Assessment**
+
    ```bash
    npm run assess
    ```
@@ -263,6 +270,7 @@ linear-tdd-workflow/
 ### Common Issues
 
 **npm install fails**
+
 ```bash
 # Clear cache and retry
 npm cache clean --force
@@ -271,11 +279,13 @@ npm install
 ```
 
 **Linear connection fails**
+
 - Verify API key in `.env`
 - Check network connectivity
 - Ensure Linear workspace access
 
 **Tests fail with coverage errors**
+
 - Run `npm test` to see coverage report
 - Add tests for uncovered code
 - Check coverage thresholds in `jest.config.js`
@@ -291,4 +301,4 @@ For more issues, see the [Troubleshooting Guide](../reference/troubleshooting.md
 
 ---
 
-*Ready to start? Run `npm run assess` to begin improving your code!*
+_Ready to start? Run `npm run assess` to begin improving your code!_

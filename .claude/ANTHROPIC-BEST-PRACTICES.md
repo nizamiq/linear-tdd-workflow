@@ -15,12 +15,12 @@ The Linear TDD Workflow System now implements **all major Anthropic best practic
 
 ## Summary of Improvements (Phases 1-4)
 
-| Phase | Focus | Key Deliverables | Impact |
-|-------|-------|------------------|--------|
-| **Phase 1** | Loop Controls & Safety | Hooks, iteration limits, ground truth checks | Foundation for reliability |
-| **Phase 2** | Workflow Simplification | 6 deterministic workflows | 35-40% cost reduction |
-| **Phase 3** | Advanced Patterns | Parallel execution, orchestrator-workers | 5-10x speedup |
-| **Phase 4** | Simplicity & ACI | Decision matrix, response standards, workflow migration | 90-95% cost reduction on simple ops |
+| Phase       | Focus                   | Key Deliverables                                        | Impact                              |
+| ----------- | ----------------------- | ------------------------------------------------------- | ----------------------------------- |
+| **Phase 1** | Loop Controls & Safety  | Hooks, iteration limits, ground truth checks            | Foundation for reliability          |
+| **Phase 2** | Workflow Simplification | 6 deterministic workflows                               | 35-40% cost reduction               |
+| **Phase 3** | Advanced Patterns       | Parallel execution, orchestrator-workers                | 5-10x speedup                       |
+| **Phase 4** | Simplicity & ACI        | Decision matrix, response standards, workflow migration | 90-95% cost reduction on simple ops |
 
 ---
 
@@ -37,24 +37,28 @@ The Linear TDD Workflow System now implements **all major Anthropic best practic
 **Purpose**: Provide clear guidance on **when to use direct calls vs workflows vs agents**
 
 **Content**:
+
 - Decision tree with objective criteria
 - Cost/complexity/quality tradeoffs
 - Real-world scenarios with recommendations
 - Migration strategies from agents to workflows
 
 **Key Principle**:
+
 ```
 Direct Tool Call → Workflow → Autonomous Agent
   (simplest)        (when needed)   (last resort)
 ```
 
 **Impact**:
+
 - Clear agent selection guidance
 - Prevents over-engineering
 - Systematic cost optimization
 - Educational resource for team
 
 **Example Decision**:
+
 ```
 Task: "Lint all Python files"
 
@@ -83,6 +87,7 @@ Recommendation: Direct call (95% cost reduction)
 **Agents Replaced**:
 
 #### LINTER → lint-workflow.yaml
+
 - **Before**: 400+ line autonomous agent
 - **After**: Deterministic workflow with language-specific configs
 - **Cost Reduction**: 95%
@@ -91,6 +96,7 @@ Recommendation: Direct call (95% cost reduction)
 - **Integration**: Pre-commit hooks, CI/CD, post-write hooks
 
 #### TYPECHECKER → typecheck-workflow.yaml
+
 - **Before**: Autonomous type checking agent
 - **After**: Deterministic workflow with incremental mode
 - **Cost Reduction**: 95%
@@ -98,6 +104,7 @@ Recommendation: Direct call (95% cost reduction)
 - **Integration**: Pre-commit, IDE, CI/CD
 
 #### VALIDATOR → validation-workflow.yaml
+
 - **Before**: Orchestration agent for quality gates
 - **After**: Hybrid workflow (minimal LLM for orchestration, deterministic for checks)
 - **Cost Reduction**: 90%
@@ -106,13 +113,14 @@ Recommendation: Direct call (95% cost reduction)
 
 **Migration Impact**:
 
-| Operation | Agent Cost | Workflow Cost | Savings | Speed Improvement |
-|-----------|------------|---------------|---------|-------------------|
-| Lint check | $0.20 | $0.01 | 95% | 10x faster |
-| Type check | $0.15 | $0.007 | 95% | 8x faster |
-| Full validation | $0.50 | $0.05 | 90% | 5x faster |
+| Operation       | Agent Cost | Workflow Cost | Savings | Speed Improvement |
+| --------------- | ---------- | ------------- | ------- | ----------------- |
+| Lint check      | $0.20      | $0.01         | 95%     | 10x faster        |
+| Type check      | $0.15      | $0.007        | 95%     | 8x faster         |
+| Full validation | $0.50      | $0.05         | 90%     | 5x faster         |
 
 **Projected Annual Savings** (for 1000 operations/month):
+
 - Linting: $2,280/year
 - Type checking: $1,716/year
 - Validation: $5,400/year
@@ -135,11 +143,13 @@ Recommendation: Direct call (95% cost reduction)
 7. **Progress Reports** - Checkpoint-based status updates
 
 **Implementation Status**:
+
 - ✅ STRATEGIST: Full response style integration
 - ⏳ AUDITOR, EXECUTOR, GUARDIAN, SCHOLAR: Pending
 - ⏳ Remaining 18 agents: Queued
 
 **Example (STRATEGIST)**:
+
 ```markdown
 ## Orchestration Plan: Implement Sprint Fixes
 
@@ -159,6 +169,7 @@ Recommendation: Direct call (95% cost reduction)
 ```
 
 **Benefits**:
+
 - Consistent communication across all agents
 - Evidence-based decision making
 - Clear risk escalation
@@ -171,6 +182,7 @@ Recommendation: Direct call (95% cost reduction)
 **Implemented Patterns**:
 
 #### 1. Required Absolute Paths
+
 ```yaml
 # Bad (agent can misuse)
 tools:
@@ -185,16 +197,18 @@ tools:
 ```
 
 #### 2. Dry Run Support
+
 ```yaml
 # Risky operations must support dry-run
 tools:
   - name: Bash
     params:
       - dry_run: boolean
-    default: true  # Safe by default
+    default: true # Safe by default
 ```
 
 #### 3. Helpful Error Messages
+
 ```yaml
 # Bad
 error: "Invalid input"
@@ -207,6 +221,7 @@ error: "Type checking failed in src/auth.ts:45
 ```
 
 #### 4. Tool Inheritance Clarification
+
 ```yaml
 # Explicit about MCP access
 tools: inherit  # Inherits all main thread tools + MCP
@@ -218,6 +233,7 @@ tool_inheritance: full_mcp_access  # Explicit
 ```
 
 **Status**: Partially implemented
+
 - ✅ Workflows have full ACI patterns
 - ⏳ Agent tool specs need enhancement
 - ⏳ Error messages need improvement
@@ -225,17 +241,20 @@ tool_inheritance: full_mcp_access  # Explicit
 ### 4.5 Integration with Existing System
 
 **CLAUDE.md Updates**:
+
 - Added "Simplicity Principle" section (prominent placement)
 - Decision hierarchy with cost/complexity matrix
 - Quick rules for each approach
 - Links to decision matrix and workflows
 
 **Agent Updates**:
+
 - STRATEGIST: Full response style integration with examples
 - Decision-making framework references DECISION-MATRIX.md
 - Orchestration patterns emphasize simplicity first
 
 **Documentation Cross-References**:
+
 - All workflow files reference decision matrix
 - Agent files reference response style template
 - README.md updated with workflow benefits
@@ -244,18 +263,20 @@ tool_inheritance: full_mcp_access  # Explicit
 
 **Cost Reduction Validation**:
 
-| Approach | Before | After | Savings |
-|----------|--------|-------|---------|
-| Simple operations (lint/typecheck) | Agent ($0.20) | Workflow ($0.01) | 95% |
-| Complex orchestration (validation) | Agent ($0.50) | Workflow ($0.05) | 90% |
-| Assessment (judgment required) | Agent ($2.00) | Agent ($2.00) | 0% (appropriate) |
+| Approach                           | Before        | After            | Savings          |
+| ---------------------------------- | ------------- | ---------------- | ---------------- |
+| Simple operations (lint/typecheck) | Agent ($0.20) | Workflow ($0.01) | 95%              |
+| Complex orchestration (validation) | Agent ($0.50) | Workflow ($0.05) | 90%              |
+| Assessment (judgment required)     | Agent ($2.00) | Agent ($2.00)    | 0% (appropriate) |
 
 **Reliability Improvement**:
+
 - Deterministic operations: 70-95% → 100%
 - Speed: 5-10x improvement (no LLM latency)
 - Consistency: Workflow guarantees same output for same input
 
 **Educational Impact**:
+
 - Clear decision criteria reduce trial-and-error
 - Team can systematically optimize costs
 - New developers have clear guidance
@@ -265,22 +286,27 @@ tool_inheritance: full_mcp_access  # Explicit
 ## Phase 1: Foundation (Loop Controls & Safety)
 
 ### Hooks System (`.claude/hooks.json`)
+
 **Purpose**: Deterministic quality enforcement without agent memory
 
 **Capabilities**:
+
 - Pre-tool-use hooks: Quality gates before git commits (lint + typecheck + tests)
 - Post-tool-use hooks: Auto-format after code writes
 - On-file-write hooks: Language-specific formatting (Python: ruff, JS/TS: prettier)
 
 **Benefits**:
+
 - Zero reliance on agent memory
 - Guaranteed quality gates
 - Instant feedback on violations
 
 ### Loop Controls (5 Core Agents)
+
 **Agents Enhanced**: STRATEGIST, AUDITOR, EXECUTOR, GUARDIAN, SCHOLAR
 
 **Control Mechanisms**:
+
 - **Iteration Limits**: Prevent runaway loops (3-20 iterations based on complexity)
 - **Time Caps**: SLA enforcement (600s - 3600s based on task)
 - **Cost Limits**: Token budget protection (100k - 500k tokens)
@@ -288,6 +314,7 @@ tool_inheritance: full_mcp_access  # Explicit
 - **Ground Truth Checks**: Tool output verification vs agent estimation
 
 **Example - EXECUTOR**:
+
 ```yaml
 loop_controls:
   max_iterations: 5
@@ -295,7 +322,7 @@ loop_controls:
   tdd_cycle_enforcement: true
   ground_truth_checks:
     - tool: Bash
-      command: "npm test"
+      command: 'npm test'
       verify: exit_code_equals_0
   workflow_phases:
     - phase: RED
@@ -307,6 +334,7 @@ loop_controls:
 ```
 
 ### Success Criteria (`.claude/agents/success-criteria.yaml`)
+
 **Comprehensive metrics for all 22 agents**:
 
 - **Quantitative metrics**: Targets, units, measurements
@@ -315,32 +343,35 @@ loop_controls:
 - **Verification protocol**: "Ground truth over estimation"
 
 **Example Metrics**:
+
 ```yaml
 EXECUTOR:
   quantitative:
     - metric: test_coverage_diff
       target: 80
       unit: percent
-      measurement: "new_covered_lines / new_total_lines"
+      measurement: 'new_covered_lines / new_total_lines'
     - metric: mutation_score
       target: 30
       unit: percent
 ```
 
 ### Model Optimization
+
 **Cost-optimized model selection across all 22 agents**:
 
-| Model | Agents | Use Case | Cost Impact |
-|-------|--------|----------|-------------|
-| haiku | 3 | Simple/deterministic (LINTER, TYPECHECKER, VALIDATOR) | 75% reduction |
-| sonnet | 15 | Balanced tasks (most agents) | Baseline |
-| opus | 4 | Complex/critical (EXECUTOR, CODE-REVIEWER, DB-OPTIMIZER, K8S-ARCHITECT) | Premium |
+| Model  | Agents | Use Case                                                                | Cost Impact   |
+| ------ | ------ | ----------------------------------------------------------------------- | ------------- |
+| haiku  | 3      | Simple/deterministic (LINTER, TYPECHECKER, VALIDATOR)                   | 75% reduction |
+| sonnet | 15     | Balanced tasks (most agents)                                            | Baseline      |
+| opus   | 4      | Complex/critical (EXECUTOR, CODE-REVIEWER, DB-OPTIMIZER, K8S-ARCHITECT) | Premium       |
 
 **Projected Savings**: 35-40% cost reduction on simple tasks
 
 ## Phase 2: Workflow Simplification
 
 ### The Simplest Approach Principle
+
 ```
 Direct Tool Call → Workflow → Autonomous Agent
    (best)           (good)       (necessary)
@@ -349,30 +380,35 @@ Direct Tool Call → Workflow → Autonomous Agent
 ### 6 Deterministic Workflows Created
 
 #### 1. TDD Cycle (`tdd-cycle.yaml`)
+
 - Enforces RED→GREEN→REFACTOR with validation gates
 - Max attempts per phase (RED: 2, GREEN: 3, REFACTOR: 2)
 - Ground truth verification via test exit codes
 - SLA: 5 minutes
 
 #### 2. Lint and Format (`lint-and-format.yaml`)
+
 - Auto-detect language, run appropriate tools
 - Python: ruff, JS/TS: prettier/eslint
 - Syntax validation after changes
 - SLA: 1 minute
 
 #### 3. Type Check (`type-check.yaml`)
+
 - Incremental by default (changed files only)
 - TypeScript: tsc, Python: mypy
 - Escalates to experts for >10 errors
 - SLA: 2 minutes
 
 #### 4. PR Review Checklist (`pr-review-checklist.yaml`)
+
 - Automated validation: tests, coverage, linting, type checking
 - Security: vulnerability scan, secret detection
 - Documentation: PR description completeness
 - SLA: 5 minutes
 
 #### 5. Deployment Gates (`deployment-gates.yaml`)
+
 - Pre-flight: CI status, branch protection, coverage
 - Security: vulnerability scan, dependency audit
 - Operational: rollback plan, monitoring, backups
@@ -380,6 +416,7 @@ Direct Tool Call → Workflow → Autonomous Agent
 - SLA: 10 minutes
 
 #### 6. Fix Pack Generation (`fix-pack-generation.yaml`)
+
 - Load assessment JSON, filter FIL-0/1 issues
 - Group related issues (<300 LOC combined)
 - Generate specs with acceptance criteria
@@ -387,6 +424,7 @@ Direct Tool Call → Workflow → Autonomous Agent
 - SLA: 5 minutes
 
 ### Workflow Benefits
+
 **Cost**: 75-80% reduction vs agents
 **Speed**: 10x faster (direct tool execution)
 **Reliability**: 100% consistent behavior
@@ -397,6 +435,7 @@ Direct Tool Call → Workflow → Autonomous Agent
 **Purpose**: Self-correcting implementations before human review
 
 **Pattern**:
+
 ```
 1. GENERATOR: Create TDD cycle implementation
 2. CRITIC: Validate against comprehensive rubric
@@ -405,12 +444,14 @@ Direct Tool Call → Workflow → Autonomous Agent
 ```
 
 **Quality Rubric** (16 criteria across 4 categories):
+
 - **Clean Code**: SRP, naming, DRY, complexity ≤10
 - **Test Quality**: Isolation, assertions, edge cases, reliability
 - **TDD Adherence**: Test-first, minimal implementation, no premature optimization
 - **Coverage Metrics**: Diff ≥80%, branch coverage, mutation ≥30%
 
 **Example Iteration**:
+
 ```python
 # Iteration 1: Basic implementation (75% quality)
 def calculate_tax(income):
@@ -433,6 +474,7 @@ def calculate_tax(income):
 ```
 
 **Benefits**:
+
 - Faster feedback (seconds vs hours)
 - Higher quality (consistent rubric)
 - Reduced review burden
@@ -447,6 +489,7 @@ def calculate_tax(income):
 **Iterate**: Self-correct on failures (max 2 retries)
 
 **Tool Selection Matrix**:
+
 ```yaml
 file_operations:
   read_single_file: Read
@@ -461,6 +504,7 @@ code_analysis:
 ```
 
 **Clear Instructions Example**:
+
 ```yaml
 # ✓ Good
 Bash:
@@ -474,6 +518,7 @@ Bash:
 ```
 
 **Iteration Strategy**:
+
 ```
 Attempt 1: Grep("function\\s+\\w+", path="src/")
 Error: Invalid regex
@@ -486,11 +531,13 @@ Success: 47 matches
 ### Multi-Pass Review Strategy (CODE-REVIEWER)
 
 **Pass 1: Automated Analysis** (2-3 min)
+
 - Security scan (Semgrep, npm audit)
 - Quality scan (linters, type checkers)
 - Test scan (coverage, presence, naming)
 
 **Pass 2: Contextual Analysis** (5-7 min)
+
 - Read PR description
 - Analyze changed files
 - Check related code
@@ -498,6 +545,7 @@ Success: 47 matches
 - Assess architecture
 
 **Pass 3: Deep Review** (8-12 min)
+
 - Performance analysis (bottlenecks, N+1, leaks)
 - Security deep dive (logic flaws, race conditions)
 - Error handling validation
@@ -505,6 +553,7 @@ Success: 47 matches
 - Team learning opportunities
 
 **Constructive Feedback Framework**:
+
 ```markdown
 ## [Category]: [Specific Issue]
 
@@ -528,11 +577,13 @@ Success: 47 matches
 **4 Orchestration Phases**:
 
 #### 1. Decomposition
+
 Break complex requests into independent, parallelizable sub-tasks
 
 **Example**:
+
 ```yaml
-Request: "Assess codebase and implement top 5 fixes"
+Request: 'Assess codebase and implement top 5 fixes'
 
 Sub-tasks:
   - AUDITOR: assess (parallel, no deps)
@@ -542,27 +593,34 @@ Sub-tasks:
 ```
 
 #### 2. Worker Selection
+
 Choose optimal agents based on:
+
 - Capability matching
 - Cost-performance tradeoffs
 - Model complexity (haiku → sonnet → opus)
 - Workflow vs agent preference
 
 #### 3. Parallel Execution
+
 Launch independent workers concurrently:
+
 - Max 10 workers simultaneously
 - Respect token budget per phase
 - Handle worker failures gracefully
 - Implement backpressure if needed
 
 #### 4. Result Aggregation
+
 Synthesize worker outputs:
+
 - Collect all results
 - Validate completeness
 - Check consistency
 - Provide comprehensive evidence
 
 **Example Orchestration**:
+
 ```markdown
 ## Orchestration Summary
 
@@ -579,6 +637,7 @@ Phase 4: CODE-REVIEWER validated (20 min)
 ```
 
 **Benefits**:
+
 - **Efficiency**: 5-10x faster through parallelization
 - **Reliability**: Isolated failures, clear dependencies
 - **Scalability**: Linear scaling with workers
@@ -588,25 +647,27 @@ Phase 4: CODE-REVIEWER validated (20 min)
 
 ### Before vs After
 
-| Aspect | Before | After | Improvement |
-|--------|--------|-------|-------------|
-| Simple task cost | $X | $0.25X | 75% reduction |
-| Simple task speed | 60s | 6s | 10x faster |
-| Consistency | Variable | 100% | Deterministic |
-| Quality threshold | Unclear | ≥95% | Enforced |
-| Parallel execution | Manual | Automated | 5-10x throughput |
-| Self-correction | Manual review | Automated | Instant feedback |
-| Tool use clarity | Implicit | Explicit (ACI) | Fewer errors |
+| Aspect             | Before        | After          | Improvement      |
+| ------------------ | ------------- | -------------- | ---------------- |
+| Simple task cost   | $X            | $0.25X         | 75% reduction    |
+| Simple task speed  | 60s           | 6s             | 10x faster       |
+| Consistency        | Variable      | 100%           | Deterministic    |
+| Quality threshold  | Unclear       | ≥95%           | Enforced         |
+| Parallel execution | Manual        | Automated      | 5-10x throughput |
+| Self-correction    | Manual review | Automated      | Instant feedback |
+| Tool use clarity   | Implicit      | Explicit (ACI) | Fewer errors     |
 
 ### Architecture Evolution
 
 **Before**:
+
 ```
 User Request → Agent → Agent → Agent → Result
 (sequential, no controls, variable quality)
 ```
 
 **After**:
+
 ```
 User Request
     ↓
@@ -629,18 +690,21 @@ Evidence-Based Output (≥95% quality)
 ## Implementation Checklist
 
 ### Phase 1: Foundation ✅
+
 - [x] Hooks system for deterministic enforcement
 - [x] Loop controls on 5 core agents
 - [x] Success criteria documentation
 - [x] Model optimization (22 agents)
 
 ### Phase 2: Workflows ✅
+
 - [x] 6 workflow YAML specifications
 - [x] Comprehensive workflow documentation
 - [x] Generator-critic pattern in EXECUTOR
 - [x] Workflow decision matrix
 
 ### Phase 3: Advanced Patterns ✅
+
 - [x] ACI protocol (AUDITOR, CODE-REVIEWER)
 - [x] Multi-pass review strategy (CODE-REVIEWER)
 - [x] Orchestrator-workers pattern (STRATEGIST)
@@ -649,44 +713,55 @@ Evidence-Based Output (≥95% quality)
 ## Anthropic Principles Applied
 
 ### 1. Simplest Approach ✅
+
 Tool → Workflow → Agent hierarchy enforced throughout system
 
 ### 2. Loop Controls ✅
+
 All agents have iteration limits, time caps, cost limits, checkpoints
 
 ### 3. Ground Truth ✅
+
 All critical decisions verified via tool output, not estimation
 
 ### 4. Clear Instructions ✅
+
 ACI protocol enforces complete, unambiguous tool parameters
 
 ### 5. Generator-Critic ✅
+
 EXECUTOR implements self-correcting quality improvements
 
 ### 6. Orchestrator-Workers ✅
+
 STRATEGIST manages complex parallel workflows efficiently
 
 ### 7. Constructive Feedback ✅
+
 CODE-REVIEWER provides actionable, specific, educational reviews
 
 ## Metrics & Validation
 
 ### Cost Reduction
+
 - Simple tasks: **75% reduction** (workflows vs agents)
 - Model optimization: **35-40% reduction** overall
 - Combined: **~60% total cost reduction** projected
 
 ### Speed Improvement
+
 - Workflows: **10x faster** than agent reasoning
 - Parallel execution: **5-10x throughput** via orchestrator
 - Combined: **Up to 100x faster** on parallelizable workloads
 
 ### Quality Enhancement
+
 - Generator-critic: **≥95% quality threshold**
 - Ground truth: **100% verification** on critical decisions
 - Multi-pass review: **3-layer validation** (automated → contextual → deep)
 
 ### Reliability
+
 - Workflows: **100% consistent** behavior
 - Loop controls: **Zero runaway** scenarios
 - ACI protocol: **Max 2 retries** before escalation
@@ -694,6 +769,7 @@ CODE-REVIEWER provides actionable, specific, educational reviews
 ## Future Enhancements
 
 ### Phase 4 (Planned)
+
 - Workflow execution engine/CLI
 - DEBUGGER and DATA-SCIENTIST subagents
 - Automated workflow validation test suite
@@ -701,6 +777,7 @@ CODE-REVIEWER provides actionable, specific, educational reviews
 - Pattern catalog integration with SCHOLAR
 
 ### Long-term
+
 - Machine learning from orchestration patterns
 - Adaptive model selection based on task history
 - Dynamic worker scaling based on load
@@ -721,12 +798,14 @@ CODE-REVIEWER provides actionable, specific, educational reviews
 **Components Created**:
 
 #### on-subagent-stop.sh (195 lines)
+
 - Triggers after each subagent completes
 - Suggests next workflow steps automatically
 - Updates enhancement queue with status transitions
 - Provides color-coded output for readability
 
 **Example Output**:
+
 ```
 ✓ Assessment complete (180s)
 
@@ -739,6 +818,7 @@ Suggested command:
 ```
 
 #### on-stop.sh (120 lines)
+
 - Triggers when Claude Code session ends
 - Provides session summary (duration, exit reason)
 - Checks for uncommitted changes and open PRs
@@ -746,6 +826,7 @@ Suggested command:
 - Shows command reference
 
 **Benefits**:
+
 - **Reliable automation**: Hooks more dependable than prompt-based chaining
 - **Reduced cognitive load**: System suggests next steps
 - **Audit trail**: All transitions logged with timestamps
@@ -756,6 +837,7 @@ Suggested command:
 **Deliverable**: `.claude/queue/enhancements.json`
 
 **Structure**:
+
 ```json
 {
   "enhancements": {
@@ -764,8 +846,8 @@ Suggested command:
       "status": "READY_FOR_BUILD",
       "linear_task": "FEAT-123",
       "agent_history": [
-        {"agent": "PM", "status": "READY_FOR_ARCH"},
-        {"agent": "ARCHITECT", "status": "READY_FOR_BUILD"}
+        { "agent": "PM", "status": "READY_FOR_ARCH" },
+        { "agent": "ARCHITECT", "status": "READY_FOR_BUILD" }
       ],
       "next_agent": "EXECUTOR"
     }
@@ -774,12 +856,14 @@ Suggested command:
 ```
 
 **Status Flow**:
+
 ```
 BACKLOG → READY_FOR_DESIGN → READY_FOR_ARCH → READY_FOR_BUILD
   → READY_FOR_REVIEW → READY_FOR_TEST → READY_FOR_DEPLOY → DONE
 ```
 
 **Use Cases**:
+
 - Multi-phase workflows (PM → Architect → Implementer → Reviewer)
 - Complex features requiring multiple agent handoffs
 - Tracking partially completed work
@@ -790,6 +874,7 @@ BACKLOG → READY_FOR_DESIGN → READY_FOR_ARCH → READY_FOR_BUILD
 **Deliverable**: Standardized DoD checklists in agent YAML frontmatter
 
 **Agents Updated** (5):
+
 1. **AUDITOR** (7-item checklist)
    - Scope all files
    - Scan for quality issues
@@ -842,6 +927,7 @@ BACKLOG → READY_FOR_DESIGN → READY_FOR_ARCH → READY_FOR_BUILD
    - Suggest next steps
 
 **Benefits**:
+
 - Consistent execution across agent invocations
 - Clear expectations for completion
 - Verification criteria for each task
@@ -854,12 +940,14 @@ BACKLOG → READY_FOR_DESIGN → READY_FOR_ARCH → READY_FOR_BUILD
 **Components**:
 
 #### Pre-Flight Checklist
+
 - [ ] List files each agent will read/write
 - [ ] Check for write-write conflicts
 - [ ] Verify unique Linear task assignments
 - [ ] Confirm no shared state modifications
 
 #### Detection Tools
+
 ```bash
 # Simple CLI checker
 .claude/scripts/check-conflicts.sh
@@ -869,6 +957,7 @@ function detectFileConflicts(agentTasks)
 ```
 
 #### Resolution Strategies
+
 1. **File Separation** - Assign disjoint file sets (preferred)
 2. **Sequential Execution** - Run conflicting tasks sequentially
 3. **Git Worktrees** - Isolated workspaces for each agent
@@ -881,6 +970,7 @@ function detectFileConflicts(agentTasks)
 **Deliverable**: `.claude/docs/HOOKS-GUIDE.md` (650+ lines)
 
 **Sections**:
+
 - Overview & configuration
 - on-subagent-stop.sh detailed guide
 - on-stop.sh detailed guide
@@ -916,17 +1006,20 @@ function detectFileConflicts(agentTasks)
 ### 5.7 Impact Assessment
 
 **Reliability Improvements**:
+
 - Workflow automation: Manual → Automated (hooks suggest next steps)
 - Queue tracking: Ad-hoc → Structured (status transitions logged)
 - Definition of Done: Implicit → Explicit (checklists per agent)
 - Conflict prevention: Reactive → Proactive (pre-flight detection)
 
 **Adoption Path**:
+
 - **Phase 5a (Foundation)**: Hooks + Queue + DoD checklists ✅ Complete
 - **Phase 5b (Advanced)**: Git worktrees, multi-model bridges (optional)
 - **Phase 5c (Enterprise)**: Advanced monitoring, resource management (future)
 
 **Alignment Improvement**:
+
 - Before Phase 5: 85% aligned with Anthropic best practices
 - After Phase 5: 98% aligned with best practices (October 2025)
 
@@ -935,6 +1028,7 @@ function detectFileConflicts(agentTasks)
 ### 5.8 Files Created/Modified
 
 **Created** (5 files):
+
 1. `.claude/hooks/on-subagent-stop.sh` (195 lines)
 2. `.claude/hooks/on-stop.sh` (120 lines)
 3. `.claude/queue/enhancements.json` (75 lines)
@@ -942,6 +1036,7 @@ function detectFileConflicts(agentTasks)
 5. `.claude/scripts/check-conflicts.sh` (example in docs)
 
 **Modified** (8 files):
+
 1. `.claude/settings.json` - Added hooks and queue configuration
 2. `.claude/agents/auditor.md` - Added 7-item DoD checklist
 3. `.claude/agents/executor.md` - Added 9-item DoD checklist
@@ -956,6 +1051,7 @@ function detectFileConflicts(agentTasks)
 ### 5.9 Usage Examples
 
 #### Example 1: Assessment → Fix Workflow (Automated)
+
 ```
 User: "/assess"
 AUDITOR completes (15min)
@@ -972,6 +1068,7 @@ CODE-REVIEWER completes (8min)
 **After Hooks**: System guides user through workflow
 
 #### Example 2: Multi-Phase Feature (Queue Tracking)
+
 ```
 PM agent completes requirements
   → Queue: status = "READY_FOR_ARCH"
@@ -989,6 +1086,7 @@ EXECUTOR completes implementation
 **Benefit**: Resume any time by checking queue status
 
 #### Example 3: Conflict Detection (Parallel Safety)
+
 ```
 STRATEGIST: "Fix 5 issues in parallel"
 
@@ -1006,23 +1104,23 @@ Resolution: Run CLEAN-123 → CLEAN-124 sequentially
 
 **October 2025 Best Practices Coverage**:
 
-| Category | Before Phase 5 | After Phase 5 |
-|----------|----------------|---------------|
-| Single Responsibility | 100% | 100% |
-| Context Isolation | 100% | 100% |
-| Explicit Delegation | 100% | 100% |
-| Parallel Patterns | 100% | 100% |
-| Tool Access Control | 100% | 100% |
-| Model Selection | 100% | 100% |
-| Loop Controls | 100% | 100% |
-| Status Tracking | 90% | 100% ✓ |
-| Version Control | 100% | 100% |
-| File Organization | 100% | 100% |
-| **Hooks Automation** | **0%** | **100% ✓** |
-| **Human-in-Loop** | **60%** | **100% ✓** |
-| **Error Prevention** | **70%** | **95% ✓** |
-| Context Efficiency | 90% | 100% ✓ |
-| **Resource Management** | **20%** | **80% ✓** |
+| Category                | Before Phase 5 | After Phase 5 |
+| ----------------------- | -------------- | ------------- |
+| Single Responsibility   | 100%           | 100%          |
+| Context Isolation       | 100%           | 100%          |
+| Explicit Delegation     | 100%           | 100%          |
+| Parallel Patterns       | 100%           | 100%          |
+| Tool Access Control     | 100%           | 100%          |
+| Model Selection         | 100%           | 100%          |
+| Loop Controls           | 100%           | 100%          |
+| Status Tracking         | 90%            | 100% ✓        |
+| Version Control         | 100%           | 100%          |
+| File Organization       | 100%           | 100%          |
+| **Hooks Automation**    | **0%**         | **100% ✓**    |
+| **Human-in-Loop**       | **60%**        | **100% ✓**    |
+| **Error Prevention**    | **70%**        | **95% ✓**     |
+| Context Efficiency      | 90%            | 100% ✓        |
+| **Resource Management** | **20%**        | **80% ✓**     |
 
 **Overall Alignment**: 85% → 98%
 

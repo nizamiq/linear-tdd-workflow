@@ -22,7 +22,7 @@ class CIRecoveryJourney {
       diagnosis: null,
       actions: [],
       outcome: null,
-      incident: null
+      incident: null,
     };
   }
 
@@ -59,7 +59,6 @@ class CIRecoveryJourney {
 
       console.log('✅ Recovery process complete');
       return this.results;
-
     } catch (error) {
       console.error('❌ Recovery failed:', error.message);
       await this.createIncident(error);
@@ -77,7 +76,7 @@ class CIRecoveryJourney {
       ci: await this.checkCIStatus(),
       tests: await this.checkTestStatus(),
       build: await this.checkBuildStatus(),
-      quality: await this.checkQualityGates()
+      quality: await this.checkQualityGates(),
     };
 
     const failures = Object.entries(checks)
@@ -90,7 +89,7 @@ class CIRecoveryJourney {
 
     if (!healthy) {
       console.log('   Failed components:');
-      failures.forEach(f => {
+      failures.forEach((f) => {
         console.log(`      - ${f.component}: ${f.error}`);
       });
     }
@@ -99,7 +98,7 @@ class CIRecoveryJourney {
       healthy,
       checks,
       failures,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     return this.pipelineStatus;
@@ -120,9 +119,8 @@ class CIRecoveryJourney {
 
       return {
         passed: false,
-        error: `CI status: ${parsed[0]?.status || 'unknown'}`
+        error: `CI status: ${parsed[0]?.status || 'unknown'}`,
       };
-
     } catch (error) {
       // Check alternative CI systems
       return this.checkAlternativeCI();
@@ -169,7 +167,6 @@ class CIRecoveryJourney {
 
       execSync(testCommand, { encoding: 'utf8', stdio: 'pipe' });
       return { passed: true, status: 'All tests passing' };
-
     } catch (error) {
       const output = error.stdout || error.stderr || error.message;
 
@@ -179,7 +176,7 @@ class CIRecoveryJourney {
       return {
         passed: false,
         error: `${failures.count} test failures`,
-        failures
+        failures,
       };
     }
   }
@@ -207,12 +204,11 @@ class CIRecoveryJourney {
       }
 
       return { passed: true, status: 'Build successful' };
-
     } catch (error) {
       return {
         passed: false,
         error: 'Build failed',
-        output: error.stdout || error.message
+        output: error.stdout || error.message,
       };
     }
   }
@@ -243,7 +239,7 @@ class CIRecoveryJourney {
     return {
       passed: gates.length === 0,
       error: gates.join(', '),
-      gates
+      gates,
     };
   }
 
@@ -259,7 +255,7 @@ class CIRecoveryJourney {
       category: null,
       rootCause: null,
       confidence: 0,
-      recommendations: []
+      recommendations: [],
     };
 
     for (const failure of status.failures) {
@@ -293,36 +289,36 @@ class CIRecoveryJourney {
         category: 'transient',
         rootCause: 'Timeout error',
         confidence: 0.9,
-        recommendations: ['retry', 'increase-timeout']
+        recommendations: ['retry', 'increase-timeout'],
       },
       {
         pattern: /ENOENT|file not found/i,
         category: 'configuration',
         rootCause: 'Missing file or misconfiguration',
         confidence: 0.95,
-        recommendations: ['check-files', 'verify-paths']
+        recommendations: ['check-files', 'verify-paths'],
       },
       {
         pattern: /dependency|package|module not found/i,
         category: 'dependency',
         rootCause: 'Dependency issue',
         confidence: 0.9,
-        recommendations: ['install-deps', 'clear-cache']
+        recommendations: ['install-deps', 'clear-cache'],
       },
       {
         pattern: /test.*fail|assertion.*fail/i,
         category: 'test-failure',
         rootCause: 'Test regression',
         confidence: 0.85,
-        recommendations: ['quarantine-test', 'revert-commit']
+        recommendations: ['quarantine-test', 'revert-commit'],
       },
       {
         pattern: /memory|heap|OOM/i,
         category: 'resource',
         rootCause: 'Resource exhaustion',
         confidence: 0.8,
-        recommendations: ['increase-memory', 'optimize-code']
-      }
+        recommendations: ['increase-memory', 'optimize-code'],
+      },
     ];
 
     // Check patterns
@@ -339,7 +335,7 @@ class CIRecoveryJourney {
       category: 'unknown',
       rootCause: 'Unknown failure',
       confidence: 0.3,
-      recommendations: ['manual-investigation']
+      recommendations: ['manual-investigation'],
     };
   }
 
@@ -350,12 +346,12 @@ class CIRecoveryJourney {
     console.log('\n🎯 Determining recovery strategy...');
 
     const strategies = {
-      'transient': ['retry', 'wait-retry', 'cache-clear'],
-      'configuration': ['verify-config', 'restore-defaults', 'regenerate'],
-      'dependency': ['reinstall-deps', 'lock-versions', 'cache-clear'],
+      transient: ['retry', 'wait-retry', 'cache-clear'],
+      configuration: ['verify-config', 'restore-defaults', 'regenerate'],
+      dependency: ['reinstall-deps', 'lock-versions', 'cache-clear'],
       'test-failure': ['quarantine', 'skip-flaky', 'revert'],
-      'resource': ['increase-limits', 'cleanup', 'optimize'],
-      'unknown': ['collect-logs', 'create-incident']
+      resource: ['increase-limits', 'cleanup', 'optimize'],
+      unknown: ['collect-logs', 'create-incident'],
     };
 
     const category = diagnosis.category || 'unknown';
@@ -366,7 +362,7 @@ class CIRecoveryJourney {
       actions,
       autoApproved: this.isAutoApproved(diagnosis),
       maxAttempts: 3,
-      timeout: 600000 // 10 minutes
+      timeout: 600000, // 10 minutes
     };
 
     console.log(`   📋 Strategy: ${category}`);
@@ -386,14 +382,12 @@ class CIRecoveryJourney {
     }
 
     // Auto-approve dependency cache issues
-    if (diagnosis.category === 'dependency' &&
-        diagnosis.rootCause.includes('cache')) {
+    if (diagnosis.category === 'dependency' && diagnosis.rootCause.includes('cache')) {
       return true;
     }
 
     // Auto-approve test quarantine for flaky tests
-    if (diagnosis.category === 'test-failure' &&
-        diagnosis.rootCause.includes('flaky')) {
+    if (diagnosis.category === 'test-failure' && diagnosis.rootCause.includes('flaky')) {
       return true;
     }
 
@@ -425,13 +419,13 @@ class CIRecoveryJourney {
       results.push({
         action,
         success: result.success,
-        output: result.output
+        output: result.output,
       });
 
       this.recoveryAttempts.push({
         action,
         result,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
 
       if (result.success) {
@@ -453,7 +447,7 @@ class CIRecoveryJourney {
     return {
       executed: true,
       results,
-      recovered: results.some(r => r.success)
+      recovered: results.some((r) => r.success),
     };
   }
 
@@ -506,7 +500,9 @@ class CIRecoveryJourney {
       return { success: true, output: 'Pipeline rerun triggered' };
     } catch {
       // Fallback: trigger via commit
-      execSync('git commit --allow-empty -m "ci: retry pipeline [skip-changelog]"', { stdio: 'ignore' });
+      execSync('git commit --allow-empty -m "ci: retry pipeline [skip-changelog]"', {
+        stdio: 'ignore',
+      });
       execSync('git push', { stdio: 'ignore' });
       return { success: true, output: 'Pipeline retriggered via empty commit' };
     }
@@ -538,7 +534,7 @@ class CIRecoveryJourney {
 
     return {
       success: cleared.length > 0,
-      output: `Cleared caches: ${cleared.join(', ')}`
+      output: `Cleared caches: ${cleared.join(', ')}`,
     };
   }
 
@@ -569,7 +565,7 @@ class CIRecoveryJourney {
     // This would identify and skip flaky tests
     return {
       success: true,
-      output: 'Flaky tests quarantined (mock implementation)'
+      output: 'Flaky tests quarantined (mock implementation)',
     };
   }
 
@@ -589,7 +585,7 @@ class CIRecoveryJourney {
 
       return {
         success: false,
-        output: 'Cannot auto-revert non-FIL-0/1 commits'
+        output: 'Cannot auto-revert non-FIL-0/1 commits',
       };
     } catch (error) {
       return { success: false, output: error.message };
@@ -652,15 +648,11 @@ class CIRecoveryJourney {
       duration: this.calculateDuration(),
       metrics: {
         attemptCount: this.recoveryAttempts.length,
-        timeToRecovery: this.calculateDuration()
-      }
+        timeToRecovery: this.calculateDuration(),
+      },
     };
 
-    const reportPath = path.join(
-      this.projectRoot,
-      'ci-recovery',
-      `recovery-${Date.now()}.json`
-    );
+    const reportPath = path.join(this.projectRoot, 'ci-recovery', `recovery-${Date.now()}.json`);
 
     await this.ensureDirectory(path.dirname(reportPath));
     await fs.writeFile(reportPath, JSON.stringify(report, null, 2));
@@ -679,14 +671,10 @@ class CIRecoveryJourney {
       diagnosis: this.failureAnalysis,
       attempts: this.recoveryAttempts,
       error: error?.message,
-      requiresManual: true
+      requiresManual: true,
     };
 
-    const incidentPath = path.join(
-      this.projectRoot,
-      'incidents',
-      `${incident.id}.json`
-    );
+    const incidentPath = path.join(this.projectRoot, 'incidents', `${incident.id}.json`);
 
     await this.ensureDirectory(path.dirname(incidentPath));
     await fs.writeFile(incidentPath, JSON.stringify(incident, null, 2));
@@ -705,8 +693,7 @@ class CIRecoveryJourney {
     if (await this.fileExists('package.json')) {
       return 'javascript';
     }
-    if (await this.fileExists('requirements.txt') ||
-        await this.fileExists('pyproject.toml')) {
+    if ((await this.fileExists('requirements.txt')) || (await this.fileExists('pyproject.toml'))) {
       return 'python';
     }
     return 'javascript';
@@ -745,13 +732,19 @@ class CIRecoveryJourney {
       const projectType = await this.detectProjectType();
 
       if (projectType === 'javascript') {
-        const output = execSync('npm test -- --coverage | grep "All files"', { encoding: 'utf8', stdio: 'pipe' });
+        const output = execSync('npm test -- --coverage | grep "All files"', {
+          encoding: 'utf8',
+          stdio: 'pipe',
+        });
         const match = output.match(/(\d+(?:\.\d+)?)\s*%/);
         return match ? parseFloat(match[1]) : 0;
       }
 
       if (projectType === 'python') {
-        const output = execSync('pytest --cov --cov-report=term | grep TOTAL', { encoding: 'utf8', stdio: 'pipe' });
+        const output = execSync('pytest --cov --cov-report=term | grep TOTAL', {
+          encoding: 'utf8',
+          stdio: 'pipe',
+        });
         const match = output.match(/(\d+)%/);
         return match ? parseInt(match[1]) : 0;
       }
@@ -774,7 +767,7 @@ class CIRecoveryJourney {
     // This would modify CI configuration
     return {
       success: false,
-      output: 'Resource limit increase requires manual configuration'
+      output: 'Resource limit increase requires manual configuration',
     };
   }
 
@@ -793,18 +786,14 @@ class CIRecoveryJourney {
       logs.push({ type: 'ci', content: ciLogs });
     } catch {}
 
-    const logPath = path.join(
-      this.projectRoot,
-      'diagnostics',
-      `logs-${Date.now()}.json`
-    );
+    const logPath = path.join(this.projectRoot, 'diagnostics', `logs-${Date.now()}.json`);
 
     await this.ensureDirectory(path.dirname(logPath));
     await fs.writeFile(logPath, JSON.stringify(logs, null, 2));
 
     return {
       success: true,
-      output: `Logs collected to ${path.relative(this.projectRoot, logPath)}`
+      output: `Logs collected to ${path.relative(this.projectRoot, logPath)}`,
     };
   }
 
@@ -818,7 +807,7 @@ class CIRecoveryJourney {
   }
 
   async sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
 

@@ -39,6 +39,7 @@ tags: [tdd, testing, development, workflow, quality]
 The fundamental TDD cycle is **non-negotiable** for all development:
 
 #### Phase 1: RED - Write Failing Test
+
 ```typescript
 // ALWAYS start with a failing test
 describe('Calculator', () => {
@@ -50,12 +51,14 @@ describe('Calculator', () => {
 ```
 
 **Requirements:**
+
 - Write a single, small, focused test
-- Test defines what the code *should* do
+- Test defines what the code _should_ do
 - Confirm test fails for the expected reason
 - Never write production code without a failing test
 
 #### Phase 2: GREEN - Minimal Implementation
+
 ```typescript
 // Write ONLY enough code to pass the test
 class Calculator {
@@ -66,17 +69,19 @@ class Calculator {
 ```
 
 **Requirements:**
+
 - Write absolute minimum code to pass
 - Do not add extra logic or edge cases
 - Focus only on making the test green
 - Resist temptation to over-engineer
 
 #### Phase 3: REFACTOR - Improve with Safety
+
 ```typescript
 // Refactor ONLY with passing tests
 class Calculator {
   private validateNumbers(...nums: number[]): void {
-    nums.forEach(num => {
+    nums.forEach((num) => {
       if (typeof num !== 'number' || isNaN(num)) {
         throw new TypeError('Invalid number provided');
       }
@@ -91,6 +96,7 @@ class Calculator {
 ```
 
 **Requirements:**
+
 - All tests must remain green
 - Improve code clarity and design
 - Remove duplication
@@ -99,31 +105,45 @@ class Calculator {
 ### 1.2 Clean Code Principles
 
 #### Single Responsibility Principle (SRP)
+
 Every function, class, or module has **one reason to change**:
 
 ```typescript
 // BAD: Multiple responsibilities
 class UserService {
-  validateEmail(email: string) { /* ... */ }
-  sendEmail(email: string) { /* ... */ }
-  saveToDatabase(user: User) { /* ... */ }
+  validateEmail(email: string) {
+    /* ... */
+  }
+  sendEmail(email: string) {
+    /* ... */
+  }
+  saveToDatabase(user: User) {
+    /* ... */
+  }
 }
 
 // GOOD: Single responsibility
 class EmailValidator {
-  validate(email: string): boolean { /* ... */ }
+  validate(email: string): boolean {
+    /* ... */
+  }
 }
 
 class EmailSender {
-  send(email: string): void { /* ... */ }
+  send(email: string): void {
+    /* ... */
+  }
 }
 
 class UserRepository {
-  save(user: User): void { /* ... */ }
+  save(user: User): void {
+    /* ... */
+  }
 }
 ```
 
 #### Don't Repeat Yourself (DRY)
+
 Abstract shared logic into reusable components:
 
 ```typescript
@@ -147,6 +167,7 @@ function calculateTax(amount: number, rate: number = TAX_RATE): number {
 ```
 
 #### Keep It Simple, Stupid (KISS)
+
 Favor simple, straightforward solutions:
 
 ```typescript
@@ -180,12 +201,14 @@ class UserFactory {
 #### Unit Testing Requirements
 
 **Characteristics:**
+
 - Small, fast, isolated
 - Test single units in isolation
 - Mock all external dependencies
 - Run in milliseconds
 
 **Example:**
+
 ```typescript
 describe('UserValidator', () => {
   let validator: UserValidator;
@@ -215,12 +238,14 @@ describe('UserValidator', () => {
 #### Integration Testing Requirements
 
 **Characteristics:**
+
 - Test component interactions
 - Use real implementations where practical
 - Test database transactions
 - Verify API contracts
 
 **Example:**
+
 ```typescript
 describe('User Registration Flow', () => {
   let app: Application;
@@ -236,12 +261,10 @@ describe('User Registration Flow', () => {
   });
 
   test('complete registration flow', async () => {
-    const response = await request(app)
-      .post('/api/register')
-      .send({
-        email: 'newuser@example.com',
-        password: 'SecurePass123!'
-      });
+    const response = await request(app).post('/api/register').send({
+      email: 'newuser@example.com',
+      password: 'SecurePass123!',
+    });
 
     expect(response.status).toBe(201);
     expect(response.body).toHaveProperty('userId');
@@ -256,12 +279,14 @@ describe('User Registration Flow', () => {
 #### End-to-End Testing Requirements
 
 **Characteristics:**
+
 - Simulate complete user journeys
 - Run against production-like environment
 - Validate entire workflows
 - Include UI interactions
 
 **Example:**
+
 ```typescript
 describe('User Purchase Flow', () => {
   test('complete purchase journey', async () => {
@@ -292,31 +317,31 @@ describe('User Purchase Flow', () => {
 
 #### Coverage Requirements
 
-| Metric | Minimum | Target | Critical Path |
-|--------|---------|--------|---------------|
-| Line Coverage | 80% | 90% | 95% |
-| Branch Coverage | 75% | 85% | 90% |
-| Function Coverage | 80% | 90% | 95% |
-| Diff Coverage | 80% | 90% | 95% |
+| Metric            | Minimum | Target | Critical Path |
+| ----------------- | ------- | ------ | ------------- |
+| Line Coverage     | 80%     | 90%    | 95%           |
+| Branch Coverage   | 75%     | 85%    | 90%           |
+| Function Coverage | 80%     | 90%    | 95%           |
+| Diff Coverage     | 80%     | 90%    | 95%           |
 
 #### Mutation Testing Thresholds
 
 ```yaml
 stryker_config:
-  mutationScoreThreshold: 30  # Minimum
-  targetMutationScore: 50     # Goal
-  criticalPathScore: 70       # Critical code
+  mutationScoreThreshold: 30 # Minimum
+  targetMutationScore: 50 # Goal
+  criticalPathScore: 70 # Critical code
 ```
 
 #### Quality Metrics
 
-| Metric | Threshold | Action if Exceeded |
-|--------|-----------|-------------------|
-| Cyclomatic Complexity | >10 | Refactor required |
-| Function Length | >50 lines | Split function |
-| File Length | >300 lines | Split file |
-| Class Cohesion | <0.5 | Restructure class |
-| Coupling | >5 | Reduce dependencies |
+| Metric                | Threshold  | Action if Exceeded  |
+| --------------------- | ---------- | ------------------- |
+| Cyclomatic Complexity | >10        | Refactor required   |
+| Function Length       | >50 lines  | Split function      |
+| File Length           | >300 lines | Split file          |
+| Class Cohesion        | <0.5       | Restructure class   |
+| Coupling              | >5         | Reduce dependencies |
 
 ## 2. Implementation
 
@@ -325,6 +350,7 @@ stryker_config:
 #### JavaScript/TypeScript
 
 **Testing Framework:** Jest
+
 ```json
 {
   "jest": {
@@ -343,6 +369,7 @@ stryker_config:
 ```
 
 **Linting:** ESLint + Prettier
+
 ```json
 {
   "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
@@ -355,6 +382,7 @@ stryker_config:
 ```
 
 **Formatting:** Prettier
+
 ```json
 {
   "semi": true,
@@ -367,6 +395,7 @@ stryker_config:
 #### Python
 
 **Testing Framework:** pytest
+
 ```ini
 # pytest.ini
 [tool.pytest.ini_options]
@@ -377,6 +406,7 @@ python_files = "test_*.py"
 ```
 
 **Linting:** Ruff
+
 ```toml
 # ruff.toml
 [tool.ruff]
@@ -389,6 +419,7 @@ max-complexity = 10
 ```
 
 **Formatting:** Black
+
 ```toml
 # pyproject.toml
 [tool.black]
@@ -511,20 +542,20 @@ export const QualityGates = {
     lines: 80,
     branches: 75,
     functions: 80,
-    statements: 80
+    statements: 80,
   },
   complexity: {
     cyclomatic: 10,
-    cognitive: 15
+    cognitive: 15,
   },
   duplication: {
-    threshold: 3 // Max 3% duplication
+    threshold: 3, // Max 3% duplication
   },
   security: {
     critical: 0,
     high: 0,
-    medium: 3 // Max 3 medium issues
-  }
+    medium: 3, // Max 3 medium issues
+  },
 };
 
 // Enforce in CI
@@ -532,11 +563,15 @@ export async function enforceQualityGates(metrics: Metrics): Promise<void> {
   const violations = [];
 
   if (metrics.coverage.lines < QualityGates.coverage.lines) {
-    violations.push(`Line coverage ${metrics.coverage.lines}% below threshold ${QualityGates.coverage.lines}%`);
+    violations.push(
+      `Line coverage ${metrics.coverage.lines}% below threshold ${QualityGates.coverage.lines}%`,
+    );
   }
 
   if (metrics.complexity.cyclomatic > QualityGates.complexity.cyclomatic) {
-    violations.push(`Cyclomatic complexity ${metrics.complexity.cyclomatic} exceeds threshold ${QualityGates.complexity.cyclomatic}`);
+    violations.push(
+      `Cyclomatic complexity ${metrics.complexity.cyclomatic} exceeds threshold ${QualityGates.complexity.cyclomatic}`,
+    );
   }
 
   if (violations.length > 0) {
@@ -552,12 +587,14 @@ export async function enforceQualityGates(metrics: Metrics): Promise<void> {
 #### Pre-Deployment Checklist
 
 **Code Review**
+
 - [ ] All changes reviewed by 2+ developers
 - [ ] Review comments addressed
 - [ ] No experimental code in production branch
 - [ ] Follows TDD methodology
 
 **Testing**
+
 - [ ] All unit tests passing (100%)
 - [ ] Integration tests passing
 - [ ] E2E tests passing for critical paths
@@ -566,18 +603,21 @@ export async function enforceQualityGates(metrics: Metrics): Promise<void> {
 - [ ] No critical security vulnerabilities
 
 **Documentation**
+
 - [ ] API documentation updated
 - [ ] README updated if needed
 - [ ] CHANGELOG entry added
 - [ ] Architecture decisions documented
 
 **Configuration**
+
 - [ ] Environment variables documented
 - [ ] No hardcoded secrets
 - [ ] Configuration validated
 - [ ] Feature flags configured
 
 **Performance**
+
 - [ ] Load testing completed
 - [ ] Response time SLAs met
 - [ ] Database queries optimized
@@ -586,6 +626,7 @@ export async function enforceQualityGates(metrics: Metrics): Promise<void> {
 #### TDD Checklist
 
 **RED Phase**
+
 - [ ] Test written before code
 - [ ] Test is focused and small
 - [ ] Test clearly describes expected behavior
@@ -593,6 +634,7 @@ export async function enforceQualityGates(metrics: Metrics): Promise<void> {
 - [ ] No production code written yet
 
 **GREEN Phase**
+
 - [ ] Minimal code to pass test
 - [ ] No extra functionality added
 - [ ] All existing tests still pass
@@ -600,6 +642,7 @@ export async function enforceQualityGates(metrics: Metrics): Promise<void> {
 - [ ] Code is simplest solution
 
 **REFACTOR Phase**
+
 - [ ] All tests remain green
 - [ ] Code duplication removed
 - [ ] Names are clear and meaningful
@@ -610,31 +653,31 @@ export async function enforceQualityGates(metrics: Metrics): Promise<void> {
 
 #### Test Execution Metrics
 
-| Test Type | Max Duration | Parallelization | Retry Policy |
-|-----------|--------------|-----------------|--------------|
-| Unit | <100ms per test | Yes (4 workers) | No retry |
-| Integration | <5s per test | Yes (2 workers) | 1 retry |
-| E2E | <30s per test | No | 2 retries |
-| Smoke | <2min total | No | No retry |
+| Test Type   | Max Duration    | Parallelization | Retry Policy |
+| ----------- | --------------- | --------------- | ------------ |
+| Unit        | <100ms per test | Yes (4 workers) | No retry     |
+| Integration | <5s per test    | Yes (2 workers) | 1 retry      |
+| E2E         | <30s per test   | No              | 2 retries    |
+| Smoke       | <2min total     | No              | No retry     |
 
 #### Code Quality Metrics
 
-| Metric | Excellent | Good | Acceptable | Poor |
-|--------|-----------|------|------------|------|
-| Test Coverage | >95% | 85-95% | 80-85% | <80% |
-| Cyclomatic Complexity | <5 | 5-10 | 10-15 | >15 |
-| Code Duplication | <1% | 1-3% | 3-5% | >5% |
-| Technical Debt Ratio | <5% | 5-10% | 10-20% | >20% |
-| Maintainability Index | >85 | 65-85 | 50-65 | <50 |
+| Metric                | Excellent | Good   | Acceptable | Poor |
+| --------------------- | --------- | ------ | ---------- | ---- |
+| Test Coverage         | >95%      | 85-95% | 80-85%     | <80% |
+| Cyclomatic Complexity | <5        | 5-10   | 10-15      | >15  |
+| Code Duplication      | <1%       | 1-3%   | 3-5%       | >5%  |
+| Technical Debt Ratio  | <5%       | 5-10%  | 10-20%     | >20% |
+| Maintainability Index | >85       | 65-85  | 50-65      | <50  |
 
 #### Performance Benchmarks
 
-| Operation | P50 | P95 | P99 | Max |
-|-----------|-----|-----|-----|-----|
-| API Response | 100ms | 300ms | 500ms | 1s |
-| Database Query | 10ms | 50ms | 100ms | 500ms |
-| Page Load | 1s | 2s | 3s | 5s |
-| Background Job | 30s | 2min | 5min | 10min |
+| Operation      | P50   | P95   | P99   | Max   |
+| -------------- | ----- | ----- | ----- | ----- |
+| API Response   | 100ms | 300ms | 500ms | 1s    |
+| Database Query | 10ms  | 50ms  | 100ms | 500ms |
+| Page Load      | 1s    | 2s    | 3s    | 5s    |
+| Background Job | 30s   | 2min  | 5min  | 10min |
 
 ### 3.3 Common Patterns
 
@@ -646,7 +689,7 @@ class UserBuilder {
   private user: Partial<User> = {
     id: 'test-id',
     email: 'test@example.com',
-    name: 'Test User'
+    name: 'Test User',
   };
 
   withEmail(email: string): this {
@@ -665,10 +708,7 @@ class UserBuilder {
 }
 
 // Usage
-const adminUser = new UserBuilder()
-  .withEmail('admin@example.com')
-  .withRole('admin')
-  .build();
+const adminUser = new UserBuilder().withEmail('admin@example.com').withRole('admin').build();
 ```
 
 #### Mock Factories
@@ -682,7 +722,7 @@ export class MockFactory {
       insert: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
-      transaction: jest.fn()
+      transaction: jest.fn(),
     };
   }
 
@@ -691,7 +731,7 @@ export class MockFactory {
       info: jest.fn(),
       warn: jest.fn(),
       error: jest.fn(),
-      debug: jest.fn()
+      debug: jest.fn(),
     };
   }
 }
@@ -711,9 +751,9 @@ expect.extend({
       message: () =>
         pass
           ? `Expected ${received} not to be a valid email`
-          : `Expected ${received} to be a valid email`
+          : `Expected ${received} to be a valid email`,
     };
-  }
+  },
 });
 
 // Usage
@@ -729,13 +769,13 @@ export const fixtures = {
     valid: {
       email: 'valid@example.com',
       password: 'SecurePass123!',
-      name: 'Valid User'
+      name: 'Valid User',
     },
     invalid: {
       email: 'invalid-email',
       password: '123',
-      name: ''
-    }
+      name: '',
+    },
   },
 
   products: {
@@ -743,9 +783,9 @@ export const fixtures = {
       id: 'prod-1',
       name: 'Laptop',
       price: 999.99,
-      stock: 10
-    }
-  }
+      stock: 10,
+    },
+  },
 };
 ```
 
@@ -772,6 +812,7 @@ The Linear TDD Workflow System treats **tests as the source of truth**. Producti
 ### Appendix B: Anti-Patterns to Avoid
 
 **Testing Anti-Patterns:**
+
 - Writing tests after code
 - Testing implementation details
 - Excessive mocking
@@ -779,6 +820,7 @@ The Linear TDD Workflow System treats **tests as the source of truth**. Producti
 - Test code duplication
 
 **Code Anti-Patterns:**
+
 - God classes/functions
 - Deep nesting (>3 levels)
 - Magic numbers/strings
@@ -797,4 +839,4 @@ For existing codebases without TDD:
 
 ---
 
-*This document represents the mandatory TDD workflow for all development. Non-compliance will result in PR rejection and pipeline failure.*
+_This document represents the mandatory TDD workflow for all development. Non-compliance will result in PR rejection and pipeline failure._

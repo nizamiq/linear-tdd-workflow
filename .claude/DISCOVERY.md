@@ -53,6 +53,7 @@ node .claude/journeys/jr1-onboarding.js
 When the user asks you to:
 
 **Core Workflow:**
+
 1. **"Check code quality"** → Use `/assess` command
 2. **"Fix issues"** → Use `/fix <TASK-ID>` command
 3. **"Fix pipeline"** → Use `/recover` command
@@ -62,15 +63,9 @@ When the user asks you to:
 7. **"Plan sprint"** → Use `/cycle` command
 8. **"Validate documentation"** → Use `/docs` command
 
-**Development Tasks:**
-8. **"Django help"** → Use `/django` command
-9. **"Python optimization"** → Use `/python` command
-10. **"TypeScript migration"** → Use `/typescript` command
+**Development Tasks:** 8. **"Django help"** → Use `/django` command 9. **"Python optimization"** → Use `/python` command 10. **"TypeScript migration"** → Use `/typescript` command
 
-**Infrastructure:**
-11. **"Deploy to production"** → Use `/deploy` command
-12. **"Fix database performance"** → Use `/optimize-db` command
-13. **"Set up monitoring"** → Use `/monitor` command
+**Infrastructure:** 11. **"Deploy to production"** → Use `/deploy` command 12. **"Fix database performance"** → Use `/optimize-db` command 13. **"Set up monitoring"** → Use `/monitor` command
 
 ### For Autonomous Operation
 
@@ -90,16 +85,19 @@ make fix-pack
 ## Key Files & Locations
 
 ### Configuration
+
 - `.env` - API keys and settings (LINEAR_API_KEY required)
 - `.claude/settings.json` - System configuration
 - `.claude/journeys/registry.yaml` - Journey definitions
 
 ### Commands
+
 - `Makefile` - Universal command interface
 - `.claude/cli.js` - Direct agent invocation
 - `package.json` - npm scripts
 
 ### Documentation
+
 - `.claude/docs/` - System documentation
 - `docs/JOURNEYS.md` - Journey details
 - `CLAUDE.md` - Project-specific instructions
@@ -121,6 +119,7 @@ When helping the user, consider:
 ## Language Support
 
 The system auto-detects and supports:
+
 - **JavaScript/TypeScript** (via package.json)
 - **Python** (via requirements.txt or pyproject.toml)
 
@@ -141,7 +140,7 @@ node .claude/cli.js status
 1. **Max 300 LOC per PR** - Fix packs are limited
 2. **80% coverage required** - On all changes
 3. **Linear API key required** - For task management
-4. **GitFlow enforced** - feature/*, release/*, hotfix/*
+4. **GitFlow enforced** - feature/_, release/_, hotfix/\*
 
 ## Getting Help
 

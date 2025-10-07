@@ -43,17 +43,20 @@ This project and everyone participating in it is governed by our Code of Conduct
 ### Installation Steps
 
 1. **Install dependencies**:
+
    ```bash
    npm install
    ```
 
 2. **Set up environment**:
+
    ```bash
    cp .env.example .env
    # Edit .env with your configuration
    ```
 
 3. **Initialize GitFlow**:
+
    ```bash
    git flow init -d
    ```
@@ -119,15 +122,18 @@ Your pull request must:
 
 ```markdown
 ## Description
+
 Brief description of changes
 
 ## Type of Change
+
 - [ ] Bug fix (non-breaking change which fixes an issue)
 - [ ] New feature (non-breaking change which adds functionality)
 - [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
 - [ ] Documentation update
 
 ## Testing
+
 - [ ] Test written first ([RED])
 - [ ] Implementation complete ([GREEN])
 - [ ] Code refactored ([REFACTOR])
@@ -135,6 +141,7 @@ Brief description of changes
 - [ ] Coverage ≥80%
 
 ## Checklist
+
 - [ ] My code follows the style guidelines
 - [ ] I have performed a self-review
 - [ ] I have commented my code where necessary
@@ -205,6 +212,7 @@ def calculate_total_price(items: List[Item]) -> float:
 ## Documentation Standards
 
 ### File Naming
+
 - Use **kebab-case** for all documentation files
 - Example: `my-new-feature.md`, not `My New Feature.md`
 
@@ -214,19 +222,24 @@ def calculate_total_price(items: List[Item]) -> float:
 # Document Title
 
 ## Overview
+
 Brief introduction (2-3 sentences)
 
 ## Table of Contents (if > 500 words)
+
 - [Section 1](#section-1)
 - [Section 2](#section-2)
 
 ## Section 1
+
 Content with clear, concise writing
 
 ### Subsection
+
 More detailed information
 
 ## Code Examples
+
 \`\`\`typescript
 // Complete, runnable example
 const example = new Example();
@@ -235,11 +248,13 @@ example.run();
 \`\`\`
 
 ## Next Steps
+
 - Link to related documentation
 - Suggested follow-up actions
 ```
 
 ### Writing Style
+
 - Use **active voice**: "The system processes requests" not "Requests are processed by the system"
 - Keep sentences **under 25 words** when possible
 - Use **present tense** for descriptions
@@ -281,6 +296,7 @@ describe('ComponentName', () => {
 ```
 
 ### Coverage Requirements
+
 - **Unit tests**: ≥90% coverage
 - **Integration tests**: Key workflows covered
 - **E2E tests**: Critical user paths
@@ -291,6 +307,7 @@ describe('ComponentName', () => {
 We follow [Conventional Commits](https://www.conventionalcommits.org/) specification:
 
 ### Format
+
 ```
 <type>(<scope>): <subject>
 
@@ -300,6 +317,7 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/) specifica
 ```
 
 ### Types
+
 - **feat**: New feature
 - **fix**: Bug fix
 - **docs**: Documentation only
@@ -352,6 +370,7 @@ Follow GitFlow conventions:
 - `release/version-number` - Release preparation
 
 Examples:
+
 - `feature/LIN-123-add-authentication`
 - `bugfix/LIN-456-fix-memory-leak`
 - `release/1.2.0`
@@ -382,6 +401,7 @@ Examples:
 ## Recognition
 
 Contributors are recognized in:
+
 - The project README
 - Release notes
 - Our contributors page
@@ -390,5 +410,5 @@ Thank you for contributing to Linear TDD Workflow System! 🎉
 
 ---
 
-*Last updated: 2024*
-*Version: 1.2.0*
+_Last updated: 2024_
+_Version: 1.2.0_

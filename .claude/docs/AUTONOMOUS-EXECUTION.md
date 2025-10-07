@@ -9,6 +9,7 @@ This document explains how the autonomous execution system works, what "autonomo
 ## What is Autonomous Execution?
 
 **Autonomous execution** means:
+
 - ✅ Slash commands trigger immediate agent invocation
 - ✅ Agents complete their full workflow without pausing
 - ✅ No manual Task tool invocations required
@@ -16,6 +17,7 @@ This document explains how the autonomous execution system works, what "autonomo
 - ✅ Agents make decisions within their scope automatically
 
 **Autonomous execution does NOT mean**:
+
 - ❌ No human oversight
 - ❌ Bypassing safety checks
 - ❌ Deploying to production without approval
@@ -32,6 +34,7 @@ When a user invokes a slash command:
 ```
 
 Claude Code:
+
 1. Reads `.claude/commands/assess.md`
 2. Sees the "🤖 Execution Instructions for Claude Code" section
 3. Follows the instructions to invoke the AUDITOR agent via Task tool
@@ -40,6 +43,7 @@ Claude Code:
 ### 2. Agent Execution
 
 The AUDITOR agent receives the Task tool invocation and:
+
 1. Reads its specification from `.claude/agents/auditor.md`
 2. Sees the "⚡ IMMEDIATE EXECUTION INSTRUCTIONS" section at the top
 3. Begins execution immediately without asking for permission
@@ -52,6 +56,7 @@ The AUDITOR agent receives the Task tool invocation and:
 ### 3. Result Presentation
 
 Claude Code receives the agent's results and:
+
 1. Displays quality report to user
 2. Shows key metrics and findings
 3. Asks user: "Would you like me to create Linear tasks for these findings?"
@@ -203,6 +208,7 @@ These actions execute **without pausing**:
 **Human intervention**: Once (Linear task creation approval)
 
 **Autonomous actions**:
+
 - Scan all files in scope
 - Categorize issues by severity
 - Generate assessment report
@@ -216,6 +222,7 @@ These actions execute **without pausing**:
 **Human intervention**: None (PR creation automatic)
 
 **Autonomous actions**:
+
 - Retrieve task from Linear
 - RED phase: Write failing test
 - GREEN phase: Implement minimal solution
@@ -230,6 +237,7 @@ These actions execute **without pausing**:
 **Human intervention**: Once (Linear cycle creation approval)
 
 **Autonomous actions**:
+
 - Phase 1: Analyze Linear state (parallelized)
 - Phase 2: Score and select issues
 - Phase 3: Create work queues
@@ -243,6 +251,7 @@ These actions execute **without pausing**:
 **Human intervention**: Once (incident creation, if enabled)
 
 **Autonomous actions**:
+
 - Detect pipeline failures
 - Analyze root cause
 - Apply recovery strategy
@@ -257,6 +266,7 @@ These actions execute **without pausing**:
 **Human intervention**: Once (production deployment approval)
 
 **Autonomous actions**:
+
 - Phase 1: Preparation (branch, version, changelog)
 - Phase 2: Pre-flight checks
 - Phase 2.5: Functional release gate validation
@@ -276,6 +286,7 @@ The system uses parallel execution for maximum efficiency:
 ### AUDITOR Agent
 
 For large codebases (>100k LOC):
+
 - Analyzes codebase size using Bash commands
 - **Partitions by directory** (e.g., src/api, src/ui, src/core, tests)
 - **Launches parallel AUDITOR subagents via Task tool**:
@@ -296,6 +307,7 @@ For large codebases (>100k LOC):
 ### PLANNER Agent
 
 **Phase 1 - Parallel Analysis**:
+
 ```
 In a SINGLE message, makes 4 Task tool calls:
 - Task call 1: general-purpose for cycle health
@@ -303,15 +315,18 @@ In a SINGLE message, makes 4 Task tool calls:
 - Task call 3: AUDITOR for backlog analysis
 - Task call 4: general-purpose for dependency mapping
 ```
+
 Waits for all 4 to complete, then merges results
 
 **Phase 4 - Parallel Validation**:
+
 ```
 In a SINGLE message, makes 3 Task tool calls:
 - Task call 1: GUARDIAN for pipeline health
 - Task call 2: general-purpose for environment config
 - Task call 3: general-purpose for quality gates
 ```
+
 Waits for all 3 to complete, then merges results
 
 **Critical**: All Task calls within each phase MUST be in a single message
@@ -321,6 +336,7 @@ Waits for all 3 to complete, then merges results
 ### EXECUTOR Agent
 
 For batch fix implementations:
+
 - STRATEGIST launches multiple EXECUTOR agents
 - Each EXECUTOR implements one fix independently
 - All follow strict TDD cycle
@@ -336,6 +352,7 @@ For batch fix implementations:
 **Cause**: Immediate execution instructions not being read
 
 **Fix**:
+
 1. Check command file has "🤖 Execution Instructions" section
 2. Check agent file has "⚡ IMMEDIATE EXECUTION INSTRUCTIONS" section
 3. Ensure instructions are clear and directive
@@ -347,6 +364,7 @@ For batch fix implementations:
 **Cause**: Instructions not clear about autonomous execution
 
 **Fix**:
+
 1. Update instructions to say "execute all phases WITHOUT pausing"
 2. Add "DO NOT ask permission between phases" to agent spec
 
@@ -357,6 +375,7 @@ For batch fix implementations:
 **Cause**: Command instructions missing approval gate step
 
 **Fix**:
+
 1. Add "Step 3: Pause for Approval" section to command
 2. Ensure instructions say "Ask user: Would you like...?"
 
@@ -367,6 +386,7 @@ For batch fix implementations:
 **Cause**: Non-STRATEGIST agent trying to access Linear
 
 **Fix**:
+
 1. Ensure only STRATEGIST has linear-server in mcp_servers
 2. Route all Linear operations through STRATEGIST
 3. Update command to invoke STRATEGIST for Linear tasks
@@ -431,13 +451,13 @@ Ensure Linear MCP server is configured in `.claude/mcp.json`:
 
 ## Performance SLAs
 
-| Operation | Target Time | With Parallelization |
-|-----------|-------------|---------------------|
-| Code Assessment | 8-12 min | 5-8 min |
-| TDD Fix Implementation | 12-18 min | N/A (sequential) |
-| Cycle Planning | 80 min | 40 min |
-| Pipeline Recovery | 10-15 min | N/A |
-| Release Management | 50 min | N/A |
+| Operation              | Target Time | With Parallelization |
+| ---------------------- | ----------- | -------------------- |
+| Code Assessment        | 8-12 min    | 5-8 min              |
+| TDD Fix Implementation | 12-18 min   | N/A (sequential)     |
+| Cycle Planning         | 80 min      | 40 min               |
+| Pipeline Recovery      | 10-15 min   | N/A                  |
+| Release Management     | 50 min      | N/A                  |
 
 ## Success Metrics
 
@@ -468,15 +488,15 @@ Ensure Linear MCP server is configured in `.claude/mcp.json`:
 
 ## Quick Reference
 
-| User Action | Agent | Autonomous? | Approval Gate? |
-|-------------|-------|-------------|----------------|
-| `/assess` | AUDITOR | Yes | Linear task creation |
-| `/fix CLEAN-123` | EXECUTOR | Yes | No (PR reviewed separately) |
-| `/cycle plan` | PLANNER | Yes | Linear cycle creation |
-| `/recover` | GUARDIAN | Yes | Incident creation (optional) |
-| `/release 1.2.0` | STRATEGIST | Semi | Production deployment |
-| `/learn` | SCHOLAR | Yes | No |
-| `/status` | STRATEGIST | Yes | No |
+| User Action      | Agent      | Autonomous? | Approval Gate?               |
+| ---------------- | ---------- | ----------- | ---------------------------- |
+| `/assess`        | AUDITOR    | Yes         | Linear task creation         |
+| `/fix CLEAN-123` | EXECUTOR   | Yes         | No (PR reviewed separately)  |
+| `/cycle plan`    | PLANNER    | Yes         | Linear cycle creation        |
+| `/recover`       | GUARDIAN   | Yes         | Incident creation (optional) |
+| `/release 1.2.0` | STRATEGIST | Semi        | Production deployment        |
+| `/learn`         | SCHOLAR    | Yes         | No                           |
+| `/status`        | STRATEGIST | Yes         | No                           |
 
 ## Version
 

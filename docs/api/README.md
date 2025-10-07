@@ -21,6 +21,7 @@ npm run docs:openapi
 ## Documentation Standards
 
 All API endpoints should be documented with:
+
 - Clear descriptions
 - Request/response schemas
 - Example payloads

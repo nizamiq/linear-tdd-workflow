@@ -11,7 +11,17 @@
       "description": "Assessment scope",
       "values": ["full", "changed", "incremental", "critical"],
       "default": "changed",
-      "agents": ["AUDITOR", "ANALYZER", "CLEANER", "MIGRATOR", "ARCHITECT", "REFACTORER", "DOCUMENTER", "INTEGRATOR", "RESEARCHER"],
+      "agents": [
+        "AUDITOR",
+        "ANALYZER",
+        "CLEANER",
+        "MIGRATOR",
+        "ARCHITECT",
+        "REFACTORER",
+        "DOCUMENTER",
+        "INTEGRATOR",
+        "RESEARCHER"
+      ],
       "conflicts": "NONE"
     },
     "depth": {
@@ -19,7 +29,17 @@
       "description": "Analysis depth",
       "values": ["shallow", "deep", "standard", "quick"],
       "default": "standard",
-      "agents": ["AUDITOR", "ANALYZER", "CLEANER", "MIGRATOR", "ARCHITECT", "REFACTORER", "DOCUMENTER", "INTEGRATOR", "RESEARCHER"],
+      "agents": [
+        "AUDITOR",
+        "ANALYZER",
+        "CLEANER",
+        "MIGRATOR",
+        "ARCHITECT",
+        "REFACTORER",
+        "DOCUMENTER",
+        "INTEGRATOR",
+        "RESEARCHER"
+      ],
       "conflicts": "NONE"
     },
     "language": {

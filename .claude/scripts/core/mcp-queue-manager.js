@@ -21,7 +21,7 @@ const colors = {
   cyan: (text) => `[36m${text}[0m`,
   white: (text) => `[37m${text}[0m`,
   gray: (text) => `[90m${text}[0m`,
-  bold: (text) => `[1m${text}[0m`
+  bold: (text) => `[1m${text}[0m`,
 };
 
 class McpQueueManager extends EventEmitter {
@@ -32,10 +32,10 @@ class McpQueueManager extends EventEmitter {
     this.serverLimits = {
       'linear-server': 2,
       'sequential-thinking': 2,
-      'context7': 1, // Conservative for unknown servers
-      'kubernetes': 1,
-      'playwright': 2,
-      ...options.customLimits
+      context7: 1, // Conservative for unknown servers
+      kubernetes: 1,
+      playwright: 2,
+      ...options.customLimits,
     };
 
     // Active operations per server
@@ -52,7 +52,7 @@ class McpQueueManager extends EventEmitter {
       failedRequests: 0,
       timeoutRequests: 0,
       averageResponseTime: 0,
-      queueWaitTimes: []
+      queueWaitTimes: [],
     };
 
     // Configuration
@@ -61,7 +61,7 @@ class McpQueueManager extends EventEmitter {
       retryAttempts: 3,
       retryDelay: 1000, // 1 second base delay
       maxQueueSize: 50,
-      ...options
+      ...options,
     };
 
     // Error recovery manager (set later)
@@ -70,7 +70,11 @@ class McpQueueManager extends EventEmitter {
     // Initialize server tracking
     this.initializeServers();
 
-    console.log(colors.blue(`🔌 MCP Queue Manager initialized with limits: ${JSON.stringify(this.serverLimits)}`));
+    console.log(
+      colors.blue(
+        `🔌 MCP Queue Manager initialized with limits: ${JSON.stringify(this.serverLimits)}`,
+      ),
+    );
   }
 
   /**
@@ -108,7 +112,7 @@ class McpQueueManager extends EventEmitter {
       priority: options.priority || 'normal', // high, normal, low
       resolve: null,
       reject: null,
-      abortController: new AbortController()
+      abortController: new AbortController(),
     };
 
     this.metrics.totalRequests++;
@@ -120,7 +124,10 @@ class McpQueueManager extends EventEmitter {
       request.reject = reject;
 
       // Check circuit breaker
-      if (this.errorRecoveryManager && !this.errorRecoveryManager.shouldAllowOperation(serverName)) {
+      if (
+        this.errorRecoveryManager &&
+        !this.errorRecoveryManager.shouldAllowOperation(serverName)
+      ) {
         reject(new Error(`Circuit breaker open for ${serverName} - operation blocked`));
         return;
       }
@@ -153,7 +160,7 @@ class McpQueueManager extends EventEmitter {
       queue.push(request);
     } else {
       // Normal priority - insert before low priority items
-      const lowPriorityIndex = queue.findIndex(item => item.priority === 'low');
+      const lowPriorityIndex = queue.findIndex((item) => item.priority === 'low');
       if (lowPriorityIndex !== -1) {
         queue.splice(lowPriorityIndex, 0, request);
       } else {
@@ -184,14 +191,13 @@ class McpQueueManager extends EventEmitter {
     this.activeOperations[serverName].add(request.id);
 
     // Execute the operation
-    this.executeOperation(request)
-      .finally(() => {
-        // Remove from active tracking
-        this.activeOperations[serverName].delete(request.id);
+    this.executeOperation(request).finally(() => {
+      // Remove from active tracking
+      this.activeOperations[serverName].delete(request.id);
 
-        // Process next item in queue
-        setImmediate(() => this.processQueue(serverName));
-      });
+      // Process next item in queue
+      setImmediate(() => this.processQueue(serverName));
+    });
   }
 
   /**
@@ -201,7 +207,11 @@ class McpQueueManager extends EventEmitter {
     const { serverName, operation, params, timeout, attempts } = request;
     const startTime = Date.now();
 
-    console.log(colors.blue(`🔄 Executing ${serverName}:${operation} (ID: ${request.id}, attempt: ${attempts + 1})`));
+    console.log(
+      colors.blue(
+        `🔄 Executing ${serverName}:${operation} (ID: ${request.id}, attempt: ${attempts + 1})`,
+      ),
+    );
 
     try {
       // Increment attempt counter
@@ -210,7 +220,7 @@ class McpQueueManager extends EventEmitter {
       // Execute the operation with timeout
       const result = await Promise.race([
         this.callMcpOperation(serverName, operation, params),
-        this.createTimeoutPromise(timeout, request.abortController.signal)
+        this.createTimeoutPromise(timeout, request.abortController.signal),
       ]);
 
       // Calculate metrics
@@ -224,18 +234,23 @@ class McpQueueManager extends EventEmitter {
         this.errorRecoveryManager.recordOperationResult(serverName, true);
       }
 
-      console.log(colors.green(`✅ Completed ${serverName}:${operation} (ID: ${request.id}) - ${duration}ms`));
+      console.log(
+        colors.green(`✅ Completed ${serverName}:${operation} (ID: ${request.id}) - ${duration}ms`),
+      );
 
       // Resolve the original promise
       request.resolve(result);
-
     } catch (error) {
       const duration = Date.now() - startTime;
       const waitTime = startTime - request.queueTime;
 
       // Check if we should retry
       if (request.attempts < this.config.retryAttempts && !request.abortController.signal.aborted) {
-        console.log(colors.yellow(`⚠️  Retrying ${serverName}:${operation} (ID: ${request.id}) - ${error.message}`));
+        console.log(
+          colors.yellow(
+            `⚠️  Retrying ${serverName}:${operation} (ID: ${request.id}) - ${error.message}`,
+          ),
+        );
 
         // Exponential backoff delay
         const delay = this.config.retryDelay * Math.pow(2, request.attempts - 1);
@@ -254,7 +269,11 @@ class McpQueueManager extends EventEmitter {
       // Track failure metrics
       if (error.message.includes('timeout')) {
         this.updateMetrics(duration, waitTime, 'timeout');
-        console.log(colors.red(`⏰ Timeout ${serverName}:${operation} (ID: ${request.id}) after ${duration}ms`));
+        console.log(
+          colors.red(
+            `⏰ Timeout ${serverName}:${operation} (ID: ${request.id}) after ${duration}ms`,
+          ),
+        );
 
         // Handle timeout error through recovery manager
         if (this.errorRecoveryManager) {
@@ -262,12 +281,14 @@ class McpQueueManager extends EventEmitter {
             serverName,
             operation,
             duration,
-            attempts: request.attempts
+            attempts: request.attempts,
           });
         }
       } else {
         this.updateMetrics(duration, waitTime, 'failure');
-        console.log(colors.red(`❌ Failed ${serverName}:${operation} (ID: ${request.id}) - ${error.message}`));
+        console.log(
+          colors.red(`❌ Failed ${serverName}:${operation} (ID: ${request.id}) - ${error.message}`),
+        );
 
         // Handle other errors through recovery manager
         if (this.errorRecoveryManager) {
@@ -276,7 +297,7 @@ class McpQueueManager extends EventEmitter {
             serverName,
             operation,
             error,
-            attempts: request.attempts
+            attempts: request.attempts,
           });
         }
       }
@@ -335,12 +356,13 @@ class McpQueueManager extends EventEmitter {
         result,
         duration,
         timestamp: Date.now(),
-        success: true
+        success: true,
       };
-
     } catch (error) {
       const duration = Date.now() - startTime;
-      console.log(colors.red(`❌ ${serverName}:${operation} failed after ${duration}ms: ${error.message}`));
+      console.log(
+        colors.red(`❌ ${serverName}:${operation} failed after ${duration}ms: ${error.message}`),
+      );
 
       // Return error result instead of throwing (for queue stability)
       return {
@@ -350,7 +372,7 @@ class McpQueueManager extends EventEmitter {
         error: error.message,
         duration,
         timestamp: Date.now(),
-        success: false
+        success: false,
       };
     }
   }
@@ -380,7 +402,7 @@ class McpQueueManager extends EventEmitter {
         const newIssue = await client.createIssue({
           title: params.title,
           description: params.description,
-          teamId: params.teamId
+          teamId: params.teamId,
         });
         return { issue: newIssue, created: true };
 
@@ -405,7 +427,7 @@ class McpQueueManager extends EventEmitter {
       thoughtNumber: 1,
       totalThoughts: thoughts,
       thought: params.thought || 'Analyzing problem...',
-      nextThoughtNeeded: true
+      nextThoughtNeeded: true,
     };
 
     // Simulate thinking time (sequential-thinking is naturally slower)
@@ -414,7 +436,7 @@ class McpQueueManager extends EventEmitter {
     return {
       thinking,
       completed: thinking.thoughtNumber >= thinking.totalThoughts,
-      nextStep: thinking.nextThoughtNeeded ? 'continue' : 'complete'
+      nextStep: thinking.nextThoughtNeeded ? 'continue' : 'complete',
     };
   }
 
@@ -430,14 +452,14 @@ class McpQueueManager extends EventEmitter {
         return {
           libraryId: `/org/${params.libraryName}`,
           confidence: 0.95,
-          found: true
+          found: true,
         };
 
       case 'get-library-docs':
         return {
           documentation: `# ${params.libraryId}\n\nSample documentation content...`,
           version: '1.0.0',
-          lastUpdated: new Date().toISOString()
+          lastUpdated: new Date().toISOString(),
         };
 
       default:
@@ -461,7 +483,9 @@ class McpQueueManager extends EventEmitter {
           return { connected: true, client: 'kubectl' };
 
         case 'get_pods':
-          const { stdout } = await execAsync(`kubectl get pods -n ${params.namespace || 'default'} -o json`);
+          const { stdout } = await execAsync(
+            `kubectl get pods -n ${params.namespace || 'default'} -o json`,
+          );
           const pods = JSON.parse(stdout);
           return { pods: pods.items, namespace: params.namespace || 'default' };
 
@@ -485,13 +509,13 @@ class McpQueueManager extends EventEmitter {
         return {
           url: params.url,
           status: 'loaded',
-          title: 'Page Title'
+          title: 'Page Title',
         };
 
       case 'screenshot':
         return {
           screenshot: 'base64_image_data...',
-          timestamp: Date.now()
+          timestamp: Date.now(),
         };
 
       default:
@@ -513,7 +537,7 @@ class McpQueueManager extends EventEmitter {
       operation,
       params,
       result: 'generic_success',
-      note: 'Called via generic MCP interface'
+      note: 'Called via generic MCP interface',
     };
   }
 
@@ -522,11 +546,11 @@ class McpQueueManager extends EventEmitter {
    */
   getSimulatedResponseTime(serverName) {
     const baseTimes = {
-      'linear-server': 250,      // 200-400ms observed
+      'linear-server': 250, // 200-400ms observed
       'sequential-thinking': 400, // 300-600ms observed
-      'context7': 200,
-      'kubernetes': 150,
-      'playwright': 300
+      context7: 200,
+      kubernetes: 150,
+      playwright: 300,
     };
 
     const baseTime = baseTimes[serverName] || 300;
@@ -594,9 +618,11 @@ class McpQueueManager extends EventEmitter {
       activeCounts[serverName] = this.activeOperations[serverName].size;
     }
 
-    const avgWaitTime = this.metrics.queueWaitTimes.length > 0
-      ? this.metrics.queueWaitTimes.reduce((a, b) => a + b, 0) / this.metrics.queueWaitTimes.length
-      : 0;
+    const avgWaitTime =
+      this.metrics.queueWaitTimes.length > 0
+        ? this.metrics.queueWaitTimes.reduce((a, b) => a + b, 0) /
+          this.metrics.queueWaitTimes.length
+        : 0;
 
     return {
       serverLimits: this.serverLimits,
@@ -605,10 +631,11 @@ class McpQueueManager extends EventEmitter {
       metrics: {
         ...this.metrics,
         averageWaitTime: avgWaitTime,
-        successRate: this.metrics.totalRequests > 0
-          ? (this.metrics.completedRequests / this.metrics.totalRequests * 100).toFixed(1)
-          : 0
-      }
+        successRate:
+          this.metrics.totalRequests > 0
+            ? ((this.metrics.completedRequests / this.metrics.totalRequests) * 100).toFixed(1)
+            : 0,
+      },
     };
   }
 
@@ -632,7 +659,7 @@ class McpQueueManager extends EventEmitter {
 
     // Wait for active operations to complete (with timeout)
     const shutdownStart = Date.now();
-    while (this.hasActiveOperations() && (Date.now() - shutdownStart) < timeout) {
+    while (this.hasActiveOperations() && Date.now() - shutdownStart < timeout) {
       await this.sleep(100);
     }
 
@@ -650,8 +677,7 @@ class McpQueueManager extends EventEmitter {
    * Check if any operations are still active
    */
   hasActiveOperations() {
-    return Object.values(this.activeOperations)
-      .some(activeSet => activeSet.size > 0);
+    return Object.values(this.activeOperations).some((activeSet) => activeSet.size > 0);
   }
 
   /**
@@ -665,7 +691,7 @@ class McpQueueManager extends EventEmitter {
    * Sleep utility
    */
   sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   /**
@@ -683,14 +709,20 @@ class McpQueueManager extends EventEmitter {
       const queued = status.queueSizes[server];
       const utilization = ((active / limit) * 100).toFixed(0);
 
-      console.log(colors.white(`${server.padEnd(20)} ${active}/${limit} active (${utilization}%) | ${queued} queued`));
+      console.log(
+        colors.white(
+          `${server.padEnd(20)} ${active}/${limit} active (${utilization}%) | ${queued} queued`,
+        ),
+      );
     }
 
     // Metrics
     console.log(colors.blue('─'.repeat(50)));
     console.log(colors.white(`Total Requests:     ${status.metrics.totalRequests}`));
     console.log(colors.white(`Success Rate:       ${status.metrics.successRate}%`));
-    console.log(colors.white(`Avg Response Time:  ${status.metrics.averageResponseTime.toFixed(0)}ms`));
+    console.log(
+      colors.white(`Avg Response Time:  ${status.metrics.averageResponseTime.toFixed(0)}ms`),
+    );
     console.log(colors.white(`Avg Wait Time:      ${status.metrics.averageWaitTime.toFixed(0)}ms`));
     console.log(colors.blue('─'.repeat(50)));
   }

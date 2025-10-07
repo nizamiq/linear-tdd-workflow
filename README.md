@@ -2,71 +2,23 @@
 
 > **Enterprise-grade multi-agent AI framework for autonomous code quality management**
 
-[![Version](https://img.shields.io/badge/version-1.3.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.4.0-blue.svg)](CHANGELOG.md)
 [![TDD Compliant](https://img.shields.io/badge/TDD-Strict-brightgreen.svg)](docs/WORKFLOW-TDD-PROTOCOL.md)
 [![Linear Integrated](https://img.shields.io/badge/Linear-Connected-blue.svg)](docs/INTEGRATION-LINEAR.md)
 [![Clean Code](https://img.shields.io/badge/Clean%20Code-Enforced-green.svg)](docs/WORKFLOW-CLEAN-CODE-ASSESSMENT.md)
-[![Agents](https://img.shields.io/badge/Agents-23_Specialized-gold.svg)](.claude/agents/CLAUDE.md)
+[![Agents](https://img.shields.io/badge/Agents-22_Specialized-gold.svg)](.claude/agents/)
 [![Languages](https://img.shields.io/badge/Languages-JS%2FTS%2FPython-blue.svg)](docs/languages/)
 [![Installation](https://img.shields.io/badge/Install-Drop--in-purple.svg)](#installation-strategy)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-*Last Updated: January 2025 | Version: 1.3.0*
+_Last Updated: October 2025 | Version: 1.4.0_
 
 ## What is Linear TDD Workflow System?
 
-An autonomous code quality management system that uses 23 specialized AI agents to continuously assess, improve, and maintain your codebase. The system enforces strict Test-Driven Development practices with **real coverage validation** and **production-ready deployment pipelines**.
-
-## ⚠️ Non-Negotiable: Test-Driven Development
-
-**Every code change follows strict TDD. This is not optional.**
-
-```
-[RED] → [GREEN] → [REFACTOR]
-  ↓         ↓           ↓
-Test    Minimal    Improve
-First     Code     Design
-```
-
-**The EXECUTOR agent enforces TDD automatically through the `/fix` command.**
-
-### Quality Gates (Blocking)
-- **≥80% diff coverage** - Every changed line must be tested
-- **≥30% mutation score** - Tests must validate actual behavior
-- **NO production code without failing test first** - Zero exceptions
-
-### Why This Matters
-1. **Tests as Documentation** - Your tests explain what code should do
-2. **Confidence to Change** - Refactor fearlessly with test safety net
-3. **Better Design** - TDD forces testable, loosely-coupled code
-4. **Automatic Coverage** - TDD gives you ≥80% coverage for free
-
-### TDD Cycle Example
-```javascript
-// [RED] Write failing test FIRST
-test('calculates tax for high income', () => {
-  expect(calculateTax(100000)).toBe(25000);
-});
-// ❌ FAILS - calculateTax doesn't exist yet
-
-// [GREEN] Minimal code to pass
-function calculateTax(income) {
-  return income * 0.25;
-}
-// ✅ PASSES
-
-// [REFACTOR] Improve design
-const TAX_RATE = 0.25;
-function calculateTax(income) {
-  validateIncome(income);
-  return income * TAX_RATE;
-}
-// ✅ STILL PASSES - refactored safely
-```
-
-**Learn more:** `.claude/docs/TDD-REMINDER.md` - Quick reference card for TDD requirements
+An autonomous code quality management system that uses 22 specialized AI agents to continuously assess, improve, and maintain your codebase. The system enforces strict Test-Driven Development practices with **real coverage validation** and **production-ready deployment pipelines**.
 
 ### Key Benefits
+
 - **50% faster** Mean Time to Recovery (MTTR)
 - **30-35% improvement** in PR cycle time
 - **≥80% diff coverage** enforcement on all changes
@@ -93,46 +45,26 @@ function calculateTax(income) {
 
 ## 🎯 Installation Strategy
 
-The Linear TDD Workflow System is designed as a **self-contained drop-in enhancement** for both new and existing projects:
+The Linear TDD Workflow System is designed as a **drop-in enhancement** for any project:
 
-1. **Clone alongside your target projects** - Keep this repository in your parent development directory
-2. **Install into target project** - The system copies all components into the target project's `.claude/` directory
-3. **Self-contained operation** - Everything runs from within the target project's `.claude/` directory
-4. **Configure and use** - Set up your Linear API key and start using
+1. **Clone alongside your projects** - Keep this repository next to your project(s)
+2. **Copy into your project** - Simple manual copy of `.claude/` and `Makefile`
+3. **Configure and use** - Set up your Linear API key and start using
 
-### Key Design Principles
+### Directory Structure
 
-- **Self-contained**: All system components live in `.claude/` directory
-- **Non-invasive**: Minimal changes to existing project structure
-- **Universal**: Works for new projects or existing codebases
-- **Language-agnostic**: Supports JavaScript/TypeScript, Python, and polyglot projects
-
-### Directory Structure After Installation
 ```
-~/code/                                    # Your development directory
-├── linear-tdd-workflow/                   # This repository (source)
-│   ├── .claude/                           # Agent system templates
-│   ├── scripts/install.sh                 # Installation script
-│   ├── Makefile                           # Universal commands template
-│   └── README.md                          # This file
-│
-└── your-target-project/                   # Your project (new or existing)
-    ├── .claude/                           # Self-contained system (installed)
-    │   ├── agents/                        # 23 agent specifications
-    │   ├── commands/                      # Slash command definitions
-    │   ├── docs/                          # System documentation
-    │   ├── scripts/                       # Operational scripts
-    │   ├── workflows/                     # Workflow definitions
-    │   ├── mcp.json                       # MCP server configuration
-    │   ├── setup.js                       # System initialization
-    │   ├── cli.js                         # CLI interface
-    │   └── DISCOVERY.md                   # System discovery guide
-    │
-    ├── package.json                       # Your project file (optional enhancement)
-    ├── Makefile                           # Copied universal commands
-    ├── CLAUDE.md                          # Project instructions (auto-created)
-    ├── .env                               # Your configuration
-    └── [your existing project files]     # Untouched
+~/code/                          # Your development directory
+├── linear-tdd-workflow/         # This repository
+│   ├── .claude/                 # Agent system source
+│   ├── scripts/                 # System scripts
+│   └── Makefile                 # Universal commands template
+└── your-project/                # Your target project
+    ├── .claude/                 # Copied agent system
+    ├── package.json             # Your existing package.json
+    ├── Makefile                 # Copied universal commands
+    ├── .env                     # Your configuration
+    └── CLAUDE.md                # Project instructions (auto-created)
 ```
 
 ## ✅ Prerequisites
@@ -150,118 +82,113 @@ Before you begin, ensure you have:
 
 Get up and running with the Linear TDD Workflow System in your project:
 
-### Installation for Existing Projects
+### Simple Manual Setup
 
 ```bash
-# 1. Clone this repository in your development directory
+# 1. Clone this repository alongside your project
 cd ~/code  # Or wherever you keep your projects
 git clone https://github.com/your-org/linear-tdd-workflow.git
 
-# 2. Navigate to your existing target project
-cd ../your-existing-project
+# 2. Navigate to your target project
+cd your-existing-project
 
-# 3. Install the system (self-contained in .claude/)
+# 3. Copy the core components
 cp -r ../linear-tdd-workflow/.claude .
 cp ../linear-tdd-workflow/Makefile .
 
-# 4. Create environment configuration
+# 4. Create your environment configuration
 cat > .env << EOF
 LINEAR_API_KEY=your_linear_api_key_here
-LINEAR_TEAM_ID=your-team-id
-LINEAR_PROJECT_ID=your-project-id  # Optional
-GITHUB_TOKEN=your_github_token     # Optional for PR creation
+LINEAR_TEAM_ID=a-coders
+LINEAR_PROJECT_ID=ai-coding
+GITHUB_TOKEN=your_github_token_here  # Optional
 EOF
 
-# 5. Initialize the system (detects project type)
+# 5. Install dependencies (if Node.js project)
+npm install
+
+# 6. Initialize the system
 node .claude/setup.js
 
-# 6. Run onboarding (configures for your tech stack)
+# 7. Run onboarding to detect project type and configure
 make onboard
 
-# 7. Run your first assessment
+# 8. Run your first assessment
 make assess
 ```
 
-### Installation for New Projects
+### For New Projects
 
 ```bash
-# 1. Create your new project directory
+# 1. Create your new project
 mkdir my-new-project && cd my-new-project
+npm init -y  # or: python -m venv venv (for Python)
 
-# 2. Initialize project (choose one)
-npm init -y              # For Node.js/JavaScript
-npm init -y && npx tsc --init  # For TypeScript
-python -m venv venv      # For Python
-
-# 3. Install the workflow system
+# 2. Follow the same steps above from step 3
 cp -r ../linear-tdd-workflow/.claude .
 cp ../linear-tdd-workflow/Makefile .
-
-# 4. Configure environment (create .env as shown above)
-
-# 5. Initialize and onboard
-node .claude/setup.js
-make onboard
-
-# 6. Start developing with TDD
-make assess
+# ... continue with setup
 ```
 
 ### What This Installs
 
-The system is **completely self-contained** in the `.claude/` directory:
+- **`.claude/`** - The complete agent system and workflows
+- **`Makefile`** - Universal commands that work for any language
+- **`.env`** - Your configuration (Linear API keys, etc.)
+- **Enhanced `package.json`** - Additional scripts for the workflow (if applicable)
 
-- **`.claude/agents/`** - 23 specialized agent specifications
-- **`.claude/commands/`** - Slash command definitions
-- **`.claude/docs/`** - Complete system documentation
-- **`.claude/scripts/`** - Operational automation scripts
-- **`.claude/workflows/`** - Multi-phase workflow definitions
-- **`.claude/mcp.json`** - MCP server configuration (Linear, etc.)
-- **`.claude/cli.js`** - Command-line interface
-- **`Makefile`** - Universal commands (language-agnostic)
-- **`CLAUDE.md`** - Instructions for Claude Code AI (auto-created)
+### ⚠️ Important: Agent Execution Patterns (v1.4.0+)
+
+When creating custom agents or workflows, be aware of **subprocess isolation**:
+
+**The Issue:** Agents spawned via subprocess cannot persist state changes (file writes, git commits, PR creation) to your actual workspace.
+
+**The Solution:** Follow documented execution patterns:
+
+- **Direct Execution** - For commands that modify state (files, git, PRs, Linear)
+- **Orchestrator-Workers** - For parallel read-only analysis
+- **Validation-Then-Action** - For hybrid workflows
+
+**Documentation:**
+
+- 📖 **Best Practices Guide**: `.claude/docs/SUBPROCESS-BEST-PRACTICES.md`
+- 📝 **Quick Reference**: `.claude/docs/SUBPROCESS-QUICK-REFERENCE.md`
+- 🚶 **Migration Guide**: `.claude/docs/MIGRATION-SUBPROCESS-PATTERNS.md`
+
+**This is critical** if you're creating custom agents or modifying existing commands. See the guides above before making changes that write files, create commits, or modify Linear tasks.
 
 ## 🎯 How It Works
 
 ### Installation Process
 
-The installation is simple and self-contained:
+When you install the Linear TDD Workflow System into a project:
 
-1. **Copy Phase** - Copy `.claude/` directory and `Makefile` into your target project
-2. **Detection Phase** - System detects project type (JavaScript/TypeScript/Python)
-3. **Initialization Phase** - Run `node .claude/setup.js` to configure
-4. **Onboarding Phase** - Run `make onboard` for tech-stack-specific setup
-5. **Validation Phase** - System validates configuration and runs health checks
+1. **Detection Phase** - The installer detects your project type (JavaScript, TypeScript, Python, or polyglot)
+2. **Backup Phase** - Existing files are backed up before modification
+3. **Installation Phase** - The `.claude` directory and supporting files are installed
+4. **Enhancement Phase** - Your `package.json` (or `pyproject.toml`) is enhanced with workflow scripts
+5. **Integration Phase** - Makefile is added/updated with universal commands
+6. **Validation Phase** - The system validates the installation and runs initial checks
 
-### Self-Contained Architecture
+### What Gets Installed
 
-All system components live in `.claude/` directory:
-
-| Component | Purpose | Location |
-|-----------|---------|----------|
-| `.claude/agents/` | 23 specialized agent specifications | Self-contained |
-| `.claude/commands/` | Slash command definitions | Self-contained |
-| `.claude/docs/` | System documentation | Self-contained |
-| `.claude/scripts/` | Operational automation | Self-contained |
-| `.claude/workflows/` | Multi-phase workflows | Self-contained |
-| `.claude/mcp.json` | MCP server config (Linear, K8s, etc.) | Self-contained |
-| `.claude/cli.js` | Command-line interface | Self-contained |
-| `Makefile` | Universal command interface | Project root |
-| `CLAUDE.md` | Instructions for Claude Code AI | Project root (auto-created) |
-| `.env` | Your configuration (Linear API keys) | Project root (user-created) |
-
-**Key Benefit**: The entire system can be installed, updated, or removed by simply managing the `.claude/` directory.
+| Component            | Purpose                                | Location      |
+| -------------------- | -------------------------------------- | ------------- |
+| `.claude/` directory | Agent system, journeys, and core logic | Project root  |
+| `Makefile`           | Universal command interface            | Project root  |
+| `CLAUDE.md`          | Instructions for Claude Code AI        | Project root  |
+| Enhanced scripts     | Workflow commands in package.json      | Existing file |
+| `.env` template      | Configuration for Linear and GitHub    | Project root  |
 
 ### After Installation
 
-Your project gains autonomous capabilities:
+Your project gains:
 
-- **23 specialized AI agents** operating from `.claude/agents/`
-- **Multi-phase workflows** defined in `.claude/workflows/`
-- **Universal commands** via `Makefile` (language-agnostic)
+- **20 specialized AI agents** ready for autonomous operation
+- **6 autonomous journeys** for complete workflows
+- **Universal commands** that work regardless of language
 - **TDD enforcement** with automatic validation
-- **Linear.app integration** via MCP server configuration
-- **Slash commands** available in Claude Code (`/assess`, `/fix`, `/recover`, etc.)
+- **Linear.app integration** for task management
 
 ## 🎯 Core Features
 
@@ -274,6 +201,7 @@ Every change follows the mandatory TDD cycle:
 3. **[REFACTOR]** - Improve with test safety
 
 **Quality Gates:**
+
 - Diff coverage ≥80% on changed lines
 - Mutation testing ≥30% on changed files
 - CI automatically blocks non-compliant PRs
@@ -282,99 +210,66 @@ Every change follows the mandatory TDD cycle:
 
 Pre-approved, low-risk improvements that agents implement autonomously:
 
-| Fix Type | Description | Example |
-|----------|-------------|---------|
-| **Linting** | Auto-fix style violations | ESLint, Prettier, Black |
-| **Dead Code** | Remove unused code | Unused imports, variables |
-| **Documentation** | Add missing docs | JSDoc, docstrings |
-| **Refactoring** | Simplify code | Extract constants, rename |
-| **Dependencies** | Update packages | Non-breaking patches |
-| **Tests** | Add test scaffolds | Basic test structure |
+| Fix Type          | Description               | Example                   |
+| ----------------- | ------------------------- | ------------------------- |
+| **Linting**       | Auto-fix style violations | ESLint, Prettier, Black   |
+| **Dead Code**     | Remove unused code        | Unused imports, variables |
+| **Documentation** | Add missing docs          | JSDoc, docstrings         |
+| **Refactoring**   | Simplify code             | Extract constants, rename |
+| **Dependencies**  | Update packages           | Non-breaking patches      |
+| **Tests**         | Add test scaffolds        | Basic test structure      |
 
 **Constraints:** Max 300 LOC per PR • 80% coverage required • Full rollback plan
 
 ### Feature Impact Level (FIL) Classification
 
-| Level | Impact | Examples | Approval |
-|-------|--------|----------|----------|
-| **FIL-0** | None | Formatting, comments | Auto |
-| **FIL-1** | Low | Variable rename, constants | Auto |
-| **FIL-2** | Medium | New utilities, configs | Tech Lead |
-| **FIL-3** | High | APIs, migrations, UI | Tech Lead + Product |
+| Level     | Impact | Examples                   | Approval            |
+| --------- | ------ | -------------------------- | ------------------- |
+| **FIL-0** | None   | Formatting, comments       | Auto                |
+| **FIL-1** | Low    | Variable rename, constants | Auto                |
+| **FIL-2** | Medium | New utilities, configs     | Tech Lead           |
+| **FIL-3** | High   | APIs, migrations, UI       | Tech Lead + Product |
 
 ## 🏗️ Architecture Overview
 
-### Self-Contained 23-Agent System
+### 22-Agent System
 
-All agents operate from within your project's `.claude/agents/` directory:
+The system coordinates 22 specialized agents through Linear.app:
 
 ```
 Linear.app (Task Management)
          ↓
-    STRATEGIST (Orchestrator)
+    STRATEGIST
+   (Orchestrator)
          ↓
-┌────────────┬─────────────┬──────────────┬────────────┬──────────────┐
-│  AUDITOR   │  EXECUTOR   │   GUARDIAN   │  SCHOLAR   │   PLANNER    │
-│(Assessment)│(Fix Impl.)  │(CI/CD Guard) │(Learning)  │(Cycle Plan)  │
-└────────────┴─────────────┴──────────────┴────────────┴──────────────┘
-                              ↓
-              [18 Specialized Support Agents]
+┌────────────┬─────────────┬──────────────┬────────────┐
+│  AUDITOR   │  EXECUTOR   │   GUARDIAN   │  SCHOLAR   │
+│(Assessment)│(Fix Impl.)  │(CI/CD Guard) │(Learning)  │
+└────────────┴─────────────┴──────────────┴────────────┘
+                    ↓
+        [15 Specialized Support Agents]
 ```
 
-**Core Agents** (in `.claude/agents/`):
-- **AUDITOR** - Code quality assessment (generates Linear task definitions)
-- **EXECUTOR** - TDD fix implementation (strict RED→GREEN→REFACTOR)
-- **GUARDIAN** - CI/CD monitoring & auto-recovery (reports incidents to STRATEGIST)
-- **STRATEGIST** - Multi-agent orchestration & **EXCLUSIVE Linear MCP access**
-- **SCHOLAR** - Pattern learning from successful PRs
-- **PLANNER** - Sprint/cycle planning with parallel execution
-- **DOC-KEEPER** - Documentation validation & generation (generates doc task definitions)
+**Core Agents:**
 
-**Linear Integration Model:**
-- **STRATEGIST** is the ONLY agent with `linear-server` MCP access
-- **All other agents** delegate Linear operations through STRATEGIST
-- AUDITOR/GUARDIAN/DOC-KEEPER provide task definitions → STRATEGIST creates issues
-- This prevents permission conflicts and ensures consistent task management
+- **AUDITOR** - Continuous code quality assessment
+- **EXECUTOR** - Fix Pack implementation engine
+- **GUARDIAN** - Pipeline monitoring & recovery
+- **STRATEGIST** - Multi-agent orchestration
+- **SCHOLAR** - Pattern learning & optimization
 
-**Specialized Agents:** Testing (3) • Development (3) • Infrastructure (3) • Database (1) • Documentation (1) • Security (1) • Legacy (1) • Review (2)
+**Specialized Agents:** Testing (3) • Development (3) • Infrastructure (3) • Architecture (3) • Documentation (1) • Security (4)
 
-### Parallel Execution Support
+### Agent Invocation
 
-The system supports **parallel subagent execution** for 5-10x speedup:
-
-- **Max 10 concurrent subagents** via Claude Code Task tool
-- **Phases 1 & 4 of cycle planning** run in parallel (40 min → 20 min)
-- **Batch assessments** of multiple directories (30 min → 10 min)
-- **Parallel fix implementation** of independent tasks (69 min → 18 min)
-
-See `.claude/docs/PARALLEL-EXECUTION.md` for comprehensive guide.
-
-### Agent Invocation Methods
-
-**Via Slash Commands** (Recommended in Claude Code):
 ```bash
-/assess              # AUDITOR - Code quality scan
-/fix CLEAN-123       # EXECUTOR - Implement fix with TDD
-/recover             # GUARDIAN - Auto-fix broken pipeline
-/learn               # SCHOLAR - Mine patterns from PRs
-/cycle plan          # PLANNER - Sprint planning (parallel phases)
-/docs                # DOC-KEEPER - Validate documentation
-```
+# Standard invocation pattern (from your project)
+npm run agent:invoke <AGENT>:<COMMAND> -- [parameters]
 
-**Via Makefile** (Universal):
-```bash
-make assess          # Invoke AUDITOR
-make fix TASK=CLEAN-123  # Invoke EXECUTOR
-make recover         # Invoke GUARDIAN
-make learn           # Invoke SCHOLAR
-make cycle:full      # Invoke PLANNER (all 4 phases)
-```
-
-**Via CLI** (Direct):
-```bash
-node .claude/cli.js assess --scope=full
-node .claude/cli.js fix --task-id=CLEAN-123
-node .claude/cli.js recover --auto-fix
+# Examples
+npm run agent:invoke AUDITOR:assess-code -- --scope full
+npm run agent:invoke EXECUTOR:implement-fix -- --task-id CLEAN-123
+npm run agent:invoke GUARDIAN:analyze-failure -- --auto-fix
 ```
 
 ## 💻 Available Commands
@@ -445,159 +340,6 @@ poetry run black .
 poetry run ruff check .
 ```
 
-## 🏢 Enterprise Features
-
-**Phase 5: Production-Grade Automation** (✅ Complete)
-
-The system includes enterprise features for production deployments and large teams:
-
-### Hooks-Based Workflow Automation
-
-Automated workflow chaining eliminates manual orchestration:
-
-```bash
-# Hooks automatically suggest next steps
-User: "/assess"
-AUDITOR completes → Hook suggests: "/fix CLEAN-123"
-
-User: "/fix CLEAN-123"
-EXECUTOR completes → Hook suggests: "/invoke CODE-REVIEWER"
-
-User: "/invoke CODE-REVIEWER"
-CODE-REVIEWER completes → Hook suggests: "gh pr merge 456"
-```
-
-**Configuration**: `.claude/settings.json`
-```json
-{
-  "hooks": {
-    "enabled": true,
-    "onSubagentStop": ".claude/hooks/on-subagent-stop.sh",
-    "onStop": ".claude/hooks/on-stop.sh"
-  }
-}
-```
-
-### Enhancement Queue System
-
-Track multi-phase workflows across agent handoffs:
-
-```json
-{
-  "enhancements": {
-    "user-auth": {
-      "slug": "user-auth",
-      "status": "READY_FOR_BUILD",
-      "linear_task": "FEAT-123",
-      "agent_history": [
-        {"agent": "PM", "status": "READY_FOR_ARCH"},
-        {"agent": "ARCHITECT", "status": "READY_FOR_BUILD"}
-      ],
-      "next_agent": "EXECUTOR"
-    }
-  }
-}
-```
-
-**Status Flow**:
-```
-BACKLOG → READY_FOR_DESIGN → READY_FOR_ARCH → READY_FOR_BUILD
-  → READY_FOR_REVIEW → READY_FOR_TEST → READY_FOR_DEPLOY → DONE
-```
-
-### Definition of Done Checklists
-
-Every agent has explicit completion criteria:
-
-**EXECUTOR Checklist** (9 items):
-- ✓ [RED] Write failing test
-- ✓ [GREEN] Implement minimal code
-- ✓ [REFACTOR] Improve design
-- ✓ Achieve ≥80% diff coverage
-- ✓ Pass all linting/formatting
-- ✓ Create PR with description
-- ✓ Update Linear task to Done
-
-**Benefits**:
-- Consistent execution across agent invocations
-- Clear expectations for completion
-- Easier debugging when agents "miss" steps
-
-### Conflict Detection
-
-Pre-flight checks prevent race conditions in parallel execution:
-
-```bash
-# Automated conflict detection
-.claude/scripts/check-conflicts.sh
-
-# Pre-flight checklist
-- [ ] List files each agent will read/write
-- [ ] Check for write-write conflicts
-- [ ] Verify unique Linear task assignments
-- [ ] Confirm no shared state modifications
-```
-
-**Resolution Strategies**:
-1. File Separation (assign disjoint file sets)
-2. Sequential Execution (run conflicting tasks sequentially)
-3. Git Worktrees (isolated workspaces per agent)
-4. Resource Locking (queue-based file locking)
-
-### Enterprise Documentation
-
-Comprehensive guides for production deployment:
-
-- **[HOOKS-GUIDE.md](.claude/docs/HOOKS-GUIDE.md)** (650+ lines)
-  - Setup, configuration, customization
-  - Common workflows and patterns
-  - Debugging and troubleshooting
-  - CI/CD integration examples
-
-- **[PARALLEL-EXECUTION.md](.claude/docs/PARALLEL-EXECUTION.md)** (850+ lines)
-  - Conflict detection and prevention
-  - Batch orchestration patterns
-  - Performance optimization strategies
-
-- **[ANTHROPIC-BEST-PRACTICES.md](.claude/ANTHROPIC-BEST-PRACTICES.md)** (1000+ lines)
-  - Phase 5 implementation details
-  - Alignment with October 2025 best practices
-  - 98% compliance with Anthropic guidance
-
-### Enterprise Metrics
-
-**Reliability Improvements**:
-- Workflow automation: Manual → Automated (hooks suggest next steps)
-- Queue tracking: Ad-hoc → Structured (status transitions logged)
-- Definition of Done: Implicit → Explicit (checklists per agent)
-- Conflict prevention: Reactive → Proactive (pre-flight detection)
-
-**Alignment with Best Practices**:
-- Before Phase 5: 85% aligned
-- After Phase 5: **98% aligned** with Anthropic's October 2025 guidance
-
-### Usage
-
-```bash
-# Enable hooks (already configured in settings.json)
-# Hooks automatically activate on agent completion
-
-# Check enhancement queue
-cat .claude/queue/enhancements.json
-
-# Run conflict detection before parallel execution
-.claude/scripts/check-conflicts.sh
-
-# Session end summary (automatic)
-# Displays: duration, uncommitted changes, open PRs, next steps
-```
-
-**See Also**:
-- [HOOKS-GUIDE.md](.claude/docs/HOOKS-GUIDE.md) - Complete hooks documentation
-- [DECISION-MATRIX.md](.claude/docs/DECISION-MATRIX.md) - When to use agents vs workflows vs hooks
-
----
-
 ## ⚙️ Configuration
 
 ### Environment Variables
@@ -630,37 +372,41 @@ PROJECT_TYPE=javascript  # or: typescript, python, polyglot
 
 ### Performance Targets
 
-| Operation | Target | Notes |
-|-----------|--------|-------|
-| Code Assessment | ≤12min | 150k LOC JS/TS |
-| Python Assessment | ≤15min | 150k LOC |
-| Fix Implementation | ≤15min | Average |
-| Pipeline Recovery | ≤10min | Auto-recovery |
-| Linear Sync | ≤2s | Update latency |
+| Operation          | Target | Notes          |
+| ------------------ | ------ | -------------- |
+| Code Assessment    | ≤12min | 150k LOC JS/TS |
+| Python Assessment  | ≤15min | 150k LOC       |
+| Fix Implementation | ≤15min | Average        |
+| Pipeline Recovery  | ≤10min | Auto-recovery  |
+| Linear Sync        | ≤2s    | Update latency |
 
 ## 📚 Documentation
 
 ### For Claude Code AI Navigation
 
 **Critical References for AI Agents:**
+
 - [Agent System Reference](.claude/agents/CLAUDE.md) - Complete agent specifications and MCP tool matrix
 - [Agent Selection Guide](.claude/agents/AGENT-SELECTION-GUIDE.md) - Decision trees for choosing the right agent
 - [Linear Operations Guide](.claude/agents/LINEAR-OPERATIONS-GUIDE.md) - Who manages Linear tasks
 - [Project Instructions](CLAUDE.md) - Essential commands and workflows
 
 ### Essential Guides
+
 - [Getting Started](docs/getting-started/README.md) - Complete setup guide
 - [Installation Guide](docs/INSTALLATION-TROUBLESHOOTING.md) - Detailed installation help
 - [AI Development Protocol](docs/ai-development-protocol.md) - TDD methodology
 - [Linear Integration](docs/linear-setup.md) - Task management setup
 
 ### Core Documentation
+
 - [TDD Protocol](docs/WORKFLOW-TDD-PROTOCOL.md) - Test-Driven Development requirements
 - [Clean Code Assessment](docs/WORKFLOW-CLEAN-CODE-ASSESSMENT.md) - Quality standards
 - [GitFlow Integration](docs/INTEGRATION-GITFLOW.md) - Branching strategy
 - [Architecture Guide](docs/ARCHITECTURE-AGENTS.md) - System architecture
 
 ### References
+
 - [API Documentation](docs/api-reference/) - Complete API specs
 - [Documentation Index](docs/REFERENCE-MASTER.md) - Complete documentation map
 - [FAQ](docs/reference/faq.md) - Frequently asked questions
@@ -697,49 +443,9 @@ PROJECT_TYPE=javascript  # or: typescript, python, polyglot
 <details>
 <summary><strong>Linear tasks not being created</strong></summary>
 
-**Root Cause**: Only STRATEGIST can create Linear tasks. Other agents provide task definitions.
-
-**Solution**:
-1. Verify STRATEGIST has Linear MCP access in `.claude/mcp.json`:
-   ```json
-   {
-     "mcpServers": {
-       "linear-server": {
-         "allowedAgents": ["strategist"]
-       }
-     }
-   }
-   ```
-
-2. After AUDITOR completes, create Linear tasks:
-   ```bash
-   # Quick command (auto-detects latest assessment)
-   /linear
-
-   # Or specify file explicitly
-   /linear proposals/issues-TIMESTAMP.json
-   ```
-
-3. Alternative methods:
-   ```bash
-   # Direct STRATEGIST invocation
-   /invoke STRATEGIST:create-linear-tasks proposals/issues-TIMESTAMP.json
-
-   # Helper script (for CI/CD)
-   .claude/scripts/linear/create-tasks-from-assessment.sh proposals/issues-TIMESTAMP.json
-   ```
-
-4. Verify environment variables:
-   - `LINEAR_API_KEY` - Your Linear API token
-   - `LINEAR_TEAM_ID` - Your team ID
-   - `LINEAR_PROJECT_ID` - (optional) Project ID
-
-**Test Connection**:
-```bash
-# Via helper script
-LINEAR_API_KEY="your-key" LINEAR_TEAM_ID="your-team" \
-  .claude/scripts/linear/create-tasks-from-assessment.sh /path/to/assessment.json
-```
+- Verify LINEAR_API_KEY is correct in `.env`
+- Check team/project IDs match your workspace
+- Test with: `node .claude/cli.js linear test`
 </details>
 
 <details>

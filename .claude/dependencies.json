@@ -1,13 +1,6 @@
 {
   "javascript": {
-    "required": [
-      "eslint",
-      "prettier",
-      "jest",
-      "chalk",
-      "commander",
-      "js-yaml"
-    ],
+    "required": ["eslint", "prettier", "jest", "chalk", "commander", "js-yaml"],
     "optional": [
       "typescript",
       "ts-node",
@@ -16,12 +9,7 @@
       "husky",
       "lint-staged"
     ],
-    "testing": [
-      "jest",
-      "@jest/globals",
-      "jest-junit",
-      "supertest"
-    ],
+    "testing": ["jest", "@jest/globals", "jest-junit", "supertest"],
     "linting": [
       "eslint",
       "@typescript-eslint/eslint-plugin",
@@ -29,71 +17,22 @@
       "eslint-config-prettier",
       "eslint-plugin-jest"
     ],
-    "formatting": [
-      "prettier"
-    ],
-    "mutation": [
-      "@stryker-mutator/core",
-      "@stryker-mutator/jest-runner"
-    ]
+    "formatting": ["prettier"],
+    "mutation": ["@stryker-mutator/core", "@stryker-mutator/jest-runner"]
   },
   "python": {
-    "required": [
-      "pytest",
-      "black",
-      "ruff",
-      "coverage"
-    ],
-    "optional": [
-      "mypy",
-      "mutmut",
-      "hypothesis",
-      "bandit",
-      "safety"
-    ],
-    "testing": [
-      "pytest",
-      "pytest-cov",
-      "pytest-xdist",
-      "pytest-mock",
-      "hypothesis"
-    ],
-    "linting": [
-      "ruff",
-      "pylint",
-      "flake8",
-      "bandit"
-    ],
-    "formatting": [
-      "black",
-      "isort",
-      "autopep8"
-    ],
-    "typing": [
-      "mypy",
-      "pydantic",
-      "typing-extensions"
-    ],
-    "mutation": [
-      "mutmut",
-      "cosmic-ray"
-    ]
+    "required": ["pytest", "black", "ruff", "coverage"],
+    "optional": ["mypy", "mutmut", "hypothesis", "bandit", "safety"],
+    "testing": ["pytest", "pytest-cov", "pytest-xdist", "pytest-mock", "hypothesis"],
+    "linting": ["ruff", "pylint", "flake8", "bandit"],
+    "formatting": ["black", "isort", "autopep8"],
+    "typing": ["mypy", "pydantic", "typing-extensions"],
+    "mutation": ["mutmut", "cosmic-ray"]
   },
   "tooling": {
-    "git": [
-      "husky",
-      "lint-staged",
-      "commitizen"
-    ],
-    "ci": [
-      "gh",
-      "act"
-    ],
-    "documentation": [
-      "typedoc",
-      "sphinx",
-      "mkdocs"
-    ]
+    "git": ["husky", "lint-staged", "commitizen"],
+    "ci": ["gh", "act"],
+    "documentation": ["typedoc", "sphinx", "mkdocs"]
   },
   "frameworks": {
     "react": {

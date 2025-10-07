@@ -33,34 +33,34 @@ class ConcurrencyManager extends EventEmitter {
         fixPack: 3,
         validation: 0.2,
         pattern: 1,
-        recovery: 2
+        recovery: 2,
       },
       sla: {
         orchestrationOverhead: 0.05, // 5% max
-        utilizationTarget: 0.75,     // 75% min
-        decisionTime: 2000,          // 2s max
-        planningTime: 1500           // 1.5s max
-      }
+        utilizationTarget: 0.75, // 75% min
+        decisionTime: 2000, // 2s max
+        planningTime: 1500, // 1.5s max
+      },
     };
 
     // State management
     this.state = {
-      activeAgents: new Map(),      // agentId -> {name, startTime, operation, cost}
-      idleAgents: new Set(),         // agentId set
-      queuedTasks: [],               // {task, priority, timestamp}
-      pathLocks: new Map(),          // path -> {agentId, timestamp, ttl}
+      activeAgents: new Map(), // agentId -> {name, startTime, operation, cost}
+      idleAgents: new Set(), // agentId set
+      queuedTasks: [], // {task, priority, timestamp}
+      pathLocks: new Map(), // path -> {agentId, timestamp, ttl}
       budgetUsed: {
         daily: 0,
         monthly: 0,
-        perRepo: new Map()
+        perRepo: new Map(),
       },
       metrics: {
         tasksCompleted: 0,
         averageWaitTime: 0,
         utilizationRate: 0,
         orchestrationOverhead: 0,
-        costPerFix: []
-      }
+        costPerFix: [],
+      },
     };
 
     // Circuit breaker
@@ -68,7 +68,7 @@ class ConcurrencyManager extends EventEmitter {
       isOpen: false,
       failures: 0,
       threshold: 5,
-      resetTime: 60000 // 1 minute
+      resetTime: 60000, // 1 minute
     };
 
     // Start background tasks
@@ -114,7 +114,7 @@ class ConcurrencyManager extends EventEmitter {
         startTime: Date.now(),
         operation: task.operation,
         cost: estimatedCost,
-        paths: requiredPaths
+        paths: requiredPaths,
       });
 
       // Track orchestration overhead
@@ -126,9 +126,8 @@ class ConcurrencyManager extends EventEmitter {
         status: 'scheduled',
         estimatedCost,
         locks: requiredPaths,
-        queuePosition: 0
+        queuePosition: 0,
       };
-
     } catch (error) {
       this.releasePathLocks(requiredPaths);
       this.handleFailure(error);
@@ -144,19 +143,19 @@ class ConcurrencyManager extends EventEmitter {
 
     switch (operation) {
       case 'assessment':
-        shards.push(...await this.shardByPath(scope));
+        shards.push(...(await this.shardByPath(scope)));
         break;
 
       case 'validation':
-        shards.push(...await this.shardByTestSuite(scope));
+        shards.push(...(await this.shardByTestSuite(scope)));
         break;
 
       case 'fixPack':
-        shards.push(...await this.shardByModule(scope));
+        shards.push(...(await this.shardByModule(scope)));
         break;
 
       case 'pattern':
-        shards.push(...await this.shardByLanguage(scope));
+        shards.push(...(await this.shardByLanguage(scope)));
         break;
 
       default:
@@ -180,7 +179,7 @@ class ConcurrencyManager extends EventEmitter {
       'tests/unit',
       'tests/integration',
       'scripts',
-      'docs'
+      'docs',
     ];
 
     for (const pathPattern of paths) {
@@ -190,7 +189,7 @@ class ConcurrencyManager extends EventEmitter {
           type: 'path',
           pattern: pathPattern,
           priority: this.getPathPriority(pathPattern),
-          estimatedSize: await this.estimatePathSize(pathPattern)
+          estimatedSize: await this.estimatePathSize(pathPattern),
         });
       }
     }
@@ -207,7 +206,7 @@ class ConcurrencyManager extends EventEmitter {
     // Parse package.json for workspaces or detect modules
     try {
       const packageJson = JSON.parse(
-        await fs.readFile(path.join(process.cwd(), 'package.json'), 'utf8')
+        await fs.readFile(path.join(process.cwd(), 'package.json'), 'utf8'),
       );
 
       if (packageJson.workspaces) {
@@ -217,7 +216,7 @@ class ConcurrencyManager extends EventEmitter {
             type: 'module',
             path: workspace,
             priority: 'normal',
-            dependencies: []
+            dependencies: [],
           });
         }
       }
@@ -227,7 +226,7 @@ class ConcurrencyManager extends EventEmitter {
         id: crypto.randomBytes(8).toString('hex'),
         type: 'module',
         path: '.',
-        priority: 'normal'
+        priority: 'normal',
       });
     }
 
@@ -257,7 +256,7 @@ class ConcurrencyManager extends EventEmitter {
       this.state.pathLocks.set(lockPath, {
         agentId,
         timestamp,
-        ttl: this.config.lockTTL
+        ttl: this.config.lockTTL,
       });
 
       acquiredLocks.push(lockPath);
@@ -288,8 +287,7 @@ class ConcurrencyManager extends EventEmitter {
     }
 
     // Sort by load
-    const sorted = Array.from(agentLoads.entries())
-      .sort((a, b) => b[1] - a[1]);
+    const sorted = Array.from(agentLoads.entries()).sort((a, b) => b[1] - a[1]);
 
     if (sorted.length < 2) return;
 
@@ -320,7 +318,7 @@ class ConcurrencyManager extends EventEmitter {
         repo,
         used: repoUsed,
         limit: this.config.budgetPerRepo,
-        requested: cost
+        requested: cost,
       });
 
       // Throttle at 95%
@@ -334,7 +332,7 @@ class ConcurrencyManager extends EventEmitter {
       this.emit('budget_critical', {
         used: globalUsed,
         limit: this.config.budgetGlobal,
-        requested: cost
+        requested: cost,
       });
 
       return false;
@@ -371,7 +369,7 @@ class ConcurrencyManager extends EventEmitter {
       priority: task.priority || 'normal',
       timestamp: Date.now(),
       reason,
-      retries: 0
+      retries: 0,
     };
 
     this.state.queuedTasks.push(queueEntry);
@@ -381,15 +379,14 @@ class ConcurrencyManager extends EventEmitter {
       const ageB = Date.now() - b.timestamp;
       const priorityWeight = { critical: 1000, high: 100, normal: 10, low: 1 };
 
-      return (priorityWeight[b.priority] + ageB / 1000) -
-             (priorityWeight[a.priority] + ageA / 1000);
+      return priorityWeight[b.priority] + ageB / 1000 - (priorityWeight[a.priority] + ageA / 1000);
     });
 
     return {
       status: 'queued',
       queuePosition: this.state.queuedTasks.length,
       reason,
-      estimatedWait: this.estimateWaitTime()
+      estimatedWait: this.estimateWaitTime(),
     };
   }
 
@@ -397,9 +394,10 @@ class ConcurrencyManager extends EventEmitter {
    * Process queued tasks
    */
   async processQueue() {
-    while (this.state.queuedTasks.length > 0 &&
-           this.state.activeAgents.size < this.config.maxConcurrent) {
-
+    while (
+      this.state.queuedTasks.length > 0 &&
+      this.state.activeAgents.size < this.config.maxConcurrent
+    ) {
       const entry = this.state.queuedTasks.shift();
 
       try {
@@ -447,7 +445,7 @@ class ConcurrencyManager extends EventEmitter {
       agentId,
       runtime,
       cost: actualCost,
-      utilization: this.calculateUtilization()
+      utilization: this.calculateUtilization(),
     };
   }
 
@@ -477,7 +475,7 @@ class ConcurrencyManager extends EventEmitter {
 
       this.emit('circuit_breaker_open', {
         failures: this.circuitBreaker.failures,
-        resetIn: this.circuitBreaker.resetTime
+        resetIn: this.circuitBreaker.resetTime,
       });
     }
   }
@@ -515,7 +513,7 @@ class ConcurrencyManager extends EventEmitter {
           utilization: this.state.metrics.utilizationRate,
           costMedian: median,
           costP95: p95,
-          tasksCompleted: this.state.metrics.tasksCompleted
+          tasksCompleted: this.state.metrics.tasksCompleted,
         });
       }
     }, 30000); // Every 30 seconds
@@ -555,7 +553,9 @@ class ConcurrencyManager extends EventEmitter {
     const activeAgents = this.state.activeAgents.size;
     const avgTaskTime = 5 * 60 * 1000; // 5 minutes average
 
-    return Math.ceil((queueLength / Math.max(1, this.config.maxConcurrent - activeAgents)) * avgTaskTime);
+    return Math.ceil(
+      (queueLength / Math.max(1, this.config.maxConcurrent - activeAgents)) * avgTaskTime,
+    );
   }
 
   optimizeShards(shards) {
@@ -578,7 +578,7 @@ class ConcurrencyManager extends EventEmitter {
         current = {
           ...current,
           id: `${current.id}_${shard.id}`,
-          pattern: `${current.pattern},${shard.pattern}`
+          pattern: `${current.pattern},${shard.pattern}`,
         };
       } else {
         optimized.push(current);
@@ -605,13 +605,13 @@ class ConcurrencyManager extends EventEmitter {
       utilization: this.calculateUtilization(),
       budget: {
         monthly: this.state.budgetUsed.monthly,
-        perRepo: Object.fromEntries(this.state.budgetUsed.perRepo)
+        perRepo: Object.fromEntries(this.state.budgetUsed.perRepo),
       },
       circuitBreaker: {
         status: this.circuitBreaker.isOpen ? 'open' : 'closed',
-        failures: this.circuitBreaker.failures
+        failures: this.circuitBreaker.failures,
       },
-      metrics: this.state.metrics
+      metrics: this.state.metrics,
     };
   }
 }
@@ -647,12 +647,13 @@ if (require.main === module) {
     repo: 'linear-tdd-workflow',
     paths: ['src/components', 'src/services'],
     priority: 'high',
-    complexity: 1.5
+    complexity: 1.5,
   };
 
-  manager.scheduleTask(exampleTask)
-    .then(result => console.log('Task scheduled:', result))
-    .catch(error => console.error('Scheduling failed:', error));
+  manager
+    .scheduleTask(exampleTask)
+    .then((result) => console.log('Task scheduled:', result))
+    .catch((error) => console.error('Scheduling failed:', error));
 
   // Status monitoring
   setInterval(() => {

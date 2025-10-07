@@ -13,18 +13,21 @@ These scripts provide Linear task management capabilities for the TDD workflow s
 Creates Linear tasks from AUDITOR assessment results.
 
 **Usage**:
+
 ```bash
 # From STRATEGIST agent or hooks
 .claude/scripts/linear/create-tasks-from-assessment.sh proposals/issues-2025-10-01.json
 ```
 
 **Environment Variables**:
+
 - `LINEAR_API_KEY` - Linear API token (required)
 - `LINEAR_TEAM_ID` - Linear team ID (required)
 - `LINEAR_PROJECT_ID` - Linear project ID (optional)
 
 **Input Format**:
 Assessment JSON file with `linear_tasks` array:
+
 ```json
 {
   "linear_tasks": [
@@ -40,6 +43,7 @@ Assessment JSON file with `linear_tasks` array:
 ```
 
 **Output**:
+
 - Prints created task IDs to stdout
 - Returns exit code 0 on success, 1 if any task creation failed
 
@@ -49,16 +53,19 @@ In Claude Code, STRATEGIST should use MCP tools directly instead of calling this
 
 ```javascript
 // Preferred: Direct MCP call
-const result = await mcp__linear-server__create_issue({
-  team: process.env.LINEAR_TEAM_ID,
-  title: taskDef.title,
-  description: taskDef.description,
-  labels: taskDef.labels,
-  priority: taskDef.priority
-});
+const result =
+  (await mcp__linear) -
+  server__create_issue({
+    team: process.env.LINEAR_TEAM_ID,
+    title: taskDef.title,
+    description: taskDef.description,
+    labels: taskDef.labels,
+    priority: taskDef.priority,
+  });
 ```
 
 This script serves as a fallback for:
+
 - CI/CD automation (GitHub Actions, Jenkins)
 - Manual task creation from terminal
 - Testing Linear integration without Claude Code
@@ -84,6 +91,7 @@ LINEAR_PROJECT_ID=proj456  # optional
 ```
 
 Or via export:
+
 ```bash
 export LINEAR_API_KEY="lin_api_xxxxxxxxxxxxx"
 export LINEAR_TEAM_ID="abc123"
@@ -122,6 +130,7 @@ Scripts use exit codes and colored output:
 - **Blue (ℹ)**: Info
 
 Exit codes:
+
 - `0`: All tasks created successfully
 - `1`: One or more tasks failed to create
 

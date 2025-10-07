@@ -48,9 +48,7 @@
   "rollbackAvailable": false,
   "validation": {
     "ready": true,
-    "issues": [
-      "Database Migration check failed"
-    ],
+    "issues": ["Database Migration check failed"],
     "checks": {
       "Code Quality": {
         "passing": true,

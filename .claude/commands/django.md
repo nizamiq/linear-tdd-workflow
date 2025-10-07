@@ -2,9 +2,7 @@
 name: django
 description: Django development assistance including async views, DRF APIs, ORM optimization, and architectural patterns. Use PROACTIVELY for Django feature development, API design, or performance issues.
 agent: DJANGO-PRO
-usage: "/django [--task=<api|model|view|optimization|security>] [--async] [--drf]"
-allowed-tools: [Read, Write, Edit, Grep, Glob, Bash, mcp__context7__*]
-argument-hint: "[--task=api|model|view|migration|admin|optimization|security|channels|all] [--async] [--drf]"
+usage: '/django [--task=<api|model|view|optimization|security>] [--async] [--drf]'
 parameters:
   - name: task
     description: Django task type
@@ -26,17 +24,21 @@ parameters:
 Expert Django 5.x development with the DJANGO-PRO agent, specializing in async views, DRF APIs, and production-ready architectures.
 
 ## Usage
+
 ```
 /django [--task=<api|model|view|optimization|security>] [--async] [--drf]
 ```
 
 ## Parameters
+
 - `--task`: Development focus - api, model, view, migration, admin, optimization, security, channels, or all (default: all)
 - `--async`: Implement async views and middleware (default: false)
 - `--drf`: Include Django REST Framework patterns (default: true)
 
 ## What This Command Does
+
 The DJANGO-PRO agent will:
+
 1. Design Django models with optimal relationships
 2. Create RESTful APIs with DRF
 3. Implement async views for high concurrency
@@ -47,6 +49,7 @@ The DJANGO-PRO agent will:
 8. Create comprehensive test suites
 
 ## Expected Output
+
 - **Model Definitions**: Optimized database schema with indexes
 - **API Implementation**: DRF viewsets, serializers, permissions
 - **View Code**: Class-based or function views with proper patterns
@@ -57,6 +60,7 @@ The DJANGO-PRO agent will:
 - **Documentation**: API docs and deployment guide
 
 ## Examples
+
 ```bash
 # Full Django application setup
 /django
@@ -80,30 +84,35 @@ The DJANGO-PRO agent will:
 ## Django Patterns
 
 ### Model Architecture
+
 - Abstract base classes
 - Model mixins
 - Custom managers
 - Signal handlers
 
 ### API Design
+
 - ViewSets and routers
 - Custom permissions
 - API versioning
 - Throttling and caching
 
 ### Async Support
+
 - ASGI deployment
 - Async views
 - Database async queries
 - Async middleware
 
 ### Performance
+
 - select_related/prefetch_related
 - Query optimization
 - Database indexing
 - Redis caching
 
 ## Best Practices
+
 - Fat models, thin views
 - Explicit is better than implicit
 - DRY principle
@@ -111,6 +120,7 @@ The DJANGO-PRO agent will:
 - Test everything
 
 ## Integration
+
 - **PostgreSQL**: Optimal database backend
 - **Redis**: Caching and Celery broker
 - **Celery**: Async task processing
@@ -118,12 +128,14 @@ The DJANGO-PRO agent will:
 - **HTMX**: Modern UI without heavy JS
 
 ## Performance Targets
+
 - API response time: <200ms (p95)
 - ORM query efficiency: <5 queries per request
 - Test coverage: >90%
 - Security score: A+ rating
 
 ## SLAs
+
 - Model design: ≤10 minutes
 - API implementation: ≤20 minutes
 - Full feature: ≤45 minutes

@@ -10,11 +10,11 @@ Track which features are implemented and which have E2E test coverage to ensure 
 
 ## Feature Status
 
-| Status | Meaning | Blocks Release? |
-|--------|---------|-----------------|
-| `implemented` | Has code + E2E test | ❌ No - green light |
-| `partial` | Has code, NO E2E test | ✅ Yes - must add test |
-| `planned` | Not yet built | ❌ No - future work |
+| Status        | Meaning               | Blocks Release?        |
+| ------------- | --------------------- | ---------------------- |
+| `implemented` | Has code + E2E test   | ❌ No - green light    |
+| `partial`     | Has code, NO E2E test | ✅ Yes - must add test |
+| `planned`     | Not yet built         | ❌ No - future work    |
 
 ## Registry Format
 
@@ -69,8 +69,8 @@ If you've implemented a feature but haven't written E2E test yet:
 ```yaml
 features:
   my-feature:
-    name: "Description"
-    status: partial  # Blocks release!
+    name: 'Description'
+    status: partial # Blocks release!
     e2e_test: null
 ```
 
@@ -81,14 +81,15 @@ features:
 ```yaml
 features:
   future-feature:
-    name: "Description"
-    status: planned  # Doesn't block release
+    name: 'Description'
+    status: planned # Doesn't block release
     e2e_test: null
 ```
 
 ## Integration with Release Journey
 
 When you run `/release 1.x.0`, Phase 2.5 automatically:
+
 1. Reads this registry
 2. Finds all `implemented` features
 3. Verifies each has `e2e_test` specified
@@ -108,29 +109,32 @@ When you run `/release 1.x.0`, Phase 2.5 automatically:
 ## Examples
 
 ### Good: Implemented with E2E Test
+
 ```yaml
 user-authentication:
-  name: "User can log in with email and password"
+  name: 'User can log in with email and password'
   status: implemented
-  e2e_test: "tests/e2e/auth.test.js::login-workflow"
-  notes: "Covers login, token refresh, logout"
+  e2e_test: 'tests/e2e/auth.test.js::login-workflow'
+  notes: 'Covers login, token refresh, logout'
 ```
 
 ### Bad: Partial (Blocks Release)
+
 ```yaml
 user-authentication:
-  name: "User can log in with email and password"
-  status: partial  # ❌ Will block release
+  name: 'User can log in with email and password'
+  status: partial # ❌ Will block release
   e2e_test: null
 ```
 
 ### Good: Planned (Future Work)
+
 ```yaml
 oauth-integration:
-  name: "User can log in with Google OAuth"
-  status: planned  # ✅ Won't block release
+  name: 'User can log in with Google OAuth'
+  status: planned # ✅ Won't block release
   e2e_test: null
-  notes: "Planned for Sprint 12"
+  notes: 'Planned for Sprint 12'
 ```
 
 ## Validation
@@ -142,6 +146,7 @@ npm run release:validate-functional
 ```
 
 Output shows:
+
 - ✅ Implemented features with E2E coverage
 - ❌ Partial features blocking release
 - ⏳ Planned features (informational)

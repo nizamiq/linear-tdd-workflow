@@ -17,13 +17,14 @@ The system tracks features in `.claude/user-stories/registry.yaml`:
 ```yaml
 features:
   feature-slug:
-    name: "User-facing feature description"
+    name: 'User-facing feature description'
     status: implemented | partial | planned
-    e2e_test: "path/to/test.js::test-name"
-    notes: "Optional implementation notes"
+    e2e_test: 'path/to/test.js::test-name'
+    notes: 'Optional implementation notes'
 ```
 
 **Status Meanings:**
+
 - **`implemented`**: Feature is built AND has passing E2E test → ✅ Allows release
 - **`partial`**: Feature is built but NO E2E test → ❌ **BLOCKS RELEASE**
 - **`planned`**: Feature not yet built → ⚪ Doesn't affect release
@@ -46,6 +47,7 @@ test('should complete full assessment workflow', async () => {
 ### 3. Functional Release Gate
 
 An automated validator that runs during releases:
+
 - ✅ Checks all `implemented` features have E2E tests
 - ✅ Runs all E2E tests to verify they pass
 - ❌ **BLOCKS** release if any failures or missing tests
@@ -54,6 +56,7 @@ An automated validator that runs during releases:
 ## Quick Start
 
 ### Check Current Status
+
 ```bash
 # View coverage report
 npm run release:user-stories
@@ -66,6 +69,7 @@ npm run release:user-stories
 ```
 
 ### Validate Release Readiness
+
 ```bash
 # Run functional gate manually
 npm run release:validate-functional
@@ -75,6 +79,7 @@ make release-check
 ```
 
 ### Add New Feature to Registry
+
 ```bash
 # Interactive mode
 npm run release:add-story
@@ -86,6 +91,7 @@ node .claude/scripts/user-stories/registry-helper.js add \
 ```
 
 ### Validate E2E Test Coverage
+
 ```bash
 # Check all @feature tags match registry
 npm run e2e:validate
@@ -97,17 +103,20 @@ npm run e2e:report
 ## Release Workflow
 
 ### Phase 1: Feature Development
+
 1. Build feature with TDD (RED→GREEN→REFACTOR)
 2. Add feature to registry with `status: planned`
 3. Merge feature to `develop`
 
 ### Phase 2: E2E Test Creation
+
 1. Write E2E test simulating user story
 2. Add `@feature feature-slug` tag to test
 3. Update registry: `status: implemented`, `e2e_test: "path::name"`
 4. Verify test passes: `npm test:e2e`
 
 ### Phase 3: Release Attempt
+
 1. Run `/release 1.2.0` or `make release`
 2. Gate runs automatically in Phase 2.5
 3. **If blocked:** Fix missing E2E tests, re-run
@@ -116,16 +125,18 @@ npm run e2e:report
 ## Example: Complete Feature Lifecycle
 
 ### Step 1: Add Feature to Registry (Planned)
+
 ```yaml
 features:
   export-json-data:
-    name: "User can export assessment data as JSON"
+    name: 'User can export assessment data as JSON'
     status: planned
     e2e_test: null
-    notes: "Requested in FEATURE-456"
+    notes: 'Requested in FEATURE-456'
 ```
 
 ### Step 2: Implement Feature with Unit Tests
+
 ```bash
 # TDD cycle
 git checkout -b feature/export-json
@@ -135,6 +146,7 @@ git push origin feature/export-json
 ```
 
 ### Step 3: Create E2E Test
+
 ```javascript
 // tests/e2e/export-features.test.js
 /**
@@ -158,16 +170,18 @@ test('should export assessment data as JSON', async () => {
 ```
 
 ### Step 4: Update Registry (Implemented)
+
 ```yaml
 features:
   export-json-data:
-    name: "User can export assessment data as JSON"
+    name: 'User can export assessment data as JSON'
     status: implemented
-    e2e_test: "tests/e2e/export-features.test.js::should export assessment data as JSON"
-    notes: "Completed in FEATURE-456"
+    e2e_test: 'tests/e2e/export-features.test.js::should export assessment data as JSON'
+    notes: 'Completed in FEATURE-456'
 ```
 
 ### Step 5: Verify and Release
+
 ```bash
 # Verify E2E test passes
 npm run test:e2e
@@ -183,23 +197,28 @@ make release VERSION=1.2.0
 ## Common Scenarios
 
 ### Scenario 1: Feature Built, No E2E Test Yet
+
 **Status:** `partial`
 **Effect:** ❌ Blocks release
 **Fix:** Either:
+
 - Write E2E test and update to `implemented`
 - Mark as `planned` if not ready for release
 
 ### Scenario 2: E2E Test Fails
+
 **Status:** `implemented` with failing test
 **Effect:** ❌ Blocks release
 **Fix:** Debug and fix E2E test until it passes
 
 ### Scenario 3: Half-Built Feature
+
 **Status:** Should be `planned`
 **Effect:** ⚪ Doesn't block release
 **Action:** Leave as `planned` until ready for E2E testing
 
 ### Scenario 4: All Features Have E2E Tests
+
 **Status:** All `implemented` with passing tests
 **Effect:** ✅ Release proceeds
 **Action:** Continue with UAT and deployment
@@ -207,6 +226,7 @@ make release VERSION=1.2.0
 ## Registry Management
 
 ### List All Features
+
 ```bash
 node .claude/scripts/user-stories/registry-helper.js list
 
@@ -218,6 +238,7 @@ node .claude/scripts/user-stories/registry-helper.js list
 ```
 
 ### Show Coverage Report
+
 ```bash
 node .claude/scripts/user-stories/registry-helper.js coverage
 
@@ -231,6 +252,7 @@ node .claude/scripts/user-stories/registry-helper.js coverage
 ```
 
 ### Add New Feature
+
 ```bash
 node .claude/scripts/user-stories/registry-helper.js add \
   --name "User can schedule assessments" \
@@ -239,6 +261,7 @@ node .claude/scripts/user-stories/registry-helper.js add \
 ```
 
 ### Validate Registry Format
+
 ```bash
 node .claude/scripts/user-stories/registry-helper.js validate
 
@@ -251,6 +274,7 @@ node .claude/scripts/user-stories/registry-helper.js validate
 ## E2E Test Parser
 
 ### Validate Test Coverage
+
 ```bash
 node .claude/scripts/testing/e2e-parser.js validate
 
@@ -261,6 +285,7 @@ node .claude/scripts/testing/e2e-parser.js validate
 ```
 
 ### Generate Coverage Report
+
 ```bash
 node .claude/scripts/testing/e2e-parser.js report
 
@@ -276,6 +301,7 @@ node .claude/scripts/testing/e2e-parser.js report
 ```
 
 ### List @feature Tags
+
 ```bash
 node .claude/scripts/testing/e2e-parser.js list
 
@@ -292,26 +318,31 @@ node .claude/scripts/testing/e2e-parser.js list
 ### What the Gate Checks
 
 **Phase 1: Partial Feature Detection**
+
 - Scans registry for `status: partial`
 - **Blocks immediately** if any found
 - Reason: Feature is built but not validated
 
 **Phase 2: Implemented Feature Validation**
+
 - Finds all `status: implemented` features
 - Checks each has `e2e_test` specified
 - **Blocks** if any missing test paths
 
 **Phase 3: E2E Test Execution**
+
 - Runs full E2E test suite: `npm run test:e2e`
 - **Blocks** if any test fails
 
 **Phase 4: Final Report**
+
 - Passes ✅ only if all checks pass
 - Provides detailed failure reasons if blocked
 
 ### Running the Gate
 
 **Automatic:** Runs during `/release` command in Phase 2.5
+
 ```bash
 /release 1.2.0
 # ... Phase 1: Preparation
@@ -321,6 +352,7 @@ node .claude/scripts/testing/e2e-parser.js list
 ```
 
 **Manual:** Run anytime to check status
+
 ```bash
 npm run release:validate-functional
 
@@ -332,6 +364,7 @@ npm run release:validate-functional
 ```
 
 **Via Make:** Same as npm script
+
 ```bash
 make release-check
 ```
@@ -354,6 +387,7 @@ async run(options = {}) {
 ```
 
 **If gate fails:**
+
 - Release process halts
 - Clear error messages displayed
 - Must fix blocking issues before proceeding
@@ -361,20 +395,26 @@ async run(options = {}) {
 ## Best Practices
 
 ### 1. Add Features to Registry Early
+
 Add features with `status: planned` during sprint planning.
 
 ### 2. Update Status Progressively
+
 - `planned` → Feature exists in registry, not built yet
 - `partial` → Feature built, needs E2E test (temporary state)
 - `implemented` → Feature built AND E2E test passing
 
 ### 3. Never Leave Features as `partial`
+
 This status should be transient. If a feature is built, immediately:
+
 - Write E2E test
 - Update to `implemented`
 
 ### 4. Write E2E Tests from User Perspective
+
 Tests should simulate actual user workflows:
+
 ```javascript
 // ✅ Good: Simulates user journey
 test('user assesses code and creates Linear task', async () => {
@@ -390,7 +430,9 @@ test('AUDITOR agent executes successfully', async () => {
 ```
 
 ### 5. Link Tests to Features Explicitly
+
 Always add `@feature` tag:
+
 ```javascript
 /**
  * @feature feature-slug
@@ -399,7 +441,9 @@ Always add `@feature` tag:
 ```
 
 ### 6. Run Gate Before Creating Release PR
+
 Check readiness before starting release process:
+
 ```bash
 npm run release:validate-functional
 # Only proceed if ✅ PASSED
@@ -408,46 +452,52 @@ npm run release:validate-functional
 ## Troubleshooting
 
 ### Problem: Gate blocks with "partial" status
+
 **Solution:** Write E2E test for the feature or mark as `planned` if not ready.
 
 ### Problem: E2E test fails during gate
+
 **Solution:** Debug test, fix implementation, or fix test. All E2E tests must pass.
 
 ### Problem: Feature not found in registry
+
 **Solution:** Add feature to registry with appropriate status.
 
 ### Problem: @feature tag doesn't match registry
+
 **Solution:** Update either the tag or registry to match. Run `npm run e2e:validate`.
 
 ### Problem: Registry YAML format invalid
+
 **Solution:** Run `npm run release:user-stories` to see validation errors. Fix YAML syntax.
 
 ## Files and Locations
 
-| File | Purpose |
-|------|---------|
-| `.claude/user-stories/registry.yaml` | Central feature registry |
-| `.claude/scripts/user-stories/registry-helper.js` | CLI tool for registry management |
-| `.claude/scripts/testing/e2e-parser.js` | E2E test metadata parser |
-| `.claude/scripts/release/functional-gate.js` | Gate validator (runs during release) |
-| `.claude/journeys/jr6-release.js` | Release journey (integrates gate) |
-| `tests/e2e/**/*.test.js` | E2E test files with @feature tags |
+| File                                              | Purpose                              |
+| ------------------------------------------------- | ------------------------------------ |
+| `.claude/user-stories/registry.yaml`              | Central feature registry             |
+| `.claude/scripts/user-stories/registry-helper.js` | CLI tool for registry management     |
+| `.claude/scripts/testing/e2e-parser.js`           | E2E test metadata parser             |
+| `.claude/scripts/release/functional-gate.js`      | Gate validator (runs during release) |
+| `.claude/journeys/jr6-release.js`                 | Release journey (integrates gate)    |
+| `tests/e2e/**/*.test.js`                          | E2E test files with @feature tags    |
 
 ## Command Reference
 
-| Command | Purpose |
-|---------|---------|
-| `npm run release:validate-functional` | Run functional gate manually |
-| `npm run release:user-stories` | Show coverage report |
-| `npm run release:add-story` | Add feature to registry interactively |
-| `npm run e2e:validate` | Validate @feature tags match registry |
-| `npm run e2e:report` | Generate E2E coverage report |
-| `make release-check` | Run functional gate (via Make) |
-| `make release VERSION=x.y.z` | Full release with gate |
+| Command                               | Purpose                               |
+| ------------------------------------- | ------------------------------------- |
+| `npm run release:validate-functional` | Run functional gate manually          |
+| `npm run release:user-stories`        | Show coverage report                  |
+| `npm run release:add-story`           | Add feature to registry interactively |
+| `npm run e2e:validate`                | Validate @feature tags match registry |
+| `npm run e2e:report`                  | Generate E2E coverage report          |
+| `make release-check`                  | Run functional gate (via Make)        |
+| `make release VERSION=x.y.z`          | Full release with gate                |
 
 ## Summary
 
 The functional release concept ensures:
+
 1. ✅ Only working, validated features are released
 2. ✅ E2E tests prove features work from user perspective
 3. ✅ Partial implementations are caught before release

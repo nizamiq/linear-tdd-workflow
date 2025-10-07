@@ -158,13 +158,7 @@ export CLAUDE_PERFORMANCE_MODE=optimal
   "settings": {
     "scan_interval": 300000,
     "max_files_per_scan": 1000,
-    "ignore_patterns": [
-      "node_modules/**",
-      "dist/**",
-      "build/**",
-      "*.min.js",
-      "vendor/**"
-    ],
+    "ignore_patterns": ["node_modules/**", "dist/**", "build/**", "*.min.js", "vendor/**"],
     "quality_thresholds": {
       "complexity": 10,
       "duplication": 5,
@@ -322,12 +316,7 @@ export CLAUDE_PERFORMANCE_MODE=optimal
       "**/dist/**",
       "**/build/**"
     ],
-    "critical_paths": [
-      "src/core/**",
-      "src/api/**",
-      "src/security/**",
-      "src/payment/**"
-    ]
+    "critical_paths": ["src/core/**", "src/api/**", "src/security/**", "src/payment/**"]
   }
 }
 ```
@@ -341,12 +330,7 @@ export CLAUDE_PERFORMANCE_MODE=optimal
     "minimum_score": 30,
     "critical_path_score": 60,
     "timeout": 300000,
-    "ignore_patterns": [
-      "**/*.test.{js,ts}",
-      "**/*.spec.{js,ts}",
-      "**/test/**",
-      "**/tests/**"
-    ],
+    "ignore_patterns": ["**/*.test.{js,ts}", "**/*.spec.{js,ts}", "**/test/**", "**/tests/**"],
     "mutators": {
       "arithmetic": true,
       "comparison": true,
@@ -411,16 +395,8 @@ export CLAUDE_PERFORMANCE_MODE=optimal
       "critical_paths": 95
     },
     "exemptions": {
-      "file_patterns": [
-        "**/*.config.{js,ts}",
-        "**/*.spec.{js,ts}",
-        "**/test/**"
-      ],
-      "directories": [
-        "scripts/",
-        "docs/",
-        "examples/"
-      ]
+      "file_patterns": ["**/*.config.{js,ts}", "**/*.spec.{js,ts}", "**/test/**"],
+      "directories": ["scripts/", "docs/", "examples/"]
     }
   }
 }
@@ -454,10 +430,7 @@ module.exports = {
     },
   },
   coverageReporters: ['text', 'lcov', 'html'],
-  watchPlugins: [
-    'jest-watch-typeahead/filename',
-    'jest-watch-typeahead/testname',
-  ],
+  watchPlugins: ['jest-watch-typeahead/filename', 'jest-watch-typeahead/testname'],
   setupFilesAfterEnv: ['<rootDir>/tests/setup.js'],
   testTimeout: 30000,
 };
@@ -731,11 +704,7 @@ module.exports = {
 // .claude/templates/eslint.config.template.js
 module.exports = {
   parser: '@typescript-eslint/parser',
-  extends: [
-    'eslint:recommended',
-    '@typescript-eslint/recommended',
-    'prettier',
-  ],
+  extends: ['eslint:recommended', '@typescript-eslint/recommended', 'prettier'],
   plugins: ['@typescript-eslint', 'jest'],
   env: {
     node: true,
@@ -1139,26 +1108,31 @@ npm run config:check-compatibility
 ## Configuration Best Practices
 
 ### 1. Environment Separation
+
 - Use environment-specific configuration files
 - Leverage environment variables for sensitive data
 - Test configurations in staging before production
 
 ### 2. Security First
+
 - Never commit secrets to version control
 - Use `.claude/settings.local.json` for local overrides
 - Regularly rotate API keys and tokens
 
 ### 3. Performance Optimization
+
 - Tune concurrency settings based on your hardware
 - Adjust timeouts based on your codebase size
 - Monitor performance metrics and adjust thresholds
 
 ### 4. Team Collaboration
+
 - Document configuration changes
 - Use role-based access control
 - Share knowledge about configuration patterns
 
 ### 5. Incremental Adoption
+
 - Start with loose quality gates and tighten over time
 - Enable features gradually
 - Monitor impact and adjust accordingly
@@ -1166,6 +1140,7 @@ npm run config:check-compatibility
 ---
 
 **For additional configuration help, see:**
+
 - [User Guide](USER-GUIDE.md) - Complete system overview
 - [Commands Reference](COMMANDS.md) - CLI command documentation
 - [Troubleshooting](TROUBLESHOOTING.md) - Configuration issues resolution

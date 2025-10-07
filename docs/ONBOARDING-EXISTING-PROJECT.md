@@ -46,6 +46,7 @@ node .claude/scripts/compatibility-check.js
 ```
 
 The analysis will show:
+
 - **Languages detected**: JavaScript, TypeScript, Python, etc.
 - **Test frameworks**: Jest, Mocha, pytest, etc.
 - **Build tools**: npm, yarn, poetry, etc.
@@ -63,6 +64,7 @@ node .claude/setup.js
 ```
 
 **Automated Detection:**
+
 - **Project Type**: Existing project (has source files)
 - **Languages**: Scans for `.js`, `.ts`, `.py`, etc.
 - **Package Managers**: Detects `package.json`, `pyproject.toml`, etc.
@@ -71,6 +73,7 @@ node .claude/setup.js
 - **Framework**: React, Express, FastAPI, Django, etc.
 
 **Automatic Backup:**
+
 ```
 .claude-backup/          # Created automatically
 ├── package.json.bak     # Original package.json
@@ -86,6 +89,7 @@ The system enhances existing configurations without breaking them:
 #### JavaScript/TypeScript Projects
 
 **package.json Enhancement:**
+
 ```json
 {
   "name": "your-existing-project",
@@ -119,6 +123,7 @@ The system enhances existing configurations without breaking them:
 ```
 
 **Configuration Merging Strategy:**
+
 - **Preserve existing**: Never overwrites working configurations
 - **Extend, don't replace**: Adds new rules alongside existing ones
 - **Smart merging**: Combines compatible configurations
@@ -127,6 +132,7 @@ The system enhances existing configurations without breaking them:
 #### Python Projects
 
 **pyproject.toml Enhancement:**
+
 ```toml
 [build-system]
 # Existing build system preserved
@@ -187,12 +193,14 @@ make tdd-roadmap
 **TDD Integration Modes:**
 
 1. **New Code Only** (Default for existing projects):
+
    ```bash
    # Only new changes require TDD
    make validate-tdd --mode=new-only
    ```
 
 2. **Gradual Adoption**:
+
    ```bash
    # Gradually add tests to existing code
    make tdd-adopt --target=10  # 10% per sprint
@@ -207,6 +215,7 @@ make tdd-roadmap
 #### Test Framework Integration
 
 **If you have Jest:**
+
 ```javascript
 // jest.config.js - Enhanced, not replaced
 module.exports = {
@@ -215,10 +224,7 @@ module.exports = {
   roots: ['<rootDir>/src', '<rootDir>/tests'],
 
   // Claude enhancements added
-  collectCoverageFrom: [
-    'src/**/*.{js,ts}',
-    '!src/**/*.d.ts',
-  ],
+  collectCoverageFrom: ['src/**/*.{js,ts}', '!src/**/*.d.ts'],
   coverageThreshold: {
     global: {
       branches: 80,
@@ -228,14 +234,12 @@ module.exports = {
     },
   },
   // TDD mode for watch
-  watchPlugins: [
-    'jest-watch-typeahead/filename',
-    'jest-watch-typeahead/testname',
-  ],
+  watchPlugins: ['jest-watch-typeahead/filename', 'jest-watch-typeahead/testname'],
 };
 ```
 
 **If you have pytest:**
+
 ```toml
 # pyproject.toml - Enhanced pytest config
 [tool.pytest.ini_options]
@@ -276,30 +280,26 @@ The 20-agent system integrates with your existing workflow:
   "agents": {
     "auditor": {
       "enabled": true,
-      "scope": "incremental",  // Only assess changed files
+      "scope": "incremental", // Only assess changed files
       "respect_gitignore": true,
-      "exclude_patterns": [
-        "legacy/*",
-        "vendor/*",
-        "node_modules/*"
-      ]
+      "exclude_patterns": ["legacy/*", "vendor/*", "node_modules/*"]
     },
     "executor": {
       "enabled": true,
-      "max_file_changes": 300,  // Fix Pack limit
-      "auto_commit": false,     // Human review required
-      "preserve_style": true    // Match existing code style
+      "max_file_changes": 300, // Fix Pack limit
+      "auto_commit": false, // Human review required
+      "preserve_style": true // Match existing code style
     },
     "guardian": {
       "enabled": true,
       "protect_existing_ci": true,
-      "enhance_ci": false       // Don't modify existing CI initially
+      "enhance_ci": false // Don't modify existing CI initially
     }
   },
   "tdd": {
     "enforcement_mode": "new_code_only",
-    "coverage_baseline": 60,   // Current coverage level
-    "coverage_target": 80,     // Target coverage
+    "coverage_baseline": 60, // Current coverage level
+    "coverage_target": 80, // Target coverage
     "gradual_adoption": true
   }
 }
@@ -308,6 +308,7 @@ The 20-agent system integrates with your existing workflow:
 #### Legacy Code Handling
 
 **Smart Legacy Detection:**
+
 ```bash
 # Mark legacy directories (excluded from strict TDD)
 node .claude/cli.js mark-legacy src/legacy/
@@ -318,6 +319,7 @@ node .claude/cli.js legacy-roadmap
 ```
 
 **Generated `.claudeignore`:**
+
 ```
 # Legacy code (gradually migrate to TDD)
 src/legacy/
@@ -369,7 +371,7 @@ jobs:
         run: make validate-tdd --new-only
       - name: Run assessment
         run: make assess
-        continue-on-error: true  # Don't fail build initially
+        continue-on-error: true # Don't fail build initially
 ```
 
 #### New CI/CD Features
@@ -401,6 +403,7 @@ jobs:
 #### Gradual Team Integration
 
 **Phase 1: Assessment Only (Week 1)**
+
 ```bash
 # Team members run assessments (no enforcement)
 make assess
@@ -408,18 +411,21 @@ make status
 ```
 
 **Phase 2: New Code TDD (Week 2-4)**
+
 ```bash
 # New features must follow TDD
 make validate-tdd --new-only
 ```
 
 **Phase 3: Legacy Improvement (Month 2+)**
+
 ```bash
 # Gradually improve legacy code
 make tdd-adopt --target=25  # 25% coverage increase
 ```
 
 **Phase 4: Full Integration (Month 3+)**
+
 ```bash
 # Full Claude workflow adoption
 make validate-tdd --full
@@ -428,6 +434,7 @@ make validate-tdd --full
 #### Training Materials
 
 **Generated for your team:**
+
 ```
 .claude/docs/team/
 ├── QUICK-START.md           # 5-minute onboarding
@@ -470,6 +477,7 @@ make reset-config      # Reset to default configuration
 **Challenge**: 100k+ lines, low test coverage, multiple contributors
 
 **Solution**:
+
 ```bash
 # Configure for large legacy projects
 node .claude/setup.js --legacy-mode
@@ -487,6 +495,7 @@ make legacy-roadmap --timeline=6months
 **Challenge**: You have 500+ existing tests
 
 **Solution**:
+
 ```bash
 # Preserve existing tests
 node .claude/setup.js --preserve-tests
@@ -503,6 +512,7 @@ make validate-tdd --mode=additive
 **Challenge**: You use both npm and poetry
 
 **Solution**:
+
 ```bash
 # Polyglot project setup
 node .claude/setup.js --languages=javascript,python
@@ -519,6 +529,7 @@ make test-py          # Python tests
 **Challenge**: Complex webpack/Docker build process
 
 **Solution**:
+
 ```bash
 # Preserve existing build
 node .claude/setup.js --preserve-build
@@ -534,19 +545,13 @@ make validate-build    # Validate build quality
 **Challenge**: Cannot modify certain files
 
 **Solution**:
+
 ```json
 // .claude/settings.local.json
 {
   "protection": {
-    "immutable_files": [
-      "package.json",
-      "tsconfig.json",
-      ".eslintrc.js"
-    ],
-    "read_only_dirs": [
-      "vendor/",
-      "third-party/"
-    ]
+    "immutable_files": ["package.json", "tsconfig.json", ".eslintrc.js"],
+    "read_only_dirs": ["vendor/", "third-party/"]
   },
   "integration": {
     "mode": "additive",
@@ -587,6 +592,7 @@ make validate     # Validation passes
 ```
 
 Expected results:
+
 - ✅ Existing functionality unchanged
 - ✅ All original tests pass
 - ✅ Build process unaffected
@@ -630,6 +636,7 @@ node .claude/cli.js disable-agent securityguard
 ### Integration with Existing Tools
 
 **ESLint Integration:**
+
 ```javascript
 // .eslintrc.js - Extended configuration
 module.exports = {
@@ -638,7 +645,7 @@ module.exports = {
     '@your-company/eslint-config',
 
     // Claude additions (optional)
-    './.claude/configs/eslint-tdd.js'
+    './.claude/configs/eslint-tdd.js',
   ],
   rules: {
     // Your existing rules preserved
@@ -647,13 +654,14 @@ module.exports = {
     // Claude rules added conditionally
     ...(process.env.CLAUDE_TDD === 'true' && {
       'jest/expect-expect': 'error',
-      'jest/no-disabled-tests': 'warn'
-    })
-  }
+      'jest/no-disabled-tests': 'warn',
+    }),
+  },
 };
 ```
 
 **Prettier Integration:**
+
 ```json
 {
   "extends": ["./.claude/configs/prettier-base.json"],
@@ -723,18 +731,21 @@ make build-enhanced  # Claude-enhanced build
 Track these metrics during integration:
 
 **Code Quality:**
+
 - Test coverage percentage
 - Bug discovery rate
 - Code complexity scores
 - Technical debt reduction
 
 **Development Velocity:**
+
 - Time to implement features
 - Code review turnaround
 - Deployment frequency
 - Mean time to recovery
 
 **Team Adoption:**
+
 - Agent usage statistics
 - TDD compliance rate
 - Developer satisfaction scores

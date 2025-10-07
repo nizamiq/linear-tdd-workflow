@@ -24,7 +24,7 @@ const colors = {
   cyan: (text) => `\x1b[36m${text}\x1b[0m`,
   white: (text) => `\x1b[37m${text}\x1b[0m`,
   gray: (text) => `\x1b[90m${text}\x1b[0m`,
-  bold: (text) => `\x1b[1m${text}\x1b[0m`
+  bold: (text) => `\x1b[1m${text}\x1b[0m`,
 };
 
 class AgentPool extends EventEmitter {
@@ -35,10 +35,10 @@ class AgentPool extends EventEmitter {
 
     this.config = {
       maxConcurrentAgents: 3, // Conservative start based on MCP limits
-      agentTimeout: 300000,   // 5 minutes max per agent task
+      agentTimeout: 300000, // 5 minutes max per agent task
       retryAttempts: 2,
       healthCheckInterval: 30000, // 30 seconds
-      ...options
+      ...options,
     };
 
     // Agent tracking
@@ -54,17 +54,32 @@ class AgentPool extends EventEmitter {
       timeoutTasks: 0,
       agentsSpawned: 0,
       averageTaskTime: 0,
-      concurrencyUtilization: []
+      concurrencyUtilization: [],
     };
 
     // Available agent types from our system
     this.availableAgents = [
-      'auditor', 'executor', 'guardian', 'scholar', 'strategist',
-      'analyzer', 'architect', 'cleaner', 'deployer', 'documenter',
-      'integrator', 'migrator', 'monitor', 'optimizer', 'refactorer',
-      'researcher', 'reviewer', 'securityguard', 'tester', 'validator'
+      'auditor',
+      'executor',
+      'guardian',
+      'scholar',
+      'strategist',
+      'analyzer',
+      'architect',
+      'cleaner',
+      'deployer',
+      'documenter',
+      'integrator',
+      'migrator',
+      'monitor',
+      'optimizer',
+      'refactorer',
+      'researcher',
+      'reviewer',
+      'securityguard',
+      'tester',
+      'validator',
     ];
-
 
     // Start health monitoring
     this.startHealthMonitoring();
@@ -87,11 +102,10 @@ class AgentPool extends EventEmitter {
       queueTime,
       attempts: 0,
       resolve: null,
-      reject: null
+      reject: null,
     };
 
     this.metrics.totalTasks++;
-
 
     return new Promise((resolve, reject) => {
       task.resolve = resolve;
@@ -113,7 +127,7 @@ class AgentPool extends EventEmitter {
     } else if (task.priority === 'low') {
       this.taskQueue.push(task);
     } else {
-      const lowPriorityIndex = this.taskQueue.findIndex(item => item.priority === 'low');
+      const lowPriorityIndex = this.taskQueue.findIndex((item) => item.priority === 'low');
       if (lowPriorityIndex !== -1) {
         this.taskQueue.splice(lowPriorityIndex, 0, task);
       } else {
@@ -138,11 +152,10 @@ class AgentPool extends EventEmitter {
     const task = this.taskQueue.shift();
     if (!task) return;
 
-    this.spawnAgent(task)
-      .finally(() => {
-        // Process next task in queue
-        setImmediate(() => this.processTaskQueue());
-      });
+    this.spawnAgent(task).finally(() => {
+      // Process next task in queue
+      setImmediate(() => this.processTaskQueue());
+    });
   }
 
   /**
@@ -158,13 +171,12 @@ class AgentPool extends EventEmitter {
       task: task,
       startTime,
       status: 'starting',
-      process: null
+      process: null,
     };
 
     // Track active agent
     this.activeAgents.set(agentId, agentInfo);
     this.metrics.agentsSpawned++;
-
 
     try {
       // Execute the agent task
@@ -176,10 +188,8 @@ class AgentPool extends EventEmitter {
 
       this.updateMetrics(duration, 'success');
 
-
       // Resolve the task
       task.resolve(result);
-
     } catch (error) {
       // Handle task failure
       const duration = Date.now() - startTime;
@@ -237,8 +247,8 @@ class AgentPool extends EventEmitter {
       mcpOperations.push(
         this.mcpQueueManager.queueOperation('linear-server', 'list_issues', {
           limit: 10,
-          assignee: 'me'
-        })
+          assignee: 'me',
+        }),
       );
     }
 
@@ -248,8 +258,8 @@ class AgentPool extends EventEmitter {
           thought: `Analyzing task ${task.id} for ${task.agentType}`,
           thoughtNumber: 1,
           totalThoughts: 2,
-          nextThoughtNeeded: true
-        })
+          nextThoughtNeeded: true,
+        }),
       );
     }
 
@@ -272,7 +282,7 @@ class AgentPool extends EventEmitter {
       command: task.command,
       mcpResults,
       result: `${task.agentType} completed ${task.command}`,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
   }
 
@@ -303,42 +313,46 @@ class AgentPool extends EventEmitter {
       reviewer: { usesLinear: false, usesSequentialThinking: true, processingTime: 1500 },
       securityguard: { usesLinear: false, usesSequentialThinking: true, processingTime: 2000 },
       tester: { usesLinear: false, usesSequentialThinking: false, processingTime: 2500 },
-      validator: { usesLinear: false, usesSequentialThinking: false, processingTime: 1500 }
+      validator: { usesLinear: false, usesSequentialThinking: false, processingTime: 1500 },
     };
 
-    return behaviors[agentType] || {
-      usesLinear: false,
-      usesSequentialThinking: false,
-      processingTime: 2000
-    };
+    return (
+      behaviors[agentType] || {
+        usesLinear: false,
+        usesSequentialThinking: false,
+        processingTime: 2000,
+      }
+    );
   }
 
   /**
    * Get current pool status
    */
   getStatus() {
-    const activeAgentInfo = Array.from(this.activeAgents.values()).map(agent => ({
+    const activeAgentInfo = Array.from(this.activeAgents.values()).map((agent) => ({
       id: agent.id,
       type: agent.type,
       taskId: agent.task.id,
       status: agent.status,
-      runtime: Date.now() - agent.startTime
+      runtime: Date.now() - agent.startTime,
     }));
 
-    const utilization = (this.activeAgents.size / this.config.maxConcurrentAgents * 100).toFixed(1);
+    const utilization = ((this.activeAgents.size / this.config.maxConcurrentAgents) * 100).toFixed(
+      1,
+    );
 
     return {
       configuration: {
         maxConcurrentAgents: this.config.maxConcurrentAgents,
-        agentTimeout: this.config.agentTimeout
+        agentTimeout: this.config.agentTimeout,
       },
       currentState: {
         activeAgents: this.activeAgents.size,
         queuedTasks: this.taskQueue.length,
-        utilization: `${utilization}%`
+        utilization: `${utilization}%`,
       },
       activeAgents: activeAgentInfo,
-      metrics: this.metrics
+      metrics: this.metrics,
     };
   }
 
@@ -390,7 +404,6 @@ class AgentPool extends EventEmitter {
       const runtime = now - agentInfo.startTime;
 
       if (runtime > agentInfo.task.timeout) {
-
         // Mark task as failed due to timeout
         this.updateMetrics(runtime, 'timeout');
         agentInfo.task.reject(new Error(`Agent timeout after ${runtime}ms`));
@@ -405,7 +418,6 @@ class AgentPool extends EventEmitter {
    * Gracefully shutdown the agent pool
    */
   async shutdown(timeout = 60000) {
-
     // Stop accepting new tasks
     this.shuttingDown = true;
 
@@ -416,7 +428,7 @@ class AgentPool extends EventEmitter {
     }
 
     const shutdownStart = Date.now();
-    while (this.activeAgents.size > 0 && (Date.now() - shutdownStart) < timeout) {
+    while (this.activeAgents.size > 0 && Date.now() - shutdownStart < timeout) {
       await this.sleep(1000);
     }
 
@@ -425,7 +437,6 @@ class AgentPool extends EventEmitter {
       agentInfo.task.reject(new Error('Agent pool shutdown'));
       this.activeAgents.delete(agentId);
     }
-
   }
 
   /**
@@ -446,7 +457,7 @@ class AgentPool extends EventEmitter {
    * Sleep utility
    */
   sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   /**
@@ -454,7 +465,6 @@ class AgentPool extends EventEmitter {
    */
   displayStatus() {
     const status = this.getStatus();
-
 
     // Current state
 

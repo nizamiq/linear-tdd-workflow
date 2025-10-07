@@ -25,7 +25,7 @@ class ProductionMonitor extends EventEmitter {
       agents: {},
       memory: {},
       performance: {},
-      errors: []
+      errors: [],
     };
 
     this.alertThresholds = {
@@ -34,7 +34,7 @@ class ProductionMonitor extends EventEmitter {
       diskUsagePercent: 90,
       errorRate: 0.05, // 5%
       responseTimeMs: 5000,
-      agentFailureRate: 0.1 // 10%
+      agentFailureRate: 0.1, // 10%
     };
 
     this.isMonitoring = false;
@@ -62,13 +62,13 @@ class ProductionMonitor extends EventEmitter {
     // Start periodic monitoring
     this.monitoringInterval = setInterval(
       () => this.collectMetrics(),
-      this.config.monitoring.healthCheckInterval
+      this.config.monitoring.healthCheckInterval,
     );
 
     // Start health checks
     this.healthCheckInterval = setInterval(
       () => this.runHealthChecks(),
-      this.config.monitoring.healthCheckInterval * 2
+      this.config.monitoring.healthCheckInterval * 2,
     );
 
     // Initial collection
@@ -125,7 +125,6 @@ class ProductionMonitor extends EventEmitter {
 
       // Emit metrics event
       this.emit('metrics', this.metrics);
-
     } catch (error) {
       console.error('❌ Error collecting metrics:', error.message);
       this.logError('metrics_collection', error);
@@ -140,7 +139,7 @@ class ProductionMonitor extends EventEmitter {
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
       nodeVersion: process.version,
-      platform: process.platform
+      platform: process.platform,
     };
 
     try {
@@ -152,7 +151,7 @@ class ProductionMonitor extends EventEmitter {
       // Memory usage
       const memInfo = execSync('free -m', { encoding: 'utf8' });
       const memLines = memInfo.split('\n');
-      const memLine = memLines.find(line => line.includes('Mem:'));
+      const memLine = memLines.find((line) => line.includes('Mem:'));
       if (memLine) {
         const memParts = memLine.trim().split(/\s+/);
         metrics.totalMemoryMB = parseInt(memParts[1]);
@@ -169,7 +168,6 @@ class ProductionMonitor extends EventEmitter {
       const loadAvg = execSync('uptime', { encoding: 'utf8' });
       const loadMatch = loadAvg.match(/load average: ([\d.]+)/);
       metrics.loadAverage = loadMatch ? parseFloat(loadMatch[1]) : 0;
-
     } catch (error) {
       console.warn('⚠️ Some system metrics unavailable:', error.message);
     }
@@ -189,8 +187,9 @@ class ProductionMonitor extends EventEmitter {
       externalMB: Math.round(processMemory.external / 1024 / 1024),
       arrayBuffersMB: Math.round((processMemory.arrayBuffers || 0) / 1024 / 1024),
       memoryLimit: this.config.memory.maxMemoryMB,
-      memoryUsagePercent: (processMemory.heapUsed / 1024 / 1024) / this.config.memory.maxMemoryMB * 100,
-      isWithinLimits: (processMemory.heapUsed / 1024 / 1024) < this.config.memory.maxMemoryMB
+      memoryUsagePercent:
+        (processMemory.heapUsed / 1024 / 1024 / this.config.memory.maxMemoryMB) * 100,
+      isWithinLimits: processMemory.heapUsed / 1024 / 1024 < this.config.memory.maxMemoryMB,
     };
   }
 
@@ -211,7 +210,7 @@ class ProductionMonitor extends EventEmitter {
         tasksCompleted: Math.floor(Math.random() * 100),
         avgResponseTimeMs: Math.floor(Math.random() * 1000) + 100,
         errorCount: Math.floor(Math.random() * 5),
-        memoryUsageMB: Math.floor(Math.random() * 50) + 10
+        memoryUsageMB: Math.floor(Math.random() * 50) + 10,
       };
     }
 
@@ -226,7 +225,7 @@ class ProductionMonitor extends EventEmitter {
       eventLoopDelay: await this.measureEventLoopDelay(),
       gcMetrics: this.getGCMetrics(),
       activeHandles: process._getActiveHandles().length,
-      activeRequests: process._getActiveRequests().length
+      activeRequests: process._getActiveRequests().length,
     };
   }
 
@@ -260,7 +259,7 @@ class ProductionMonitor extends EventEmitter {
     const healthResults = {
       timestamp: new Date().toISOString(),
       overall: 'healthy',
-      checks: {}
+      checks: {},
     };
 
     try {
@@ -280,15 +279,14 @@ class ProductionMonitor extends EventEmitter {
       healthResults.checks.filesystem = await this.checkFileSystemHealth();
 
       // Determine overall health
-      const failedChecks = Object.values(healthResults.checks).filter(check => !check.healthy);
+      const failedChecks = Object.values(healthResults.checks).filter((check) => !check.healthy);
       healthResults.overall = failedChecks.length === 0 ? 'healthy' : 'unhealthy';
 
       if (failedChecks.length > 0) {
-        console.warn(`⚠️ Health check failures: ${failedChecks.map(c => c.name).join(', ')}`);
+        console.warn(`⚠️ Health check failures: ${failedChecks.map((c) => c.name).join(', ')}`);
       }
 
       this.emit('health', healthResults);
-
     } catch (error) {
       console.error('❌ Health check error:', error.message);
       healthResults.overall = 'error';
@@ -310,8 +308,8 @@ class ProductionMonitor extends EventEmitter {
       details: {
         usagePercent: memMetrics.memoryUsagePercent,
         heapUsedMB: memMetrics.heapUsedMB,
-        limitMB: memMetrics.memoryLimit
-      }
+        limitMB: memMetrics.memoryLimit,
+      },
     };
   }
 
@@ -330,8 +328,8 @@ class ProductionMonitor extends EventEmitter {
       details: {
         totalAgents: Object.keys(agentMetrics).length,
         unhealthyAgents,
-        healthyCount: Object.keys(agentMetrics).length - unhealthyAgents.length
-      }
+        healthyCount: Object.keys(agentMetrics).length - unhealthyAgents.length,
+      },
     };
   }
 
@@ -347,8 +345,8 @@ class ProductionMonitor extends EventEmitter {
         healthy: true,
         details: {
           connected: true,
-          responseTimeMs: Math.floor(Math.random() * 50) + 10
-        }
+          responseTimeMs: Math.floor(Math.random() * 50) + 10,
+        },
       };
     } catch (error) {
       return {
@@ -356,8 +354,8 @@ class ProductionMonitor extends EventEmitter {
         healthy: false,
         details: {
           connected: false,
-          error: error.message
-        }
+          error: error.message,
+        },
       };
     }
   }
@@ -366,9 +364,7 @@ class ProductionMonitor extends EventEmitter {
    * Check external dependencies health
    */
   async checkDependenciesHealth() {
-    const dependencies = [
-      { name: 'Linear API', url: 'https://api.linear.app/graphql' }
-    ];
+    const dependencies = [{ name: 'Linear API', url: 'https://api.linear.app/graphql' }];
 
     const results = [];
 
@@ -382,18 +378,18 @@ class ProductionMonitor extends EventEmitter {
         results.push({
           name: dep.name,
           healthy: true,
-          responseTimeMs: responseTime
+          responseTimeMs: responseTime,
         });
       } catch (error) {
         results.push({
           name: dep.name,
           healthy: false,
-          error: error.message
+          error: error.message,
         });
       }
     }
 
-    const unhealthy = results.filter(r => !r.healthy);
+    const unhealthy = results.filter((r) => !r.healthy);
 
     return {
       name: 'dependencies',
@@ -402,8 +398,8 @@ class ProductionMonitor extends EventEmitter {
         total: results.length,
         healthy: results.length - unhealthy.length,
         unhealthy: unhealthy.length,
-        results
-      }
+        results,
+      },
     };
   }
 
@@ -428,16 +424,16 @@ class ProductionMonitor extends EventEmitter {
         healthy: content === 'health check',
         details: {
           writable: true,
-          readable: true
-        }
+          readable: true,
+        },
       };
     } catch (error) {
       return {
         name: 'filesystem',
         healthy: false,
         details: {
-          error: error.message
-        }
+          error: error.message,
+        },
       };
     }
   }
@@ -455,7 +451,7 @@ class ProductionMonitor extends EventEmitter {
         severity: 'warning',
         message: `Memory usage is ${this.metrics.memory.memoryUsagePercent.toFixed(1)}% (threshold: ${this.alertThresholds.memoryUsagePercent}%)`,
         value: this.metrics.memory.memoryUsagePercent,
-        threshold: this.alertThresholds.memoryUsagePercent
+        threshold: this.alertThresholds.memoryUsagePercent,
       });
     }
 
@@ -466,7 +462,7 @@ class ProductionMonitor extends EventEmitter {
         severity: 'warning',
         message: `CPU usage is ${this.metrics.system.cpuUsagePercent}% (threshold: ${this.alertThresholds.cpuUsagePercent}%)`,
         value: this.metrics.system.cpuUsagePercent,
-        threshold: this.alertThresholds.cpuUsagePercent
+        threshold: this.alertThresholds.cpuUsagePercent,
       });
     }
 
@@ -477,7 +473,7 @@ class ProductionMonitor extends EventEmitter {
         severity: 'critical',
         message: `Disk usage is ${this.metrics.system.diskUsagePercent}% (threshold: ${this.alertThresholds.diskUsagePercent}%)`,
         value: this.metrics.system.diskUsagePercent,
-        threshold: this.alertThresholds.diskUsagePercent
+        threshold: this.alertThresholds.diskUsagePercent,
       });
     }
 
@@ -530,7 +526,7 @@ class ProductionMonitor extends EventEmitter {
       timestamp: new Date().toISOString(),
       category,
       message: error.message,
-      stack: error.stack
+      stack: error.stack,
     };
 
     this.metrics.errors.push(errorEntry);
@@ -562,7 +558,9 @@ if (require.main === module) {
 
   // Event handlers
   monitor.on('metrics', (metrics) => {
-    console.log(`📊 Metrics: Memory ${metrics.memory.heapUsedMB}MB, CPU ${metrics.system.cpuUsagePercent}%`);
+    console.log(
+      `📊 Metrics: Memory ${metrics.memory.heapUsedMB}MB, CPU ${metrics.system.cpuUsagePercent}%`,
+    );
   });
 
   monitor.on('alert', (alert) => {

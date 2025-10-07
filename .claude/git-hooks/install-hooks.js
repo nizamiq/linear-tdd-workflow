@@ -45,12 +45,13 @@ class GitHooksInstaller {
 
       console.log('✅ TDD enforcement hooks installed successfully!');
       console.log('\n📝 Usage:');
-      console.log('   - Commit with [RED], [GREEN], or [REFACTOR] in message for TDD phase detection');
+      console.log(
+        '   - Commit with [RED], [GREEN], or [REFACTOR] in message for TDD phase detection',
+      );
       console.log('   - All commits are automatically validated for test coverage and quality');
       console.log('   - Use "git commit --no-verify" to bypass hooks (not recommended)');
 
       return true;
-
     } catch (error) {
       console.error('❌ Failed to install hooks:', error.message);
       return false;
@@ -222,40 +223,40 @@ echo "✅ Commit message validation passed"
       allowSkippedTests: false,
       testTimeout: 30000,
       excludePatterns: [
-        "node_modules/**",
-        "coverage/**",
-        "*.min.js",
-        "dist/**",
-        "build/**",
-        "__pycache__/**",
-        "*.pyc"
+        'node_modules/**',
+        'coverage/**',
+        '*.min.js',
+        'dist/**',
+        'build/**',
+        '__pycache__/**',
+        '*.pyc',
       ],
       testPatterns: [
-        "**/*.test.js",
-        "**/*.spec.js",
-        "**/*.test.ts",
-        "**/*.spec.ts",
-        "**/test_*.py",
-        "tests/**/*.py"
+        '**/*.test.js',
+        '**/*.spec.js',
+        '**/*.test.ts',
+        '**/*.spec.ts',
+        '**/test_*.py',
+        'tests/**/*.py',
       ],
       hooks: {
         preCommit: {
           enabled: true,
           runTests: true,
           checkCoverage: true,
-          enforcePhases: true
+          enforcePhases: true,
         },
         prePush: {
           enabled: true,
           runFullTestSuite: true,
-          checkOverallCoverage: true
+          checkOverallCoverage: true,
         },
         commitMsg: {
           enabled: true,
           enforceConventionalCommits: false,
-          blockTodoFixme: true
-        }
-      }
+          blockTodoFixme: true,
+        },
+      },
     };
 
     fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
@@ -303,18 +304,19 @@ echo "✅ Commit message validation passed"
       if (fs.existsSync(hookPath)) {
         const content = fs.readFileSync(hookPath, 'utf8');
         const isOurs = content.includes('Claude Agentic Workflow System');
-        const isExecutable = (fs.statSync(hookPath).mode & parseInt('755', 8)) === parseInt('755', 8);
+        const isExecutable =
+          (fs.statSync(hookPath).mode & parseInt('755', 8)) === parseInt('755', 8);
 
         status[hook] = {
           exists: true,
           isOurs,
           isExecutable,
-          status: isOurs && isExecutable ? 'installed' : 'exists_but_not_ours'
+          status: isOurs && isExecutable ? 'installed' : 'exists_but_not_ours',
         };
       } else {
         status[hook] = {
           exists: false,
-          status: 'not_installed'
+          status: 'not_installed',
         };
       }
     }
@@ -322,15 +324,17 @@ echo "✅ Commit message validation passed"
     // Print status
     console.log('\n📊 Hook Installation Status:');
     for (const [hook, info] of Object.entries(status)) {
-      const emoji = info.status === 'installed' ? '✅' :
-                   info.status === 'exists_but_not_ours' ? '⚠️' : '❌';
+      const emoji =
+        info.status === 'installed' ? '✅' : info.status === 'exists_but_not_ours' ? '⚠️' : '❌';
       console.log(`   ${emoji} ${hook}: ${info.status}`);
     }
 
     // Check TDD config
     const configPath = path.join(this.projectRoot, '.claude', 'config', 'tdd-config.json');
     const configExists = fs.existsSync(configPath);
-    console.log(`   ${configExists ? '✅' : '❌'} TDD config: ${configExists ? 'exists' : 'missing'}`);
+    console.log(
+      `   ${configExists ? '✅' : '❌'} TDD config: ${configExists ? 'exists' : 'missing'}`,
+    );
 
     return status;
   }
@@ -355,7 +359,6 @@ echo "✅ Commit message validation passed"
       console.log(`   Tests passed: ${result ? 'Yes' : 'No'}`);
 
       return result;
-
     } catch (error) {
       console.error('❌ Hook test failed:', error.message);
       return false;

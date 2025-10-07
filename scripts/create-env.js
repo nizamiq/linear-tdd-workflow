@@ -6,7 +6,7 @@ const readline = require('readline');
 
 const rl = readline.createInterface({
   input: process.stdin,
-  output: process.stdout
+  output: process.stdout,
 });
 
 const envPath = path.join(__dirname, '..', '.env');
@@ -49,9 +49,7 @@ async function createEnvFile() {
     const [key, defaultValue] = line.split('=');
     if (key) {
       const isSecret = key.includes('KEY') || key.includes('TOKEN');
-      const prompt = isSecret
-        ? `Enter ${key} (sensitive): `
-        : `Enter ${key} [${defaultValue}]: `;
+      const prompt = isSecret ? `Enter ${key} (sensitive): ` : `Enter ${key} [${defaultValue}]: `;
 
       const value = await question(prompt);
       const finalValue = value.trim() || defaultValue;

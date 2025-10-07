@@ -62,7 +62,7 @@ class E2EParser {
 
     if (features.length > 0) {
       console.log(`✅ ${relativePath}`);
-      features.forEach(f => console.log(`   @feature ${f}`));
+      features.forEach((f) => console.log(`   @feature ${f}`));
     }
   }
 
@@ -107,7 +107,9 @@ class E2EParser {
         errors.push(`Feature '${slug}' is implemented but has no E2E test`);
         allValid = false;
       } else if (!hasTest && registryTest) {
-        warnings.push(`Feature '${slug}' has e2e_test in registry but no @feature tag in test files`);
+        warnings.push(
+          `Feature '${slug}' has e2e_test in registry but no @feature tag in test files`,
+        );
       } else if (hasTest && !registryTest) {
         warnings.push(`Feature '${slug}' has @feature tag but no e2e_test in registry`);
       } else {
@@ -122,13 +124,13 @@ class E2EParser {
     if (errors.length > 0) {
       console.log('\n❌ Validation FAILED\n');
       console.log('Errors:');
-      errors.forEach(err => console.log(`  - ${err}`));
+      errors.forEach((err) => console.log(`  - ${err}`));
       allValid = false;
     }
 
     if (warnings.length > 0) {
       console.log('\n⚠️  Warnings:');
-      warnings.forEach(warn => console.log(`  - ${warn}`));
+      warnings.forEach((warn) => console.log(`  - ${warn}`));
     }
 
     if (allValid && errors.length === 0) {
@@ -160,14 +162,13 @@ class E2EParser {
     console.log(`   Implemented: ${implemented.length}`);
     console.log(`   With E2E Tests: ${withTests.length}`);
 
-    const coverage = implemented.length > 0
-      ? Math.round((withTests.length / implemented.length) * 100)
-      : 0;
+    const coverage =
+      implemented.length > 0 ? Math.round((withTests.length / implemented.length) * 100) : 0;
 
     console.log(`\n📈 E2E Test Coverage: ${coverage}%`);
 
     console.log('\n🧪 Test Files Found:');
-    this.testFiles.forEach(file => {
+    this.testFiles.forEach((file) => {
       const relative = path.relative(this.projectRoot, file);
       console.log(`   - ${relative}`);
     });
@@ -175,7 +176,7 @@ class E2EParser {
     console.log('\n🔗 Feature → Test Mapping:');
     this.featureMap.forEach((tests, feature) => {
       console.log(`   ${feature}:`);
-      tests.forEach(test => console.log(`      → ${test}`));
+      tests.forEach((test) => console.log(`      → ${test}`));
     });
 
     console.log('\n' + '═'.repeat(80));
@@ -196,7 +197,7 @@ class E2EParser {
     } else {
       this.featureMap.forEach((tests, feature) => {
         console.log(`\n✅ ${feature}`);
-        tests.forEach(test => console.log(`   → ${test}`));
+        tests.forEach((test) => console.log(`   → ${test}`));
       });
     }
 
@@ -248,7 +249,7 @@ Examples:
 }
 
 if (require.main === module) {
-  main().catch(error => {
+  main().catch((error) => {
     console.error('Error:', error.message);
     process.exit(1);
   });

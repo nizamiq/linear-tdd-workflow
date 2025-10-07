@@ -9,6 +9,7 @@ The Linear TDD Workflow System is an enterprise-grade multi-agent AI development
 ### Who should use this system?
 
 This system is designed for:
+
 - **Engineering teams** looking to reduce technical debt
 - **Development teams** wanting to enforce TDD practices
 - **Organizations** seeking to improve code quality metrics
@@ -28,6 +29,7 @@ This system is designed for:
 ### What are the system requirements?
 
 **Minimum Requirements**:
+
 - Node.js 18+
 - npm 8+
 - Git 2.30+
@@ -35,6 +37,7 @@ This system is designed for:
 - 10GB disk space
 
 **Recommended**:
+
 - Node.js 20+
 - 8GB RAM
 - SSD storage
@@ -64,6 +67,7 @@ npm run agents:init
 ### Do I need a Linear.app account?
 
 Yes, a Linear.app account is required for full functionality. You'll need:
+
 - Linear API key
 - Team ID
 - Project ID (optional)
@@ -85,6 +89,7 @@ You can run the system in limited mode without Linear, but task management featu
 ### What is a Fix Pack?
 
 Fix Packs are pre-approved, low-risk improvements that agents can implement autonomously:
+
 - Linting and formatting fixes
 - Dead code removal
 - Documentation updates
@@ -96,6 +101,7 @@ Fix Packs are pre-approved, low-risk improvements that agents can implement auto
 ### What is FIL classification?
 
 FIL (Feature Impact Level) classifies changes by risk:
+
 - **FIL-0**: No risk (formatting, comments)
 - **FIL-1**: Low risk (variable renames)
 - **FIL-2**: Medium risk (requires Tech Lead approval)
@@ -104,11 +110,13 @@ FIL (Feature Impact Level) classifies changes by risk:
 ### How does TDD enforcement work?
 
 Every change must follow the red-green-refactor cycle:
+
 1. **[RED]**: Write a failing test first
 2. **[GREEN]**: Write minimal code to pass the test
 3. **[REFACTOR]**: Improve code while maintaining passing tests
 
 The system enforces:
+
 - Diff coverage ≥80%
 - Mutation testing ≥30%
 - All commits must include tests
@@ -120,6 +128,7 @@ The system enforces:
 ### How do I configure Linear integration?
 
 Add these to your `.env` file:
+
 ```bash
 LINEAR_API_KEY=lin_api_xxxxxxxxxxxx
 LINEAR_TEAM_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
@@ -127,6 +136,7 @@ LINEAR_PROJECT_ID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 ```
 
 Get these values from Linear:
+
 - Settings → API → Personal API keys
 - Team settings → General → Team ID
 - Project settings → General → Project ID
@@ -134,14 +144,15 @@ Get these values from Linear:
 ### How do I adjust agent limits?
 
 Edit `.claude/settings.json`:
+
 ```json
 {
   "agents": {
     "executor": {
       "constraints": {
-        "maxLOC": 300,      // Max lines per PR
-        "minCoverage": 80,  // Min coverage %
-        "minMutation": 30   // Min mutation score %
+        "maxLOC": 300, // Max lines per PR
+        "minCoverage": 80, // Min coverage %
+        "minMutation": 30 // Min mutation score %
       }
     }
   }
@@ -151,12 +162,13 @@ Edit `.claude/settings.json`:
 ### Can I disable certain agents?
 
 Yes, in `.claude/settings.json`:
+
 ```json
 {
   "agents": {
     "roster": {
       "scholar": {
-        "active": false  // Disable SCHOLAR agent
+        "active": false // Disable SCHOLAR agent
       }
     }
   }
@@ -170,11 +182,13 @@ Yes, in `.claude/settings.json`:
 ### What testing frameworks are supported?
 
 **JavaScript/TypeScript**:
+
 - Jest (primary)
 - Mocha (compatible)
 - Vitest (experimental)
 
 **Python**:
+
 - pytest (primary)
 - unittest (compatible)
 
@@ -200,19 +214,18 @@ npm test
 ### What if my tests don't meet coverage requirements?
 
 Options:
+
 1. **Add more tests** (recommended)
 2. **Exclude files** from coverage (use sparingly):
    ```javascript
    // jest.config.js
-   coveragePathIgnorePatterns: [
-     "legacy-code.js"
-   ]
+   coveragePathIgnorePatterns: ['legacy-code.js'];
    ```
 3. **Temporarily lower threshold** (not recommended):
    ```javascript
    coverageThreshold: {
      global: {
-       lines: 75  // Lower from 80
+       lines: 75; // Lower from 80
      }
    }
    ```
@@ -224,6 +237,7 @@ Options:
 ### Why are my PRs being rejected?
 
 Common reasons:
+
 1. **No tests**: Every PR needs tests
 2. **Low coverage**: Diff coverage must be ≥80%
 3. **No TDD tags**: Commits need [RED], [GREEN], [REFACTOR] tags
@@ -233,6 +247,7 @@ Common reasons:
 ### Why isn't the GUARDIAN recovering my pipeline?
 
 Check:
+
 1. GUARDIAN agent is active: `npm run agents:status`
 2. GitHub webhooks configured correctly
 3. Recovery attempts haven't exceeded limit (3)
@@ -241,6 +256,7 @@ Check:
 ### How do I debug agent issues?
 
 Enable debug logging:
+
 ```bash
 export DEBUG=linear-tdd:*
 export AGENT_LOG_LEVEL=trace
@@ -248,6 +264,7 @@ npm run agents:status
 ```
 
 Check logs:
+
 ```bash
 tail -f logs/auditor.log
 tail -f logs/executor.log
@@ -266,6 +283,7 @@ tail -f logs/executor.log
 ### Should I auto-merge agent PRs?
 
 No, always require human review. Agents create PRs but humans must:
+
 - Review code changes
 - Verify business logic
 - Approve for merge
@@ -290,16 +308,17 @@ No, always require human review. Agents create PRs but humans must:
 
 ### What are typical processing times?
 
-| Operation | Time |
-|-----------|------|
+| Operation                  | Time      |
+| -------------------------- | --------- |
 | Code assessment (150k LOC) | 10-15 min |
-| Fix Pack implementation | 5-15 min |
-| Pipeline recovery | 5-10 min |
-| Pattern extraction | 30-60 min |
+| Fix Pack implementation    | 5-15 min  |
+| Pipeline recovery          | 5-10 min  |
+| Pattern extraction         | 30-60 min |
 
 ### How much does it cost to run?
 
 Estimated costs:
+
 - **Per Fix**: $3 median, $5 p95
 - **Per Repository**: $2,500/month limit
 - **Total Monthly**: $10,000 global limit
@@ -311,6 +330,7 @@ Estimated costs:
 ### Can I use this without Linear?
 
 Yes, but with limitations:
+
 - No automatic task creation
 - No sprint planning features
 - Manual issue tracking required
@@ -323,6 +343,7 @@ Currently, only GitHub is fully supported. GitLab/Bitbucket support is planned f
 ### Can I integrate with other tools?
 
 Yes, through:
+
 - MCP (Model Context Protocol) for tool integration
 - Webhook system for external notifications
 - REST/GraphQL APIs for custom integrations
@@ -350,6 +371,7 @@ Yes, through:
 ### Is my code sent to external services?
 
 Only if explicitly configured:
+
 - Linear API for task management
 - GitHub for version control
 - Optional: External MCP tools
@@ -394,6 +416,6 @@ npm test
 
 ---
 
-*Last updated: 2024*
-*Version: 1.2.0*
-*Have a question not answered here? [Open an issue](https://github.com/your-org/linear-tdd-workflow/issues/new)*
+_Last updated: 2024_
+_Version: 1.2.0_
+_Have a question not answered here? [Open an issue](https://github.com/your-org/linear-tdd-workflow/issues/new)_

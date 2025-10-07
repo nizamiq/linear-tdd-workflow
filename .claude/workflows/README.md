@@ -16,17 +16,20 @@ Direct Tool Call → Workflow → Autonomous Agent
 ## Available Workflows
 
 ### 1. TDD Cycle (`tdd-cycle.yaml`)
+
 **Purpose**: Enforce strict RED→GREEN→REFACTOR TDD cycle
 **Replaces**: Part of EXECUTOR agent's deterministic logic
 **Cost Profile**: Minimal (no LLM overhead)
 **SLA**: 5 minutes
 
 **Phases**:
+
 - **RED**: Write failing test (max 2 attempts)
 - **GREEN**: Minimal implementation (max 3 attempts)
 - **REFACTOR**: Improve design (max 2 attempts)
 
 **Quality Gates**:
+
 - Test coverage ≥80%
 - All tests pass
 - Linting passes
@@ -34,6 +37,7 @@ Direct Tool Call → Workflow → Autonomous Agent
 **Escalation**: EXECUTOR agent after max attempts exceeded
 
 **Usage**:
+
 ```bash
 # Via Claude Code
 Execute tdd-cycle workflow with:
@@ -48,18 +52,21 @@ workflow run tdd-cycle --test=tests/test_calculator.py --impl=src/calculator.py
 ---
 
 ### 2. Lint and Format (`lint-and-format.yaml`)
+
 **Purpose**: Deterministic code linting and auto-formatting
 **Replaces**: LINTER agent for FIL-0/1 changes
 **Cost Profile**: Minimal
 **SLA**: 1 minute
 
 **Actions**:
+
 - Auto-detect language (Python, JS/TS)
 - Run ruff format/check (Python) or prettier/eslint (JS/TS)
 - Verify no syntax errors introduced
 - Optional: Run tests if `fail_on_error=true`
 
 **Quality Gates**:
+
 - All files formatted
 - No syntax errors
 - Style compliant
@@ -67,6 +74,7 @@ workflow run tdd-cycle --test=tests/test_calculator.py --impl=src/calculator.py
 **Escalation**: EXECUTOR for non-auto-fixable issues
 
 **Usage**:
+
 ```bash
 # Via hook (automatic on file write)
 # Triggered by .claude/hooks.json on-file-write
@@ -78,24 +86,28 @@ workflow run lint-and-format --files=src/**/*.py --auto-fix
 ---
 
 ### 3. Type Check (`type-check.yaml`)
+
 **Purpose**: Fast, incremental type checking
 **Replaces**: TYPECHECKER agent
 **Cost Profile**: Minimal
 **SLA**: 2 minutes
 
 **Actions**:
+
 - Incremental type checking (default)
 - TypeScript: `tsc --noEmit` on changed files
 - Python: `mypy` on changed files
 - Full check available via flag
 
 **Quality Gates**:
+
 - No type errors (strict)
 - OR no NEW type errors (incremental)
 
 **Escalation**: TYPESCRIPT-PRO or PYTHON-PRO for complex errors (>10 errors)
 
 **Usage**:
+
 ```bash
 # Via PR check
 workflow run type-check --changed-files=$(git diff --name-only)
@@ -107,12 +119,14 @@ workflow run type-check --full-check
 ---
 
 ### 4. PR Review Checklist (`pr-review-checklist.yaml`)
+
 **Purpose**: Automated PR readiness validation
 **Replaces**: Part of VALIDATOR agent
 **Cost Profile**: Minimal
 **SLA**: 5 minutes
 
 **Validates**:
+
 - ✅ Tests pass
 - ✅ Coverage ≥80%
 - ✅ Linting passes
@@ -123,6 +137,7 @@ workflow run type-check --full-check
 - ✅ PR description complete
 
 **Quality Checklist**:
+
 - Code quality (automated)
 - Git hygiene (automated)
 - Security (automated)
@@ -132,6 +147,7 @@ workflow run type-check --full-check
 **Escalation**: CODE-REVIEWER for complex review needs
 
 **Usage**:
+
 ```bash
 # Via GitHub Actions
 workflow run pr-review-checklist --pr-number=123
@@ -143,18 +159,21 @@ gh pr view 123 | workflow run pr-review-checklist
 ---
 
 ### 5. Deployment Gates (`deployment-gates.yaml`)
+
 **Purpose**: Pre-deployment validation and safety checks
 **Replaces**: Part of VALIDATOR agent
 **Cost Profile**: Minimal
 **SLA**: 10 minutes
 
 **Gates**:
+
 - **Pre-flight**: CI status, test coverage, branch protection
 - **Security**: Vulnerability scan, secret scan, dependency check
 - **Performance**: Smoke tests, migration dry-run, bundle size
 - **Operational**: Rollback plan, monitoring, database backup
 
 **Go/No-Go Decision**:
+
 - All critical gates pass: ✅ Proceed
 - Any critical gate fails: ❌ Block
 - High warnings: ⚠️ Manual approval required
@@ -162,6 +181,7 @@ gh pr view 123 | workflow run pr-review-checklist
 **Escalation**: DEPLOYMENT-ENGINEER for gate failures
 
 **Usage**:
+
 ```bash
 # Via deployment pipeline
 workflow run deployment-gates \
@@ -176,12 +196,14 @@ workflow run deployment-gates --force-deploy
 ---
 
 ### 6. Fix Pack Generation (`fix-pack-generation.yaml`)
+
 **Purpose**: Generate atomic fix packs from assessment findings
 **Replaces**: Part of AUDITOR agent
 **Cost Profile**: Minimal
 **SLA**: 5 minutes
 
 **Process**:
+
 1. Load assessment report JSON
 2. Filter FIL-0/1 issues only
 3. Group related issues (<300 LOC combined)
@@ -189,6 +211,7 @@ workflow run deployment-gates --force-deploy
 5. Create Linear tasks automatically
 
 **Fix Pack Templates**:
+
 - Lint/format fixes
 - Dead code removal
 - Simple refactoring
@@ -196,6 +219,7 @@ workflow run deployment-gates --force-deploy
 - Test coverage
 
 **Quality Validation**:
+
 - ✅ Atomic (single responsibility)
 - ✅ Reversible (rollback plan)
 - ✅ Testable (clear acceptance criteria)
@@ -204,6 +228,7 @@ workflow run deployment-gates --force-deploy
 **Escalation**: AUDITOR for validation, EXECUTOR for implementation
 
 **Usage**:
+
 ```bash
 # After assessment
 workflow run fix-pack-generation \
@@ -216,17 +241,17 @@ workflow run fix-pack-generation \
 
 ## Workflow vs Agent Decision Matrix
 
-| Task Type | Complexity | Deterministic? | Recommendation |
-|-----------|-----------|----------------|----------------|
-| Lint/format files | Low | Yes | **Workflow** |
-| Type check | Low | Yes | **Workflow** |
-| Run test suite | Low | Yes | **Direct tool** |
-| TDD cycle enforcement | Medium | Yes | **Workflow** |
-| PR validation checklist | Medium | Yes | **Workflow** |
-| Code assessment | High | Partially | **Agent** (AUDITOR) |
-| Fix implementation | High | No | **Agent** (EXECUTOR) |
-| Architectural review | Very high | No | **Agent** (CODE-REVIEWER) |
-| Pattern learning | Very high | No | **Agent** (SCHOLAR) |
+| Task Type               | Complexity | Deterministic? | Recommendation            |
+| ----------------------- | ---------- | -------------- | ------------------------- |
+| Lint/format files       | Low        | Yes            | **Workflow**              |
+| Type check              | Low        | Yes            | **Workflow**              |
+| Run test suite          | Low        | Yes            | **Direct tool**           |
+| TDD cycle enforcement   | Medium     | Yes            | **Workflow**              |
+| PR validation checklist | Medium     | Yes            | **Workflow**              |
+| Code assessment         | High       | Partially      | **Agent** (AUDITOR)       |
+| Fix implementation      | High       | No             | **Agent** (EXECUTOR)      |
+| Architectural review    | Very high  | No             | **Agent** (CODE-REVIEWER) |
+| Pattern learning        | Very high  | No             | **Agent** (SCHOLAR)       |
 
 ## Integration with Agents
 
@@ -249,21 +274,25 @@ STRATEGIST (orchestrator)
 ## Benefits of Workflows
 
 ### Cost Reduction
+
 - **75% cost savings** on deterministic tasks
 - No LLM inference needed for clear algorithmic processes
 - Token usage reduced from thousands to zero
 
 ### Speed Improvement
+
 - **10x faster** than agent reasoning
 - Direct tool execution without planning overhead
 - Parallel execution where possible
 
 ### Reliability Enhancement
+
 - **100% consistent** behavior (no LLM variability)
 - Clear success/failure conditions
 - Deterministic error handling
 
 ### Maintainability
+
 - Human-readable YAML specifications
 - Version controlled alongside code
 - Easy to test and validate
@@ -281,6 +310,7 @@ claude-workflow describe <workflow-name>
 ```
 
 For now, workflows serve as:
+
 1. **Documentation** of deterministic processes
 2. **Specifications** for tool orchestration
 3. **Templates** for agent behavior
@@ -297,6 +327,7 @@ When creating new workflows:
 5. **Document SLAs** - Time and cost expectations
 
 Template structure:
+
 ```yaml
 ---
 name: workflow-name

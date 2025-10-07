@@ -24,18 +24,21 @@ The Claude Agentic Workflow System integrates deeply with Linear.app to provide 
 ### Integration Benefits
 
 **Automated Task Management:**
+
 - **Automatic Issue Creation**: AUDITOR creates Linear tasks for quality findings
 - **Progress Tracking**: Real-time updates as agents work on tasks
 - **Sprint Coordination**: STRATEGIST manages sprint planning and execution
 - **Team Collaboration**: Seamless handoff between agents and human developers
 
 **Workflow Automation:**
+
 - **Task Assignment**: Intelligent assignment based on issue type and team expertise
 - **Status Updates**: Automatic status transitions based on work progress
 - **Priority Management**: Dynamic priority adjustment based on impact and urgency
 - **Effort Estimation**: Automated story point estimation using historical data
 
 **Quality Management:**
+
 - **Technical Debt Tracking**: Quantified technical debt with improvement roadmaps
 - **Quality Metrics**: Integration with code quality metrics and trends
 - **Fix Pack Management**: Structured approach to implementing improvements
@@ -130,6 +133,7 @@ npm run validate -- --linear
 #### Step 2: Team and Project Identification
 
 1. **Find Team ID**:
+
    ```bash
    # List available teams
    npm run linear:list-teams
@@ -139,6 +143,7 @@ npm run validate -- --linear
    ```
 
 2. **Find Project ID** (Optional):
+
    ```bash
    # List projects in team
    npm run linear:list-projects -- --team DEV
@@ -292,14 +297,14 @@ The system automatically creates Linear tasks based on agent findings:
 
 #### Task Types and Prefixes
 
-| Agent | Task Type | Prefix | Description |
-|-------|-----------|---------|-------------|
-| AUDITOR | Code Quality | CLEAN-XXX | General quality improvements |
-| AUDITOR | Performance | PERF-XXX | Performance optimizations |
-| AUDITOR | Security | SEC-XXX | Security vulnerabilities |
-| AUDITOR | Technical Debt | DEBT-XXX | Technical debt reduction |
-| MONITOR | Incidents | INC-XXX | System incidents |
-| GUARDIAN | Pipeline Issues | PIPE-XXX | CI/CD problems |
+| Agent    | Task Type       | Prefix    | Description                  |
+| -------- | --------------- | --------- | ---------------------------- |
+| AUDITOR  | Code Quality    | CLEAN-XXX | General quality improvements |
+| AUDITOR  | Performance     | PERF-XXX  | Performance optimizations    |
+| AUDITOR  | Security        | SEC-XXX   | Security vulnerabilities     |
+| AUDITOR  | Technical Debt  | DEBT-XXX  | Technical debt reduction     |
+| MONITOR  | Incidents       | INC-XXX   | System incidents             |
+| GUARDIAN | Pipeline Issues | PIPE-XXX  | CI/CD problems               |
 
 #### Example Task Creation
 
@@ -377,6 +382,7 @@ npm run linear:list-tasks -- --team DEV --status "Todo"
 Different agents have different levels of Linear access:
 
 #### STRATEGIST (Full Access)
+
 - **CREATE**: All task types
 - **READ**: All tasks and projects
 - **UPDATE**: All task properties
@@ -392,7 +398,8 @@ npm run agent:invoke STRATEGIST:manage-sprint
 ```
 
 #### AUDITOR (Create Only)
-- **CREATE**: Quality improvement tasks (CLEAN-*, PERF-*, SEC-*, DEBT-*)
+
+- **CREATE**: Quality improvement tasks (CLEAN-_, PERF-_, SEC-_, DEBT-_)
 - **READ**: Task status for assessment planning
 - **UPDATE**: Limited to adding assessment details
 
@@ -404,7 +411,8 @@ npm run agent:invoke AUDITOR:update-task-details
 ```
 
 #### MONITOR (Create Only)
-- **CREATE**: Incident tasks (INC-*)
+
+- **CREATE**: Incident tasks (INC-\*)
 - **READ**: Incident history
 - **UPDATE**: Incident status and resolution details
 
@@ -416,6 +424,7 @@ npm run agent:invoke MONITOR:resolve-incident
 ```
 
 #### SCHOLAR (Read Only)
+
 - **READ**: All tasks for pattern analysis
 - **ANALYZE**: Task completion patterns, velocity trends
 
@@ -427,6 +436,7 @@ npm run agent:invoke SCHOLAR:completion-trends
 ```
 
 #### Other Agents (Update Only)
+
 - **UPDATE**: Status changes related to their work
 - **COMMENT**: Progress updates and completion notes
 
@@ -703,6 +713,7 @@ npm run workflow:validate -- --workflow security-response.json
 Common workflow templates:
 
 #### Code Review Workflow
+
 ```json
 {
   "name": "Code Review",
@@ -727,6 +738,7 @@ Common workflow templates:
 ```
 
 #### Performance Optimization Workflow
+
 ```json
 {
   "name": "Performance Optimization",
@@ -770,6 +782,7 @@ npm run validate -- --linear --verbose
 ```
 
 **Solutions**:
+
 1. **Verify API Key**: Ensure key is valid and has correct permissions
 2. **Check Network**: Verify firewall/proxy settings
 3. **Update Configuration**: Refresh team/project IDs
@@ -790,6 +803,7 @@ npm run linear:api-key-info
 ```
 
 **Solutions**:
+
 1. **Regenerate API Key**: Create new key with correct scopes
 2. **Update Team Membership**: Ensure account has team access
 3. **Check Workspace Access**: Verify workspace permissions
@@ -810,6 +824,7 @@ npm run linear:validate-task-template
 ```
 
 **Solutions**:
+
 1. **Check Required Fields**: Ensure all required fields are provided
 2. **Validate Labels**: Verify labels exist in Linear workspace
 3. **Check Project Access**: Ensure project exists and is accessible
@@ -908,6 +923,7 @@ npm run linear:rebuild-history
 **The Linear integration transforms the Claude Agentic Workflow System from a code quality tool into a comprehensive development workflow orchestrator. Master this integration to unlock the full potential of autonomous task management! 🚀**
 
 **For additional Linear integration help:**
+
 - [User Guide](USER-GUIDE.md) - Complete system overview
 - [FAQ](FAQ.md) - Linear integration questions
 - [Troubleshooting](TROUBLESHOOTING.md) - Integration problem resolution

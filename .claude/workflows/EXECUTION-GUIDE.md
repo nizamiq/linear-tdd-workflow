@@ -46,11 +46,13 @@ claude-workflow list
 ## Available Workflows
 
 ### 1. TDD Cycle (`tdd-cycle`)
+
 **Purpose**: Enforce strict RED→GREEN→REFACTOR TDD cycle
 **SLA**: 5 minutes
 **Cost**: Minimal (no LLM overhead)
 
 **Usage**:
+
 ```bash
 scripts/claude-workflow run tdd-cycle \
   --param test_file_path="tests/test_calculator.py" \
@@ -60,6 +62,7 @@ scripts/claude-workflow run tdd-cycle \
 ```
 
 **What it does**:
+
 1. **RED Phase**: Write failing test (max 2 attempts)
 2. **GREEN Phase**: Minimal code to pass (max 3 attempts)
 3. **REFACTOR Phase**: Improve design (max 2 attempts)
@@ -71,11 +74,13 @@ scripts/claude-workflow run tdd-cycle \
 ---
 
 ### 2. Lint and Format (`lint-and-format`)
+
 **Purpose**: Deterministic code linting and auto-formatting
 **SLA**: 1 minute
 **Cost**: 75% cheaper than LINTER agent
 
 **Usage**:
+
 ```bash
 # Format Python files
 scripts/claude-workflow run lint-and-format \
@@ -94,17 +99,20 @@ scripts/claude-workflow run lint-and-format \
 ```
 
 **Tools used**:
+
 - Python: `ruff format`, `ruff check`
 - JavaScript/TypeScript: `prettier`, `eslint`
 
 ---
 
 ### 3. Type Check (`type-check`)
+
 **Purpose**: Fast, incremental type checking
 **SLA**: 2 minutes
 **Cost**: 80% cheaper than TYPECHECKER agent
 
 **Usage**:
+
 ```bash
 # Incremental check (changed files only)
 scripts/claude-workflow run type-check \
@@ -120,6 +128,7 @@ scripts/claude-workflow run type-check \
 ```
 
 **Tools used**:
+
 - Python: `mypy`
 - TypeScript: `tsc --noEmit`
 
@@ -128,11 +137,13 @@ scripts/claude-workflow run type-check \
 ---
 
 ### 4. PR Review Checklist (`pr-review-checklist`)
+
 **Purpose**: Automated PR readiness validation
 **SLA**: 5 minutes
 **Cost**: 70% cheaper than VALIDATOR agent
 
 **Usage**:
+
 ```bash
 scripts/claude-workflow run pr-review-checklist \
   --param pr_number=123 \
@@ -147,6 +158,7 @@ scripts/claude-workflow run pr-review-checklist \
 ```
 
 **Validates**:
+
 - ✅ Tests pass
 - ✅ Coverage ≥80%
 - ✅ Linting passes
@@ -159,11 +171,13 @@ scripts/claude-workflow run pr-review-checklist \
 ---
 
 ### 5. Deployment Gates (`deployment-gates`)
+
 **Purpose**: Pre-deployment validation and safety checks
 **SLA**: 10 minutes
 **Cost**: Minimal
 
 **Usage**:
+
 ```bash
 # Staging deployment
 scripts/claude-workflow run deployment-gates \
@@ -184,12 +198,14 @@ scripts/claude-workflow run deployment-gates \
 ```
 
 **Validates**:
+
 - **Pre-flight**: CI status, branch protection, coverage
 - **Security**: Vulnerability scan, secret scan, dependencies
 - **Performance**: Smoke tests, migration dry-run
 - **Operational**: Rollback plan, monitoring, backups
 
 **Go/No-Go Decision**:
+
 - ✅ All critical gates pass → Proceed
 - ❌ Any critical gate fails → Block
 - ⚠️ High warnings → Manual approval required
@@ -197,11 +213,13 @@ scripts/claude-workflow run deployment-gates \
 ---
 
 ### 6. Fix Pack Generation (`fix-pack-generation`)
+
 **Purpose**: Generate atomic fix packs from assessment findings
 **SLA**: 5 minutes
 **Cost**: Minimal
 
 **Usage**:
+
 ```bash
 scripts/claude-workflow run fix-pack-generation \
   --param assessment_report_path=".claude/reports/assessment-2025-01-30.json" \
@@ -211,6 +229,7 @@ scripts/claude-workflow run fix-pack-generation \
 ```
 
 **Process**:
+
 1. Load assessment JSON
 2. Filter FIL-0/1 issues only
 3. Group related issues (<300 LOC)
@@ -234,6 +253,7 @@ Options:
 ```
 
 **Examples**:
+
 ```bash
 # Basic run
 scripts/claude-workflow run test-simple --param message="Hello World"
@@ -265,6 +285,7 @@ Options:
 ```
 
 **Output**:
+
 ```
 📋 Available Workflows (6)
 ============================================================
@@ -289,6 +310,7 @@ Options:
 ```
 
 **Output**:
+
 ```
 ============================================================
 Workflow: lint-and-format
@@ -319,6 +341,7 @@ scripts/claude-workflow validate <workflow-file>
 ```
 
 **Output**:
+
 ```
 Validating: .claude/workflows/lint-and-format.yaml
 Workflow: lint-and-format
@@ -416,16 +439,16 @@ fi
 
 ## Workflow vs Agent Decision
 
-| Task | Use Workflow | Use Agent | Reason |
-|------|--------------|-----------|--------|
-| Lint/format files | ✅ | ❌ | Deterministic, 75% cheaper |
-| Type check | ✅ | ❌ | Deterministic, 80% cheaper |
-| Run tests | ✅ | ❌ | Deterministic, fast |
-| TDD cycle enforcement | ✅ | ❌ | Clear phases, retry logic |
-| PR validation checklist | ✅ | ❌ | Objective criteria |
-| Code assessment | ❌ | ✅ AUDITOR | Complex analysis required |
-| Fix implementation | ❌ | ✅ EXECUTOR | Requires reasoning |
-| Architectural review | ❌ | ✅ CODE-REVIEWER | Subjective judgment |
+| Task                    | Use Workflow | Use Agent        | Reason                     |
+| ----------------------- | ------------ | ---------------- | -------------------------- |
+| Lint/format files       | ✅           | ❌               | Deterministic, 75% cheaper |
+| Type check              | ✅           | ❌               | Deterministic, 80% cheaper |
+| Run tests               | ✅           | ❌               | Deterministic, fast        |
+| TDD cycle enforcement   | ✅           | ❌               | Clear phases, retry logic  |
+| PR validation checklist | ✅           | ❌               | Objective criteria         |
+| Code assessment         | ❌           | ✅ AUDITOR       | Complex analysis required  |
+| Fix implementation      | ❌           | ✅ EXECUTOR      | Requires reasoning         |
+| Architectural review    | ❌           | ✅ CODE-REVIEWER | Subjective judgment        |
 
 **Rule of Thumb**: If the task is **algorithmic** with clear steps and validation → Use Workflow. If it requires **reasoning** or **creativity** → Use Agent.
 
@@ -435,21 +458,21 @@ fi
 
 ### Speed Comparison
 
-| Task | Agent Time | Workflow Time | Speedup |
-|------|------------|---------------|---------|
-| Lint & Format | 60s | 6s | **10x faster** |
-| Type Check | 45s | 4s | **11x faster** |
-| Run Tests | 30s | 3s | **10x faster** |
-| TDD Cycle | 180s | 20s | **9x faster** |
+| Task          | Agent Time | Workflow Time | Speedup        |
+| ------------- | ---------- | ------------- | -------------- |
+| Lint & Format | 60s        | 6s            | **10x faster** |
+| Type Check    | 45s        | 4s            | **11x faster** |
+| Run Tests     | 30s        | 3s            | **10x faster** |
+| TDD Cycle     | 180s       | 20s           | **9x faster**  |
 
 ### Cost Comparison
 
-| Task | Agent Cost | Workflow Cost | Savings |
-|------|------------|---------------|---------|
-| Lint & Format | $0.10 | $0.025 | **75%** |
-| Type Check | $0.08 | $0.016 | **80%** |
-| Run Tests | $0.05 | $0.01 | **80%** |
-| TDD Cycle | $0.30 | $0.09 | **70%** |
+| Task          | Agent Cost | Workflow Cost | Savings |
+| ------------- | ---------- | ------------- | ------- |
+| Lint & Format | $0.10      | $0.025        | **75%** |
+| Type Check    | $0.08      | $0.016        | **80%** |
+| Run Tests     | $0.05      | $0.01         | **80%** |
+| TDD Cycle     | $0.30      | $0.09         | **70%** |
 
 **Total Projected Savings**: **~60% cost reduction** on deterministic tasks
 
@@ -464,6 +487,7 @@ Error: Workflow not found: .claude/workflows/my-workflow.yaml
 ```
 
 **Solution**: Check workflow name (without `.yaml`) and ensure file exists:
+
 ```bash
 ls .claude/workflows/
 scripts/claude-workflow list
@@ -476,6 +500,7 @@ Error: Missing required parameter: test_file_path
 ```
 
 **Solution**: Check required parameters:
+
 ```bash
 scripts/claude-workflow describe tdd-cycle
 # Look for "Inputs: Required:" section
@@ -493,6 +518,7 @@ scripts/claude-workflow run tdd-cycle \
 ```
 
 **Solution**: Check tool is installed:
+
 ```bash
 # For Python workflows
 pip install ruff mypy pytest
@@ -508,6 +534,7 @@ bash: scripts/claude-workflow: Permission denied
 ```
 
 **Solution**: Make script executable:
+
 ```bash
 chmod +x scripts/claude-workflow
 ```
@@ -519,6 +546,7 @@ Error: PyYAML is required. Install with: pip install PyYAML
 ```
 
 **Solution**: Install PyYAML:
+
 ```bash
 pip install PyYAML
 # Or install all requirements

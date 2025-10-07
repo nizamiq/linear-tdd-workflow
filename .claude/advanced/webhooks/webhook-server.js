@@ -32,9 +32,9 @@ class WebhookServer {
     // Rate limiter configuration
     this.rateLimiter = {
       windowMs: 60000, // 1 minute
-      max: 100,        // 100 requests per window
+      max: 100, // 100 requests per window
       requestCounts: new Map(),
-      windowStart: new Map()
+      windowStart: new Map(),
     };
 
     // Security headers configuration
@@ -43,12 +43,12 @@ class WebhookServer {
       'X-Frame-Options': 'DENY',
       'X-XSS-Protection': '1; mode=block',
       'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
-      'Content-Security-Policy': "default-src 'self'; script-src 'none'; object-src 'none';"
+      'Content-Security-Policy': "default-src 'self'; script-src 'none'; object-src 'none';",
     };
 
     // HTTPS enforcer
     this.httpsEnforcer = {
-      enabled: process.env.NODE_ENV === 'production'
+      enabled: process.env.NODE_ENV === 'production',
     };
 
     // CORS configuration
@@ -56,7 +56,7 @@ class WebhookServer {
       origin: ['https://app.linear.app', 'https://linear.app'],
       methods: ['POST', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Linear-Signature', 'X-Linear-Signature'],
-      maxAge: 86400 // 24 hours
+      maxAge: 86400, // 24 hours
     };
 
     // Security logger
@@ -68,7 +68,7 @@ class WebhookServer {
           sanitizedData.signature = '[REDACTED]';
         }
         console.warn(`SECURITY ALERT: ${event}`, sanitizedData);
-      }
+      },
     };
   }
 
@@ -123,7 +123,7 @@ class WebhookServer {
       return {
         allowed: false,
         remaining: 0,
-        resetTime: windowStart + this.rateLimiter.windowMs
+        resetTime: windowStart + this.rateLimiter.windowMs,
       };
     }
 
@@ -133,7 +133,7 @@ class WebhookServer {
     return {
       allowed: true,
       remaining: this.rateLimiter.max - currentCount - 1,
-      resetTime: windowStart + this.rateLimiter.windowMs
+      resetTime: windowStart + this.rateLimiter.windowMs,
     };
   }
 
@@ -164,7 +164,7 @@ class WebhookServer {
         /javascript:/gi,
         /onclick=/gi,
         /onload=/gi,
-        /onerror=/gi
+        /onerror=/gi,
       ];
 
       for (const pattern of scriptPatterns) {
@@ -177,7 +177,7 @@ class WebhookServer {
       const sqlPatterns = [
         /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|EXEC|UNION)\b)/gi,
         /(--|\/\*|\*\/|;)/g,
-        /('|(\\');|(\\");)/g
+        /('|(\\');|(\\");)/g,
       ];
 
       for (const pattern of sqlPatterns) {
@@ -188,7 +188,6 @@ class WebhookServer {
 
       // Payload is clean
       return { safe: true, sanitized: payload };
-
     } catch (error) {
       return { safe: false, error: 'Payload sanitization failed' };
     }
@@ -201,14 +200,14 @@ class WebhookServer {
     if (process.env.NODE_ENV === 'production') {
       return {
         error: 'Internal server error',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     }
 
     return {
       error: error.message,
       timestamp: new Date().toISOString(),
-      ...(context.stack && { stack: error.stack })
+      ...(context.stack && { stack: error.stack }),
     };
   }
 
@@ -263,13 +262,13 @@ class WebhookServer {
       if (!rateLimitResult.allowed) {
         this.securityLogger.logSecurityEvent('rate_limit_exceeded', {
           ip: clientIp,
-          path: req.path
+          path: req.path,
         });
 
         return res.status(429).json({
           error: 'Rate limit exceeded',
           retryAfter: Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000),
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         });
       }
 
@@ -277,10 +276,13 @@ class WebhookServer {
     });
 
     // Payload size limit
-    this.app.use('/webhooks', express.raw({
-      type: 'application/json',
-      limit: '1mb' // Prevent DoS attacks with large payloads
-    }));
+    this.app.use(
+      '/webhooks',
+      express.raw({
+        type: 'application/json',
+        limit: '1mb', // Prevent DoS attacks with large payloads
+      }),
+    );
 
     // JSON parser for other routes
     this.app.use(express.json({ limit: '100kb' }));
@@ -297,7 +299,7 @@ class WebhookServer {
         status: 'healthy',
         timestamp: new Date().toISOString(),
         environment: this.config.name,
-        webhookHandlers: this.webhookHandler.getWebhookStats()
+        webhookHandlers: this.webhookHandler.getWebhookStats(),
       });
     });
   }
@@ -321,12 +323,12 @@ class WebhookServer {
           this.securityLogger.logSecurityEvent('signature_validation_failed', {
             ip: clientIp,
             error: signatureValidation.error,
-            hasSignature: !!signature
+            hasSignature: !!signature,
           });
 
           return res.status(401).json({
             error: 'Missing or invalid signature',
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
           });
         }
 
@@ -337,12 +339,12 @@ class WebhookServer {
         } catch (error) {
           this.securityLogger.logSecurityEvent('invalid_json_payload', {
             ip: clientIp,
-            payloadLength: payload.length
+            payloadLength: payload.length,
           });
 
           return res.status(400).json({
             error: 'Invalid JSON payload',
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
           });
         }
 
@@ -352,12 +354,12 @@ class WebhookServer {
           this.securityLogger.logSecurityEvent('malicious_payload_detected', {
             ip: clientIp,
             error: sanitizationResult.error,
-            payloadType: parsedPayload.type || 'unknown'
+            payloadType: parsedPayload.type || 'unknown',
           });
 
           return res.status(400).json({
             error: 'Invalid or malicious payload',
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
           });
         }
 
@@ -367,7 +369,7 @@ class WebhookServer {
         if (!result.success) {
           return res.status(result.status || 400).json({
             error: result.error,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
           });
         }
 
@@ -377,15 +379,14 @@ class WebhookServer {
           success: true,
           eventType: result.eventType,
           processed: true,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         });
-
       } catch (error) {
         console.error('❌ Webhook processing error:', error.message);
 
         const errorResponse = this.formatError(error, {
           stack: error.stack,
-          message: error.message
+          message: error.message,
         });
 
         res.status(500).json(errorResponse);
@@ -400,22 +401,22 @@ class WebhookServer {
         linearWebhook: {
           url: this.config.linear?.webhookUrl || 'Not configured',
           hasSecret: hasSecret,
-          mockMode: this.config.linear?.mockMode || false
+          mockMode: this.config.linear?.mockMode || false,
         },
         handlers: this.webhookHandler.getWebhookStats(),
         server: {
           port: this.port,
-          environment: this.config.name
+          environment: this.config.name,
         },
         security: {
           rateLimiting: {
             enabled: true,
             maxRequests: this.rateLimiter.max,
-            windowMs: this.rateLimiter.windowMs
+            windowMs: this.rateLimiter.windowMs,
           },
           httpsEnforced: this.httpsEnforcer.enabled,
-          corsConfigured: this.corsConfig.origin.length > 0
-        }
+          corsConfigured: this.corsConfig.origin.length > 0,
+        },
       };
 
       // Add security warning if webhook secret is not configured
@@ -440,15 +441,15 @@ class WebhookServer {
           description: 'This is a test webhook',
           priority: 3,
           state: { name: 'Todo' },
-          createdAt: new Date().toISOString()
-        }
+          createdAt: new Date().toISOString(),
+        },
       });
 
       const result = await this.webhookHandler.handleWebhook(testPayload, null);
 
       res.json({
         testResult: result,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     });
 
@@ -459,9 +460,9 @@ class WebhookServer {
         server: {
           uptime: process.uptime(),
           memory: process.memoryUsage(),
-          environment: this.config.name
+          environment: this.config.name,
         },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     });
   }
@@ -475,7 +476,7 @@ class WebhookServer {
       res.status(404).json({
         error: 'Not found',
         path: req.path,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     });
 
@@ -486,7 +487,7 @@ class WebhookServer {
       res.status(500).json({
         error: 'Internal server error',
         timestamp: new Date().toISOString(),
-        ...(this.config.name === 'development' && { stack: error.stack })
+        ...(this.config.name === 'development' && { stack: error.stack }),
       });
     });
   }
@@ -511,7 +512,6 @@ class WebhookServer {
         });
 
         this.server.on('error', reject);
-
       } catch (error) {
         reject(error);
       }
@@ -541,12 +541,14 @@ class WebhookServer {
     const shutdown = (signal) => {
       console.log(`\n📡 Received ${signal}, shutting down webhook server gracefully...`);
 
-      this.stop().then(() => {
-        process.exit(0);
-      }).catch((error) => {
-        console.error('❌ Error during shutdown:', error.message);
-        process.exit(1);
-      });
+      this.stop()
+        .then(() => {
+          process.exit(0);
+        })
+        .catch((error) => {
+          console.error('❌ Error during shutdown:', error.message);
+          process.exit(1);
+        });
     };
 
     process.on('SIGTERM', () => shutdown('SIGTERM'));
@@ -573,7 +575,8 @@ if (require.main === module) {
   server.setupGracefulShutdown();
 
   // Start server
-  server.start()
+  server
+    .start()
     .then(() => {
       console.log('✅ Webhook server is ready to receive Linear webhooks');
 
@@ -586,7 +589,9 @@ if (require.main === module) {
         console.log('4. Set secret (optional but recommended)');
         console.log('5. Select events: Issues, Comments, Projects');
         console.log('6. Save webhook');
-        console.log('\n🧪 Test with: curl -X POST http://localhost:' + server.port + '/webhooks/test');
+        console.log(
+          '\n🧪 Test with: curl -X POST http://localhost:' + server.port + '/webhooks/test',
+        );
       }
     })
     .catch((error) => {

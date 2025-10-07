@@ -9,6 +9,7 @@ tags: [integration, linear, project-management, task-tracking, automation]
 # Linear.app Integration Documentation
 
 ## Table of Contents
+
 1. [Overview](#1-overview)
 2. [Setup & Configuration](#2-setup--configuration)
 3. [Core Integration Features](#3-core-integration-features)
@@ -67,11 +68,13 @@ graph TD
 ## Prerequisites
 
 ### Required Accounts
+
 - Linear.app workspace with API access
 - GitHub account with repository permissions
 - Admin access to create webhooks
 
 ### Environment Variables
+
 ```bash
 # Required Linear Configuration
 LINEAR_API_KEY=lin_api_xxxxxxxxxxxxx      # Your Linear API key
@@ -89,6 +92,7 @@ LINEAR_WEBHOOK_SECRET=xxx                 # Webhook verification secret
 ## Initial Setup Steps
 
 ### Step 1: Generate Linear API Key
+
 ```markdown
 1. Navigate to Linear Settings → API
 2. Click "Create new API key"
@@ -98,55 +102,57 @@ LINEAR_WEBHOOK_SECRET=xxx                 # Webhook verification secret
 ```
 
 ### Step 2: Configure Team and Project
+
 ```typescript
 // Verify team exists
 const team = await linear.teams({
-  filter: { key: { eq: "a-coders" } }
+  filter: { key: { eq: 'a-coders' } },
 });
 
 // Create or verify project
 const project = await linear.projects({
   filter: {
-    name: { eq: "AI Coding" },
-    team: { key: { eq: "a-coders" } }
-  }
+    name: { eq: 'AI Coding' },
+    team: { key: { eq: 'a-coders' } },
+  },
 });
 
 // If not exists, create
 if (!project) {
   await linear.createProject({
-    name: "AI Coding",
+    name: 'AI Coding',
     teamId: team.id,
-    description: "Autonomous code quality management",
-    color: "#5E6AD2",
-    state: "started"
+    description: 'Autonomous code quality management',
+    color: '#5E6AD2',
+    state: 'started',
   });
 }
 ```
 
 ### Step 3: Create Required Labels
+
 ```typescript
 const requiredLabels = [
   // Agent Labels
-  { name: "claude-code", color: "#5E6AD2", description: "Agent-managed task" },
-  { name: "automated", color: "#4CB782", description: "Automated process" },
-  { name: "fix-pack", color: "#26B5CE", description: "Pre-approved fix" },
+  { name: 'claude-code', color: '#5E6AD2', description: 'Agent-managed task' },
+  { name: 'automated', color: '#4CB782', description: 'Automated process' },
+  { name: 'fix-pack', color: '#26B5CE', description: 'Pre-approved fix' },
 
   // Type Labels
-  { name: "assessment", color: "#F7CE45", description: "Code assessment" },
-  { name: "implementation", color: "#4CB782", description: "Code changes" },
-  { name: "pipeline", color: "#B5A4DB", description: "CI/CD related" },
+  { name: 'assessment', color: '#F7CE45', description: 'Code assessment' },
+  { name: 'implementation', color: '#4CB782', description: 'Code changes' },
+  { name: 'pipeline', color: '#B5A4DB', description: 'CI/CD related' },
 
   // Priority Labels
-  { name: "p0-critical", color: "#F2453D", description: "Critical priority" },
-  { name: "p1-high", color: "#F2994A", description: "High priority" },
-  { name: "p2-medium", color: "#F7CE45", description: "Medium priority" },
-  { name: "p3-low", color: "#5E6AD2", description: "Low priority" },
+  { name: 'p0-critical', color: '#F2453D', description: 'Critical priority' },
+  { name: 'p1-high', color: '#F2994A', description: 'High priority' },
+  { name: 'p2-medium', color: '#F7CE45', description: 'Medium priority' },
+  { name: 'p3-low', color: '#5E6AD2', description: 'Low priority' },
 
   // Status Labels
-  { name: "blocked", color: "#95918C", description: "Blocked task" },
-  { name: "in-review", color: "#26B5CE", description: "Under review" },
-  { name: "ready", color: "#4CB782", description: "Ready to start" }
+  { name: 'blocked', color: '#95918C', description: 'Blocked task' },
+  { name: 'in-review', color: '#26B5CE', description: 'Under review' },
+  { name: 'ready', color: '#4CB782', description: 'Ready to start' },
 ];
 
 for (const label of requiredLabels) {
@@ -155,19 +161,20 @@ for (const label of requiredLabels) {
 ```
 
 ### Step 4: Configure Webhooks
+
 ```typescript
 const webhook = await linear.createWebhook({
-  url: "https://your-system.com/webhooks/linear",
+  url: 'https://your-system.com/webhooks/linear',
   teamId: team.id,
-  label: "TDD Workflow System",
+  label: 'TDD Workflow System',
   events: [
-    "Issue.created",
-    "Issue.updated",
-    "Issue.deleted",
-    "Comment.created",
-    "Project.updated",
-    "Cycle.created"
-  ]
+    'Issue.created',
+    'Issue.updated',
+    'Issue.deleted',
+    'Comment.created',
+    'Project.updated',
+    'Cycle.created',
+  ],
 });
 ```
 
@@ -193,9 +200,9 @@ ON_PROJECT_START:
     - Define priority matrix
 
   4_create_meta_issues:
-    - "Project Setup and Architecture Planning"
-    - "Codebase Analysis and Technical Debt Assessment"
-    - "Claude Code Work Log and Decisions"
+    - 'Project Setup and Architecture Planning'
+    - 'Codebase Analysis and Technical Debt Assessment'
+    - 'Claude Code Work Log and Decisions'
 
   5_configure_automation:
     - Set up webhooks
@@ -211,6 +218,7 @@ ON_PROJECT_START:
 ## 3.1 Issue Management
 
 ### Creating Issues
+
 ```typescript
 interface IssueCreation {
   title: string;
@@ -233,39 +241,46 @@ async function createAgentIssue(task: AssessmentFinding): Promise<Issue> {
     projectId: LINEAR_PROJECT_ID,
     priority: mapPriority(task.severity),
     estimate: estimateEffort(task.complexity),
-    labels: ["claude-code", "automated", task.category],
-    assigneeId: "me", // Self-assignment
-    state: "backlog"
+    labels: ['claude-code', 'automated', task.category],
+    assigneeId: 'me', // Self-assignment
+    state: 'backlog',
   });
 }
 ```
 
 ### Issue Templates
+
 ```markdown
 ## Automated Task Template
+
 **Agent**: ${agent_name}
 **Created**: ${timestamp}
 **Type**: ${task_type}
 
 ### Objective
+
 ${clear_objective}
 
 ### Context
+
 - **Repository**: ${repo_url}
 - **Branch**: ${branch_name}
 - **Files Affected**: ${file_count}
 - **Complexity**: ${complexity_score}
 
 ### Success Criteria
+
 - [ ] ${criterion_1}
 - [ ] ${criterion_2}
 - [ ] All tests passing
 - [ ] Coverage ≥80%
 
 ### Technical Details
+
 ${technical_description}
 
 ### Execution Log
+
 - Starting: ${start_time}
 - Status: ${current_status}
 ```
@@ -273,15 +288,16 @@ ${technical_description}
 ## 3.2 Status Management
 
 ### Workflow States
+
 ```typescript
 enum WorkflowState {
-  BACKLOG = "backlog",
-  TODO = "todo",
-  IN_PROGRESS = "in_progress",
-  IN_REVIEW = "in_review",
-  BLOCKED = "blocked",
-  DONE = "done",
-  CANCELLED = "cancelled"
+  BACKLOG = 'backlog',
+  TODO = 'todo',
+  IN_PROGRESS = 'in_progress',
+  IN_REVIEW = 'in_review',
+  BLOCKED = 'blocked',
+  DONE = 'done',
+  CANCELLED = 'cancelled',
 }
 
 const stateTransitions = {
@@ -291,26 +307,23 @@ const stateTransitions = {
   implementing: WorkflowState.IN_PROGRESS,
   testing: WorkflowState.IN_REVIEW,
   blocked: WorkflowState.BLOCKED,
-  complete: WorkflowState.DONE
+  complete: WorkflowState.DONE,
 };
 ```
 
 ### Automatic Status Updates
+
 ```typescript
-async function updateTaskStatus(
-  issueId: string,
-  status: string,
-  details: object
-): Promise<void> {
+async function updateTaskStatus(issueId: string, status: string, details: object): Promise<void> {
   // Update issue state
   await linear.updateIssue(issueId, {
-    stateId: getStateId(status)
+    stateId: getStateId(status),
   });
 
   // Add progress comment
   await linear.createComment({
     issueId,
-    body: formatProgressUpdate(status, details)
+    body: formatProgressUpdate(status, details),
   });
 
   // Update metrics
@@ -321,6 +334,7 @@ async function updateTaskStatus(
 ## 3.3 Comment System
 
 ### Progress Updates
+
 ```typescript
 function formatProgressUpdate(status: string, details: any): string {
   return `
@@ -330,34 +344,32 @@ function formatProgressUpdate(status: string, details: any): string {
 **Agent**: ${details.agent}
 
 #### Completed
-${details.completed.map(item => `- ✅ ${item}`).join('\n')}
+${details.completed.map((item) => `- ✅ ${item}`).join('\n')}
 
 #### In Progress
-${details.inProgress.map(item => `- 🔄 ${item}`).join('\n')}
+${details.inProgress.map((item) => `- 🔄 ${item}`).join('\n')}
 
 #### Next Steps
-${details.nextSteps.map(item => `- ⏭️ ${item}`).join('\n')}
+${details.nextSteps.map((item) => `- ⏭️ ${item}`).join('\n')}
 
-**Blockers**: ${details.blockers || "None"}
+**Blockers**: ${details.blockers || 'None'}
 **Files Modified**: ${details.filesModified || 0}
 **Tests Added/Modified**: ${details.testsModified || 0}
-**Coverage**: ${details.coverage || "N/A"}
+**Coverage**: ${details.coverage || 'N/A'}
 `;
 }
 ```
 
 ### Decision Documentation
+
 ```typescript
-async function documentDecision(
-  issueId: string,
-  decision: Decision
-): Promise<void> {
+async function documentDecision(issueId: string, decision: Decision): Promise<void> {
   const comment = `
 ### 🎯 Decision Point
 
 **Context**: ${decision.context}
 **Options Considered**:
-${decision.options.map(opt => `- ${opt.name}: ${opt.pros} / ${opt.cons}`).join('\n')}
+${decision.options.map((opt) => `- ${opt.name}: ${opt.pros} / ${opt.cons}`).join('\n')}
 
 **Decision**: ${decision.chosen}
 **Rationale**: ${decision.rationale}
@@ -379,6 +391,7 @@ ${decision.options.map(opt => `- ${opt.name}: ${opt.pros} / ${opt.cons}`).join('
 ## 4.1 Task Creation Strategy
 
 ### When to Create Issues
+
 ```yaml
 automatic_creation_triggers:
   assessment_findings:
@@ -404,16 +417,19 @@ automatic_creation_triggers:
 ```
 
 ### Task Granularity Rules
+
 ```typescript
 const granularityRules = {
-  maxEstimate: 8,        // Maximum story points
-  maxDuration: "4h",     // Maximum time estimate
-  breakdownThreshold: 5,  // Points requiring breakdown
+  maxEstimate: 8, // Maximum story points
+  maxDuration: '4h', // Maximum time estimate
+  breakdownThreshold: 5, // Points requiring breakdown
 
   shouldBreakdown(task: Task): boolean {
-    return task.estimate > this.breakdownThreshold ||
-           task.complexity === "high" ||
-           task.dependencies.length > 3;
+    return (
+      task.estimate > this.breakdownThreshold ||
+      task.complexity === 'high' ||
+      task.dependencies.length > 3
+    );
   },
 
   createSubtasks(parent: Task): Task[] {
@@ -421,31 +437,32 @@ const granularityRules = {
       { title: `[1/n] Analysis: ${parent.title}`, estimate: 2 },
       { title: `[2/n] Implementation: ${parent.title}`, estimate: 3 },
       { title: `[3/n] Testing: ${parent.title}`, estimate: 2 },
-      { title: `[4/n] Documentation: ${parent.title}`, estimate: 1 }
+      { title: `[4/n] Documentation: ${parent.title}`, estimate: 1 },
     ];
-  }
+  },
 };
 ```
 
 ## 4.2 Task Prioritization
 
 ### Priority Matrix
+
 ```typescript
 interface PriorityFactors {
-  businessImpact: number;  // 0-10
-  userImpact: number;      // 0-10
-  technicalRisk: number;   // 0-10
-  effort: number;          // 1-13 (story points)
-  dependencies: number;    // Count of blocking tasks
+  businessImpact: number; // 0-10
+  userImpact: number; // 0-10
+  technicalRisk: number; // 0-10
+  effort: number; // 1-13 (story points)
+  dependencies: number; // Count of blocking tasks
 }
 
 function calculatePriority(factors: PriorityFactors): number {
   const score =
-    (factors.businessImpact * 3) +
-    (factors.userImpact * 2) +
-    (factors.technicalRisk * 2) +
-    ((13 - factors.effort) * 1) +
-    (factors.dependencies * -2);
+    factors.businessImpact * 3 +
+    factors.userImpact * 2 +
+    factors.technicalRisk * 2 +
+    (13 - factors.effort) * 1 +
+    factors.dependencies * -2;
 
   // Map to Linear priority (0-4)
   if (score >= 40) return 0; // Urgent
@@ -457,6 +474,7 @@ function calculatePriority(factors: PriorityFactors): number {
 ```
 
 ### Smart Queue Management
+
 ```typescript
 class TaskQueue {
   private queue: PriorityQueue<Task>;
@@ -471,7 +489,7 @@ class TaskQueue {
     }
 
     // Check resource availability
-    if (!await this.hasAvailableResources(task)) {
+    if (!(await this.hasAvailableResources(task))) {
       this.queue.enqueue(task, task.priority);
       return this.processNext();
     }
@@ -485,6 +503,7 @@ class TaskQueue {
 ## 4.3 Task Lifecycle
 
 ### State Machine
+
 ```mermaid
 stateDiagram-v2
     [*] --> Discovered
@@ -504,6 +523,7 @@ stateDiagram-v2
 ```
 
 ### Lifecycle Hooks
+
 ```typescript
 class TaskLifecycle {
   async onStateChange(task: Task, from: State, to: State): Promise<void> {
@@ -512,11 +532,11 @@ class TaskLifecycle {
 
     // Update Linear
     await linear.updateIssue(task.linearId, {
-      stateId: to.linearStateId
+      stateId: to.linearStateId,
     });
 
     // Trigger automations
-    switch(to) {
+    switch (to) {
       case State.IN_PROGRESS:
         await this.startTracking(task);
         break;
@@ -541,10 +561,9 @@ class TaskLifecycle {
 ## 5.1 Bulk Issue Generation
 
 ### From Assessment Results
+
 ```typescript
-async function createIssuesFromAssessment(
-  assessment: AssessmentResult
-): Promise<Issue[]> {
+async function createIssuesFromAssessment(assessment: AssessmentResult): Promise<Issue[]> {
   const issues: Issue[] = [];
 
   // Group findings by category
@@ -555,8 +574,8 @@ async function createIssuesFromAssessment(
     const parent = await linear.createIssue({
       title: `[Assessment] ${category} Improvements`,
       description: `Found ${findings.length} ${category} issues`,
-      labels: ["assessment", category],
-      projectId: LINEAR_PROJECT_ID
+      labels: ['assessment', category],
+      projectId: LINEAR_PROJECT_ID,
     });
 
     // Create child issues for specific findings
@@ -567,7 +586,7 @@ async function createIssuesFromAssessment(
         parentId: parent.id,
         priority: mapSeverityToPriority(finding.severity),
         estimate: estimateFixEffort(finding),
-        labels: ["claude-code", "fix-pack", finding.type]
+        labels: ['claude-code', 'fix-pack', finding.type],
       });
       issues.push(child);
     }
@@ -578,16 +597,15 @@ async function createIssuesFromAssessment(
 ```
 
 ### From Pattern Detection
+
 ```typescript
-async function createPatternIssues(
-  patterns: DetectedPattern[]
-): Promise<void> {
+async function createPatternIssues(patterns: DetectedPattern[]): Promise<void> {
   for (const pattern of patterns) {
     // Check if issue already exists
     const existing = await linear.issues({
       filter: {
-        title: { contains: pattern.signature }
-      }
+        title: { contains: pattern.signature },
+      },
     });
 
     if (existing.nodes.length === 0) {
@@ -610,7 +628,7 @@ ${pattern.suggestedFix}
         `,
         priority: pattern.count > 5 ? 1 : 2,
         estimate: pattern.estimatedEffort,
-        labels: ["pattern", "automated", pattern.category]
+        labels: ['pattern', 'automated', pattern.category],
       });
     }
   }
@@ -620,9 +638,10 @@ ${pattern.suggestedFix}
 ## 5.2 Issue Templates
 
 ### Fix Pack Template
+
 ```typescript
 const fixPackTemplate = {
-  title: "[Fix Pack] ${category} - ${scope}",
+  title: '[Fix Pack] ${category} - ${scope}',
   description: `
 ## Fix Pack Execution Plan
 
@@ -634,7 +653,7 @@ const fixPackTemplate = {
 ${scopeDescription}
 
 ### Changes
-${changes.map(c => `- [ ] ${c.file}: ${c.description}`).join('\n')}
+${changes.map((c) => `- [ ] ${c.file}: ${c.description}`).join('\n')}
 
 ### Test Plan
 - [ ] Write failing tests (RED)
@@ -652,15 +671,16 @@ ${rollbackInstructions}
 - Coverage requirements met
 - PR approved and merged
 `,
-  labels: ["fix-pack", "automated", "${category}"],
-  estimate: "${storyPoints}"
+  labels: ['fix-pack', 'automated', '${category}'],
+  estimate: '${storyPoints}',
 };
 ```
 
 ### Pipeline Recovery Template
+
 ```typescript
 const pipelineTemplate = {
-  title: "[Pipeline] ${failureType} - ${timestamp}",
+  title: '[Pipeline] ${failureType} - ${timestamp}',
   description: `
 ## Pipeline Failure Report
 
@@ -678,13 +698,13 @@ ${errorOutput}
 ${rootCause}
 
 ### Recovery Actions
-${recoverySteps.map(s => `- [ ] ${s}`).join('\n')}
+${recoverySteps.map((s) => `- [ ] ${s}`).join('\n')}
 
 ### Prevention Measures
 ${preventionMeasures}
 `,
   priority: 0, // Pipeline issues are urgent
-  labels: ["pipeline", "incident", "automated"]
+  labels: ['pipeline', 'incident', 'automated'],
 };
 ```
 
@@ -695,15 +715,16 @@ ${preventionMeasures}
 ## 6.1 Cycle Integration
 
 ### Automatic Cycle Assignment
+
 ```typescript
 async function assignToCycle(issue: Issue): Promise<void> {
   // Get current and next cycles
   const currentCycle = await linear.cycles({
-    filter: { isActive: { eq: true } }
+    filter: { isActive: { eq: true } },
   });
 
   const nextCycle = await linear.cycles({
-    filter: { startsAt: { gt: new Date() } }
+    filter: { startsAt: { gt: new Date() } },
   });
 
   // Decision logic
@@ -727,12 +748,13 @@ async function assignToCycle(issue: Issue): Promise<void> {
 
   // Update issue
   await linear.updateIssue(issue.id, {
-    cycleId: targetCycle.id
+    cycleId: targetCycle.id,
   });
 }
 ```
 
 ### Sprint Planning Automation
+
 ```typescript
 async function planSprint(): Promise<SprintPlan> {
   // Get team velocity
@@ -741,10 +763,10 @@ async function planSprint(): Promise<SprintPlan> {
   // Get prioritized backlog
   const backlog = await linear.issues({
     filter: {
-      state: { name: { in: ["backlog", "todo"] } },
-      project: { id: { eq: LINEAR_PROJECT_ID } }
+      state: { name: { in: ['backlog', 'todo'] } },
+      project: { id: { eq: LINEAR_PROJECT_ID } },
     },
-    orderBy: LinearDocument.PriorityOrder
+    orderBy: LinearDocument.PriorityOrder,
   });
 
   // Build sprint
@@ -765,7 +787,7 @@ async function planSprint(): Promise<SprintPlan> {
   for (const issue of sprint) {
     await linear.updateIssue(issue.id, {
       cycleId: cycle.id,
-      stateId: getStateId("todo")
+      stateId: getStateId('todo'),
     });
   }
 
@@ -776,6 +798,7 @@ async function planSprint(): Promise<SprintPlan> {
 ## 6.2 Progress Tracking
 
 ### Burndown Calculation
+
 ```typescript
 interface BurndownData {
   cycleId: string;
@@ -790,20 +813,18 @@ interface BurndownData {
 async function calculateBurndown(cycleId: string): Promise<BurndownData> {
   const cycle = await linear.cycle(cycleId);
   const issues = await linear.issues({
-    filter: { cycle: { id: { eq: cycleId } } }
+    filter: { cycle: { id: { eq: cycleId } } },
   });
 
-  const totalPoints = sum(issues.nodes.map(i => i.estimate || 0));
+  const totalPoints = sum(issues.nodes.map((i) => i.estimate || 0));
   const completedPoints = sum(
-    issues.nodes
-      .filter(i => i.state.type === "completed")
-      .map(i => i.estimate || 0)
+    issues.nodes.filter((i) => i.state.type === 'completed').map((i) => i.estimate || 0),
   );
 
   // Calculate ideal burndown
   const workingDays = getWorkingDays(cycle.startsAt, cycle.endsAt);
   const idealDaily = totalPoints / workingDays;
-  const idealLine = workingDays.map((_, i) => totalPoints - (idealDaily * i));
+  const idealLine = workingDays.map((_, i) => totalPoints - idealDaily * i);
 
   // Calculate actual burndown
   const actualLine = await calculateActualProgress(cycle, issues);
@@ -821,33 +842,34 @@ async function calculateBurndown(cycleId: string): Promise<BurndownData> {
     remainingPoints,
     idealLine,
     actualLine,
-    projectedCompletion
+    projectedCompletion,
   };
 }
 ```
 
 ### Velocity Tracking
+
 ```typescript
 async function trackVelocity(): Promise<VelocityMetrics> {
   const completedCycles = await linear.cycles({
     filter: {
       endsAt: { lt: new Date() },
-      completedIssueCount: { gt: 0 }
+      completedIssueCount: { gt: 0 },
     },
-    last: 6 // Last 6 cycles
+    last: 6, // Last 6 cycles
   });
 
   const velocities = await Promise.all(
-    completedCycles.nodes.map(async cycle => {
+    completedCycles.nodes.map(async (cycle) => {
       const issues = await linear.issues({
         filter: {
           cycle: { id: { eq: cycle.id } },
-          state: { type: { eq: "completed" } }
-        }
+          state: { type: { eq: 'completed' } },
+        },
       });
 
-      return sum(issues.nodes.map(i => i.estimate || 0));
-    })
+      return sum(issues.nodes.map((i) => i.estimate || 0));
+    }),
   );
 
   return {
@@ -855,7 +877,7 @@ async function trackVelocity(): Promise<VelocityMetrics> {
     median: median(velocities),
     trend: calculateTrend(velocities),
     confidence: standardDeviation(velocities) / mean(velocities),
-    recommendation: velocities.slice(-3).reduce((a, b) => a + b, 0) / 3
+    recommendation: velocities.slice(-3).reduce((a, b) => a + b, 0) / 3,
   };
 }
 ```
@@ -867,6 +889,7 @@ async function trackVelocity(): Promise<VelocityMetrics> {
 ## 7.1 Core Operations
 
 ### Issue Operations
+
 ```typescript
 // Create issue
 linear.createIssue({
@@ -903,6 +926,7 @@ linear.deleteIssue(id: string): Promise<Success>
 ```
 
 ### Comment Operations
+
 ```typescript
 // Create comment
 linear.createComment({
@@ -922,6 +946,7 @@ linear.comments({
 ```
 
 ### Project Operations
+
 ```typescript
 // Create project
 linear.createProject({
@@ -944,33 +969,35 @@ linear.project(id: string): Promise<Project>
 ## 7.2 Webhook Events
 
 ### Event Types
+
 ```typescript
 enum WebhookEvent {
   // Issue events
-  ISSUE_CREATED = "Issue.created",
-  ISSUE_UPDATED = "Issue.updated",
-  ISSUE_DELETED = "Issue.deleted",
+  ISSUE_CREATED = 'Issue.created',
+  ISSUE_UPDATED = 'Issue.updated',
+  ISSUE_DELETED = 'Issue.deleted',
 
   // Comment events
-  COMMENT_CREATED = "Comment.created",
-  COMMENT_UPDATED = "Comment.updated",
+  COMMENT_CREATED = 'Comment.created',
+  COMMENT_UPDATED = 'Comment.updated',
 
   // Project events
-  PROJECT_CREATED = "Project.created",
-  PROJECT_UPDATED = "Project.updated",
+  PROJECT_CREATED = 'Project.created',
+  PROJECT_UPDATED = 'Project.updated',
 
   // Cycle events
-  CYCLE_CREATED = "Cycle.created",
-  CYCLE_UPDATED = "Cycle.updated",
-  CYCLE_COMPLETED = "Cycle.completed"
+  CYCLE_CREATED = 'Cycle.created',
+  CYCLE_UPDATED = 'Cycle.updated',
+  CYCLE_COMPLETED = 'Cycle.completed',
 }
 ```
 
 ### Event Handler
+
 ```typescript
 class LinearWebhookHandler {
   async handleEvent(event: WebhookEvent, payload: any): Promise<void> {
-    switch(event) {
+    switch (event) {
       case WebhookEvent.ISSUE_CREATED:
         await this.onIssueCreated(payload);
         break;
@@ -990,7 +1017,7 @@ class LinearWebhookHandler {
 
   private async onIssueCreated(issue: Issue): Promise<void> {
     // Check if it's for the agent
-    if (issue.labels.some(l => l.name === "claude-code")) {
+    if (issue.labels.some((l) => l.name === 'claude-code')) {
       await this.assignAgent(issue);
       await this.startWork(issue);
     }
@@ -1001,15 +1028,14 @@ class LinearWebhookHandler {
 ## 7.3 Error Handling
 
 ### Rate Limiting
+
 ```typescript
 class LinearRateLimiter {
   private requests: number[] = [];
   private readonly limit = 1500; // Per hour
   private readonly window = 3600000; // 1 hour in ms
 
-  async executeWithLimit<T>(
-    fn: () => Promise<T>
-  ): Promise<T> {
+  async executeWithLimit<T>(fn: () => Promise<T>): Promise<T> {
     await this.waitIfNeeded();
 
     try {
@@ -1017,7 +1043,7 @@ class LinearRateLimiter {
       this.recordRequest();
       return result;
     } catch (error) {
-      if (error.message.includes("rate limit")) {
+      if (error.message.includes('rate limit')) {
         await this.handleRateLimit();
         return this.executeWithLimit(fn);
       }
@@ -1027,9 +1053,7 @@ class LinearRateLimiter {
 
   private async waitIfNeeded(): Promise<void> {
     const now = Date.now();
-    this.requests = this.requests.filter(
-      time => now - time < this.window
-    );
+    this.requests = this.requests.filter((time) => now - time < this.window);
 
     if (this.requests.length >= this.limit) {
       const oldestRequest = this.requests[0];
@@ -1041,17 +1065,10 @@ class LinearRateLimiter {
 ```
 
 ### Error Recovery
+
 ```typescript
-async function withRetry<T>(
-  fn: () => Promise<T>,
-  options: RetryOptions = {}
-): Promise<T> {
-  const {
-    maxAttempts = 3,
-    backoff = 1000,
-    multiplier = 2,
-    maxBackoff = 30000
-  } = options;
+async function withRetry<T>(fn: () => Promise<T>, options: RetryOptions = {}): Promise<T> {
+  const { maxAttempts = 3, backoff = 1000, multiplier = 2, maxBackoff = 30000 } = options;
 
   let lastError: Error;
 
@@ -1063,10 +1080,7 @@ async function withRetry<T>(
 
       if (attempt === maxAttempts) break;
 
-      const delay = Math.min(
-        backoff * Math.pow(multiplier, attempt - 1),
-        maxBackoff
-      );
+      const delay = Math.min(backoff * Math.pow(multiplier, attempt - 1), maxBackoff);
 
       console.log(`Attempt ${attempt} failed, retrying in ${delay}ms`);
       await sleep(delay);
@@ -1084,50 +1098,59 @@ async function withRetry<T>(
 ## 8.1 Issue Management Best Practices
 
 ### Naming Conventions
+
 ```yaml
 prefixes:
-  agent_tasks: "[CC]"        # Claude Code
-  assessments: "[ASSESS]"    # Assessment findings
-  fix_packs: "[FIX]"        # Fix pack implementations
-  pipeline: "[PIPE]"        # Pipeline issues
-  patterns: "[PATTERN]"     # Pattern detections
+  agent_tasks: '[CC]' # Claude Code
+  assessments: '[ASSESS]' # Assessment findings
+  fix_packs: '[FIX]' # Fix pack implementations
+  pipeline: '[PIPE]' # Pipeline issues
+  patterns: '[PATTERN]' # Pattern detections
 
-title_format: "${prefix} ${action} ${target}"
+title_format: '${prefix} ${action} ${target}'
 examples:
-  - "[CC] Refactor authentication module"
-  - "[ASSESS] High complexity in payment service"
-  - "[FIX] Remove dead code from utils"
-  - "[PIPE] Failed deployment to staging"
+  - '[CC] Refactor authentication module'
+  - '[ASSESS] High complexity in payment service'
+  - '[FIX] Remove dead code from utils'
+  - '[PIPE] Failed deployment to staging'
 ```
 
 ### Description Standards
+
 ```markdown
 ## Required Sections
 
 ### Objective
+
 Clear statement of what needs to be accomplished
 
 ### Context
+
 - Repository and branch information
 - Related issues or PRs
 - Technical constraints
 
 ### Success Criteria
+
 Measurable outcomes that define completion
 
 ### Technical Details
+
 Implementation specifics and approach
 
 ### Testing Plan
+
 How the changes will be validated
 
 ### Rollback Plan
+
 Steps to revert if issues arise
 ```
 
 ## 8.2 Automation Guidelines
 
 ### When to Automate
+
 ```yaml
 automate:
   - recurring_tasks: Daily assessments, reports
@@ -1143,6 +1166,7 @@ manual_review_required:
 ```
 
 ### Automation Safeguards
+
 ```typescript
 class AutomationSafeguards {
   // Rate limiting
@@ -1151,13 +1175,13 @@ class AutomationSafeguards {
 
   // Change limits
   private readonly maxBulkUpdates = 25;
-  private readonly requiresApproval = ["delete", "archive", "close"];
+  private readonly requiresApproval = ['delete', 'archive', 'close'];
 
   // Validation
   async validateAutomation(action: Action): Promise<boolean> {
     // Check rate limits
     if (await this.exceedsRateLimit(action)) {
-      throw new Error("Rate limit exceeded");
+      throw new Error('Rate limit exceeded');
     }
 
     // Check permissions
@@ -1167,7 +1191,7 @@ class AutomationSafeguards {
 
     // Validate scope
     if (action.affectedCount > this.maxBulkUpdates) {
-      throw new Error("Bulk operation exceeds limit");
+      throw new Error('Bulk operation exceeds limit');
     }
 
     return true;
@@ -1178,20 +1202,22 @@ class AutomationSafeguards {
 ## 8.3 Performance Optimization
 
 ### Batch Operations
+
 ```typescript
 // Inefficient: Individual API calls
 for (const issue of issues) {
-  await linear.updateIssue(issue.id, { stateId: "done" });
+  await linear.updateIssue(issue.id, { stateId: 'done' });
 }
 
 // Efficient: Batch mutation
 await linear.bulkUpdateIssues({
-  ids: issues.map(i => i.id),
-  stateId: "done"
+  ids: issues.map((i) => i.id),
+  stateId: 'done',
 });
 ```
 
 ### Caching Strategy
+
 ```typescript
 class LinearCache {
   private cache = new Map<string, CacheEntry>();
@@ -1207,7 +1233,7 @@ class LinearCache {
     const data = await fetcher();
     this.cache.set(key, {
       data,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
 
     return data;
@@ -1222,6 +1248,7 @@ class LinearCache {
 ## Common Issues
 
 ### Issue: API Connection Failures
+
 ```yaml
 symptoms:
   - "401 Unauthorized" errors
@@ -1241,6 +1268,7 @@ solutions:
 ```
 
 ### Issue: Webhook Events Not Received
+
 ```yaml
 symptoms:
   - Missing status updates
@@ -1260,6 +1288,7 @@ solutions:
 ```
 
 ### Issue: Duplicate Issues Created
+
 ```yaml
 symptoms:
   - Multiple issues for same finding
@@ -1281,73 +1310,80 @@ solutions:
 ## Debugging Tools
 
 ### Linear API Explorer
+
 ```typescript
 async function exploreLinearAPI(): Promise<void> {
   // Test connection
   const viewer = await linear.viewer;
-  console.log("Connected as:", viewer.email);
+  console.log('Connected as:', viewer.email);
 
   // List accessible teams
   const teams = await linear.teams();
-  console.log("Teams:", teams.nodes.map(t => t.name));
+  console.log(
+    'Teams:',
+    teams.nodes.map((t) => t.name),
+  );
 
   // Check permissions
   const team = teams.nodes[0];
   const permissions = await linear.teamMembership(team.id);
-  console.log("Permissions:", permissions);
+  console.log('Permissions:', permissions);
 
   // Test issue creation
   try {
     const test = await linear.createIssue({
-      title: "[TEST] API Connection Test",
-      teamId: team.id
+      title: '[TEST] API Connection Test',
+      teamId: team.id,
     });
-    console.log("Test issue created:", test.identifier);
+    console.log('Test issue created:', test.identifier);
 
     // Clean up
     await linear.deleteIssue(test.id);
   } catch (error) {
-    console.error("Issue creation failed:", error);
+    console.error('Issue creation failed:', error);
   }
 }
 ```
 
 ### Webhook Tester
+
 ```typescript
 async function testWebhook(url: string): Promise<void> {
   const testPayload = {
-    action: "issue.created",
-    type: "Issue",
+    action: 'issue.created',
+    type: 'Issue',
     data: {
-      id: "test-123",
-      title: "Test Issue",
-      createdAt: new Date().toISOString()
-    }
+      id: 'test-123',
+      title: 'Test Issue',
+      createdAt: new Date().toISOString(),
+    },
   };
 
   const response = await fetch(url, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
-      "Linear-Event": "Issue.created",
-      "Linear-Signature": generateSignature(testPayload)
+      'Content-Type': 'application/json',
+      'Linear-Event': 'Issue.created',
+      'Linear-Signature': generateSignature(testPayload),
     },
-    body: JSON.stringify(testPayload)
+    body: JSON.stringify(testPayload),
   });
 
-  console.log("Response:", response.status, await response.text());
+  console.log('Response:', response.status, await response.text());
 }
 ```
 
 ## Support Resources
 
 ### Documentation Links
+
 - [Linear API Documentation](https://developers.linear.app/docs/graphql/working-with-the-graphql-api)
 - [Linear SDK Reference](https://github.com/linear/linear-js)
 - [Webhook Events Guide](https://developers.linear.app/docs/graphql/webhooks)
 - [Rate Limiting Guidelines](https://developers.linear.app/docs/graphql/rate-limiting)
 
 ### Community Support
+
 - Linear Developer Forum
 - GitHub Discussions
 - Stack Overflow: `[linear-api]` tag
@@ -1359,6 +1395,7 @@ async function testWebhook(url: string): Promise<void> {
 The Linear integration provides comprehensive task management capabilities for the autonomous agent system. By following these guidelines and best practices, the system maintains transparency, accountability, and efficiency while seamlessly integrating with human workflows.
 
 Key takeaways:
+
 1. **Automation with Oversight**: Automate routine tasks while maintaining human control
 2. **Real-time Transparency**: Keep all stakeholders informed through Linear
 3. **Intelligent Prioritization**: Use data-driven decisions for task management
@@ -1369,4 +1406,4 @@ The integration continues to evolve with new features and improvements based on 
 
 ---
 
-*This document is maintained by the Engineering Excellence Team and updated with each Linear integration enhancement.*
+_This document is maintained by the Engineering Excellence Team and updated with each Linear integration enhancement._

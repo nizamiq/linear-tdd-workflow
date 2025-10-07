@@ -32,12 +32,14 @@ Test-Driven Development (TDD) is a software development methodology where you wr
 ### Benefits of TDD
 
 **Code Quality Benefits:**
+
 - **Higher test coverage** (typically 90%+)
 - **Better design** through interface-first thinking
 - **Fewer bugs** due to comprehensive testing
 - **Refactoring confidence** with safety net of tests
 
 **Development Benefits:**
+
 - **Clear requirements** expressed as executable tests
 - **Faster debugging** with pinpoint failure location
 - **Documentation** through living test examples
@@ -52,12 +54,14 @@ The Claude Agentic Workflow System enforces the classic TDD cycle: **RED → GRE
 **Objective**: Define what the code should do by writing a test that fails
 
 **Steps:**
+
 1. Start TDD watch mode: `npm test:watch`
 2. Write a small, focused test
 3. Run the test and verify it fails for the right reason
 4. Commit to the RED phase
 
 **Example:**
+
 ```javascript
 // tests/calculator.test.js
 import { Calculator } from '../src/calculator';
@@ -78,17 +82,19 @@ describe('Calculator', () => {
 **Objective**: Write minimal code to make the test pass
 
 **Steps:**
+
 1. Write the absolute minimum code needed
 2. Run tests to verify they pass
 3. Resist the urge to add extra functionality
 4. Commit to the GREEN phase
 
 **Example:**
+
 ```javascript
 // src/calculator.js
 export class Calculator {
   add(a, b) {
-    return a + b;  // Minimal implementation
+    return a + b; // Minimal implementation
   }
 }
 ```
@@ -100,12 +106,14 @@ export class Calculator {
 **Objective**: Improve code quality while keeping tests green
 
 **Steps:**
+
 1. Identify code smells or design improvements
 2. Refactor code while running tests continuously
 3. Ensure all tests remain green
 4. Commit to the REFACTOR phase
 
 **Example:**
+
 ```javascript
 // src/calculator.js
 /**
@@ -136,6 +144,7 @@ export class Calculator {
 The Claude Agentic Workflow System enforces TDD through multiple layers:
 
 #### 1. Pre-commit Hooks
+
 ```bash
 # Automatically runs before every commit
 npm run precommit
@@ -148,6 +157,7 @@ npm run precommit
 ```
 
 #### 2. CI/CD Quality Gates
+
 ```yaml
 # .github/workflows/ci.yml
 - name: TDD Compliance Check
@@ -161,6 +171,7 @@ npm run precommit
 ```
 
 #### 3. Agent Monitoring
+
 - **AUDITOR**: Continuously scans for untested code
 - **GUARDIAN**: Blocks PRs that violate TDD principles
 - **EXECUTOR**: Only implements fixes using TDD cycle
@@ -182,11 +193,7 @@ Configure TDD enforcement in `.claude/settings.json`:
       "critical_paths": 95
     },
     "exemptions": {
-      "file_patterns": [
-        "**/*.config.{js,ts}",
-        "**/*.spec.{js,ts}",
-        "**/scripts/**"
-      ]
+      "file_patterns": ["**/*.config.{js,ts}", "**/*.spec.{js,ts}", "**/scripts/**"]
     }
   }
 }
@@ -197,6 +204,7 @@ Configure TDD enforcement in `.claude/settings.json`:
 ### Daily TDD Development
 
 #### Morning Setup
+
 ```bash
 # Start your day with TDD readiness
 npm test:watch              # Start TDD watch mode
@@ -207,6 +215,7 @@ npm run assess             # Get quality baseline
 #### Feature Development Loop
 
 **1. Understand Requirements**
+
 ```bash
 # Review Linear task or requirements
 npm run linear:sync
@@ -214,6 +223,7 @@ npm run linear:sync
 ```
 
 **2. Start with Failing Test**
+
 ```javascript
 // tests/user-authentication.test.js
 describe('User Authentication', () => {
@@ -225,20 +235,22 @@ describe('User Authentication', () => {
       success: true,
       user: {
         email: 'user@example.com',
-        id: expect.any(String)
-      }
+        id: expect.any(String),
+      },
     });
   });
 });
 ```
 
 **3. Watch Test Fail (RED)**
+
 ```bash
 # In watch mode, test should fail
 # Error: Cannot find module '../src/user-authentication'
 ```
 
 **4. Minimal Implementation (GREEN)**
+
 ```javascript
 // src/user-authentication.js
 export class UserAuthentication {
@@ -249,8 +261,8 @@ export class UserAuthentication {
         success: true,
         user: {
           email: 'user@example.com',
-          id: '12345'
-        }
+          id: '12345',
+        },
       };
     }
     return { success: false };
@@ -259,12 +271,14 @@ export class UserAuthentication {
 ```
 
 **5. Watch Test Pass (GREEN)**
+
 ```bash
 # Test should now pass
 # ✓ should validate user credentials successfully
 ```
 
 **6. Add More Test Cases**
+
 ```javascript
 test('should reject invalid credentials', () => {
   const auth = new UserAuthentication();
@@ -272,7 +286,7 @@ test('should reject invalid credentials', () => {
 
   expect(result).toEqual({
     success: false,
-    error: 'Invalid credentials'
+    error: 'Invalid credentials',
   });
 });
 
@@ -282,12 +296,13 @@ test('should reject empty credentials', () => {
 
   expect(result).toEqual({
     success: false,
-    error: 'Email and password are required'
+    error: 'Email and password are required',
   });
 });
 ```
 
 **7. Improve Implementation**
+
 ```javascript
 // src/user-authentication.js
 export class UserAuthentication {
@@ -328,6 +343,7 @@ export class UserAuthentication {
 ```
 
 **8. Refactor and Clean Up (REFACTOR)**
+
 ```javascript
 // Extract interface
 export interface AuthenticationResult {
@@ -348,6 +364,7 @@ export interface AuthenticationResult {
 ### TDD with Different Testing Frameworks
 
 #### Jest (JavaScript/TypeScript)
+
 ```javascript
 // Setup in jest.config.js
 module.exports = {
@@ -358,17 +375,15 @@ module.exports = {
       branches: 80,
       functions: 80,
       lines: 80,
-      statements: 80
-    }
+      statements: 80,
+    },
   },
-  watchPlugins: [
-    'jest-watch-typeahead/filename',
-    'jest-watch-typeahead/testname'
-  ]
+  watchPlugins: ['jest-watch-typeahead/filename', 'jest-watch-typeahead/testname'],
 };
 ```
 
 #### pytest (Python)
+
 ```python
 # tests/test_calculator.py
 import pytest
@@ -408,6 +423,7 @@ class Calculator:
 The system enforces coverage at multiple levels:
 
 #### Line Coverage
+
 ```bash
 # Check current coverage
 npm test -- --coverage
@@ -419,23 +435,25 @@ npm test -- --coverage
 ```
 
 #### Branch Coverage
+
 ```javascript
 // Example: Testing all branches
 test('should handle all payment types', () => {
   const processor = new PaymentProcessor();
 
   // Test credit card branch
-  expect(processor.process({type: 'credit', amount: 100})).toBeDefined();
+  expect(processor.process({ type: 'credit', amount: 100 })).toBeDefined();
 
   // Test debit card branch
-  expect(processor.process({type: 'debit', amount: 100})).toBeDefined();
+  expect(processor.process({ type: 'debit', amount: 100 })).toBeDefined();
 
   // Test PayPal branch
-  expect(processor.process({type: 'paypal', amount: 100})).toBeDefined();
+  expect(processor.process({ type: 'paypal', amount: 100 })).toBeDefined();
 
   // Test invalid type branch
-  expect(() => processor.process({type: 'crypto', amount: 100}))
-    .toThrow('Unsupported payment type');
+  expect(() => processor.process({ type: 'crypto', amount: 100 })).toThrow(
+    'Unsupported payment type',
+  );
 });
 ```
 
@@ -484,6 +502,7 @@ describe('API Performance', () => {
 ### Test Organization Patterns
 
 #### AAA Pattern (Arrange-Act-Assert)
+
 ```javascript
 test('should calculate tax correctly', () => {
   // Arrange
@@ -500,13 +519,14 @@ test('should calculate tax correctly', () => {
 ```
 
 #### Given-When-Then Pattern
+
 ```javascript
 describe('User Registration', () => {
   test('given valid user data, when registering, then user should be created', async () => {
     // Given
     const userData = {
       email: 'user@example.com',
-      password: 'securePassword123'
+      password: 'securePassword123',
     };
     const userService = new UserService();
 
@@ -524,6 +544,7 @@ describe('User Registration', () => {
 ### Mocking and Stubbing Patterns
 
 #### Dependency Injection for Testability
+
 ```javascript
 // src/user-service.js
 export class UserService {
@@ -543,10 +564,10 @@ export class UserService {
 test('should send welcome email after registration', async () => {
   // Arrange
   const mockRepository = {
-    create: jest.fn().mockResolvedValue({ id: '123', email: 'user@example.com' })
+    create: jest.fn().mockResolvedValue({ id: '123', email: 'user@example.com' }),
   };
   const mockEmailService = {
-    sendWelcomeEmail: jest.fn().mockResolvedValue(true)
+    sendWelcomeEmail: jest.fn().mockResolvedValue(true),
   };
   const userService = new UserService(mockRepository, mockEmailService);
 
@@ -561,20 +582,18 @@ test('should send welcome email after registration', async () => {
 ### Error Handling Patterns
 
 #### Testing Exception Scenarios
+
 ```javascript
 test('should throw error for invalid input', () => {
   const calculator = new Calculator();
 
-  expect(() => calculator.divide(10, 0))
-    .toThrow('Division by zero is not allowed');
+  expect(() => calculator.divide(10, 0)).toThrow('Division by zero is not allowed');
 });
 
 test('should handle async errors', async () => {
   const apiClient = new ApiClient();
 
-  await expect(apiClient.fetchUser('invalid-id'))
-    .rejects
-    .toThrow('User not found');
+  await expect(apiClient.fetchUser('invalid-id')).rejects.toThrow('User not found');
 });
 ```
 
@@ -587,28 +606,23 @@ test('should handle async errors', async () => {
 import fc from 'fast-check';
 
 test('addition should be commutative', () => {
-  fc.assert(fc.property(
-    fc.integer(),
-    fc.integer(),
-    (a, b) => {
+  fc.assert(
+    fc.property(fc.integer(), fc.integer(), (a, b) => {
       const calc = new Calculator();
       expect(calc.add(a, b)).toBe(calc.add(b, a));
-    }
-  ));
+    }),
+  );
 });
 
 test('addition should be associative', () => {
-  fc.assert(fc.property(
-    fc.integer(),
-    fc.integer(),
-    fc.integer(),
-    (a, b, c) => {
+  fc.assert(
+    fc.property(fc.integer(), fc.integer(), fc.integer(), (a, b, c) => {
       const calc = new Calculator();
       const result1 = calc.add(calc.add(a, b), c);
       const result2 = calc.add(a, calc.add(b, c));
       expect(result1).toBe(result2);
-    }
-  ));
+    }),
+  );
 });
 ```
 
@@ -622,7 +636,7 @@ export class UserBuilder {
       email: 'default@example.com',
       name: 'Default User',
       age: 25,
-      active: true
+      active: true,
     };
   }
 
@@ -648,10 +662,7 @@ export class UserBuilder {
 
 // Usage in tests
 test('should validate adult users', () => {
-  const user = new UserBuilder()
-    .withAge(21)
-    .withEmail('adult@example.com')
-    .build();
+  const user = new UserBuilder().withAge(21).withEmail('adult@example.com').build();
 
   const validator = new UserValidator();
   const result = validator.validateAge(user);
@@ -669,7 +680,7 @@ describe.each([
   [1, 1, 2],
   [0, 5, 5],
   [-1, 1, 0],
-  [-2, -3, -5]
+  [-2, -3, -5],
 ])('Calculator.add(%i, %i)', (a, b, expected) => {
   test(`should return ${expected}`, () => {
     const calc = new Calculator();
@@ -691,7 +702,7 @@ describe('User API Contract', () => {
       id: expect.any(String),
       email: expect.any(String),
       name: expect.any(String),
-      createdAt: expect.any(String)
+      createdAt: expect.any(String),
     });
   });
 });
@@ -704,11 +715,13 @@ describe('User API Contract', () => {
 #### Problem: "Tests are too slow"
 
 **Symptoms:**
+
 - Test suite takes >30 seconds to run
 - TDD cycle becomes sluggish
 - Developers avoid running tests
 
 **Solutions:**
+
 ```bash
 # Run specific test files
 npm test -- user-service.test.js
@@ -726,11 +739,13 @@ npm test -- --maxWorkers=4
 #### Problem: "Coverage requirements too strict"
 
 **Symptoms:**
+
 - Cannot commit changes due to coverage failures
 - Spending too much time writing trivial tests
 - Team resistance to TDD
 
 **Solutions:**
+
 ```json
 // Temporarily lower thresholds
 {
@@ -738,7 +753,7 @@ npm test -- --maxWorkers=4
     "coverage": {
       "thresholds": {
         "global": {
-          "lines": 70  // Gradually increase over time
+          "lines": 70 // Gradually increase over time
         }
       }
     }
@@ -749,11 +764,13 @@ npm test -- --maxWorkers=4
 #### Problem: "TDD blocking urgent fixes"
 
 **Symptoms:**
+
 - Production issue needs immediate fix
 - TDD enforcement preventing deployment
 - Time pressure conflicts with test-first approach
 
 **Solutions:**
+
 ```bash
 # Emergency bypass (use sparingly)
 export CLAUDE_TDD_ENFORCEMENT=false
@@ -766,6 +783,7 @@ export CLAUDE_TDD_ENFORCEMENT=true
 ### Debugging Test Failures
 
 #### Analyzing Test Output
+
 ```bash
 # Verbose test output
 npm test -- --verbose
@@ -780,6 +798,7 @@ node --inspect-brk node_modules/.bin/jest --runInBand user.test.js
 #### Common Test Anti-patterns
 
 **❌ Testing Implementation Details**
+
 ```javascript
 // Bad: Testing internal method
 test('should call validateInput method', () => {
@@ -795,12 +814,12 @@ test('should call validateInput method', () => {
 test('should reject invalid user data', () => {
   const service = new UserService();
 
-  expect(() => service.createUser({}))
-    .toThrow('Invalid user data'); // Testing behavior
+  expect(() => service.createUser({})).toThrow('Invalid user data'); // Testing behavior
 });
 ```
 
 **❌ Overly Complex Tests**
+
 ```javascript
 // Bad: Complex setup
 test('should process complex user workflow', () => {
@@ -826,6 +845,7 @@ test('should create user with valid data', () => {
 ### Gradual TDD Introduction
 
 #### Phase 1: Assessment and Training (Week 1-2)
+
 ```bash
 # Team assessment
 npm run assess
@@ -837,18 +857,20 @@ npm run agent:invoke DOCUMENTER:tdd-best-practices
 ```
 
 #### Phase 2: TDD for New Features (Week 3-6)
+
 ```json
 {
   "tdd": {
     "enforcement_mode": "new_code_only",
     "coverage_requirements": {
-      "new_code": 75  // Start lower
+      "new_code": 75 // Start lower
     }
   }
 }
 ```
 
 #### Phase 3: Legacy Code Improvement (Month 2-3)
+
 ```bash
 # Identify legacy code for improvement
 npm run agent:invoke AUDITOR:legacy-analysis
@@ -861,6 +883,7 @@ npm run generate:test-stubs -- --legacy-coverage
 ```
 
 #### Phase 4: Full TDD Adoption (Month 3+)
+
 ```json
 {
   "tdd": {
@@ -877,6 +900,7 @@ npm run generate:test-stubs -- --legacy-coverage
 ### Team TDD Metrics
 
 #### Track TDD Adoption
+
 ```bash
 # TDD compliance metrics
 npm run agent:invoke SCHOLAR:tdd-metrics
@@ -889,6 +913,7 @@ npm run agent:invoke STRATEGIST:team-tdd-performance
 ```
 
 **Key Metrics:**
+
 - **TDD Compliance Rate**: % of changes following TDD cycle
 - **Test Coverage Trend**: Coverage over time
 - **Test Quality Score**: Mutation testing results
@@ -908,6 +933,7 @@ npm run agent:invoke STRATEGIST:team-tdd-performance
 ### Test Quality Guidelines
 
 #### Good Test Characteristics
+
 - **Fast**: Runs quickly (< 100ms per test)
 - **Isolated**: Independent of other tests
 - **Repeatable**: Same result every time
@@ -915,6 +941,7 @@ npm run agent:invoke STRATEGIST:team-tdd-performance
 - **Timely**: Written just before production code
 
 #### Test Naming Conventions
+
 ```javascript
 // Pattern: should_ExpectedBehavior_When_StateUnderTest
 test('should_ReturnSum_When_AddingTwoPositiveNumbers', () => {
@@ -935,6 +962,7 @@ test('should calculate total price including tax', () => {
 ### TDD Code Review Checklist
 
 #### Reviewing TDD Implementation
+
 - [ ] Tests written before implementation
 - [ ] Tests fail for right reasons (RED phase)
 - [ ] Minimal implementation makes tests pass (GREEN phase)
@@ -945,6 +973,7 @@ test('should calculate total price including tax', () => {
 - [ ] Appropriate use of mocks and stubs
 
 #### Agent-Assisted Review
+
 ```bash
 # Automated TDD compliance check
 npm run agent:invoke REVIEWER:tdd-compliance -- --pr-number 123
@@ -961,6 +990,7 @@ npm run agent:invoke ANALYZER:coverage-analysis
 **TDD Mastery takes practice, but the Claude Agentic Workflow System provides the structure and enforcement to make it successful. Embrace the cycle, trust the process, and enjoy the benefits of higher quality code! 🚀**
 
 **For additional TDD resources:**
+
 - [User Guide](USER-GUIDE.md) - Complete system overview
 - [FAQ](FAQ.md) - Common TDD questions
 - [Troubleshooting](TROUBLESHOOTING.md) - TDD issue resolution

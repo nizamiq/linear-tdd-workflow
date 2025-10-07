@@ -13,7 +13,7 @@ class TestingTaskValidator {
       coverage: this.getCoverageTaskRules(),
       tdd: this.getTDDTaskRules(),
       testing: this.getGeneralTestingRules(),
-      specification: this.getSpecificationTaskRules()
+      specification: this.getSpecificationTaskRules(),
     };
 
     this.requiredLabels = {
@@ -21,7 +21,7 @@ class TestingTaskValidator {
       tdd: ['tdd', 'process'],
       security: ['security', 'testing'],
       performance: ['performance', 'testing'],
-      integration: ['integration', 'testing']
+      integration: ['integration', 'testing'],
     };
 
     this.estimationGuidelines = {
@@ -30,7 +30,7 @@ class TestingTaskValidator {
       e2eTest: { min: 3, max: 8, typical: 5 },
       securityTest: { min: 3, max: 8, typical: 5 },
       performanceTest: { min: 5, max: 13, typical: 8 },
-      tddViolationFix: { min: 1, max: 5, typical: 2 }
+      tddViolationFix: { min: 1, max: 5, typical: 2 },
     };
   }
 
@@ -38,11 +38,7 @@ class TestingTaskValidator {
    * Validate a testing-related task
    */
   validateTestingTask(task, options = {}) {
-    const {
-      strict = false,
-      project = 'default',
-      enforceEstimation = true
-    } = options;
+    const { strict = false, project = 'default', enforceEstimation = true } = options;
 
     const violations = [];
     const taskType = this.inferTaskType(task);
@@ -70,7 +66,7 @@ class TestingTaskValidator {
       isValid: violations.length === 0,
       violations,
       taskType,
-      recommendations: this.generateRecommendations(task, violations, taskType)
+      recommendations: this.generateRecommendations(task, violations, taskType),
     };
   }
 
@@ -92,9 +88,11 @@ class TestingTaskValidator {
     // Check title and description
     if (title.includes('coverage') || description.includes('coverage')) return 'coverage';
     if (title.includes('tdd') || description.includes('tdd')) return 'tdd';
-    if (title.includes('specification') || description.includes('specification')) return 'specification';
+    if (title.includes('specification') || description.includes('specification'))
+      return 'specification';
     if (title.includes('security test') || description.includes('security test')) return 'security';
-    if (title.includes('performance test') || description.includes('performance test')) return 'performance';
+    if (title.includes('performance test') || description.includes('performance test'))
+      return 'performance';
 
     return 'testing'; // Default fallback
   }
@@ -111,7 +109,7 @@ class TestingTaskValidator {
         field: 'title',
         severity: 'error',
         rule: 'minimum-length',
-        message: 'Task title must be at least 10 characters'
+        message: 'Task title must be at least 10 characters',
       });
     }
 
@@ -120,7 +118,7 @@ class TestingTaskValidator {
         field: 'title',
         severity: 'warning',
         rule: 'maximum-length',
-        message: 'Task title should be under 60 characters for readability'
+        message: 'Task title should be under 60 characters for readability',
       });
     }
 
@@ -130,7 +128,7 @@ class TestingTaskValidator {
         field: 'description',
         severity: 'error',
         rule: 'minimum-content',
-        message: 'Task description must be at least 50 characters and provide clear context'
+        message: 'Task description must be at least 50 characters and provide clear context',
       });
     }
 
@@ -140,7 +138,7 @@ class TestingTaskValidator {
         field: 'labels',
         severity: 'error',
         rule: 'required-testing-label',
-        message: 'All testing tasks must have the "testing" label'
+        message: 'All testing tasks must have the "testing" label',
       });
     }
 
@@ -150,7 +148,7 @@ class TestingTaskValidator {
         field: 'estimate',
         severity: 'error',
         rule: 'required-estimate',
-        message: 'Testing tasks must have story point estimates'
+        message: 'Testing tasks must have story point estimates',
       });
     }
 
@@ -160,7 +158,7 @@ class TestingTaskValidator {
         field: 'priority',
         severity: 'warning',
         rule: 'missing-priority',
-        message: 'Testing tasks should have explicit priority'
+        message: 'Testing tasks should have explicit priority',
       });
     }
 
@@ -181,7 +179,7 @@ class TestingTaskValidator {
           field: 'labels',
           severity: 'error',
           rule: 'coverage-label-required',
-          message: 'Coverage tasks must have "coverage" label'
+          message: 'Coverage tasks must have "coverage" label',
         });
       }
 
@@ -191,17 +189,20 @@ class TestingTaskValidator {
           field: 'description',
           severity: 'warning',
           rule: 'coverage-target-missing',
-          message: 'Coverage tasks should specify target coverage percentage'
+          message: 'Coverage tasks should specify target coverage percentage',
         });
       }
 
       // Should have acceptance criteria
-      if (!task.description?.includes('Acceptance Criteria') && !task.description?.includes('- [ ]')) {
+      if (
+        !task.description?.includes('Acceptance Criteria') &&
+        !task.description?.includes('- [ ]')
+      ) {
         violations.push({
           field: 'description',
           severity: 'warning',
           rule: 'missing-acceptance-criteria',
-          message: 'Coverage tasks should include acceptance criteria checklist'
+          message: 'Coverage tasks should include acceptance criteria checklist',
         });
       }
 
@@ -213,7 +214,7 @@ class TestingTaskValidator {
             field: 'description',
             severity: 'error',
             rule: 'missing-component-reference',
-            message: 'Coverage tasks must specify the module or component being tested'
+            message: 'Coverage tasks must specify the module or component being tested',
           });
         }
 
@@ -223,7 +224,7 @@ class TestingTaskValidator {
             field: 'labels',
             severity: 'error',
             rule: 'missing-technical-debt-label',
-            message: 'Coverage gap tasks must be labeled as technical debt'
+            message: 'Coverage gap tasks must be labeled as technical debt',
           });
         }
       }
@@ -246,14 +247,14 @@ class TestingTaskValidator {
           field: 'labels',
           severity: 'error',
           rule: 'tdd-label-required',
-          message: 'TDD tasks must have "tdd" or "process" label'
+          message: 'TDD tasks must have "tdd" or "process" label',
         });
       }
 
       // Description must mention RED-GREEN-REFACTOR or TDD cycle
       const tddKeywords = ['red-green-refactor', 'tdd', 'test-driven', 'failing test'];
-      const hasKeyword = tddKeywords.some(keyword =>
-        task.description?.toLowerCase().includes(keyword)
+      const hasKeyword = tddKeywords.some((keyword) =>
+        task.description?.toLowerCase().includes(keyword),
       );
 
       if (!hasKeyword) {
@@ -261,7 +262,7 @@ class TestingTaskValidator {
           field: 'description',
           severity: 'warning',
           rule: 'missing-tdd-context',
-          message: 'TDD tasks should reference TDD methodology or cycle'
+          message: 'TDD tasks should reference TDD methodology or cycle',
         });
       }
 
@@ -271,7 +272,7 @@ class TestingTaskValidator {
           field: 'description',
           severity: 'warning',
           rule: 'missing-commit-reference',
-          message: 'TDD violation tasks should reference the specific commit'
+          message: 'TDD violation tasks should reference the specific commit',
         });
       }
 
@@ -288,9 +289,10 @@ class TestingTaskValidator {
 
       // Should specify test type
       const testTypes = ['unit', 'integration', 'e2e', 'end-to-end', 'performance', 'security'];
-      const hasTestType = testTypes.some(type =>
-        task.title?.toLowerCase().includes(type) ||
-        task.description?.toLowerCase().includes(type)
+      const hasTestType = testTypes.some(
+        (type) =>
+          task.title?.toLowerCase().includes(type) ||
+          task.description?.toLowerCase().includes(type),
       );
 
       if (!hasTestType) {
@@ -298,14 +300,14 @@ class TestingTaskValidator {
           field: 'description',
           severity: 'info',
           rule: 'test-type-clarification',
-          message: 'Consider specifying test type (unit, integration, e2e, etc.)'
+          message: 'Consider specifying test type (unit, integration, e2e, etc.)',
         });
       }
 
       // Should mention testing framework or tools
       const frameworks = ['jest', 'pytest', 'mocha', 'jasmine', 'cypress', 'playwright'];
-      const mentionsFramework = frameworks.some(framework =>
-        task.description?.toLowerCase().includes(framework)
+      const mentionsFramework = frameworks.some((framework) =>
+        task.description?.toLowerCase().includes(framework),
       );
 
       if (!mentionsFramework && task.estimate > 3) {
@@ -313,7 +315,7 @@ class TestingTaskValidator {
           field: 'description',
           severity: 'info',
           rule: 'framework-suggestion',
-          message: 'Consider mentioning testing framework or tools for larger tasks'
+          message: 'Consider mentioning testing framework or tools for larger tasks',
         });
       }
 
@@ -335,7 +337,7 @@ class TestingTaskValidator {
           field: 'labels',
           severity: 'error',
           rule: 'specification-label-required',
-          message: 'Specification tasks must have "specification" label'
+          message: 'Specification tasks must have "specification" label',
         });
       }
 
@@ -346,7 +348,7 @@ class TestingTaskValidator {
           field: 'description',
           severity: 'warning',
           rule: 'missing-specification-id',
-          message: 'Specification tasks should reference specific requirement ID'
+          message: 'Specification tasks should reference specific requirement ID',
         });
       }
 
@@ -356,7 +358,7 @@ class TestingTaskValidator {
           field: 'description',
           severity: 'info',
           rule: 'user-story-format-suggestion',
-          message: 'User-facing features should include user story format'
+          message: 'User-facing features should include user story format',
         });
       }
 
@@ -383,7 +385,7 @@ class TestingTaskValidator {
           field: 'estimate',
           severity: 'warning',
           rule: 'estimate-too-low',
-          message: `Estimate of ${task.estimate} seems low for ${taskType} tasks (typical: ${guidelines.typical} points)`
+          message: `Estimate of ${task.estimate} seems low for ${taskType} tasks (typical: ${guidelines.typical} points)`,
         });
       }
 
@@ -392,7 +394,7 @@ class TestingTaskValidator {
           field: 'estimate',
           severity: 'warning',
           rule: 'estimate-too-high',
-          message: `Estimate of ${task.estimate} seems high for ${taskType} tasks (consider breaking down, typical: ${guidelines.typical} points)`
+          message: `Estimate of ${task.estimate} seems high for ${taskType} tasks (consider breaking down, typical: ${guidelines.typical} points)`,
         });
       }
     }
@@ -404,7 +406,7 @@ class TestingTaskValidator {
         field: 'estimate',
         severity: 'info',
         rule: 'non-fibonacci-estimate',
-        message: 'Consider using Fibonacci numbers for estimates (1, 2, 3, 5, 8, 13)'
+        message: 'Consider using Fibonacci numbers for estimates (1, 2, 3, 5, 8, 13)',
       });
     }
 
@@ -449,21 +451,24 @@ class TestingTaskValidator {
     const violations = [];
 
     // Test files should be mentioned for implementation tasks
-    if ((task.title?.includes('implement') || task.title?.includes('create')) &&
-        !task.description?.includes('.test.') && !task.description?.includes('.spec.')) {
+    if (
+      (task.title?.includes('implement') || task.title?.includes('create')) &&
+      !task.description?.includes('.test.') &&
+      !task.description?.includes('.spec.')
+    ) {
       violations.push({
         field: 'description',
         severity: 'info',
         rule: 'test-file-mention',
-        message: 'Consider mentioning specific test files to be created or modified'
+        message: 'Consider mentioning specific test files to be created or modified',
       });
     }
 
     // Coverage tasks should mention coverage tools
     if (taskType === 'coverage' && task.estimate > 3) {
       const coverageTools = ['jest', 'nyc', 'istanbul', 'pytest-cov', 'coverage.py'];
-      const mentionsTool = coverageTools.some(tool =>
-        task.description?.toLowerCase().includes(tool)
+      const mentionsTool = coverageTools.some((tool) =>
+        task.description?.toLowerCase().includes(tool),
       );
 
       if (!mentionsTool) {
@@ -471,16 +476,23 @@ class TestingTaskValidator {
           field: 'description',
           severity: 'info',
           rule: 'coverage-tool-suggestion',
-          message: 'Consider mentioning coverage tools to be used'
+          message: 'Consider mentioning coverage tools to be used',
         });
       }
     }
 
     // Tasks touching critical paths should have higher priority
-    const criticalKeywords = ['authentication', 'authorization', 'payment', 'security', 'data validation'];
-    const touchesCriticalPath = criticalKeywords.some(keyword =>
-      task.title?.toLowerCase().includes(keyword) ||
-      task.description?.toLowerCase().includes(keyword)
+    const criticalKeywords = [
+      'authentication',
+      'authorization',
+      'payment',
+      'security',
+      'data validation',
+    ];
+    const touchesCriticalPath = criticalKeywords.some(
+      (keyword) =>
+        task.title?.toLowerCase().includes(keyword) ||
+        task.description?.toLowerCase().includes(keyword),
     );
 
     if (touchesCriticalPath && task.priority > 2) {
@@ -488,7 +500,7 @@ class TestingTaskValidator {
         field: 'priority',
         severity: 'warning',
         rule: 'critical-path-priority',
-        message: 'Tasks touching critical paths should have high priority'
+        message: 'Tasks touching critical paths should have high priority',
       });
     }
 
@@ -512,7 +524,7 @@ class TestingTaskValidator {
             field: 'labels',
             severity: 'warning',
             rule: 'project-required-label',
-            message: `Project ${project} requires "${requiredLabel}" label for testing tasks`
+            message: `Project ${project} requires "${requiredLabel}" label for testing tasks`,
           });
         }
       }
@@ -525,7 +537,7 @@ class TestingTaskValidator {
           field: 'estimate',
           severity: 'error',
           rule: 'project-estimation-limit',
-          message: `Project ${project} limits task estimates to ${projectStandards.estimationLimits.max} points`
+          message: `Project ${project} limits task estimates to ${projectStandards.estimationLimits.max} points`,
         });
       }
     }
@@ -540,18 +552,18 @@ class TestingTaskValidator {
     const standards = {
       default: {
         requiredLabels: [],
-        estimationLimits: { max: 13 }
+        estimationLimits: { max: 13 },
       },
       'linear-tdd-workflow': {
         requiredLabels: ['testing'],
         estimationLimits: { max: 8 }, // Smaller tasks preferred
-        requiresAcceptanceCriteria: true
+        requiresAcceptanceCriteria: true,
       },
       enterprise: {
         requiredLabels: ['testing', 'compliance'],
         estimationLimits: { max: 13 },
-        requiresSecurityReview: true
-      }
+        requiresSecurityReview: true,
+      },
     };
 
     return standards[project] || standards.default;
@@ -564,9 +576,9 @@ class TestingTaskValidator {
     const recommendations = [];
 
     // Group violations by type
-    const errorViolations = violations.filter(v => v.severity === 'error');
-    const warningViolations = violations.filter(v => v.severity === 'warning');
-    const infoViolations = violations.filter(v => v.severity === 'info');
+    const errorViolations = violations.filter((v) => v.severity === 'error');
+    const warningViolations = violations.filter((v) => v.severity === 'warning');
+    const infoViolations = violations.filter((v) => v.severity === 'info');
 
     // High priority recommendations for errors
     if (errorViolations.length > 0) {
@@ -574,7 +586,7 @@ class TestingTaskValidator {
         priority: 'HIGH',
         category: 'Required Fixes',
         message: `Fix ${errorViolations.length} critical validation errors before task creation`,
-        actions: errorViolations.map(v => v.message)
+        actions: errorViolations.map((v) => v.message),
       });
     }
 
@@ -584,7 +596,7 @@ class TestingTaskValidator {
         priority: 'MEDIUM',
         category: 'Quality Improvements',
         message: `Address ${warningViolations.length} quality issues for better task clarity`,
-        actions: warningViolations.map(v => v.message)
+        actions: warningViolations.map((v) => v.message),
       });
     }
 
@@ -595,7 +607,7 @@ class TestingTaskValidator {
         priority: 'LOW',
         category: `${taskType} Best Practices`,
         message: `Consider these ${taskType}-specific improvements`,
-        actions: typeRecommendations
+        actions: typeRecommendations,
       });
     }
 
@@ -605,7 +617,7 @@ class TestingTaskValidator {
         priority: 'INFO',
         category: 'Suggestions',
         message: `Optional improvements for enhanced task quality`,
-        actions: infoViolations.map(v => v.message)
+        actions: infoViolations.map((v) => v.message),
       });
     }
 
@@ -663,11 +675,11 @@ class TestingTaskValidator {
         compliant: 0,
         violations: 0,
         warnings: 0,
-        errors: 0
+        errors: 0,
       },
       byType: {},
       violations: [],
-      recommendations: []
+      recommendations: [],
     };
 
     for (const task of tasks) {
@@ -682,8 +694,8 @@ class TestingTaskValidator {
       }
 
       // Count violation severities
-      const errors = validation.violations.filter(v => v.severity === 'error').length;
-      const warnings = validation.violations.filter(v => v.severity === 'warning').length;
+      const errors = validation.violations.filter((v) => v.severity === 'error').length;
+      const warnings = validation.violations.filter((v) => v.severity === 'warning').length;
 
       report.summary.errors += errors;
       report.summary.warnings += warnings;
@@ -693,7 +705,7 @@ class TestingTaskValidator {
         report.byType[taskType] = {
           total: 0,
           compliant: 0,
-          violations: 0
+          violations: 0,
         };
       }
 
@@ -710,14 +722,14 @@ class TestingTaskValidator {
           task: task.title,
           taskType,
           violations: validation.violations,
-          recommendations: validation.recommendations
+          recommendations: validation.recommendations,
         });
       }
     }
 
     // Calculate compliance rate
     report.summary.complianceRate = Math.round(
-      (report.summary.compliant / report.summary.total) * 100
+      (report.summary.compliant / report.summary.total) * 100,
     );
 
     return report;

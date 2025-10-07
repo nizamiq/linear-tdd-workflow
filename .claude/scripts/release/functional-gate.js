@@ -31,7 +31,7 @@ class FunctionalGate {
       passed: false,
       implementedCount: 0,
       totalTests: 0,
-      failures: []
+      failures: [],
     };
   }
 
@@ -68,8 +68,7 @@ class FunctionalGate {
     const features = this.registry.features || {};
 
     // Step 1: Check for partial features (automatic block)
-    const partialFeatures = Object.entries(features)
-      .filter(([_, f]) => f.status === 'partial');
+    const partialFeatures = Object.entries(features).filter(([_, f]) => f.status === 'partial');
 
     if (partialFeatures.length > 0) {
       console.log('❌ PARTIAL FEATURES DETECTED (blocks release)\n');
@@ -81,14 +80,13 @@ class FunctionalGate {
 
         this.results.failures.push({
           feature: slug,
-          reason: 'Partial status - implemented but no E2E test'
+          reason: 'Partial status - implemented but no E2E test',
         });
       });
     }
 
     // Step 2: Find all implemented features
-    const implemented = Object.entries(features)
-      .filter(([_, f]) => f.status === 'implemented');
+    const implemented = Object.entries(features).filter(([_, f]) => f.status === 'implemented');
 
     this.results.implementedCount = implemented.length;
 
@@ -113,7 +111,7 @@ class FunctionalGate {
 
         this.results.failures.push({
           feature: slug,
-          reason: 'No e2e_test specified in registry'
+          reason: 'No e2e_test specified in registry',
         });
       } else {
         console.log(`✅ ${slug}`);
@@ -134,7 +132,7 @@ class FunctionalGate {
       this.results.totalTests = testResults.total;
 
       if (!testResults.passed) {
-        testResults.failures.forEach(failure => {
+        testResults.failures.forEach((failure) => {
           this.results.failures.push(failure);
         });
       }
@@ -156,7 +154,7 @@ class FunctionalGate {
       console.log('═'.repeat(80));
       console.log(`\n❌ ${this.results.failures.length} issue(s) blocking release:\n`);
 
-      this.results.failures.forEach(failure => {
+      this.results.failures.forEach((failure) => {
         console.log(`   Feature: ${failure.feature}`);
         console.log(`   Reason: ${failure.reason}`);
         console.log('');
@@ -180,7 +178,7 @@ class FunctionalGate {
     const result = {
       passed: true,
       total: 0,
-      failures: []
+      failures: [],
     };
 
     try {
@@ -188,12 +186,11 @@ class FunctionalGate {
       console.log('Running: npm run test:e2e');
       execSync('npm run test:e2e', {
         cwd: this.projectRoot,
-        stdio: 'inherit'
+        stdio: 'inherit',
       });
 
       result.total = testsToRun.length;
       console.log(`\n✅ All ${result.total} E2E tests passed\n`);
-
     } catch (error) {
       result.passed = false;
 
@@ -201,7 +198,7 @@ class FunctionalGate {
       testsToRun.forEach(({ slug, feature }) => {
         result.failures.push({
           feature: slug,
-          reason: `E2E test failed: ${feature.e2e_test}`
+          reason: `E2E test failed: ${feature.e2e_test}`,
         });
       });
 
@@ -222,7 +219,7 @@ async function main() {
 }
 
 if (require.main === module) {
-  main().catch(error => {
+  main().catch((error) => {
     console.error('❌ Functional gate error:', error.message);
     process.exit(1);
   });

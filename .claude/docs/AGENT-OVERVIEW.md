@@ -65,6 +65,7 @@ The Claude Agentic Workflow System operates through a sophisticated network of 2
 ### Agent Communication
 
 Agents communicate through:
+
 - **Linear.app Integration**: Task creation, status updates, assignments
 - **MCP Protocol**: Tool access and operation coordination
 - **Internal Messaging**: Direct agent-to-agent communication
@@ -79,6 +80,7 @@ The core agents are always active and handle fundamental system operations.
 **Primary Responsibility**: Continuous code quality monitoring and issue detection
 
 #### Capabilities
+
 - **Comprehensive Code Scanning**: Analyzes entire codebase for quality issues
 - **Issue Classification**: Categorizes problems by severity and type
 - **Linear Task Creation**: Automatically creates improvement tasks
@@ -86,6 +88,7 @@ The core agents are always active and handle fundamental system operations.
 - **Pattern Recognition**: Identifies recurring quality problems
 
 #### Key Operations
+
 ```bash
 # Full codebase assessment
 npm run agent:invoke AUDITOR:assess-code -- --scope full
@@ -104,6 +107,7 @@ npm run agent:invoke AUDITOR:generate-fix-candidates
 ```
 
 #### Configuration Options
+
 ```json
 {
   "agent": "AUDITOR",
@@ -131,6 +135,7 @@ npm run agent:invoke AUDITOR:generate-fix-candidates
 **Primary Responsibility**: Implements approved fixes using strict TDD methodology
 
 #### Capabilities
+
 - **TDD-Driven Implementation**: Follows RED→GREEN→REFACTOR cycle
 - **Fix Pack Management**: Implements atomic changes ≤300 LOC
 - **Rollback Capability**: Automatic rollback on failure
@@ -138,6 +143,7 @@ npm run agent:invoke AUDITOR:generate-fix-candidates
 - **Safety Mechanisms**: Multiple validation layers
 
 #### Key Operations
+
 ```bash
 # Implement specific Fix Pack
 npm run agent:invoke EXECUTOR:implement-fix -- --task-id CLEAN-123
@@ -156,6 +162,7 @@ npm run agent:invoke EXECUTOR:status
 ```
 
 #### Safety Features
+
 - **Test-First Implementation**: Must write failing tests before code
 - **Coverage Validation**: Ensures adequate test coverage
 - **Automated Rollback**: Reverts changes on test failures
@@ -167,6 +174,7 @@ npm run agent:invoke EXECUTOR:status
 **Primary Responsibility**: Monitors and protects CI/CD pipelines with auto-recovery
 
 #### Capabilities
+
 - **Pipeline Monitoring**: Real-time health monitoring
 - **Failure Detection**: Intelligent failure pattern recognition
 - **Auto-Recovery**: Automatic pipeline recovery strategies
@@ -174,6 +182,7 @@ npm run agent:invoke EXECUTOR:status
 - **Incident Management**: Creates and manages incident tickets
 
 #### Key Operations
+
 ```bash
 # Check all pipeline health
 npm run agent:invoke GUARDIAN:check-pipelines
@@ -192,6 +201,7 @@ npm run agent:invoke GUARDIAN:recovery-stats
 ```
 
 #### Auto-Recovery Strategies
+
 - **Retry with Backoff**: Intelligent retry mechanisms
 - **Resource Scaling**: Automatic resource allocation
 - **Environment Reset**: Clean environment restoration
@@ -203,6 +213,7 @@ npm run agent:invoke GUARDIAN:recovery-stats
 **Primary Responsibility**: Coordinates multi-agent workflows and Linear integration
 
 #### Capabilities
+
 - **Multi-Agent Coordination**: Orchestrates complex workflows
 - **Linear Integration**: Full task management lifecycle
 - **Resource Optimization**: Efficient resource allocation
@@ -210,6 +221,7 @@ npm run agent:invoke GUARDIAN:recovery-stats
 - **Workload Balancing**: Distributes work across agents
 
 #### Key Operations
+
 ```bash
 # Plan next sprint
 npm run agent:invoke STRATEGIST:plan-sprint
@@ -228,6 +240,7 @@ npm run agent:invoke STRATEGIST:coordination-report
 ```
 
 #### Linear Management
+
 - **Task Creation**: Creates tasks based on agent findings
 - **Assignment Management**: Assigns tasks to appropriate agents
 - **Progress Tracking**: Real-time progress updates
@@ -238,6 +251,7 @@ npm run agent:invoke STRATEGIST:coordination-report
 **Primary Responsibility**: Continuous learning and system optimization
 
 #### Capabilities
+
 - **Pattern Analysis**: Identifies successful patterns and anti-patterns
 - **Performance Optimization**: Improves system efficiency
 - **Knowledge Extraction**: Builds knowledge base from experiences
@@ -245,6 +259,7 @@ npm run agent:invoke STRATEGIST:coordination-report
 - **System Evolution**: Recommends system improvements
 
 #### Key Operations
+
 ```bash
 # Analyze recent patterns
 npm run agent:invoke SCHOLAR:analyze-patterns
@@ -263,6 +278,7 @@ npm run agent:invoke SCHOLAR:team-insights
 ```
 
 #### Learning Capabilities
+
 - **Success Pattern Recognition**: Learns from successful fixes
 - **Failure Analysis**: Analyzes and learns from failures
 - **Performance Metrics**: Tracks and optimizes system performance
@@ -275,6 +291,7 @@ Specialized agents are activated based on context and specific needs.
 ### Testing Agents
 
 #### TESTER - Test Suite Generation
+
 **Focus**: Creates comprehensive test suites for untested code
 
 ```bash
@@ -289,6 +306,7 @@ npm run agent:invoke TESTER:generate-property-tests
 ```
 
 #### VALIDATOR - Test Quality Assessment
+
 **Focus**: Validates test quality and effectiveness
 
 ```bash
@@ -305,6 +323,7 @@ npm run agent:invoke VALIDATOR:mutation-analysis
 ### Quality Agents
 
 #### ANALYZER - Deep Code Analysis
+
 **Focus**: Comprehensive code metrics and analysis
 
 ```bash
@@ -319,6 +338,7 @@ npm run agent:invoke ANALYZER:analyze-architecture
 ```
 
 #### OPTIMIZER - Performance Optimization
+
 **Focus**: Code and system performance improvements
 
 ```bash
@@ -333,6 +353,7 @@ npm run agent:invoke OPTIMIZER:optimize-memory
 ```
 
 #### CLEANER - Code Cleanup
+
 **Focus**: Removes dead code, improves maintainability
 
 ```bash
@@ -347,6 +368,7 @@ npm run agent:invoke CLEANER:consolidate-duplicates
 ```
 
 #### REVIEWER - Automated Code Review
+
 **Focus**: Provides automated code review insights
 
 ```bash
@@ -363,6 +385,7 @@ npm run agent:invoke REVIEWER:validate-practices
 ### Infrastructure Agents
 
 #### DEPLOYER - Deployment Automation
+
 **Focus**: Safe and reliable deployment management
 
 ```bash
@@ -377,6 +400,7 @@ npm run agent:invoke DEPLOYER:health-check
 ```
 
 #### MONITOR - Real-time Monitoring
+
 **Focus**: System observability and metrics collection
 
 ```bash
@@ -391,6 +415,7 @@ npm run agent:invoke MONITOR:configure-alerts
 ```
 
 #### MIGRATOR - Data/Code Migration
+
 **Focus**: Manages migrations and data transformations
 
 ```bash
@@ -407,6 +432,7 @@ npm run agent:invoke MIGRATOR:plan-rollback
 ### Architecture Agents
 
 #### ARCHITECT - System Design
+
 **Focus**: Architecture analysis and design guidance
 
 ```bash
@@ -421,6 +447,7 @@ npm run agent:invoke ARCHITECT:analyze-dependencies
 ```
 
 #### REFACTORER - Code Refactoring
+
 **Focus**: Large-scale code restructuring
 
 ```bash
@@ -435,6 +462,7 @@ npm run agent:invoke REFACTORER:impact-analysis
 ```
 
 #### RESEARCHER - Technology Research
+
 **Focus**: Technology recommendations and research
 
 ```bash
@@ -451,6 +479,7 @@ npm run agent:invoke RESEARCHER:plan-upgrades
 ### Utility Agents
 
 #### SECURITYGUARD - Security Management
+
 **Focus**: Security vulnerability detection and remediation
 
 ```bash
@@ -465,6 +494,7 @@ npm run agent:invoke SECURITYGUARD:audit-practices
 ```
 
 #### DOCUMENTER - Documentation Management
+
 **Focus**: Documentation creation and maintenance
 
 ```bash
@@ -479,6 +509,7 @@ npm run agent:invoke DOCUMENTER:document-code
 ```
 
 #### INTEGRATOR - External Integration
+
 **Focus**: External service integration and management
 
 ```bash
@@ -499,6 +530,7 @@ npm run agent:invoke INTEGRATOR:health-check-integrations
 The STRATEGIST coordinates complex workflows involving multiple agents:
 
 #### Quality Improvement Workflow
+
 ```
 1. AUDITOR identifies quality issues
 2. STRATEGIST creates Linear tasks and assigns priorities
@@ -509,6 +541,7 @@ The STRATEGIST coordinates complex workflows involving multiple agents:
 ```
 
 #### Security Remediation Workflow
+
 ```
 1. SECURITYGUARD detects vulnerabilities
 2. STRATEGIST prioritizes based on severity
@@ -519,6 +552,7 @@ The STRATEGIST coordinates complex workflows involving multiple agents:
 ```
 
 #### Performance Optimization Workflow
+
 ```
 1. MONITOR identifies performance issues
 2. ANALYZER performs deep analysis
@@ -542,6 +576,7 @@ The system implements Phase B.1 Enhanced Concurrency:
 ### Command Syntax
 
 All agent commands follow the standardized pattern:
+
 ```bash
 npm run agent:invoke <AGENT>:<COMMAND> -- [options]
 ```
@@ -549,6 +584,7 @@ npm run agent:invoke <AGENT>:<COMMAND> -- [options]
 ### Common Invocation Patterns
 
 #### Health Checks
+
 ```bash
 # Individual agent health
 npm run agent:invoke AUDITOR:health-check
@@ -561,6 +597,7 @@ npm run status
 ```
 
 #### Status and Reporting
+
 ```bash
 # Agent status
 npm run agent:invoke EXECUTOR:status
@@ -573,6 +610,7 @@ npm run agent:invoke STRATEGIST:coordination-report
 ```
 
 #### Configuration Management
+
 ```bash
 # Configure agent settings
 npm run agent:configure -- --agent AUDITOR --setting max_files=1000
@@ -591,18 +629,21 @@ npm run agent:import-config -- --file strategist-config.json
 The system tracks comprehensive agent performance:
 
 #### Response Time Metrics
+
 - **Health Check**: ≤30 seconds
 - **Assessment**: ≤12 minutes for 150k LOC
 - **Fix Implementation**: ≤15 minutes p50
 - **Pipeline Recovery**: ≤10 minutes p95
 
 #### Success Rate Metrics
+
 - **MCP Operations**: >99% success rate
 - **Fix Implementation**: >95% success rate
 - **Pipeline Recovery**: >90% success rate
 - **Task Completion**: >98% success rate
 
 #### Resource Utilization
+
 - **Memory Usage**: Monitored and optimized
 - **CPU Usage**: Load balanced across agents
 - **Network Usage**: Efficient MCP protocol usage
@@ -725,7 +766,7 @@ export class MyCustomAgent {
     return {
       status: 'healthy',
       timestamp: new Date().toISOString(),
-      capabilities: this.capabilities
+      capabilities: this.capabilities,
     };
   }
 
@@ -734,7 +775,7 @@ export class MyCustomAgent {
     return {
       success: true,
       results: {},
-      recommendations: []
+      recommendations: [],
     };
   }
 
@@ -743,7 +784,7 @@ export class MyCustomAgent {
     return {
       summary: {},
       details: {},
-      actionItems: []
+      actionItems: [],
     };
   }
 }
@@ -780,6 +821,7 @@ npm run agent:monitor -- --agent MY_CUSTOM_AGENT
 ### Common Agent Issues
 
 #### Agent Not Responding
+
 ```bash
 # Check agent health
 npm run agent:invoke AGENT:health-check
@@ -792,6 +834,7 @@ npm run agent:logs -- --agent AGENT --tail 50
 ```
 
 #### Performance Issues
+
 ```bash
 # Agent performance analysis
 npm run agent:invoke SCHOLAR:agent-performance -- --agent SLOW_AGENT
@@ -804,6 +847,7 @@ npm run agent:optimize -- --agent SLOW_AGENT
 ```
 
 #### Configuration Problems
+
 ```bash
 # Validate agent configuration
 npm run agent:validate-config -- --agent AGENT
@@ -818,6 +862,7 @@ npm run agent:restore-config -- --agent AGENT --backup latest
 ### Emergency Procedures
 
 #### Agent System Recovery
+
 ```bash
 # Emergency agent system restart
 npm run agents:emergency-restart
@@ -830,6 +875,7 @@ npm run agent:disable -- --agent PROBLEMATIC_AGENT
 ```
 
 #### Data Recovery
+
 ```bash
 # Recover agent data
 npm run agent:recover-data -- --agent AGENT
@@ -848,6 +894,7 @@ npm run agent:restore-state -- --agent AGENT --timestamp "2024-01-01T12:00:00Z"
 #### When to Use Each Agent Type
 
 **Core Agents** (Use regularly):
+
 - **AUDITOR**: Daily/weekly quality assessments
 - **EXECUTOR**: Implementing approved fixes
 - **GUARDIAN**: Continuous pipeline monitoring
@@ -855,6 +902,7 @@ npm run agent:restore-state -- --agent AGENT --timestamp "2024-01-01T12:00:00Z"
 - **SCHOLAR**: Performance optimization reviews
 
 **Specialized Agents** (Use as needed):
+
 - **TESTER/VALIDATOR**: When test coverage is insufficient
 - **ANALYZER/OPTIMIZER**: For performance issues
 - **SECURITYGUARD**: For security reviews
@@ -871,6 +919,7 @@ npm run agent:restore-state -- --agent AGENT --timestamp "2024-01-01T12:00:00Z"
 ### Team Collaboration with Agents
 
 #### Agent Assignment Strategy
+
 ```bash
 # Assign agents to team members
 npm run agent:assign -- --agent AUDITOR --member "tech-lead"
@@ -884,6 +933,7 @@ npm run agent:invoke STRATEGIST:balance-workload
 ```
 
 #### Knowledge Sharing
+
 ```bash
 # Export agent insights for team
 npm run agent:invoke SCHOLAR:export-team-insights
@@ -898,6 +948,7 @@ npm run agent:invoke SCHOLAR:share-patterns
 ### Agent Maintenance
 
 #### Regular Maintenance Tasks
+
 ```bash
 # Weekly agent health review
 npm run agents:weekly-health-check
@@ -910,6 +961,7 @@ npm run agents:quarterly-config-review
 ```
 
 #### Agent Updates
+
 ```bash
 # Check for agent updates
 npm run agents:check-updates
@@ -926,6 +978,7 @@ npm run agents:update-all
 **The 20-agent system represents the future of autonomous code quality management. Each agent is a specialist that contributes to the overall health and quality of your codebase. Master their capabilities, and you'll have an unstoppable development workflow! 🚀**
 
 **For additional agent information:**
+
 - [User Guide](USER-GUIDE.md) - Complete system overview
 - [Commands Reference](COMMANDS.md) - All agent commands
 - [Configuration](CONFIGURATION.md) - Agent configuration details

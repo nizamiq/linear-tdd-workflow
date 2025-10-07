@@ -21,14 +21,11 @@ const colors = {
   yellow: (text) => `\x1b[33m${text}\x1b[0m`,
   blue: (text) => `\x1b[34m${text}\x1b[0m`,
   cyan: (text) => `\x1b[36m${text}\x1b[0m`,
-  bold: Object.assign(
-    (text) => `\x1b[1m${text}\x1b[0m`,
-    {
-      cyan: (text) => `\x1b[1m\x1b[36m${text}\x1b[0m`,
-      green: (text) => `\x1b[1m\x1b[32m${text}\x1b[0m`,
-      yellow: (text) => `\x1b[1m\x1b[33m${text}\x1b[0m`
-    }
-  )
+  bold: Object.assign((text) => `\x1b[1m${text}\x1b[0m`, {
+    cyan: (text) => `\x1b[1m\x1b[36m${text}\x1b[0m`,
+    green: (text) => `\x1b[1m\x1b[32m${text}\x1b[0m`,
+    yellow: (text) => `\x1b[1m\x1b[33m${text}\x1b[0m`,
+  }),
 };
 
 // Ignore patterns for glob operations to prevent memory issues
@@ -61,7 +58,7 @@ const IGNORE_PATTERNS = [
   '**/htmlcov/**',
   '**/.mypy_cache/**',
   '**/.ruff_cache/**',
-  '**/.hypothesis/**'
+  '**/.hypothesis/**',
 ];
 
 // Maximum depth for glob operations
@@ -85,7 +82,7 @@ class ClaudeSetup {
       hasTests: false,
       testFrameworks: [],
       hasCI: false,
-      framework: 'none' // 'react', 'vue', 'angular', 'express', 'fastapi', etc.
+      framework: 'none', // 'react', 'vue', 'angular', 'express', 'fastapi', etc.
     };
   }
 
@@ -94,9 +91,13 @@ class ClaudeSetup {
    */
   logMemoryUsage(label = '') {
     const used = process.memoryUsage();
-    const mb = (bytes) => Math.round(bytes / 1024 / 1024 * 100) / 100;
+    const mb = (bytes) => Math.round((bytes / 1024 / 1024) * 100) / 100;
 
-    console.log(colors.gray(`[MEMORY] ${label}: RSS ${mb(used.rss)}MB, Heap ${mb(used.heapUsed)}/${mb(used.heapTotal)}MB, External ${mb(used.external)}MB`));
+    console.log(
+      colors.gray(
+        `[MEMORY] ${label}: RSS ${mb(used.rss)}MB, Heap ${mb(used.heapUsed)}/${mb(used.heapTotal)}MB, External ${mb(used.external)}MB`,
+      ),
+    );
   }
 
   /**
@@ -136,7 +137,6 @@ class ClaudeSetup {
 
       console.log(colors.bold.green('\n✅ Setup completed successfully!\n'));
       console.log(this.getUsageInstructions());
-
     } catch (error) {
       console.error(colors.red(`\n❌ Setup failed: ${error.message}\n`));
       process.exit(1);
@@ -156,7 +156,13 @@ class ClaudeSetup {
     const hasSetupPy = await this.fileExists('setup.py');
     const hasSourceFiles = await this.hasAnySourceFiles();
 
-    if (!hasPackageJson && !hasPyprojectToml && !hasRequirementsTxt && !hasSetupPy && !hasSourceFiles) {
+    if (
+      !hasPackageJson &&
+      !hasPyprojectToml &&
+      !hasRequirementsTxt &&
+      !hasSetupPy &&
+      !hasSourceFiles
+    ) {
       this.projectInfo.type = 'new';
       console.log(colors.green('📁 New project detected'));
     } else {
@@ -191,7 +197,10 @@ class ClaudeSetup {
       languages.add('javascript');
     }
 
-    if (await this.hasFiles(['**/*.ts', '**/*.tsx', '**/*.d.ts']) || await this.fileExists('tsconfig.json')) {
+    if (
+      (await this.hasFiles(['**/*.ts', '**/*.tsx', '**/*.d.ts'])) ||
+      (await this.fileExists('tsconfig.json'))
+    ) {
       languages.add('typescript');
     }
 
@@ -256,7 +265,7 @@ class ClaudeSetup {
     }
 
     this.projectInfo.testFrameworks = frameworks;
-    this.projectInfo.hasTests = frameworks.length > 0 || await this.hasTestFiles();
+    this.projectInfo.hasTests = frameworks.length > 0 || (await this.hasTestFiles());
 
     console.log(colors.green(`🧪 Test Frameworks: ${frameworks.join(', ') || 'none detected'}`));
   }
@@ -266,7 +275,12 @@ class ClaudeSetup {
    */
   async detectPytestUsage() {
     // Check for pytest in requirements files
-    const requirementFiles = ['requirements.txt', 'requirements-dev.txt', 'dev-requirements.txt', 'test-requirements.txt'];
+    const requirementFiles = [
+      'requirements.txt',
+      'requirements-dev.txt',
+      'dev-requirements.txt',
+      'test-requirements.txt',
+    ];
     for (const reqFile of requirementFiles) {
       if (await this.fileExists(reqFile)) {
         try {
@@ -312,12 +326,7 @@ class ClaudeSetup {
     }
 
     // Check for pytest-style test files
-    const pytestPatterns = [
-      '**/test_*.py',
-      '**/*_test.py',
-      '**/tests/**/*.py',
-      '**/test/**/*.py'
-    ];
+    const pytestPatterns = ['**/test_*.py', '**/*_test.py', '**/tests/**/*.py', '**/test/**/*.py'];
 
     for (const pattern of pytestPatterns) {
       if (await this.hasFiles([pattern])) {
@@ -331,7 +340,7 @@ class ClaudeSetup {
             nodir: true,
             dot: false,
             follow: false,
-            realpath: false
+            realpath: false,
           });
 
           // Limit to checking first few files to prevent memory issues
@@ -346,10 +355,12 @@ class ClaudeSetup {
               if (stats.size > 1024 * 1024) continue;
 
               const content = await fs.readFile(filePath, 'utf8');
-              if (content.includes('import pytest') ||
-                  content.includes('from pytest') ||
-                  content.includes('@pytest.') ||
-                  content.includes('pytest.')) {
+              if (
+                content.includes('import pytest') ||
+                content.includes('from pytest') ||
+                content.includes('@pytest.') ||
+                content.includes('pytest.')
+              ) {
                 return true;
               }
             } catch (error) {
@@ -371,10 +382,7 @@ class ClaudeSetup {
    * Detect unittest usage in Python projects
    */
   async detectUnittestUsage() {
-    const unittestPatterns = [
-      '**/test*.py',
-      '**/tests/**/*.py'
-    ];
+    const unittestPatterns = ['**/test*.py', '**/tests/**/*.py'];
 
     for (const pattern of unittestPatterns) {
       if (await this.hasFiles([pattern])) {
@@ -387,7 +395,7 @@ class ClaudeSetup {
             nodir: true,
             dot: false,
             follow: false,
-            realpath: false
+            realpath: false,
           });
 
           // Limit to checking first few files to prevent memory issues
@@ -402,9 +410,11 @@ class ClaudeSetup {
               if (stats.size > 1024 * 1024) continue;
 
               const content = await fs.readFile(filePath, 'utf8');
-              if (content.includes('import unittest') ||
-                  content.includes('from unittest') ||
-                  content.includes('unittest.TestCase')) {
+              if (
+                content.includes('import unittest') ||
+                content.includes('from unittest') ||
+                content.includes('unittest.TestCase')
+              ) {
                 return true;
               }
             } catch (error) {
@@ -484,7 +494,9 @@ class ClaudeSetup {
     console.log(`Project Type: ${colors.cyan(this.projectInfo.type)}`);
     console.log(`Languages: ${colors.cyan(this.projectInfo.languages.join(', '))}`);
     console.log(`Package Manager: ${colors.cyan(this.projectInfo.packageManager)}`);
-    console.log(`Test Frameworks: ${colors.cyan(this.projectInfo.testFrameworks.join(', ') || 'none')}`);
+    console.log(
+      `Test Frameworks: ${colors.cyan(this.projectInfo.testFrameworks.join(', ') || 'none')}`,
+    );
     console.log(`Framework: ${colors.cyan(this.projectInfo.framework)}`);
     console.log(`Has CI/CD: ${colors.cyan(this.projectInfo.hasCI ? 'Yes' : 'No')}`);
 
@@ -507,7 +519,10 @@ class ClaudeSetup {
       const depsConfig = JSON.parse(await fs.readFile(depsFile, 'utf8'));
 
       // Install JavaScript/TypeScript dependencies
-      if (this.projectInfo.languages.includes('javascript') || this.projectInfo.languages.includes('typescript')) {
+      if (
+        this.projectInfo.languages.includes('javascript') ||
+        this.projectInfo.languages.includes('typescript')
+      ) {
         await this.installJSDependencies(depsConfig.javascript);
       }
 
@@ -515,7 +530,6 @@ class ClaudeSetup {
       if (this.projectInfo.languages.includes('python')) {
         await this.installPythonDependencies(depsConfig.python);
       }
-
     } catch (error) {
       console.warn(colors.yellow(`Warning: Could not load dependencies config: ${error.message}`));
     }
@@ -555,7 +569,9 @@ class ClaudeSetup {
         const installCmd = this.getInstallCommand(packageManager, toInstall, true);
         execSync(installCmd, { stdio: 'inherit' });
       } catch (error) {
-        console.warn(colors.yellow(`Warning: Failed to install some dependencies: ${error.message}`));
+        console.warn(
+          colors.yellow(`Warning: Failed to install some dependencies: ${error.message}`),
+        );
       }
     }
   }
@@ -591,11 +607,15 @@ class ClaudeSetup {
           execSync(`${pythonEnv.pip} install ${toInstall.join(' ')}`, { stdio: 'inherit' });
         }
       } catch (error) {
-        console.warn(colors.yellow(`Warning: Failed to install some Python dependencies: ${error.message}`));
+        console.warn(
+          colors.yellow(`Warning: Failed to install some Python dependencies: ${error.message}`),
+        );
         if (error.message.includes('PEP 668') || error.message.includes('externally-managed')) {
           console.warn(colors.yellow('Tip: Consider using a virtual environment:'));
           console.warn(colors.gray('  python -m venv venv'));
-          console.warn(colors.gray('  source venv/bin/activate  # (or venv\\Scripts\\activate on Windows)'));
+          console.warn(
+            colors.gray('  source venv/bin/activate  # (or venv\\Scripts\\activate on Windows)'),
+          );
           console.warn(colors.gray('  pip install <packages>'));
         }
       }
@@ -613,7 +633,7 @@ class ClaudeSetup {
       'venv/bin/python',
       'venv/Scripts/python.exe',
       'env/bin/python',
-      'env/Scripts/python.exe'
+      'env/Scripts/python.exe',
     ];
 
     for (const venvPath of venvPaths) {
@@ -622,7 +642,7 @@ class ClaudeSetup {
         return {
           type: 'virtual environment',
           python: venvPath,
-          pip: pipPath
+          pip: pipPath,
         };
       }
     }
@@ -632,7 +652,7 @@ class ClaudeSetup {
       return {
         type: 'active virtual environment',
         python: 'python',
-        pip: 'pip'
+        pip: 'pip',
       };
     }
 
@@ -640,7 +660,7 @@ class ClaudeSetup {
     return {
       type: 'system Python',
       python: 'python',
-      pip: 'pip'
+      pip: 'pip',
     };
   }
 
@@ -651,7 +671,10 @@ class ClaudeSetup {
     console.log(colors.yellow('\n🆕 Initializing new project...\n'));
 
     // Create package.json for JS/TS projects
-    if (this.projectInfo.languages.includes('javascript') || this.projectInfo.languages.includes('typescript')) {
+    if (
+      this.projectInfo.languages.includes('javascript') ||
+      this.projectInfo.languages.includes('typescript')
+    ) {
       await this.createPackageJson();
     }
 
@@ -682,7 +705,10 @@ class ClaudeSetup {
     }
 
     // Add Python configuration if needed
-    if (this.projectInfo.languages.includes('python') && !await this.fileExists('pyproject.toml')) {
+    if (
+      this.projectInfo.languages.includes('python') &&
+      !(await this.fileExists('pyproject.toml'))
+    ) {
       await this.createPyprojectToml();
     }
   }
@@ -750,7 +776,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
       } else {
         console.log(colors.green('✅ Created new CLAUDE.md with workflow system directive'));
       }
-
     } catch (error) {
       console.error(colors.red(`Failed to update CLAUDE.md: ${error.message}`));
     }
@@ -793,8 +818,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
           maxDepth: MAX_GLOB_DEPTH,
           nodir: true,
           dot: false,
-          follow: false,  // Don't follow symlinks
-          realpath: false // Don't resolve symlinks
+          follow: false, // Don't follow symlinks
+          realpath: false, // Don't resolve symlinks
         });
         if (files.length > 0) return true;
       }
@@ -815,9 +840,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
   async hasTestFiles() {
     return await this.hasFiles([
-      '**/test/**/*.js', '**/test/**/*.ts', '**/test/**/*.py',
-      '**/*.test.js', '**/*.test.ts', '**/*.spec.js', '**/*.spec.ts',
-      '**/test_*.py', '**/*_test.py'
+      '**/test/**/*.js',
+      '**/test/**/*.ts',
+      '**/test/**/*.py',
+      '**/*.test.js',
+      '**/*.test.ts',
+      '**/*.spec.js',
+      '**/*.spec.ts',
+      '**/test_*.py',
+      '**/*_test.py',
     ]);
   }
 
@@ -833,7 +864,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
           nodir: true,
           dot: false,
           follow: false,
-          realpath: false
+          realpath: false,
         });
 
         // Check only first few files
@@ -867,7 +898,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   async askYesNo(question, defaultValue = true) {
     const rl = readline.createInterface({
       input: process.stdin,
-      output: process.stdout
+      output: process.stdout,
     });
 
     return new Promise((resolve) => {
@@ -999,7 +1030,8 @@ Next Steps:
 // CLI execution
 if (require.main === module) {
   const setup = new ClaudeSetup();
-  setup.setup()
+  setup
+    .setup()
     .then(() => {
       process.exit(0);
     })

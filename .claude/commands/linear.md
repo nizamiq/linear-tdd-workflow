@@ -4,7 +4,7 @@ description: Create Linear tasks from assessment results
 agent: STRATEGIST
 priority: high
 allowed-tools: [Read, mcp__linear-server__*]
-argument-hint: "[proposals/issues-*.json]"
+argument-hint: '[proposals/issues-*.json]'
 ---
 
 # /linear - Create Linear Tasks from Assessment
@@ -20,6 +20,7 @@ Creates Linear issues from AUDITOR assessment results using STRATEGIST.
 3. **[REFACTOR]** - Improve design with passing tests
 
 **Non-Negotiable Quality Gates:**
+
 - ≥80% diff coverage (blocking)
 - ≥30% mutation score (blocking)
 - **NO production code without failing test first**
@@ -54,6 +55,7 @@ Use this command **immediately after** running `/assess`:
 ```
 
 The command will:
+
 1. Find the latest assessment file (or use the one you specify)
 2. Read the `linear_tasks` array from assessment JSON
 3. Create Linear issues via STRATEGIST's MCP access
@@ -107,6 +109,7 @@ Next steps:
 ## Options
 
 ### `--dry-run`
+
 Preview tasks without creating them:
 
 ```bash
@@ -116,6 +119,7 @@ Preview tasks without creating them:
 Output shows what would be created without making API calls.
 
 ### `--priority <level>`
+
 Override priority for all tasks:
 
 ```bash
@@ -126,6 +130,7 @@ Override priority for all tasks:
 ```
 
 ### `--team <TEAM-ID>`
+
 Override the default team ID:
 
 ```bash
@@ -133,6 +138,7 @@ Override the default team ID:
 ```
 
 ### `--project <PROJECT-ID>`
+
 Assign all tasks to a specific project:
 
 ```bash
@@ -140,6 +146,7 @@ Assign all tasks to a specific project:
 ```
 
 ### `--labels <label1,label2>`
+
 Add additional labels to all tasks:
 
 ```bash
@@ -248,6 +255,7 @@ This command integrates seamlessly with the TDD workflow:
 ## Success Criteria
 
 Command succeeds when:
+
 - ✓ All tasks from assessment created in Linear
 - ✓ Task IDs returned to user (CLEAN-XXX format)
 - ✓ Tasks visible in Linear workspace
@@ -272,6 +280,7 @@ Command succeeds when:
 **Problem**: "Created tasks don't appear in Linear"
 
 **Solution**:
+
 1. Check Linear team ID matches your workspace
 2. Verify you have permission to view team's backlog
 3. Try filtering by label: "code-quality"

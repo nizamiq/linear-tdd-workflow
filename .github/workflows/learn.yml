@@ -87,12 +87,13 @@ jobs:
           EOF
 
       - name: Create Linear task for pattern review
-        if: steps.validate.outputs.validated_count > 0
+        if: steps.validate.outputs.validated_count > 0 && secrets.LINEAR_API_KEY != ''
         run: |
           npm run linear:create-issues -- \
             --title "[SCHOLAR] Review validated patterns - Week $(date +%U)" \
             --description "$(cat pattern-insights.md)" \
-            --labels "patterns,learning,scholar"
+            --labels "patterns,learning,scholar" || echo "Linear integration not configured"
+        continue-on-error: true
         env:
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
           LINEAR_TEAM_ID: ${{ secrets.LINEAR_TEAM_ID }}
@@ -108,6 +109,7 @@ jobs:
           retention-days: 90
 
       - name: Notify agents
+        if: secrets.AGENT_BROADCAST_URL != ''
         run: |
           # Broadcast new patterns to all agents
           curl -X POST ${{ secrets.AGENT_BROADCAST_URL }} \
@@ -119,4 +121,15 @@ jobs:
                 "count": ${{ steps.validate.outputs.validated_count }},
                 "timestamp": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
               }
-            }'
+            }' || echo "Agent broadcast not configured"
+        continue-on-error: true
+
+      - name: Create summary
+        if: always()
+        run: |
+          echo "## 🎓 Pattern Learning Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Patterns Extracted**: ${{ steps.collect.outputs.pattern_count }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Patterns Validated**: ${{ steps.validate.outputs.validated_count }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Pattern learning is currently in stub mode for CI/CD compatibility." >> $GITHUB_STEP_SUMMARY

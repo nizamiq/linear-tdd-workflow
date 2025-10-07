@@ -46,12 +46,7 @@
   "rollbackPlan": {
     "strategy": "automated",
     "maxRollbackTime": "5min",
-    "checkpoints": [
-      "preparation",
-      "schema_changes",
-      "data_migration",
-      "validation"
-    ],
+    "checkpoints": ["preparation", "schema_changes", "data_migration", "validation"],
     "rollbackSteps": [
       "Rollback validation",
       "Rollback data_migration",
