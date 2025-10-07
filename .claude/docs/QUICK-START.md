@@ -11,6 +11,7 @@ Get the Claude Agentic Workflow System running in your project in 5 minutes.
 ## 0. Installation (First Time Only)
 
 ### New Project
+
 ```bash
 # Clone workflow system to your workspace
 cd ~/workspace  # or your projects directory
@@ -22,6 +23,7 @@ mkdir my-project && cd my-project
 ```
 
 ### Existing Project
+
 ```bash
 # Clone workflow system (parallel to your projects)
 cd ~/workspace  # or parent directory of existing project
@@ -63,6 +65,7 @@ npm run status
 ```
 
 Expected output:
+
 ```
 ✅ Claude Agentic Workflow System - Status Report
 ✅ MCP Tools: 5 servers operational
@@ -83,6 +86,7 @@ cat .claude/reports/latest-assessment.json
 ```
 
 The AUDITOR agent will:
+
 - Scan all source files for quality issues
 - Generate improvement recommendations
 - Create Linear tasks for fixes (if Linear is configured)
@@ -209,13 +213,17 @@ npm run rollback           # Emergency rollback
 ## 8. Key Concepts
 
 ### TDD Enforcement
+
 Every code change must follow RED→GREEN→REFACTOR:
+
 - **RED**: Write failing test first
 - **GREEN**: Minimal code to pass
 - **REFACTOR**: Improve while keeping tests green
 
 ### Agent System
+
 20 specialized agents handle different aspects:
+
 - **AUDITOR**: Finds quality issues
 - **EXECUTOR**: Implements fixes (≤300 LOC)
 - **GUARDIAN**: Protects CI/CD pipelines
@@ -223,14 +231,18 @@ Every code change must follow RED→GREEN→REFACTOR:
 - **+16 others**: Specialized capabilities
 
 ### Fix Packs
+
 Atomic improvements with constraints:
+
 - Maximum 300 lines of code
 - Pre-approved change types only
 - Strict TDD implementation
 - Automatic rollback capability
 
 ### Quality Gates
+
 Enforced automatically:
+
 - 80% minimum test coverage
 - 30% mutation testing for critical paths
 - Zero linting errors
@@ -239,16 +251,19 @@ Enforced automatically:
 ## 9. Next Steps
 
 ### Immediate (5 minutes)
+
 - Review assessment results: `cat .claude/reports/latest-assessment.json`
 - Configure Linear integration: [LINEAR-INTEGRATION.md](LINEAR-INTEGRATION.md)
 - Set up CI/CD hooks: [CI-CD-INTEGRATION.md](CI-CD-INTEGRATION.md)
 
 ### Short-term (30 minutes)
+
 - Read complete [User Guide](USER-GUIDE.md)
 - Explore [Agent Overview](AGENT-OVERVIEW.md)
 - Customize [Configuration](CONFIGURATION.md)
 
 ### Medium-term (1 hour)
+
 - Implement first Fix Pack
 - Set up team workflow
 - Configure quality metrics dashboards
@@ -256,6 +271,7 @@ Enforced automatically:
 ## 🚨 Troubleshooting Quick Fixes
 
 ### System Not Responding
+
 ```bash
 npm run doctor              # Comprehensive diagnostics
 npm run validate            # Check configuration
@@ -263,6 +279,7 @@ npm run reset               # Reset to clean state
 ```
 
 ### Tests Failing
+
 ```bash
 npm test -- --verbose       # Detailed test output
 npm run lint               # Check for code issues
@@ -270,12 +287,14 @@ npm run typecheck          # Verify TypeScript
 ```
 
 ### Agent Errors
+
 ```bash
 npm run agent:invoke AUDITOR:health-check
 npm run status             # Check system health
 ```
 
 ### Linear Integration Issues
+
 ```bash
 npm run linear:sync        # Re-sync with Linear
 npm run validate           # Check API configuration
@@ -303,6 +322,7 @@ You now have a functional Claude Agentic Workflow System! The system will:
 5. **Learn and adapt** to your codebase patterns
 
 For deeper understanding, continue to:
+
 - **[User Guide](USER-GUIDE.md)** - Complete system overview
 - **[TDD Workflow](TDD-WORKFLOW.md)** - Master the enforcement system
 - **[Agent Overview](AGENT-OVERVIEW.md)** - Understand the 20-agent architecture

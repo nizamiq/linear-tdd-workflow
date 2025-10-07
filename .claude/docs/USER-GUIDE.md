@@ -100,15 +100,18 @@ Enforced automatically at every level:
 ### Core Agents (Always Active)
 
 #### AUDITOR - Code Quality Assessment
+
 **Primary Responsibility**: Continuous code quality monitoring
 
 **Capabilities**:
+
 - Scans entire codebase for quality issues
 - Generates Fix Pack candidates
 - Creates Linear tasks with detailed specifications
 - Tracks technical debt and quality trends
 
 **Usage**:
+
 ```bash
 # Full codebase assessment
 npm run agent:invoke AUDITOR:assess-code -- --scope full
@@ -124,15 +127,18 @@ npm run agent:invoke AUDITOR:generate-debt-report
 ```
 
 #### EXECUTOR - Fix Implementation
+
 **Primary Responsibility**: Implements approved fixes using strict TDD
 
 **Capabilities**:
+
 - Implements Fix Packs ≤300 LOC
 - Follows RED→GREEN→REFACTOR cycle
 - Automatic rollback on failure
 - Preserves existing code style and patterns
 
 **Usage**:
+
 ```bash
 # Implement specific Fix Pack
 npm run agent:invoke EXECUTOR:implement-fix -- --task-id CLEAN-123
@@ -148,15 +154,18 @@ npm run agent:invoke EXECUTOR:rollback-last
 ```
 
 #### GUARDIAN - CI/CD Protection
+
 **Primary Responsibility**: Monitors and protects CI/CD pipelines
 
 **Capabilities**:
+
 - Detects pipeline failures
 - Implements auto-recovery strategies
 - Maintains >90% pipeline success rate
 - Prevents problematic changes from reaching production
 
 **Usage**:
+
 ```bash
 # Check pipeline health
 npm run agent:invoke GUARDIAN:check-pipelines
@@ -172,15 +181,18 @@ npm run agent:invoke GUARDIAN:health-report
 ```
 
 #### STRATEGIST - Workflow Orchestration
+
 **Primary Responsibility**: Coordinates multi-agent workflows and Linear integration
 
 **Capabilities**:
+
 - Plans sprint work across multiple agents
 - Manages Linear task assignment and prioritization
 - Coordinates complex multi-phase improvements
 - Optimizes resource allocation
 
 **Usage**:
+
 ```bash
 # Plan next sprint
 npm run agent:invoke STRATEGIST:plan-sprint
@@ -196,15 +208,18 @@ npm run agent:invoke STRATEGIST:coordination-report
 ```
 
 #### SCHOLAR - Pattern Learning
+
 **Primary Responsibility**: Analyzes patterns and continuously improves system performance
 
 **Capabilities**:
+
 - Learns from successful fixes and failures
 - Identifies codebase-specific patterns
 - Optimizes agent performance
 - Provides insights for system improvement
 
 **Usage**:
+
 ```bash
 # Analyze recent patterns
 npm run agent:invoke SCHOLAR:analyze-patterns
@@ -222,26 +237,31 @@ npm run agent:invoke SCHOLAR:export-knowledge
 ### Specialized Agents (Context-Activated)
 
 #### Testing Agents
+
 - **TESTER**: Creates comprehensive test suites
 - **VALIDATOR**: Validates test coverage and quality
 
 #### Quality Agents
+
 - **ANALYZER**: Deep code analysis and metrics
 - **OPTIMIZER**: Performance optimization
 - **CLEANER**: Code cleanup and maintenance
 - **REVIEWER**: Automated code review
 
 #### Infrastructure Agents
+
 - **DEPLOYER**: Deployment automation
 - **MONITOR**: Real-time monitoring
 - **MIGRATOR**: Data and code migration
 
 #### Architecture Agents
+
 - **ARCHITECT**: System design guidance
 - **REFACTORER**: Large-scale refactoring
 - **RESEARCHER**: Technology research
 
 #### Specialized Agents
+
 - **SECURITYGUARD**: Security scanning and fixes
 - **DOCUMENTER**: Documentation management
 - **INTEGRATOR**: External service integration
@@ -253,6 +273,7 @@ npm run agent:invoke SCHOLAR:export-knowledge
 Every code change must follow this cycle:
 
 #### 1. RED Phase - Write Failing Test
+
 ```bash
 # Start TDD watch mode
 npm test:watch
@@ -271,6 +292,7 @@ describe('UserService', () => {
 **Validation**: Test must fail for the right reason (function doesn't exist)
 
 #### 2. GREEN Phase - Minimal Implementation
+
 ```javascript
 // src/user-service.js
 export class UserService {
@@ -284,6 +306,7 @@ export class UserService {
 **Validation**: Test must pass with minimal code
 
 #### 3. REFACTOR Phase - Improve Quality
+
 ```javascript
 // src/user-service.js
 /**
@@ -309,25 +332,30 @@ export class UserService {
 The system enforces TDD through multiple layers:
 
 #### 1. Pre-commit Hooks
+
 ```bash
 # Automatically runs before every commit
 npm run precommit
 ```
 
 Checks:
+
 - All new code has corresponding tests
 - Coverage ≥80% for changed files
 - No failing tests
 - Linting passes
 
 #### 2. CI/CD Gates
+
 Quality gates in your pipeline:
+
 - Diff coverage enforcement
 - Mutation testing for critical paths
 - Performance regression detection
 - Security vulnerability scanning
 
 #### 3. Agent Monitoring
+
 - **AUDITOR**: Identifies untested code
 - **GUARDIAN**: Blocks PRs that violate TDD
 - **SCHOLAR**: Learns from TDD patterns
@@ -335,6 +363,7 @@ Quality gates in your pipeline:
 ### TDD Best Practices
 
 #### Test Organization
+
 ```
 tests/
 ├── unit/           # Isolated component tests
@@ -350,6 +379,7 @@ tests/
 ```
 
 #### Test Naming Conventions
+
 ```javascript
 // ✅ Good: Describes behavior
 test('should return error when email is invalid', () => {});
@@ -359,6 +389,7 @@ test('validateEmail function test', () => {});
 ```
 
 #### Test Structure (AAA Pattern)
+
 ```javascript
 test('should calculate tax correctly for high income', () => {
   // Arrange
@@ -376,6 +407,7 @@ test('should calculate tax correctly for high income', () => {
 ## Daily Development Workflow
 
 ### Morning Routine (5 minutes)
+
 ```bash
 # Check system health
 npm run status
@@ -393,6 +425,7 @@ npm run agent:invoke GUARDIAN:urgent-alerts
 ### Feature Development Workflow
 
 #### 1. Start New Feature
+
 ```bash
 # Create feature branch
 git checkout -b feature/user-authentication
@@ -405,6 +438,7 @@ npm test:watch
 ```
 
 #### 2. TDD Implementation Loop
+
 ```bash
 # Write failing test
 # ↓
@@ -416,6 +450,7 @@ npm test:watch
 ```
 
 #### 3. Pre-commit Validation
+
 ```bash
 # Run all quality checks
 npm run precommit
@@ -427,6 +462,7 @@ npm test                   # Ensure tests pass
 ```
 
 #### 4. Create Pull Request
+
 ```bash
 # Push feature branch
 git push origin feature/user-authentication
@@ -441,6 +477,7 @@ git push origin feature/user-authentication
 The system enhances human code review:
 
 #### Automated Pre-Review
+
 ```bash
 # Before human review, REVIEWER agent analyzes
 npm run agent:invoke REVIEWER:analyze-pr -- --pr-number 123
@@ -453,6 +490,7 @@ npm run agent:invoke REVIEWER:analyze-pr -- --pr-number 123
 ```
 
 #### Review Guidelines Enhanced by AI
+
 - **Quality Metrics**: Coverage, complexity, maintainability scores
 - **Pattern Analysis**: Consistency with codebase patterns
 - **Risk Assessment**: Change impact and rollback complexity
@@ -461,6 +499,7 @@ npm run agent:invoke REVIEWER:analyze-pr -- --pr-number 123
 ### Maintenance Workflows
 
 #### Weekly Quality Review
+
 ```bash
 # Generate comprehensive quality report
 npm run agent:invoke AUDITOR:weekly-report
@@ -473,6 +512,7 @@ npm run agent:invoke STRATEGIST:plan-improvements
 ```
 
 #### Monthly System Health
+
 ```bash
 # Comprehensive system diagnostics
 npm run doctor
@@ -491,6 +531,7 @@ npm run agent:invoke STRATEGIST:optimize-config
 The system tracks comprehensive quality metrics:
 
 #### Code Quality Metrics
+
 ```bash
 # View current metrics
 npm run status
@@ -500,6 +541,7 @@ npm run agent:invoke ANALYZER:quality-report
 ```
 
 Tracked metrics:
+
 - **Test Coverage**: Line, branch, function coverage
 - **Code Complexity**: Cyclomatic complexity, cognitive complexity
 - **Maintainability**: Technical debt, code duplication
@@ -507,6 +549,7 @@ Tracked metrics:
 - **Security**: Vulnerability count, security score
 
 #### Quality Trends
+
 ```bash
 # Historical trends
 npm run agent:invoke ANALYZER:trends-report
@@ -546,6 +589,7 @@ Quality gates are configured in `.claude/settings.json`:
 ### Continuous Quality Improvement
 
 #### Automated Quality Tasks
+
 The AUDITOR agent continuously creates quality improvement tasks:
 
 - **CLEAN-XXX**: Code cleanup tasks
@@ -555,6 +599,7 @@ The AUDITOR agent continuously creates quality improvement tasks:
 - **DEBT-XXX**: Technical debt reduction tasks
 
 #### Quality Sprint Planning
+
 ```bash
 # Plan quality-focused sprint
 npm run agent:invoke STRATEGIST:plan-quality-sprint
@@ -573,11 +618,13 @@ npm run agent:invoke STRATEGIST:estimate-improvements
 The system creates and manages Linear tasks automatically:
 
 #### Task Creation
+
 - **AUDITOR**: Creates quality improvement tasks
 - **GUARDIAN**: Creates incident response tasks
 - **STRATEGIST**: Creates coordination tasks
 
 #### Task Tracking
+
 ```bash
 # Sync current status with Linear
 npm run linear:sync
@@ -592,6 +639,7 @@ npm run agent:invoke STRATEGIST:update-progress
 ### Sprint Coordination
 
 #### Sprint Planning
+
 ```bash
 # Generate sprint plan
 npm run agent:invoke STRATEGIST:plan-sprint
@@ -604,6 +652,7 @@ npm run agent:invoke STRATEGIST:assign-tasks
 ```
 
 #### Sprint Execution
+
 ```bash
 # Daily progress update
 npm run agent:invoke STRATEGIST:daily-update
@@ -648,12 +697,14 @@ Configure Linear integration in `.claude/settings.json`:
 The system maintains strict performance commitments:
 
 #### Response Time SLAs
+
 - **Assessment**: ≤12 minutes for 150k LOC
 - **Fix Implementation**: ≤15 minutes p50
 - **Pipeline Recovery**: ≤10 minutes p95
 - **Agent Health Check**: ≤30 seconds
 
 #### Success Rate SLAs
+
 - **MCP Tool Operations**: >99% success rate
 - **Pipeline Auto-Recovery**: >90% success rate
 - **Fix Pack Implementation**: >95% success rate
@@ -661,6 +712,7 @@ The system maintains strict performance commitments:
 ### Real-time Monitoring
 
 #### Performance Dashboard
+
 ```bash
 # Current system performance
 npm run status
@@ -673,6 +725,7 @@ npm run agent:invoke MONITOR:sla-report
 ```
 
 #### Alert Configuration
+
 ```json
 {
   "monitoring": {
@@ -694,6 +747,7 @@ npm run agent:invoke MONITOR:sla-report
 ### Performance Optimization
 
 #### System Tuning
+
 ```bash
 # Optimize agent performance
 npm run agent:invoke SCHOLAR:optimize-performance
@@ -712,12 +766,14 @@ npm run agent:invoke MONITOR:update-baselines
 The system implements evidence-based concurrency management:
 
 #### Concurrency Features
+
 - **3-Agent Orchestration**: Maximum 3 agents executing simultaneously
 - **Circuit Breakers**: Automatic failure detection and recovery
 - **Evidence-Based Limits**: 2 operations per MCP server maximum
 - **Real-time Monitoring**: Performance tracking with auto-adjustment
 
 #### Concurrency Configuration
+
 ```json
 {
   "concurrency": {
@@ -732,11 +788,13 @@ The system implements evidence-based concurrency management:
 ### Multi-Language Support
 
 #### Supported Languages
+
 - **JavaScript/TypeScript**: Full support with Jest, ESLint, Prettier
 - **Python**: Full support with pytest, black, ruff
 - **Mixed Projects**: Intelligent polyglot handling
 
 #### Language-Specific Commands
+
 ```bash
 # JavaScript/TypeScript
 npm run lint:js
@@ -757,6 +815,7 @@ npm run format
 ### Custom Agent Development
 
 #### Creating Custom Agents
+
 ```bash
 # Generate agent template
 npm run agent:create -- --name CustomAgent --type specialized
@@ -769,6 +828,7 @@ npm run agent:test -- --agent CustomAgent
 ```
 
 #### Agent Development Guidelines
+
 - Follow agent interface specification
 - Implement health check endpoint
 - Include comprehensive error handling
@@ -779,6 +839,7 @@ npm run agent:test -- --agent CustomAgent
 ### Onboarding New Team Members
 
 #### Quick Team Onboarding
+
 ```bash
 # Setup for new team member
 npm run setup:team-member -- --name "John Doe" --role developer
@@ -791,6 +852,7 @@ npm run agent:invoke STRATEGIST:assign-training
 ```
 
 #### Role-Based Access
+
 ```json
 {
   "roles": {
@@ -816,6 +878,7 @@ npm run agent:invoke STRATEGIST:assign-training
 ### Knowledge Sharing
 
 #### Learning from Agent Insights
+
 ```bash
 # Generate team insights
 npm run agent:invoke SCHOLAR:team-insights
@@ -828,6 +891,7 @@ npm run agent:invoke SCHOLAR:pattern-library
 ```
 
 #### Cross-Team Collaboration
+
 ```bash
 # Share agent configurations
 npm run agent:invoke STRATEGIST:export-config
@@ -842,6 +906,7 @@ npm run agent:invoke ANALYZER:benchmark-teams
 ### Scaling with Multiple Projects
 
 #### Multi-Project Management
+
 ```bash
 # Register new project
 npm run project:register -- --name new-project --path ../new-project

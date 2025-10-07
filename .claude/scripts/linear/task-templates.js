@@ -10,33 +10,33 @@
 class TaskTemplates {
   constructor() {
     this.actionVerbs = {
-      coverage: "Implement",
-      bug: "Fix",
-      feature: "Add",
-      improvement: "Improve",
-      spike: "Investigate",
-      refactor: "Refactor",
-      documentation: "Document",
-      test: "Test",
-      security: "Secure"
+      coverage: 'Implement',
+      bug: 'Fix',
+      feature: 'Add',
+      improvement: 'Improve',
+      spike: 'Investigate',
+      refactor: 'Refactor',
+      documentation: 'Document',
+      test: 'Test',
+      security: 'Secure',
     };
 
     this.priorityLabels = {
-      HIGH: "p1-high",
-      MEDIUM: "p2-medium",
-      LOW: "p3-low",
-      URGENT: "p0-urgent"
+      HIGH: 'p1-high',
+      MEDIUM: 'p2-medium',
+      LOW: 'p3-low',
+      URGENT: 'p0-urgent',
     };
 
     this.areaLabels = {
-      frontend: "area-frontend",
-      backend: "area-backend",
-      api: "area-api",
-      database: "area-database",
-      infrastructure: "area-infrastructure",
-      testing: "area-testing",
-      security: "area-security",
-      documentation: "area-docs"
+      frontend: 'area-frontend',
+      backend: 'area-backend',
+      api: 'area-api',
+      database: 'area-database',
+      infrastructure: 'area-infrastructure',
+      testing: 'area-testing',
+      security: 'area-security',
+      documentation: 'area-docs',
     };
   }
 
@@ -44,13 +44,9 @@ class TaskTemplates {
    * Generate standardized task for coverage gap
    */
   generateCoverageTask(gap, options = {}) {
-    const {
-      threshold = 80,
-      module = "unknown",
-      component = "unknown"
-    } = options;
+    const { threshold = 80, module = 'unknown', component = 'unknown' } = options;
 
-    const title = this.formatTitle("coverage", gap.specification, gap.description);
+    const title = this.formatTitle('coverage', gap.specification, gap.description);
     const description = this.formatCoverageDescription(gap, threshold, module, component);
     const labels = this.generateCoverageLabels(gap);
     const estimate = this.estimateCoverageTask(gap);
@@ -63,10 +59,10 @@ class TaskTemplates {
       estimate,
       priority,
       metadata: {
-        type: "coverage-gap",
+        type: 'coverage-gap',
         specification: gap.specification,
-        originalGap: gap
-      }
+        originalGap: gap,
+      },
     };
   }
 
@@ -74,9 +70,13 @@ class TaskTemplates {
    * Generate standardized task for TDD violation
    */
   generateTDDTask(violation, options = {}) {
-    const title = this.formatTitle("test", "TDD compliance", `Fix TDD violation in ${violation.commit?.substring(0, 8)}`);
+    const title = this.formatTitle(
+      'test',
+      'TDD compliance',
+      `Fix TDD violation in ${violation.commit?.substring(0, 8)}`,
+    );
     const description = this.formatTDDDescription(violation);
-    const labels = ["tdd", "process", "technical-debt", this.priorityLabels.MEDIUM];
+    const labels = ['tdd', 'process', 'technical-debt', this.priorityLabels.MEDIUM];
     const estimate = this.estimateTDDTask(violation);
 
     return {
@@ -86,10 +86,10 @@ class TaskTemplates {
       estimate,
       priority: 2, // Medium priority
       metadata: {
-        type: "tdd-violation",
+        type: 'tdd-violation',
         commit: violation.commit,
-        originalViolation: violation
-      }
+        originalViolation: violation,
+      },
     };
   }
 
@@ -97,9 +97,13 @@ class TaskTemplates {
    * Generate standardized task for orphaned test
    */
   generateOrphanedTestTask(orphan, options = {}) {
-    const title = this.formatTitle("improvement", "test cleanup", `Review orphaned test: ${orphan.file}`);
+    const title = this.formatTitle(
+      'improvement',
+      'test cleanup',
+      `Review orphaned test: ${orphan.file}`,
+    );
     const description = this.formatOrphanedTestDescription(orphan);
-    const labels = ["testing", "maintenance", "technical-debt", this.priorityLabels.LOW];
+    const labels = ['testing', 'maintenance', 'technical-debt', this.priorityLabels.LOW];
     const estimate = 1; // Usually small task
 
     return {
@@ -109,10 +113,10 @@ class TaskTemplates {
       estimate,
       priority: 3, // Low priority
       metadata: {
-        type: "orphaned-test",
+        type: 'orphaned-test',
         file: orphan.file,
-        originalOrphan: orphan
-      }
+        originalOrphan: orphan,
+      },
     };
   }
 
@@ -120,7 +124,7 @@ class TaskTemplates {
    * Generate standardized task for unmapped specification
    */
   generateUnmappedSpecTask(spec, options = {}) {
-    const title = this.formatTitle("test", "specification coverage", `Create tests for ${spec.id}`);
+    const title = this.formatTitle('test', 'specification coverage', `Create tests for ${spec.id}`);
     const description = this.formatUnmappedSpecDescription(spec);
     const labels = this.generateSpecLabels(spec);
     const estimate = this.estimateSpecTask(spec);
@@ -133,10 +137,10 @@ class TaskTemplates {
       estimate,
       priority,
       metadata: {
-        type: "unmapped-spec",
+        type: 'unmapped-spec',
         specification: spec.id,
-        originalSpec: spec
-      }
+        originalSpec: spec,
+      },
     };
   }
 
@@ -144,7 +148,7 @@ class TaskTemplates {
    * Format title according to standards
    */
   formatTitle(type, category, description) {
-    const verb = this.actionVerbs[type] || "Handle";
+    const verb = this.actionVerbs[type] || 'Handle';
     let title = `${verb} ${description}`;
 
     // Ensure first letter is capitalized
@@ -152,7 +156,7 @@ class TaskTemplates {
 
     // Truncate if too long (max 60 characters)
     if (title.length > 60) {
-      title = title.substring(0, 57) + "...";
+      title = title.substring(0, 57) + '...';
     }
 
     return title;
@@ -329,32 +333,32 @@ Based on the specification type and content, consider:
    * Generate labels for coverage tasks
    */
   generateCoverageLabels(gap) {
-    const labels = ["testing", "coverage"];
+    const labels = ['testing', 'coverage'];
 
     // Add priority label
     labels.push(this.priorityLabels[gap.priority] || this.priorityLabels.MEDIUM);
 
     // Add type-specific labels
-    if (gap.type === "missing") {
-      labels.push("technical-debt");
-    } else if (gap.type === "partial") {
-      labels.push("improvement");
-    } else if (gap.type === "quality-gate") {
-      labels.push("critical");
+    if (gap.type === 'missing') {
+      labels.push('technical-debt');
+    } else if (gap.type === 'partial') {
+      labels.push('improvement');
+    } else if (gap.type === 'quality-gate') {
+      labels.push('critical');
     }
 
     // Add area labels based on keywords
     if (gap.specification) {
       const spec = gap.specification.toLowerCase();
-      if (spec.includes("api") || spec.includes("endpoint")) {
+      if (spec.includes('api') || spec.includes('endpoint')) {
         labels.push(this.areaLabels.api);
-      } else if (spec.includes("database") || spec.includes("data")) {
+      } else if (spec.includes('database') || spec.includes('data')) {
         labels.push(this.areaLabels.database);
-      } else if (spec.includes("frontend") || spec.includes("ui")) {
+      } else if (spec.includes('frontend') || spec.includes('ui')) {
         labels.push(this.areaLabels.frontend);
-      } else if (spec.includes("backend") || spec.includes("server")) {
+      } else if (spec.includes('backend') || spec.includes('server')) {
         labels.push(this.areaLabels.backend);
-      } else if (spec.includes("security") || spec.includes("auth")) {
+      } else if (spec.includes('security') || spec.includes('auth')) {
         labels.push(this.areaLabels.security);
       }
     }
@@ -366,7 +370,7 @@ Based on the specification type and content, consider:
    * Generate labels for specification tasks
    */
   generateSpecLabels(spec) {
-    const labels = ["testing", "specification"];
+    const labels = ['testing', 'specification'];
 
     // Add priority label
     labels.push(this.priorityLabels[spec.priority] || this.priorityLabels.MEDIUM);
@@ -374,18 +378,18 @@ Based on the specification type and content, consider:
     // Add type-specific labels
     if (spec.type) {
       switch (spec.type) {
-        case "security":
-        case "authentication":
+        case 'security':
+        case 'authentication':
           labels.push(this.areaLabels.security);
           break;
-        case "functional":
-          labels.push("feature");
+        case 'functional':
+          labels.push('feature');
           break;
-        case "performance":
-          labels.push("performance");
+        case 'performance':
+          labels.push('performance');
           break;
-        case "quality":
-          labels.push("quality-assurance");
+        case 'quality':
+          labels.push('quality-assurance');
           break;
       }
     }
@@ -394,13 +398,13 @@ Based on the specification type and content, consider:
     if (spec.keywords) {
       for (const keyword of spec.keywords) {
         const keywordLower = keyword.toLowerCase();
-        if (keywordLower.includes("api")) {
+        if (keywordLower.includes('api')) {
           labels.push(this.areaLabels.api);
-        } else if (keywordLower.includes("database")) {
+        } else if (keywordLower.includes('database')) {
           labels.push(this.areaLabels.database);
-        } else if (keywordLower.includes("frontend")) {
+        } else if (keywordLower.includes('frontend')) {
           labels.push(this.areaLabels.frontend);
-        } else if (keywordLower.includes("backend")) {
+        } else if (keywordLower.includes('backend')) {
           labels.push(this.areaLabels.backend);
         }
       }
@@ -417,10 +421,10 @@ Based on the specification type and content, consider:
 
     // Adjust based on gap type
     switch (gap.type) {
-      case "missing":
+      case 'missing':
         baseEstimate = 5; // New tests require more effort
         break;
-      case "partial":
+      case 'partial':
         const coverageIncrease = gap.targetCoverage - (gap.currentCoverage || 0);
         if (coverageIncrease > 50) {
           baseEstimate = 8;
@@ -430,7 +434,7 @@ Based on the specification type and content, consider:
           baseEstimate = 2;
         }
         break;
-      case "quality-gate":
+      case 'quality-gate':
         baseEstimate = 5; // Critical path requires thorough testing
         break;
     }
@@ -442,7 +446,7 @@ Based on the specification type and content, consider:
 
     // Round to Fibonacci numbers
     const fibonacci = [1, 2, 3, 5, 8, 13];
-    return fibonacci.find(f => f >= baseEstimate) || 13;
+    return fibonacci.find((f) => f >= baseEstimate) || 13;
   }
 
   /**
@@ -457,7 +461,7 @@ Based on the specification type and content, consider:
     }
 
     // Adjust based on violation reason
-    if (violation.reason?.includes("no tests")) {
+    if (violation.reason?.includes('no tests')) {
       estimate = 5; // Creating tests from scratch
     }
 
@@ -471,29 +475,29 @@ Based on the specification type and content, consider:
     let baseEstimate = 3;
 
     // Adjust based on priority (high priority often more complex)
-    if (spec.priority === "HIGH") {
+    if (spec.priority === 'HIGH') {
       baseEstimate = 5;
-    } else if (spec.priority === "LOW") {
+    } else if (spec.priority === 'LOW') {
       baseEstimate = 2;
     }
 
     // Adjust based on type
     switch (spec.type) {
-      case "security":
-      case "authentication":
+      case 'security':
+      case 'authentication':
         baseEstimate = 8; // Security tests are comprehensive
         break;
-      case "performance":
+      case 'performance':
         baseEstimate = 5; // Performance tests need setup
         break;
-      case "functional":
+      case 'functional':
         baseEstimate = 3; // Standard functional tests
         break;
     }
 
     // Round to Fibonacci
     const fibonacci = [1, 2, 3, 5, 8, 13];
-    return fibonacci.find(f => f >= baseEstimate) || 13;
+    return fibonacci.find((f) => f >= baseEstimate) || 13;
   }
 
   /**
@@ -501,10 +505,10 @@ Based on the specification type and content, consider:
    */
   mapPriorityToLinear(priority) {
     const mapping = {
-      "HIGH": 2,
-      "MEDIUM": 3,
-      "LOW": 4,
-      "URGENT": 1
+      HIGH: 2,
+      MEDIUM: 3,
+      LOW: 4,
+      URGENT: 1,
     };
     return mapping[priority] || 3;
   }
@@ -517,48 +521,51 @@ Based on the specification type and content, consider:
 
     // Title validation
     if (!task.title || task.title.length === 0) {
-      violations.push({ field: "title", issue: "missing" });
+      violations.push({ field: 'title', issue: 'missing' });
     } else if (task.title.length > 60) {
-      violations.push({ field: "title", issue: "too_long" });
+      violations.push({ field: 'title', issue: 'too_long' });
     } else if (!task.title[0].match(/[A-Z]/)) {
-      violations.push({ field: "title", issue: "not_capitalized" });
+      violations.push({ field: 'title', issue: 'not_capitalized' });
     }
 
     // Description validation
     if (!task.description || task.description.length < 50) {
-      violations.push({ field: "description", issue: "too_short" });
+      violations.push({ field: 'description', issue: 'too_short' });
     }
 
     // Labels validation
     if (!task.labels || task.labels.length === 0) {
-      violations.push({ field: "labels", issue: "missing" });
+      violations.push({ field: 'labels', issue: 'missing' });
     } else {
-      const hasTypeLabel = task.labels.some(label =>
-        ["testing", "bug", "feature", "improvement", "spike"].includes(label)
+      const hasTypeLabel = task.labels.some((label) =>
+        ['testing', 'bug', 'feature', 'improvement', 'spike'].includes(label),
       );
       if (!hasTypeLabel) {
-        violations.push({ field: "labels", issue: "missing_type_label" });
+        violations.push({ field: 'labels', issue: 'missing_type_label' });
       }
 
-      const hasPriorityLabel = task.labels.some(label =>
-        label.startsWith("p0-") || label.startsWith("p1-") ||
-        label.startsWith("p2-") || label.startsWith("p3-")
+      const hasPriorityLabel = task.labels.some(
+        (label) =>
+          label.startsWith('p0-') ||
+          label.startsWith('p1-') ||
+          label.startsWith('p2-') ||
+          label.startsWith('p3-'),
       );
       if (!hasPriorityLabel) {
-        violations.push({ field: "labels", issue: "missing_priority_label" });
+        violations.push({ field: 'labels', issue: 'missing_priority_label' });
       }
     }
 
     // Estimate validation
     if (!task.estimate) {
-      violations.push({ field: "estimate", issue: "missing" });
+      violations.push({ field: 'estimate', issue: 'missing' });
     } else if (task.estimate > 13) {
-      violations.push({ field: "estimate", issue: "too_large" });
+      violations.push({ field: 'estimate', issue: 'too_large' });
     }
 
     // Priority validation
     if (!task.priority || ![1, 2, 3, 4].includes(task.priority)) {
-      violations.push({ field: "priority", issue: "invalid" });
+      violations.push({ field: 'priority', issue: 'invalid' });
     }
 
     return violations;
@@ -569,13 +576,13 @@ Based on the specification type and content, consider:
    */
   generateStandardizedTask(item, type, options = {}) {
     switch (type) {
-      case "coverage-gap":
+      case 'coverage-gap':
         return this.generateCoverageTask(item, options);
-      case "tdd-violation":
+      case 'tdd-violation':
         return this.generateTDDTask(item, options);
-      case "orphaned-test":
+      case 'orphaned-test':
         return this.generateOrphanedTestTask(item, options);
-      case "unmapped-spec":
+      case 'unmapped-spec':
         return this.generateUnmappedSpecTask(item, options);
       default:
         throw new Error(`Unknown task type: ${type}`);

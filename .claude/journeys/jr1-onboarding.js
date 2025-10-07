@@ -20,7 +20,7 @@ class OnboardingJourney {
     this.results = {
       steps: [],
       issues: [],
-      tasks: []
+      tasks: [],
     };
   }
 
@@ -53,7 +53,6 @@ class OnboardingJourney {
 
       console.log('✅ Onboarding complete!');
       return this.results;
-
     } catch (error) {
       console.error('❌ Onboarding failed:', error.message);
       await this.rollback();
@@ -73,7 +72,7 @@ class OnboardingJourney {
       { file: 'pyproject.toml', type: 'python', parser: this.parsePyproject },
       { file: 'Gemfile', type: 'ruby', parser: this.parseGemfile },
       { file: 'pom.xml', type: 'java', parser: this.parsePom },
-      { file: 'go.mod', type: 'go', parser: this.parseGoMod }
+      { file: 'go.mod', type: 'go', parser: this.parseGoMod },
     ];
 
     for (const detector of detectors) {
@@ -86,13 +85,13 @@ class OnboardingJourney {
         this.projectType = {
           language: detector.type,
           file: detector.file,
-          details
+          details,
         };
 
         this.logDecision('project_detection', {
           detected: detector.type,
           confidence: 0.95,
-          evidence: detector.file
+          evidence: detector.file,
         });
 
         console.log(`   ✅ Detected: ${detector.type} project`);
@@ -115,7 +114,7 @@ class OnboardingJourney {
     const required = {
       javascript: ['node', 'npm'],
       python: ['python3', 'pip'],
-      common: ['git', 'make']
+      common: ['git', 'make'],
     };
 
     const missing = [];
@@ -209,7 +208,7 @@ class OnboardingJourney {
         description: this.generateTaskDescription(issue),
         priority: this.calculatePriority(issue),
         labels: this.generateLabels(issue),
-        estimate: this.estimateEffort(issue)
+        estimate: this.estimateEffort(issue),
       };
 
       // Simulate Linear task creation (would call actual API)
@@ -220,7 +219,7 @@ class OnboardingJourney {
         issue: issue.type,
         priority: task.priority,
         estimate: task.estimate,
-        automated: true
+        automated: true,
       });
     }
 
@@ -263,7 +262,7 @@ class OnboardingJourney {
     const steps = {
       red: false,
       green: false,
-      refactor: false
+      refactor: false,
     };
 
     try {
@@ -285,9 +284,8 @@ class OnboardingJourney {
       return {
         success: steps.red && steps.green && steps.refactor,
         steps,
-        files: { test: testPath, implementation: implPath }
+        files: { test: testPath, implementation: implPath },
       };
-
     } catch (error) {
       console.error('   ❌ TDD implementation failed:', error.message);
       return { success: false, steps, error };
@@ -304,18 +302,14 @@ class OnboardingJourney {
       timestamp: new Date().toISOString(),
       project: {
         type: this.projectType,
-        root: this.projectRoot
+        root: this.projectRoot,
       },
       results: this.results,
       decisions: this.decisions,
-      recommendations: this.generateRecommendations()
+      recommendations: this.generateRecommendations(),
     };
 
-    const reportPath = path.join(
-      this.projectRoot,
-      'reports',
-      `onboarding-${Date.now()}.json`
-    );
+    const reportPath = path.join(this.projectRoot, 'reports', `onboarding-${Date.now()}.json`);
 
     await this.ensureDirectory(path.dirname(reportPath));
     await fs.writeFile(reportPath, JSON.stringify(report, null, 2));
@@ -368,7 +362,7 @@ class OnboardingJourney {
       timestamp: new Date().toISOString(),
       type,
       data,
-      autonomous: true
+      autonomous: true,
     });
   }
 
@@ -377,7 +371,7 @@ class OnboardingJourney {
       issues: assessment.issues || [],
       critical: 0,
       medium: 0,
-      low: 0
+      low: 0,
     };
 
     for (const issue of analysis.issues) {
@@ -414,18 +408,16 @@ class OnboardingJourney {
   selectFirstTask(tasks) {
     // Autonomous selection of best first task
     // Prefer: Low risk (FIL-0/1), High impact, Low effort
-    return tasks.find(t =>
-      t.labels.includes('FIL-0') || t.labels.includes('FIL-1')
-    ) || tasks[0];
+    return tasks.find((t) => t.labels.includes('FIL-0') || t.labels.includes('FIL-1')) || tasks[0];
   }
 
   generateTaskTitle(issue) {
     const actionMap = {
       'unused-code': 'Remove unused',
-      'duplication': 'Eliminate duplicate',
-      'complexity': 'Simplify complex',
-      'formatting': 'Format',
-      'naming': 'Rename'
+      duplication: 'Eliminate duplicate',
+      complexity: 'Simplify complex',
+      formatting: 'Format',
+      naming: 'Rename',
     };
 
     const action = actionMap[issue.type] || 'Fix';
@@ -453,7 +445,7 @@ class OnboardingJourney {
       critical: 1,
       high: 2,
       medium: 3,
-      low: 4
+      low: 4,
     };
 
     return severityScore[issue.severity] || 3;
@@ -462,12 +454,12 @@ class OnboardingJourney {
   estimateEffort(issue) {
     // Autonomous effort estimation in hours
     const effortMap = {
-      'formatting': 0.5,
+      formatting: 0.5,
       'unused-code': 1,
-      'naming': 1,
-      'duplication': 2,
-      'complexity': 4,
-      'architecture': 8
+      naming: 1,
+      duplication: 2,
+      complexity: 4,
+      architecture: 8,
     };
 
     return effortMap[issue.type] || 2;
@@ -481,7 +473,7 @@ class OnboardingJourney {
       recommendations.push({
         type: 'schedule',
         action: 'Enable continuous assessment every 4 hours',
-        reason: 'High technical debt detected'
+        reason: 'High technical debt detected',
       });
     }
 
@@ -489,7 +481,7 @@ class OnboardingJourney {
       recommendations.push({
         type: 'tooling',
         action: 'Consider migrating to TypeScript',
-        reason: 'Improved type safety and tooling support'
+        reason: 'Improved type safety and tooling support',
       });
     }
 
@@ -505,9 +497,11 @@ class OnboardingJourney {
 // CLI execution
 if (require.main === module) {
   const journey = new OnboardingJourney();
-  journey.run({
-    autoFix: process.argv.includes('--auto-fix')
-  }).catch(console.error);
+  journey
+    .run({
+      autoFix: process.argv.includes('--auto-fix'),
+    })
+    .catch(console.error);
 }
 
 module.exports = OnboardingJourney;

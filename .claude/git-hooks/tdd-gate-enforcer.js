@@ -22,7 +22,7 @@ class TDDGateEnforcer {
       testResults: null,
       coverage: null,
       violations: [],
-      passed: false
+      passed: false,
     };
   }
 
@@ -36,13 +36,7 @@ class TDDGateEnforcer {
       requireFailingTestFirst: true,
       allowSkippedTests: false,
       testTimeout: 30000, // Default 30s, extended for LLM calls
-      excludePatterns: [
-        'node_modules/**',
-        'coverage/**',
-        '*.min.js',
-        'dist/**',
-        'build/**'
-      ]
+      excludePatterns: ['node_modules/**', 'coverage/**', '*.min.js', 'dist/**', 'build/**'],
     };
 
     try {
@@ -98,12 +92,11 @@ class TDDGateEnforcer {
         this.printViolations();
         return false;
       }
-
     } catch (error) {
       console.error('💥 TDD Gate Enforcer failed:', error.message);
       this.results.violations.push({
         type: 'enforcer_error',
-        message: `Gate enforcer failed: ${error.message}`
+        message: `Gate enforcer failed: ${error.message}`,
       });
       return false;
     }
@@ -121,13 +114,13 @@ class TDDGateEnforcer {
       const commitMessage = this.getCommitMessage();
 
       // Check if only test files are being added/modified
-      const onlyTestFiles = stagedFiles.every(file => this.isTestFile(file));
+      const onlyTestFiles = stagedFiles.every((file) => this.isTestFile(file));
 
       // Check if tests are failing
       const testsAreFailing = await this.checkIfTestsFail();
 
       // Check if implementation files are being modified
-      const implementationFiles = stagedFiles.filter(file => !this.isTestFile(file));
+      const implementationFiles = stagedFiles.filter((file) => !this.isTestFile(file));
 
       // Phase detection logic
       if (commitMessage && commitMessage.toLowerCase().includes('[red]')) {
@@ -145,7 +138,6 @@ class TDDGateEnforcer {
       }
 
       return 'standard';
-
     } catch (error) {
       console.warn('⚠️ Could not determine TDD phase, using standard checks');
       return 'standard';
@@ -170,18 +162,18 @@ class TDDGateEnforcer {
     if (testResults.success) {
       this.results.violations.push({
         type: 'red_phase_violation',
-        message: 'RED phase requires failing tests, but all tests are passing'
+        message: 'RED phase requires failing tests, but all tests are passing',
       });
     }
 
     // Ensure test files are being added/modified
     const stagedFiles = this.getStagedFiles();
-    const testFiles = stagedFiles.filter(file => this.isTestFile(file));
+    const testFiles = stagedFiles.filter((file) => this.isTestFile(file));
 
     if (testFiles.length === 0) {
       this.results.violations.push({
         type: 'red_phase_violation',
-        message: 'RED phase requires test files to be added/modified'
+        message: 'RED phase requires test files to be added/modified',
       });
     }
 
@@ -202,18 +194,18 @@ class TDDGateEnforcer {
     if (!testResults.success) {
       this.results.violations.push({
         type: 'green_phase_violation',
-        message: 'GREEN phase requires all tests to pass'
+        message: 'GREEN phase requires all tests to pass',
       });
     }
 
     // Check that implementation files are being modified
     const stagedFiles = this.getStagedFiles();
-    const implementationFiles = stagedFiles.filter(file => !this.isTestFile(file));
+    const implementationFiles = stagedFiles.filter((file) => !this.isTestFile(file));
 
     if (implementationFiles.length === 0) {
       this.results.violations.push({
         type: 'green_phase_violation',
-        message: 'GREEN phase requires implementation files to be modified'
+        message: 'GREEN phase requires implementation files to be modified',
       });
     }
 
@@ -234,20 +226,20 @@ class TDDGateEnforcer {
     if (!testResults.success) {
       this.results.violations.push({
         type: 'refactor_phase_violation',
-        message: 'REFACTOR phase requires all tests to continue passing'
+        message: 'REFACTOR phase requires all tests to continue passing',
       });
     }
 
     // Ensure no new test files are being added (refactor shouldn't add new behavior)
     const stagedFiles = this.getStagedFiles();
-    const newTestFiles = stagedFiles.filter(file =>
-      this.isTestFile(file) && this.isNewFile(file)
+    const newTestFiles = stagedFiles.filter(
+      (file) => this.isTestFile(file) && this.isNewFile(file),
     );
 
     if (newTestFiles.length > 0) {
       this.results.violations.push({
         type: 'refactor_phase_violation',
-        message: 'REFACTOR phase should not add new test files (suggests new functionality)'
+        message: 'REFACTOR phase should not add new test files (suggests new functionality)',
       });
     }
 
@@ -268,7 +260,7 @@ class TDDGateEnforcer {
     if (!testResults.success) {
       this.results.violations.push({
         type: 'test_failure',
-        message: 'All tests must pass before commit'
+        message: 'All tests must pass before commit',
       });
     }
 
@@ -294,7 +286,7 @@ class TDDGateEnforcer {
           output: 'Tests skipped - command not available',
           duration: 0,
           command: testCommand,
-          skipped: true
+          skipped: true,
         };
       }
 
@@ -308,7 +300,7 @@ class TDDGateEnforcer {
       const output = execSync(testCommand, {
         encoding: 'utf8',
         timeout: commandTimeout,
-        cwd: process.cwd()
+        cwd: process.cwd(),
       });
 
       const duration = Date.now() - startTime;
@@ -319,9 +311,8 @@ class TDDGateEnforcer {
         success: true,
         output,
         duration,
-        command: testCommand
+        command: testCommand,
       };
-
     } catch (error) {
       console.log('❌ Tests failed');
 
@@ -329,7 +320,7 @@ class TDDGateEnforcer {
         success: false,
         output: error.stdout || error.message,
         error: error.stderr || error.message,
-        command: this.getTestCommand()
+        command: this.getTestCommand(),
       };
     }
   }
@@ -343,7 +334,7 @@ class TDDGateEnforcer {
       execSync(testCommand, {
         encoding: 'utf8',
         timeout: 10000,
-        stdio: 'ignore'
+        stdio: 'ignore',
       });
       return false; // Tests pass
     } catch (error) {
@@ -375,12 +366,13 @@ class TDDGateEnforcer {
           type: 'diff_coverage_violation',
           message: `Diff coverage ${coverage.percentage}% is below minimum ${this.config.minimumDiffCoverage}%`,
           actual: coverage.percentage,
-          required: this.config.minimumDiffCoverage
+          required: this.config.minimumDiffCoverage,
         });
       }
 
-      console.log(`📊 Diff coverage: ${coverage.percentage}% (required: ${this.config.minimumDiffCoverage}%)`);
-
+      console.log(
+        `📊 Diff coverage: ${coverage.percentage}% (required: ${this.config.minimumDiffCoverage}%)`,
+      );
     } catch (error) {
       console.warn('⚠️ Could not calculate diff coverage:', error.message);
     }
@@ -401,12 +393,13 @@ class TDDGateEnforcer {
           type: 'coverage_violation',
           message: `Overall coverage ${coverage.percentage}% is below minimum ${this.config.minimumCoverage}%`,
           actual: coverage.percentage,
-          required: this.config.minimumCoverage
+          required: this.config.minimumCoverage,
         });
       }
 
-      console.log(`📊 Overall coverage: ${coverage.percentage}% (required: ${this.config.minimumCoverage}%)`);
-
+      console.log(
+        `📊 Overall coverage: ${coverage.percentage}% (required: ${this.config.minimumCoverage}%)`,
+      );
     } catch (error) {
       console.warn('⚠️ Could not calculate coverage:', error.message);
     }
@@ -428,7 +421,7 @@ class TDDGateEnforcer {
           this.results.violations.push({
             type: 'test_quality_violation',
             message: `Test file ${testFile} has no assertions`,
-            file: testFile
+            file: testFile,
           });
         }
 
@@ -436,10 +429,9 @@ class TDDGateEnforcer {
           this.results.violations.push({
             type: 'test_quality_violation',
             message: `Test file ${testFile} has no test cases`,
-            file: testFile
+            file: testFile,
           });
         }
-
       } catch (error) {
         console.warn(`⚠️ Could not validate test quality for ${testFile}`);
       }
@@ -455,7 +447,7 @@ class TDDGateEnforcer {
 
     // Basic check: ensure no functionality was added
     const stagedFiles = this.getStagedFiles();
-    const implementationFiles = stagedFiles.filter(file => !this.isTestFile(file));
+    const implementationFiles = stagedFiles.filter((file) => !this.isTestFile(file));
 
     for (const file of implementationFiles) {
       // This could be enhanced with AST analysis to detect new functionality
@@ -470,9 +462,12 @@ class TDDGateEnforcer {
     try {
       const output = execSync('git diff --cached --name-only', {
         encoding: 'utf8',
-        timeout: 5000
+        timeout: 5000,
       });
-      return output.trim().split('\n').filter(file => file.length > 0);
+      return output
+        .trim()
+        .split('\n')
+        .filter((file) => file.length > 0);
     } catch (error) {
       return [];
     }
@@ -518,10 +513,10 @@ class TDDGateEnforcer {
       // Generic patterns
       /\/tests?\//,
       /\/test_/,
-      /\/.*_test\./
+      /\/.*_test\./,
     ];
 
-    return testPatterns.some(pattern => pattern.test(filepath));
+    return testPatterns.some((pattern) => pattern.test(filepath));
   }
 
   /**
@@ -529,7 +524,9 @@ class TDDGateEnforcer {
    */
   isNewFile(filepath) {
     try {
-      const output = execSync(`git diff --cached --name-status | grep "^A.*${filepath}"`, { encoding: 'utf8' });
+      const output = execSync(`git diff --cached --name-status | grep "^A.*${filepath}"`, {
+        encoding: 'utf8',
+      });
       return output.trim().length > 0;
     } catch (error) {
       return false;
@@ -542,7 +539,9 @@ class TDDGateEnforcer {
   getTestCommand() {
     // Check for JavaScript/Node.js projects first
     if (fs.existsSync(path.join(process.cwd(), 'package.json'))) {
-      const packageJson = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'package.json'), 'utf8'));
+      const packageJson = JSON.parse(
+        fs.readFileSync(path.join(process.cwd(), 'package.json'), 'utf8'),
+      );
 
       // Prefer simple, fast test commands that are less likely to hang
       if (packageJson.scripts && packageJson.scripts['test:unit']) {
@@ -576,23 +575,24 @@ class TDDGateEnforcer {
       'setup.py',
       'requirements.txt',
       'tox.ini',
-      '.coveragerc'
+      '.coveragerc',
     ];
 
-    const hasPythonProject = pythonFiles.some(file =>
-      fs.existsSync(path.join(process.cwd(), file))
+    const hasPythonProject = pythonFiles.some((file) =>
+      fs.existsSync(path.join(process.cwd(), file)),
     );
 
     if (hasPythonProject) {
       // Prefer pytest if configuration exists
-      if (fs.existsSync(path.join(process.cwd(), 'pytest.ini')) ||
-          fs.existsSync(path.join(process.cwd(), 'pyproject.toml'))) {
+      if (
+        fs.existsSync(path.join(process.cwd(), 'pytest.ini')) ||
+        fs.existsSync(path.join(process.cwd(), 'pyproject.toml'))
+      ) {
         return 'python -m pytest';
       }
 
       // Check for unittest structure
-      if (fs.existsSync(path.join(process.cwd(), 'tests')) ||
-          this.hasUnittestFiles()) {
+      if (fs.existsSync(path.join(process.cwd(), 'tests')) || this.hasUnittestFiles()) {
         return 'python -m unittest discover';
       }
 
@@ -603,7 +603,7 @@ class TDDGateEnforcer {
     // Check for Python files in current directory as fallback
     try {
       const files = fs.readdirSync(process.cwd());
-      const hasPyFiles = files.some(file => file.endsWith('.py'));
+      const hasPyFiles = files.some((file) => file.endsWith('.py'));
       if (hasPyFiles) {
         return 'python -m pytest';
       }
@@ -621,9 +621,7 @@ class TDDGateEnforcer {
   hasUnittestFiles() {
     try {
       const files = fs.readdirSync(process.cwd());
-      return files.some(file =>
-        file.startsWith('test_') && file.endsWith('.py')
-      );
+      return files.some((file) => file.startsWith('test_') && file.endsWith('.py'));
     } catch (error) {
       return false;
     }
@@ -639,9 +637,9 @@ class TDDGateEnforcer {
       'comprehensive-workflow',
       'agent:invoke',
       'assess',
-      '.claude'
+      '.claude',
     ];
-    return llmIndicators.some(indicator => command.includes(indicator));
+    return llmIndicators.some((indicator) => command.includes(indicator));
   }
 
   /**
@@ -682,7 +680,7 @@ class TDDGateEnforcer {
     try {
       const output = execSync('git diff --cached --unified=0', {
         encoding: 'utf8',
-        timeout: 5000
+        timeout: 5000,
       });
       const lines = [];
 
@@ -702,7 +700,7 @@ class TDDGateEnforcer {
             for (let i = 0; i < lineCount; i++) {
               lines.push({
                 file: currentFile,
-                line: startLine + i
+                line: startLine + i,
               });
             }
           }
@@ -729,7 +727,6 @@ class TDDGateEnforcer {
       }
 
       return this.analyzeDiffCoverage(changedLines, coverageData);
-
     } catch (error) {
       console.warn('⚠️ Coverage calculation failed:', error.message);
       return this.estimateDiffCoverage(changedLines);
@@ -742,8 +739,10 @@ class TDDGateEnforcer {
   async runCoverageForChangedFiles(changedLines) {
     try {
       // Get unique files from changed lines
-      const changedFiles = [...new Set(changedLines.map(line => line.file))];
-      const testableFiles = changedFiles.filter(file => !this.isTestFile(file) && !this.isExcludedFile(file));
+      const changedFiles = [...new Set(changedLines.map((line) => line.file))];
+      const testableFiles = changedFiles.filter(
+        (file) => !this.isTestFile(file) && !this.isExcludedFile(file),
+      );
 
       if (testableFiles.length === 0) {
         return null;
@@ -766,13 +765,12 @@ class TDDGateEnforcer {
         timeout: coverageTimeout,
         cwd: process.cwd(),
         stdio: ['ignore', 'pipe', 'pipe'], // Capture stderr
-        killSignal: 'SIGKILL'
+        killSignal: 'SIGKILL',
       });
 
       // Parse coverage JSON
       const coverageJson = JSON.parse(output);
       return coverageJson;
-
     } catch (error) {
       // Try alternative coverage approaches
       return await this.runAlternativeCoverage();
@@ -815,17 +813,19 @@ class TDDGateEnforcer {
       'pyproject.toml',
       'pytest.ini',
       'requirements.txt',
-      'setup.py'
+      'setup.py',
     ];
 
-    const hasPythonProject = pythonFiles.some(file =>
-      fs.existsSync(path.join(process.cwd(), file))
+    const hasPythonProject = pythonFiles.some((file) =>
+      fs.existsSync(path.join(process.cwd(), file)),
     );
 
     if (hasPythonProject) {
       // Try pytest-cov first (more comprehensive), then coverage.py
-      if (fs.existsSync(path.join(process.cwd(), 'pytest.ini')) ||
-          fs.existsSync(path.join(process.cwd(), 'pyproject.toml'))) {
+      if (
+        fs.existsSync(path.join(process.cwd(), 'pytest.ini')) ||
+        fs.existsSync(path.join(process.cwd(), 'pyproject.toml'))
+      ) {
         return 'python -m pytest --cov=. --cov-report=json';
       } else {
         return 'python -m coverage run -m pytest && python -m coverage json';
@@ -847,7 +847,7 @@ class TDDGateEnforcer {
         'npx c8 --reporter=json npm test',
         'npx nyc --reporter=json npm test',
         'python -m pytest --cov=. --cov-report=json',
-        'python -m coverage run -m pytest && python -m coverage json'
+        'python -m coverage run -m pytest && python -m coverage json',
       ];
 
       for (const approach of approaches) {
@@ -862,7 +862,7 @@ class TDDGateEnforcer {
             encoding: 'utf8',
             timeout: approachTimeout,
             stdio: ['ignore', 'pipe', 'pipe'], // Capture stderr
-            killSignal: 'SIGKILL'
+            killSignal: 'SIGKILL',
           });
 
           const coverageJson = JSON.parse(output);
@@ -923,7 +923,7 @@ class TDDGateEnforcer {
       totalLines,
       coveredLines,
       percentage,
-      filesCovered: Object.keys(linesByFile).length
+      filesCovered: Object.keys(linesByFile).length,
     };
   }
 
@@ -944,23 +944,21 @@ class TDDGateEnforcer {
     } else {
       // Search for file with partial path matching
       const coverageFiles = Object.keys(
-        coverageData.coverage ||
-        coverageData.files ||
-        coverageData
+        coverageData.coverage || coverageData.files || coverageData,
       );
 
-      const matchingFile = coverageFiles.find(path => {
+      const matchingFile = coverageFiles.find((path) => {
         const normalizedPath = this.normalizePath(path);
         const normalizedTarget = this.normalizePath(filePath);
-        return normalizedPath.endsWith(normalizedTarget) ||
-               normalizedTarget.endsWith(normalizedPath) ||
-               path === filePath;
+        return (
+          normalizedPath.endsWith(normalizedTarget) ||
+          normalizedTarget.endsWith(normalizedPath) ||
+          path === filePath
+        );
       });
 
       if (matchingFile) {
-        return (coverageData.coverage ||
-                coverageData.files ||
-                coverageData)[matchingFile];
+        return (coverageData.coverage || coverageData.files || coverageData)[matchingFile];
       }
     }
 
@@ -1030,10 +1028,10 @@ class TDDGateEnforcer {
       /dist/,
       /build/,
       /vendor/,
-      /__pycache__/
+      /__pycache__/,
     ];
 
-    return excludePatterns.some(pattern => {
+    return excludePatterns.some((pattern) => {
       if (pattern instanceof RegExp) {
         return pattern.test(filePath);
       }
@@ -1045,22 +1043,22 @@ class TDDGateEnforcer {
    * Estimate diff coverage when real coverage data is unavailable
    */
   estimateDiffCoverage(changedLines) {
-    const testableLines = changedLines.filter(line =>
-      !this.isTestFile(line.file) && !this.isExcludedFile(line.file)
+    const testableLines = changedLines.filter(
+      (line) => !this.isTestFile(line.file) && !this.isExcludedFile(line.file),
     );
 
     // Conservative estimation based on file types and test presence
     let estimatedCoverage = 60; // Base assumption
 
     // Check if test files were also modified (suggests TDD)
-    const hasTestChanges = changedLines.some(line => this.isTestFile(line.file));
+    const hasTestChanges = changedLines.some((line) => this.isTestFile(line.file));
     if (hasTestChanges) {
       estimatedCoverage += 20;
     }
 
     // Check for specific file types that are typically well-tested
-    const hasWellTestedFiles = testableLines.some(line =>
-      /\.(test|spec|util|helper)\./i.test(line.file)
+    const hasWellTestedFiles = testableLines.some((line) =>
+      /\.(test|spec|util|helper)\./i.test(line.file),
     );
     if (hasWellTestedFiles) {
       estimatedCoverage += 10;
@@ -1073,7 +1071,7 @@ class TDDGateEnforcer {
       totalLines,
       coveredLines,
       percentage: totalLines > 0 ? Math.round((coveredLines / totalLines) * 100) : 100,
-      estimated: true
+      estimated: true,
     };
   }
 
@@ -1091,7 +1089,6 @@ class TDDGateEnforcer {
 
       console.warn('⚠️ Could not calculate coverage, using fallback estimation');
       return { percentage: 75, estimated: true };
-
     } catch (error) {
       console.warn('⚠️ Coverage calculation failed:', error.message);
       return { percentage: 75, estimated: true };
@@ -1132,19 +1129,22 @@ class TDDGateEnforcer {
         packageJson.scripts?.coverage ? 'npm run coverage' : null,
 
         // Jest with coverage
-        (packageJson.devDependencies?.jest || packageJson.dependencies?.jest) ?
-          'npx jest --coverage --silent --coverageReporters=text-summary' : null,
+        packageJson.devDependencies?.jest || packageJson.dependencies?.jest
+          ? 'npx jest --coverage --silent --coverageReporters=text-summary'
+          : null,
 
         // c8 with npm test
-        (packageJson.devDependencies?.c8 || packageJson.dependencies?.c8) ?
-          'npx c8 --reporter=text-summary npm test' : null,
+        packageJson.devDependencies?.c8 || packageJson.dependencies?.c8
+          ? 'npx c8 --reporter=text-summary npm test'
+          : null,
 
         // nyc with npm test
-        (packageJson.devDependencies?.nyc || packageJson.dependencies?.nyc) ?
-          'npx nyc --reporter=text-summary npm test' : null,
+        packageJson.devDependencies?.nyc || packageJson.dependencies?.nyc
+          ? 'npx nyc --reporter=text-summary npm test'
+          : null,
 
         // Default Jest fallback
-        'npx jest --coverage --silent --coverageReporters=text-summary'
+        'npx jest --coverage --silent --coverageReporters=text-summary',
       ].filter(Boolean);
 
       for (const approach of approaches) {
@@ -1161,16 +1161,20 @@ class TDDGateEnforcer {
             encoding: 'utf8',
             timeout: approachTimeout,
             stdio: ['ignore', 'pipe', 'pipe'], // Capture stderr
-            killSignal: 'SIGKILL'
+            killSignal: 'SIGKILL',
           });
 
           const percentage = this.parseJavaScriptCoverage(output);
           if (percentage !== null) {
             return {
               percentage,
-              tool: approach.includes('jest') ? 'jest' :
-                    approach.includes('c8') ? 'c8' :
-                    approach.includes('nyc') ? 'nyc' : 'npm'
+              tool: approach.includes('jest')
+                ? 'jest'
+                : approach.includes('c8')
+                  ? 'c8'
+                  : approach.includes('nyc')
+                    ? 'nyc'
+                    : 'npm',
             };
           }
         } catch (error) {
@@ -1195,18 +1199,18 @@ class TDDGateEnforcer {
       'setup.py',
       'pytest.ini',
       '.coveragerc',
-      'tox.ini'
+      'tox.ini',
     ];
 
-    const hasPythonProject = pythonFiles.some(file =>
-      fs.existsSync(path.join(process.cwd(), file))
+    const hasPythonProject = pythonFiles.some((file) =>
+      fs.existsSync(path.join(process.cwd(), file)),
     );
 
     if (!hasPythonProject) {
       // Check for .py files in current directory
       try {
         const files = fs.readdirSync(process.cwd());
-        const hasPyFiles = files.some(file => file.endsWith('.py'));
+        const hasPyFiles = files.some((file) => file.endsWith('.py'));
         if (!hasPyFiles) return null;
       } catch (error) {
         return null;
@@ -1226,7 +1230,7 @@ class TDDGateEnforcer {
         'python -m pytest --cov=. --cov-report=term-missing | grep TOTAL',
 
         // Basic coverage.py
-        'python -m coverage run --source=. -m pytest && python -m coverage report'
+        'python -m coverage run --source=. -m pytest && python -m coverage report',
       ];
 
       for (const approach of approaches) {
@@ -1243,14 +1247,14 @@ class TDDGateEnforcer {
             encoding: 'utf8',
             timeout: approachTimeout,
             stdio: ['ignore', 'pipe', 'pipe'], // Capture stderr
-            killSignal: 'SIGKILL'
+            killSignal: 'SIGKILL',
           });
 
           const percentage = this.parsePythonCoverage(output);
           if (percentage !== null) {
             return {
               percentage,
-              tool: approach.includes('pytest-cov') ? 'pytest-cov' : 'coverage.py'
+              tool: approach.includes('pytest-cov') ? 'pytest-cov' : 'coverage.py',
             };
           }
         } catch (error) {
@@ -1280,7 +1284,7 @@ class TDDGateEnforcer {
       /Coverage:\s*(\d+\.?\d*)%/,
 
       // Total coverage format: "Total: 85.5%"
-      /Total:\s*(\d+\.?\d*)%/
+      /Total:\s*(\d+\.?\d*)%/,
     ];
 
     for (const pattern of patterns) {
@@ -1312,7 +1316,7 @@ class TDDGateEnforcer {
       /^(\d+)$/m,
 
       // Coverage percentage at end of line
-      /(\d+\.?\d*)%\s*$/m
+      /(\d+\.?\d*)%\s*$/m,
     ];
 
     for (const pattern of patterns) {
@@ -1362,11 +1366,12 @@ class TDDGateEnforcer {
 if (require.main === module) {
   const enforcer = new TDDGateEnforcer();
 
-  enforcer.enforce()
-    .then(passed => {
+  enforcer
+    .enforce()
+    .then((passed) => {
       process.exit(passed ? 0 : 1);
     })
-    .catch(error => {
+    .catch((error) => {
       console.error('💥 TDD Gate Enforcer crashed:', error.message);
       process.exit(1);
     });

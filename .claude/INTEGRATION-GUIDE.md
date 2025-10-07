@@ -13,11 +13,13 @@ This guide explains the different integration modes available for connecting the
 **Best for:** 99% of users, especially Claude Code sessions
 
 #### How it Works
+
 - **Linear MCP Server** provides direct API access to Linear
 - **GitHub CLI (`gh`)** handles GitHub operations
 - **No webhooks, no servers, no infrastructure**
 
 #### Available Operations
+
 ```javascript
 // Direct Linear operations via MCP
 mcp__linear-server__list_issues({ assignee: "me" })
@@ -31,12 +33,14 @@ gh pr review --approve
 ```
 
 #### Setup
+
 ```bash
 # Already configured in Claude Code!
 # Just use the MCP tools directly
 ```
 
 #### Benefits
+
 ✅ **Zero setup** - Works immediately
 ✅ **No infrastructure** - No servers needed
 ✅ **Real-time** - Direct API calls
@@ -52,16 +56,18 @@ gh pr review --approve
 **Best for:** Automated workflows, scheduled updates
 
 #### How it Works
+
 - Scheduled jobs run `linear:sync` command
 - Polls Linear API for changes at intervals
 - Updates local cache and triggers actions
 
 #### Setup Example (GitHub Actions)
+
 ```yaml
 name: Linear Sync
 on:
   schedule:
-    - cron: '*/15 * * * *'  # Every 15 minutes
+    - cron: '*/15 * * * *' # Every 15 minutes
 
 jobs:
   sync:
@@ -72,6 +78,7 @@ jobs:
 ```
 
 #### Commands
+
 ```bash
 # Manual sync
 npm run linear:sync
@@ -81,6 +88,7 @@ npm run linear:sync -- --force --verbose
 ```
 
 #### Benefits
+
 ✅ **Predictable** - Runs on schedule
 ✅ **CI-friendly** - Integrates with pipelines
 ✅ **Batch processing** - Efficient for bulk updates
@@ -95,6 +103,7 @@ npm run linear:sync -- --force --verbose
 **Best for:** Enterprise teams with DevOps resources
 
 #### Requirements
+
 - **Persistent server** (VPS, AWS EC2, etc.)
 - **Public HTTPS endpoint** with SSL
 - **Process manager** (PM2, systemd)
@@ -102,12 +111,14 @@ npm run linear:sync -- --force --verbose
 - **Security** (Firewall, rate limiting)
 
 #### When to Consider
+
 - Sub-second event response required
 - Compliance audit requirements
 - High-volume operations (>1000 events/hour)
 - Dedicated infrastructure team
 
 #### Documentation
+
 See `.claude/advanced/webhooks/README.md` for setup instructions
 
 ⚠️ **WARNING:** Not recommended for Claude Code or typical development workflows
@@ -134,15 +145,15 @@ Do you have dedicated infrastructure?
 
 ### Quick Comparison
 
-| Feature | Standard (MCP) | Polling | Webhooks |
-|---------|---------------|---------|----------|
-| Setup Time | 0 minutes | 5 minutes | 2+ hours |
-| Infrastructure | None | CI/CD | Server + SSL |
-| Maintenance | None | Minimal | Significant |
-| Response Time | ~1 second | 1-15 minutes | <1 second |
-| Reliability | High | High | Medium |
-| Debugging | Easy | Easy | Complex |
-| Claude Code | ✅ Perfect | ⚠️ Limited | ❌ No |
+| Feature        | Standard (MCP) | Polling      | Webhooks     |
+| -------------- | -------------- | ------------ | ------------ |
+| Setup Time     | 0 minutes      | 5 minutes    | 2+ hours     |
+| Infrastructure | None           | CI/CD        | Server + SSL |
+| Maintenance    | None           | Minimal      | Significant  |
+| Response Time  | ~1 second      | 1-15 minutes | <1 second    |
+| Reliability    | High           | High         | Medium       |
+| Debugging      | Easy           | Easy         | Complex      |
+| Claude Code    | ✅ Perfect     | ⚠️ Limited   | ❌ No        |
 
 ---
 
@@ -159,9 +170,11 @@ webhookHandler.on('issue.created', async (issue) => {
 });
 
 // NEW: Direct MCP call when needed
-const issues = await mcp__linear-server__list_issues({
-  createdAt: "-PT1H"  // Last hour
-});
+const issues =
+  (await mcp__linear) -
+  server__list_issues({
+    createdAt: '-PT1H', // Last hour
+  });
 issues.forEach(processNewIssue);
 ```
 
@@ -175,7 +188,7 @@ setInterval(syncLinear, 15 * 60 * 1000);
 
 // NEW: Sync when actually needed
 async function onUserAction() {
-  const data = await mcp__linear-server__list_issues();
+  const data = (await mcp__linear) - server__list_issues();
   // Process immediately
 }
 ```
@@ -185,24 +198,30 @@ async function onUserAction() {
 ## Best Practices
 
 ### For Standard Mode (MCP)
+
 1. **Cache strategically** - Don't over-fetch data
 2. **Batch operations** - Group related API calls
 3. **Handle rate limits** - Respect API quotas
 4. **Use filters** - Request only needed data
 
 ### Example: Efficient Issue Fetching
+
 ```javascript
 // Good: Fetch only what's needed
-const activeIssues = await mcp__linear-server__list_issues({
-  assignee: "me",
-  state: "In Progress",
-  limit: 10
-});
+const activeIssues =
+  (await mcp__linear) -
+  server__list_issues({
+    assignee: 'me',
+    state: 'In Progress',
+    limit: 10,
+  });
 
 // Bad: Fetching everything
-const allIssues = await mcp__linear-server__list_issues({
-  limit: 250  // Don't do this unless necessary
-});
+const allIssues =
+  (await mcp__linear) -
+  server__list_issues({
+    limit: 250, // Don't do this unless necessary
+  });
 ```
 
 ---
@@ -210,17 +229,21 @@ const allIssues = await mcp__linear-server__list_issues({
 ## Common Patterns
 
 ### 1. Task Creation from Code Assessment
+
 ```javascript
 // Using MCP directly in Claude Code
-const issue = await mcp__linear-server__create_issue({
-  title: "Fix: Authentication vulnerability",
-  team: "engineering",
-  labels: ["security", "high-priority"],
-  description: "Found during code assessment..."
-});
+const issue =
+  (await mcp__linear) -
+  server__create_issue({
+    title: 'Fix: Authentication vulnerability',
+    team: 'engineering',
+    labels: ['security', 'high-priority'],
+    description: 'Found during code assessment...',
+  });
 ```
 
 ### 2. PR Status Updates
+
 ```bash
 # Using GitHub CLI
 gh pr list --state open --json number,title,labels |
@@ -228,12 +251,15 @@ gh pr list --state open --json number,title,labels |
 ```
 
 ### 3. Sprint Progress Tracking
+
 ```javascript
 // Get current sprint issues
-const sprint = await mcp__linear-server__list_issues({
-  cycle: "current",
-  team: "engineering"
-});
+const sprint =
+  (await mcp__linear) -
+  server__list_issues({
+    cycle: 'current',
+    team: 'engineering',
+  });
 ```
 
 ---
@@ -243,10 +269,12 @@ const sprint = await mcp__linear-server__list_issues({
 ### Standard Mode Issues
 
 **"MCP server not available"**
+
 - Ensure Claude Code has MCP servers configured
 - Check `.claude/mcp.json` exists
 
 **"Rate limit exceeded"**
+
 - Implement exponential backoff
 - Cache frequently accessed data
 - Batch operations when possible

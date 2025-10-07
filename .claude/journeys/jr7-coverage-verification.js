@@ -27,7 +27,7 @@ class CoverageVerificationJourney {
       mapping: {},
       gaps: [],
       tddCompliance: {},
-      tasks: []
+      tasks: [],
     };
 
     this.qualityGates = {
@@ -35,11 +35,11 @@ class CoverageVerificationJourney {
         overall: 80,
         diff: 80,
         critical: 95,
-        newFeatures: 90
+        newFeatures: 90,
       },
       tdd: {
-        complianceRate: 80
-      }
+        complianceRate: 80,
+      },
     };
 
     this.taskTemplates = new TaskTemplates();
@@ -49,12 +49,7 @@ class CoverageVerificationJourney {
    * Execute the coverage verification journey
    */
   async execute(options = {}) {
-    const {
-      module,
-      createTasks = false,
-      detailed = true,
-      outputFormat = 'console'
-    } = options;
+    const { module, createTasks = false, detailed = true, outputFormat = 'console' } = options;
 
     console.log('🚀 Starting JR-7: Coverage Verification Journey\n');
 
@@ -94,9 +89,8 @@ class CoverageVerificationJourney {
       return {
         success: this.isCompliant(),
         results: this.results,
-        report
+        report,
       };
-
     } catch (error) {
       console.error('❌ Journey failed:', error);
       throw error;
@@ -113,7 +107,7 @@ class CoverageVerificationJourney {
     this.results.requirements = await parser.parse({
       docsDir: path.join(process.cwd(), 'docs'),
       claudeDir: path.join(process.cwd(), '.claude'),
-      module
+      module,
     });
 
     console.log(`  ✅ Found ${this.results.requirements.length} requirements\n`);
@@ -144,7 +138,7 @@ class CoverageVerificationJourney {
     const mapper = new TestMapper();
     this.results.mapping = await mapper.map({
       requirements: this.results.requirements,
-      detailed: true
+      detailed: true,
     });
 
     const { analysis } = this.results.mapping;
@@ -166,7 +160,7 @@ class CoverageVerificationJourney {
     const analyzer = new TDDAnalyzer();
     this.results.tddCompliance = await analyzer.analyze({
       since: '1 month ago',
-      strict: false
+      strict: false,
     });
 
     const { analysis } = this.results.tddCompliance;
@@ -186,10 +180,10 @@ class CoverageVerificationJourney {
     this.results.gaps = await gapAnalyzer.analyze({
       mapping: this.results.mapping,
       qualityGates: this.qualityGates,
-      threshold: this.qualityGates.coverage.overall
+      threshold: this.qualityGates.coverage.overall,
     });
 
-    const criticalGaps = this.results.gaps.filter(g => g.priority === 'HIGH');
+    const criticalGaps = this.results.gaps.filter((g) => g.priority === 'HIGH');
     console.log(`  Total Gaps: ${this.results.gaps.length}`);
     console.log(`  Critical Gaps: ${criticalGaps.length}\n`);
   }
@@ -203,13 +197,13 @@ class CoverageVerificationJourney {
     const gates = {
       coverage: this.validateCoverageGates(),
       tdd: this.validateTDDGates(),
-      mapping: this.validateMappingGates()
+      mapping: this.validateMappingGates(),
     };
 
     this.results.gateValidation = gates;
 
     // Display results
-    const passed = Object.values(gates).every(g => g.passed);
+    const passed = Object.values(gates).every((g) => g.passed);
     const icon = passed ? '✅' : '❌';
     console.log(`  ${icon} Overall: ${passed ? 'PASSED' : 'FAILED'}`);
     console.log(`  Coverage Gates: ${gates.coverage.passed ? '✅' : '❌'}`);
@@ -228,13 +222,13 @@ class CoverageVerificationJourney {
       overall: lineCoverage >= this.qualityGates.coverage.overall,
       branches: (summary.branches?.pct || 0) >= 70,
       functions: (summary.functions?.pct || 0) >= 75,
-      statements: (summary.statements?.pct || 0) >= this.qualityGates.coverage.overall
+      statements: (summary.statements?.pct || 0) >= this.qualityGates.coverage.overall,
     };
 
     return {
-      passed: Object.values(gates).every(g => g),
+      passed: Object.values(gates).every((g) => g),
       gates,
-      message: gates.passed ? 'All coverage gates passed' : 'Some coverage gates failed'
+      message: gates.passed ? 'All coverage gates passed' : 'Some coverage gates failed',
     };
   }
 
@@ -245,13 +239,15 @@ class CoverageVerificationJourney {
     const complianceRate = this.results.tddCompliance.analysis?.complianceRate || 0;
 
     const gates = {
-      compliance: complianceRate >= this.qualityGates.tdd.complianceRate
+      compliance: complianceRate >= this.qualityGates.tdd.complianceRate,
     };
 
     return {
       passed: gates.compliance,
       gates,
-      message: gates.passed ? 'TDD compliance met' : `TDD compliance below ${this.qualityGates.tdd.complianceRate}%`
+      message: gates.passed
+        ? 'TDD compliance met'
+        : `TDD compliance below ${this.qualityGates.tdd.complianceRate}%`,
     };
   }
 
@@ -261,17 +257,17 @@ class CoverageVerificationJourney {
   validateMappingGates() {
     const { unmappedSpecs = [], orphanedTests = [] } = this.results.mapping;
 
-    const criticalUnmapped = unmappedSpecs.filter(s => s.priority === 'HIGH');
+    const criticalUnmapped = unmappedSpecs.filter((s) => s.priority === 'HIGH');
 
     const gates = {
       noCriticalUnmapped: criticalUnmapped.length === 0,
-      lowOrphaned: orphanedTests.length <= 5
+      lowOrphaned: orphanedTests.length <= 5,
     };
 
     return {
       passed: gates.noCriticalUnmapped,
       gates,
-      message: gates.passed ? 'All critical specs have tests' : 'Critical specs lack test coverage'
+      message: gates.passed ? 'All critical specs have tests' : 'Critical specs lack test coverage',
     };
   }
 
@@ -290,22 +286,24 @@ class CoverageVerificationJourney {
         const standardizedTask = this.taskTemplates.generateCoverageTask(gap, {
           threshold: this.qualityGates.coverage.overall,
           module: gap.module || 'unknown',
-          component: this.inferComponent(gap)
+          component: this.inferComponent(gap),
         });
 
         // Validate the task meets standards
         const violations = this.taskTemplates.validateTask(standardizedTask);
         if (violations.length > 0) {
-          console.log(`   ⚠️  Task validation issues for ${gap.specification}:`, violations.map(v => v.issue).join(', '));
+          console.log(
+            `   ⚠️  Task validation issues for ${gap.specification}:`,
+            violations.map((v) => v.issue).join(', '),
+          );
         }
 
         standardizedTasks.push({
           ...standardizedTask,
           sourceType: 'coverage-gap',
-          sourceData: gap
+          sourceData: gap,
         });
         taskCount++;
-
       } catch (error) {
         console.log(`   ❌ Failed to generate task for gap ${gap.specification}:`, error.message);
         // Fall back to simple task creation
@@ -317,7 +315,7 @@ class CoverageVerificationJourney {
           estimate: this.estimateEffort(gap),
           labels: ['testing', 'coverage', 'technical-debt'],
           sourceType: 'coverage-gap',
-          sourceData: gap
+          sourceData: gap,
         });
         taskCount++;
       }
@@ -331,16 +329,18 @@ class CoverageVerificationJourney {
         // Validate the task meets standards
         const violations = this.taskTemplates.validateTask(standardizedTask);
         if (violations.length > 0) {
-          console.log(`   ⚠️  Task validation issues for TDD violation ${violation.commit?.substring(0, 8)}:`, violations.map(v => v.issue).join(', '));
+          console.log(
+            `   ⚠️  Task validation issues for TDD violation ${violation.commit?.substring(0, 8)}:`,
+            violations.map((v) => v.issue).join(', '),
+          );
         }
 
         standardizedTasks.push({
           ...standardizedTask,
           sourceType: 'tdd-violation',
-          sourceData: violation
+          sourceData: violation,
         });
         taskCount++;
-
       } catch (error) {
         console.log(`   ❌ Failed to generate task for TDD violation:`, error.message);
         // Fall back to simple task creation
@@ -352,7 +352,7 @@ class CoverageVerificationJourney {
           estimate: 1,
           labels: ['tdd', 'process', 'technical-debt'],
           sourceType: 'tdd-violation',
-          sourceData: violation
+          sourceData: violation,
         });
         taskCount++;
       }
@@ -366,16 +366,18 @@ class CoverageVerificationJourney {
         // Validate the task meets standards
         const violations = this.taskTemplates.validateTask(standardizedTask);
         if (violations.length > 0) {
-          console.log(`   ⚠️  Task validation issues for orphaned test ${orphan.file}:`, violations.map(v => v.issue).join(', '));
+          console.log(
+            `   ⚠️  Task validation issues for orphaned test ${orphan.file}:`,
+            violations.map((v) => v.issue).join(', '),
+          );
         }
 
         standardizedTasks.push({
           ...standardizedTask,
           sourceType: 'orphaned-test',
-          sourceData: orphan
+          sourceData: orphan,
         });
         taskCount++;
-
       } catch (error) {
         console.log(`   ❌ Failed to generate task for orphaned test:`, error.message);
         // Fall back to simple task creation
@@ -387,7 +389,7 @@ class CoverageVerificationJourney {
           estimate: 0.5,
           labels: ['testing', 'maintenance'],
           sourceType: 'orphaned-test',
-          sourceData: orphan
+          sourceData: orphan,
         });
         taskCount++;
       }
@@ -401,16 +403,18 @@ class CoverageVerificationJourney {
         // Validate the task meets standards
         const violations = this.taskTemplates.validateTask(standardizedTask);
         if (violations.length > 0) {
-          console.log(`   ⚠️  Task validation issues for unmapped spec ${unmappedSpec.id}:`, violations.map(v => v.issue).join(', '));
+          console.log(
+            `   ⚠️  Task validation issues for unmapped spec ${unmappedSpec.id}:`,
+            violations.map((v) => v.issue).join(', '),
+          );
         }
 
         standardizedTasks.push({
           ...standardizedTask,
           sourceType: 'unmapped-spec',
-          sourceData: unmappedSpec
+          sourceData: unmappedSpec,
         });
         taskCount++;
-
       } catch (error) {
         console.log(`   ❌ Failed to generate task for unmapped spec:`, error.message);
         // Fall back to simple task creation
@@ -422,7 +426,7 @@ class CoverageVerificationJourney {
           estimate: 3,
           labels: ['testing', 'specification'],
           sourceType: 'unmapped-spec',
-          sourceData: unmappedSpec
+          sourceData: unmappedSpec,
         });
         taskCount++;
       }
@@ -432,21 +436,25 @@ class CoverageVerificationJourney {
 
     // Generate summary
     const byPriority = {
-      HIGH: standardizedTasks.filter(t => t.priority === 1 || t.priority === 'HIGH').length,
-      MEDIUM: standardizedTasks.filter(t => t.priority === 2 || t.priority === 'MEDIUM').length,
-      LOW: standardizedTasks.filter(t => t.priority === 3 || t.priority === 'LOW').length
+      HIGH: standardizedTasks.filter((t) => t.priority === 1 || t.priority === 'HIGH').length,
+      MEDIUM: standardizedTasks.filter((t) => t.priority === 2 || t.priority === 'MEDIUM').length,
+      LOW: standardizedTasks.filter((t) => t.priority === 3 || t.priority === 'LOW').length,
     };
 
     const byType = {
-      'coverage-gap': standardizedTasks.filter(t => t.sourceType === 'coverage-gap').length,
-      'tdd-violation': standardizedTasks.filter(t => t.sourceType === 'tdd-violation').length,
-      'orphaned-test': standardizedTasks.filter(t => t.sourceType === 'orphaned-test').length,
-      'unmapped-spec': standardizedTasks.filter(t => t.sourceType === 'unmapped-spec').length
+      'coverage-gap': standardizedTasks.filter((t) => t.sourceType === 'coverage-gap').length,
+      'tdd-violation': standardizedTasks.filter((t) => t.sourceType === 'tdd-violation').length,
+      'orphaned-test': standardizedTasks.filter((t) => t.sourceType === 'orphaned-test').length,
+      'unmapped-spec': standardizedTasks.filter((t) => t.sourceType === 'unmapped-spec').length,
     };
 
     console.log(`  ✅ Generated ${taskCount} standardized action items:`);
-    console.log(`     By Priority - High: ${byPriority.HIGH}, Medium: ${byPriority.MEDIUM}, Low: ${byPriority.LOW}`);
-    console.log(`     By Type - Coverage: ${byType['coverage-gap']}, TDD: ${byType['tdd-violation']}, Orphaned: ${byType['orphaned-test']}, Unmapped: ${byType['unmapped-spec']}\n`);
+    console.log(
+      `     By Priority - High: ${byPriority.HIGH}, Medium: ${byPriority.MEDIUM}, Low: ${byPriority.LOW}`,
+    );
+    console.log(
+      `     By Type - Coverage: ${byType['coverage-gap']}, TDD: ${byType['tdd-violation']}, Orphaned: ${byType['orphaned-test']}, Unmapped: ${byType['unmapped-spec']}\n`,
+    );
   }
 
   /**
@@ -507,14 +515,19 @@ class CoverageVerificationJourney {
           // Validate task before creation
           const violations = this.taskTemplates.validateTask(task);
           if (violations.length > 0) {
-            console.log(`   ⚠️  Task validation issues: ${violations.map(v => v.issue).join(', ')}`);
+            console.log(
+              `   ⚠️  Task validation issues: ${violations.map((v) => v.issue).join(', ')}`,
+            );
           }
 
           // Create standardized Linear issue
           const issue = {
             title: task.title,
             description: task.description,
-            priority: typeof task.priority === 'number' ? task.priority : this.mapPriorityToLinear(task.priority),
+            priority:
+              typeof task.priority === 'number'
+                ? task.priority
+                : this.mapPriorityToLinear(task.priority),
             estimate: task.estimate,
             labels: task.labels,
             teamId: process.env.LINEAR_TEAM_ID || 'a-coders',
@@ -524,8 +537,8 @@ class CoverageVerificationJourney {
               sourceType: task.sourceType,
               automatedCreation: true,
               coverageJourney: 'JR-7',
-              createdAt: new Date().toISOString()
-            }
+              createdAt: new Date().toISOString(),
+            },
           };
 
           // TODO: Replace with actual Linear MCP call:
@@ -544,7 +557,7 @@ class CoverageVerificationJourney {
             id: `COVERAGE-${created.length + 1}`,
             identifier: `CVG-${created.length + 1}`,
             url: `https://linear.app/issue/CVG-${created.length + 1}`,
-            created: new Date().toISOString()
+            created: new Date().toISOString(),
           };
 
           created.push(mockLinearTask);
@@ -553,12 +566,11 @@ class CoverageVerificationJourney {
           console.log(`      ID: ${mockLinearTask.identifier}`);
           console.log(`      Priority: ${issue.priority} | Estimate: ${issue.estimate} points`);
           console.log(`      Labels: ${issue.labels.join(', ')}`);
-
         } catch (error) {
           console.log(`   ❌ Failed to create task: ${task.title}`, error.message);
           failed.push({
             task,
-            error: error.message
+            error: error.message,
           });
         }
       }
@@ -569,10 +581,10 @@ class CoverageVerificationJourney {
 
       // Summary
       const byPriority = {
-        urgent: created.filter(t => t.priority === 1).length,
-        high: created.filter(t => t.priority === 2).length,
-        medium: created.filter(t => t.priority === 3).length,
-        low: created.filter(t => t.priority === 4).length
+        urgent: created.filter((t) => t.priority === 1).length,
+        high: created.filter((t) => t.priority === 2).length,
+        medium: created.filter((t) => t.priority === 3).length,
+        low: created.filter((t) => t.priority === 4).length,
       };
 
       const byType = {};
@@ -584,15 +596,20 @@ class CoverageVerificationJourney {
       console.log(`  📊 Task creation summary:`);
       console.log(`     Created: ${created.length}/${this.results.tasks.length} tasks`);
       console.log(`     Failed: ${failed.length} tasks`);
-      console.log(`     By Priority - Urgent: ${byPriority.urgent}, High: ${byPriority.high}, Medium: ${byPriority.medium}, Low: ${byPriority.low}`);
-      console.log(`     By Type - Coverage: ${byType['coverage-gap'] || 0}, TDD: ${byType['tdd-violation'] || 0}, Orphaned: ${byType['orphaned-test'] || 0}, Unmapped: ${byType['unmapped-spec'] || 0}`);
+      console.log(
+        `     By Priority - Urgent: ${byPriority.urgent}, High: ${byPriority.high}, Medium: ${byPriority.medium}, Low: ${byPriority.low}`,
+      );
+      console.log(
+        `     By Type - Coverage: ${byType['coverage-gap'] || 0}, TDD: ${byType['tdd-violation'] || 0}, Orphaned: ${byType['orphaned-test'] || 0}, Unmapped: ${byType['unmapped-spec'] || 0}`,
+      );
 
       if (failed.length > 0) {
-        console.log(`   ⚠️  ${failed.length} tasks failed to create - check error details in results\n`);
+        console.log(
+          `   ⚠️  ${failed.length} tasks failed to create - check error details in results\n`,
+        );
       } else {
         console.log(`   ✅ All tasks created successfully\n`);
       }
-
     } catch (error) {
       console.log('  ⚠️  Linear integration not available, skipping task creation');
       console.log(`      Error: ${error.message}\n`);
@@ -604,9 +621,9 @@ class CoverageVerificationJourney {
    */
   mapPriorityToLinear(priority) {
     const mapping = {
-      'HIGH': 1,
-      'MEDIUM': 2,
-      'LOW': 3
+      HIGH: 1,
+      MEDIUM: 2,
+      LOW: 3,
     };
     return mapping[priority] || 2;
   }
@@ -615,8 +632,10 @@ class CoverageVerificationJourney {
    * Check if compliant
    */
   isCompliant() {
-    return this.results.gateValidation &&
-           Object.values(this.results.gateValidation).every(g => g.passed);
+    return (
+      this.results.gateValidation &&
+      Object.values(this.results.gateValidation).every((g) => g.passed)
+    );
   }
 
   /**
@@ -667,7 +686,7 @@ class CoverageVerificationJourney {
       const byPriority = {
         HIGH: [],
         MEDIUM: [],
-        LOW: []
+        LOW: [],
       };
 
       for (const gap of this.results.gaps) {
@@ -736,9 +755,10 @@ class CoverageVerificationJourney {
    * Format type for display
    */
   formatType(type) {
-    return type.split('-').map(word =>
-      word.charAt(0).toUpperCase() + word.slice(1)
-    ).join(' ');
+    return type
+      .split('-')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
   }
 
   /**
@@ -776,7 +796,7 @@ if (require.main === module) {
       module: null,
       createTasks: false,
       detailed: true,
-      outputFormat: 'console'
+      outputFormat: 'console',
     };
 
     // Parse arguments
@@ -812,7 +832,6 @@ if (require.main === module) {
       if (!result.success) {
         process.exit(1);
       }
-
     } catch (error) {
       console.error('❌ Journey failed:', error);
       process.exit(1);

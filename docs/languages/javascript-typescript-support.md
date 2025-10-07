@@ -7,12 +7,14 @@ The Linear TDD Workflow System provides comprehensive support for JavaScript and
 ## Version Support
 
 ### JavaScript
+
 - **ES2020+** (Full modern JavaScript support)
 - **Node.js 18+** (Recommended: Node.js 20 LTS)
 - **ESM and CommonJS modules**
 - **async/await and Promises**
 
 ### TypeScript
+
 - **TypeScript 5.0+**
 - **Strict type checking**
 - **Decorators and experimental features**
@@ -23,6 +25,7 @@ The Linear TDD Workflow System provides comprehensive support for JavaScript and
 ### Testing Frameworks
 
 #### Jest (Primary)
+
 ```bash
 # Installation
 npm install --save-dev jest @types/jest ts-jest
@@ -50,6 +53,7 @@ module.exports = {
 ```
 
 #### Mocha (Alternative)
+
 ```bash
 # Installation
 npm install --save-dev mocha @types/mocha chai @types/chai ts-node
@@ -64,6 +68,7 @@ npm install --save-dev mocha @types/mocha chai @types/chai ts-node
 ```
 
 #### Vitest (Modern Alternative)
+
 ```bash
 # Installation
 npm install --save-dev vitest @vitest/ui
@@ -85,6 +90,7 @@ export default defineConfig({
 ### Code Quality Tools
 
 #### ESLint (Linting)
+
 ```bash
 # Installation
 npm install --save-dev eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin
@@ -105,6 +111,7 @@ npm install --save-dev eslint @typescript-eslint/parser @typescript-eslint/eslin
 ```
 
 #### Prettier (Formatting)
+
 ```bash
 # Installation
 npm install --save-dev prettier eslint-config-prettier
@@ -120,6 +127,7 @@ npm install --save-dev prettier eslint-config-prettier
 ```
 
 #### TypeScript Compiler
+
 ```bash
 # Configuration (tsconfig.json)
 {
@@ -143,6 +151,7 @@ npm install --save-dev prettier eslint-config-prettier
 ### Coverage Analysis
 
 #### NYC/C8
+
 ```bash
 # Installation
 npm install --save-dev nyc
@@ -165,6 +174,7 @@ npm install --save-dev c8
 ## Agent-Specific JS/TS Support
 
 ### AUDITOR
+
 - Analyzes JavaScript/TypeScript using AST
 - Detects ESLint violations
 - Identifies TypeScript type issues
@@ -175,6 +185,7 @@ npm run agent:invoke AUDITOR:assess-code -- --language typescript --scope src/
 ```
 
 ### EXECUTOR
+
 - Implements fixes following JS/TS best practices
 - Generates Jest/Mocha tests first (TDD)
 - Uses Prettier for formatting
@@ -185,6 +196,7 @@ npm run agent:invoke EXECUTOR:implement-fix -- --task-id CLEAN-456 --language ja
 ```
 
 ### GUARDIAN
+
 - Monitors Node.js CI/CD pipelines
 - Detects Jest/Mocha failures
 - Handles npm/yarn dependency issues
@@ -195,6 +207,7 @@ npm run agent:invoke GUARDIAN:analyze-failure -- --language javascript --auto-fi
 ```
 
 ### VALIDATOR
+
 - Runs Jest/Mocha/Vitest suites
 - Performs mutation testing with Stryker
 - Validates coverage thresholds
@@ -205,6 +218,7 @@ npm run agent:invoke VALIDATOR:run-tests -- --suite jest --coverage --parallel
 ```
 
 ### OPTIMIZER
+
 - Profiles JavaScript performance
 - Optimizes bundle sizes with webpack/rollup
 - Reduces memory leaks
@@ -217,6 +231,7 @@ npm run agent:invoke OPTIMIZER:optimize-bundle -- --target-size 500 --split-chun
 ## TDD Workflow for JavaScript/TypeScript
 
 ### 1. RED Phase - Write Failing Test
+
 ```typescript
 // calculator.test.ts
 import { Calculator } from './calculator';
@@ -230,6 +245,7 @@ describe('Calculator', () => {
 ```
 
 ### 2. GREEN Phase - Minimal Implementation
+
 ```typescript
 // calculator.ts
 export class Calculator {
@@ -240,6 +256,7 @@ export class Calculator {
 ```
 
 ### 3. REFACTOR Phase - Improve Code
+
 ```typescript
 // calculator.ts
 /**
@@ -258,7 +275,7 @@ export class Calculator {
   }
 
   private validateNumbers(...numbers: number[]): void {
-    numbers.forEach(num => {
+    numbers.forEach((num) => {
       if (!Number.isFinite(num)) {
         throw new Error('Invalid number provided');
       }
@@ -270,6 +287,7 @@ export class Calculator {
 ## Fix Pack Examples for JavaScript/TypeScript
 
 ### 1. Linting & Formatting
+
 ```javascript
 // Before
 const  calculate = function(items,taxRate){
@@ -290,6 +308,7 @@ const calculate = (items: Item[], taxRate: number): number => {
 ```
 
 ### 2. TypeScript Types Addition
+
 ```typescript
 // Before
 function processData(data, config) {
@@ -325,6 +344,7 @@ function processData(data: DataItem[], config: Config): DataItem[] {
 ```
 
 ### 3. JSDoc Documentation
+
 ```javascript
 // Before
 function calculateMetrics(data) {
@@ -357,6 +377,7 @@ function calculateMetrics(data) {
 ## Project Structure
 
 ### JavaScript Project
+
 ```
 js-project/
 ├── src/
@@ -378,6 +399,7 @@ js-project/
 ```
 
 ### TypeScript Project
+
 ```
 ts-project/
 ├── src/
@@ -405,6 +427,7 @@ ts-project/
 ## Configuration Files
 
 ### package.json Scripts
+
 ```json
 {
   "scripts": {
@@ -425,6 +448,7 @@ ts-project/
 ```
 
 ### Stryker Mutation Testing
+
 ```javascript
 // stryker.config.js
 module.exports = {
@@ -432,16 +456,17 @@ module.exports = {
   testRunner: 'jest',
   jest: {
     projectType: 'custom',
-    configFile: 'jest.config.js'
+    configFile: 'jest.config.js',
   },
   coverageAnalysis: 'perTest',
-  thresholds: { high: 80, low: 60, break: 30 }
+  thresholds: { high: 80, low: 60, break: 30 },
 };
 ```
 
 ## CI/CD Integration
 
 ### GitHub Actions for Node.js
+
 ```yaml
 name: Node.js CI
 
@@ -455,41 +480,42 @@ jobs:
         node-version: [18.x, 20.x]
 
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
 
-    - name: Install dependencies
-      run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-    - name: Lint code
-      run: npm run lint
+      - name: Lint code
+        run: npm run lint
 
-    - name: Check formatting
-      run: npm run format:check
+      - name: Check formatting
+        run: npm run format:check
 
-    - name: Type check
-      run: npm run typecheck
+      - name: Type check
+        run: npm run typecheck
 
-    - name: Run tests
-      run: npm test
+      - name: Run tests
+        run: npm test
 
-    - name: Upload coverage
-      uses: codecov/codecov-action@v3
-      with:
-        files: ./coverage/lcov.info
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage/lcov.info
 
-    - name: Mutation testing
-      run: npm run test:mutation
+      - name: Mutation testing
+        run: npm run test:mutation
 ```
 
 ## Common JavaScript/TypeScript Patterns
 
 ### Dependency Injection
+
 ```typescript
 interface Logger {
   log(message: string): void;
@@ -506,6 +532,7 @@ class Service {
 ```
 
 ### Factory Pattern
+
 ```typescript
 interface Product {
   name: string;
@@ -527,6 +554,7 @@ class ProductFactory {
 ```
 
 ### Async/Await Error Handling
+
 ```typescript
 async function fetchData<T>(url: string): Promise<T> {
   try {
@@ -548,6 +576,7 @@ async function fetchData<T>(url: string): Promise<T> {
 ## Performance Optimization
 
 ### Bundle Size Optimization
+
 ```javascript
 // webpack.config.js
 module.exports = {
@@ -558,24 +587,25 @@ module.exports = {
         vendor: {
           test: /[\\/]node_modules[\\/]/,
           name: 'vendors',
-          priority: 10
-        }
-      }
+          priority: 10,
+        },
+      },
     },
     minimizer: [
       new TerserPlugin({
         terserOptions: {
           compress: {
-            drop_console: true
-          }
-        }
-      })
-    ]
-  }
+            drop_console: true,
+          },
+        },
+      }),
+    ],
+  },
 };
 ```
 
 ### Memory Leak Prevention
+
 ```typescript
 class EventManager {
   private listeners = new WeakMap<object, Function[]>();
@@ -599,6 +629,7 @@ class EventManager {
 ## Security Best Practices
 
 ### Input Sanitization
+
 ```typescript
 import DOMPurify from 'isomorphic-dompurify';
 
@@ -614,6 +645,7 @@ function validateEmail(email: string): boolean {
 ```
 
 ### Environment Variables
+
 ```typescript
 // config.ts
 import dotenv from 'dotenv';
@@ -629,7 +661,7 @@ interface Config {
 const config: Config = {
   apiKey: process.env.API_KEY || '',
   dbUrl: process.env.DATABASE_URL || '',
-  port: parseInt(process.env.PORT || '3000', 10)
+  port: parseInt(process.env.PORT || '3000', 10),
 };
 
 // Validate required config
@@ -643,6 +675,7 @@ export default config;
 ## React/Vue/Angular Support
 
 ### React with TypeScript
+
 ```tsx
 // Component.tsx
 import React, { FC, useState } from 'react';
@@ -663,11 +696,7 @@ const Component: FC<Props> = ({ title, onSubmit }) => {
   return (
     <form onSubmit={handleSubmit}>
       <h2>{title}</h2>
-      <input
-        type="text"
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-      />
+      <input type="text" value={value} onChange={(e) => setValue(e.target.value)} />
       <button type="submit">Submit</button>
     </form>
   );
@@ -677,6 +706,7 @@ export default Component;
 ```
 
 ### Testing React Components
+
 ```tsx
 // Component.test.tsx
 import { render, screen, fireEvent } from '@testing-library/react';

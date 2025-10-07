@@ -2,9 +2,7 @@
 name: python
 description: Modern Python development with Python 3.12+ features, uv package management, and advanced patterns. Use PROACTIVELY for Python optimization, async programming, or modern tooling setup.
 agent: PYTHON-PRO
-usage: "/python [--task=<async|typing|optimization|testing|packaging>] [--modern-tools]"
-allowed-tools: [Read, Write, Edit, Grep, Glob, Bash, mcp__context7__*]
-argument-hint: "[--task=async|typing|optimization|testing|packaging|refactor|all] [--modern-tools]"
+usage: '/python [--task=<async|typing|optimization|testing|packaging>] [--modern-tools]'
 parameters:
   - name: task
     description: Python task type
@@ -22,16 +20,20 @@ parameters:
 Expert Python 3.12+ development with the PYTHON-PRO agent, featuring cutting-edge tooling and advanced patterns.
 
 ## Usage
+
 ```
 /python [--task=<async|typing|optimization|testing|packaging>] [--modern-tools]
 ```
 
 ## Parameters
+
 - `--task`: Development focus - async, typing, optimization, testing, packaging, refactor, or all (default: all)
 - `--modern-tools`: Configure uv, ruff, and mypy (default: true)
 
 ## What This Command Does
+
 The PYTHON-PRO agent will:
+
 1. Implement Python 3.12+ features (pattern matching, type aliases)
 2. Set up modern tooling (uv package manager, ruff linter, mypy)
 3. Design async/await patterns for I/O operations
@@ -42,6 +44,7 @@ The PYTHON-PRO agent will:
 8. Implement functional programming patterns
 
 ## Expected Output
+
 - **Python Code**: Type-annotated, modern Python
 - **Configuration Files**: pyproject.toml, ruff.toml
 - **Test Suite**: pytest with Hypothesis tests
@@ -52,6 +55,7 @@ The PYTHON-PRO agent will:
 - **Documentation**: Type hints and docstrings
 
 ## Examples
+
 ```bash
 # Full Python modernization
 /python --modern-tools
@@ -75,6 +79,7 @@ The PYTHON-PRO agent will:
 ## Modern Python Features
 
 ### Python 3.12+ Patterns
+
 - Pattern matching (match/case)
 - Type aliases (type keyword)
 - Generic types
@@ -82,6 +87,7 @@ The PYTHON-PRO agent will:
 - Exception groups
 
 ### Tooling Stack
+
 - **uv**: Fast package manager (10-100x faster than pip)
 - **ruff**: Fast linter and formatter
 - **mypy**: Static type checking
@@ -89,6 +95,7 @@ The PYTHON-PRO agent will:
 - **Hypothesis**: Property-based testing
 
 ### Async Patterns
+
 - AsyncIO primitives
 - Async context managers
 - Async generators
@@ -96,6 +103,7 @@ The PYTHON-PRO agent will:
 - Exception groups
 
 ### Type Safety
+
 - Protocols for duck typing
 - TypeGuard for narrowing
 - ParamSpec for decorators
@@ -103,6 +111,7 @@ The PYTHON-PRO agent will:
 - Literal types
 
 ## Performance
+
 - Profiling with cProfile
 - Memory optimization
 - Caching strategies (lru_cache)
@@ -110,6 +119,7 @@ The PYTHON-PRO agent will:
 - Vectorization with NumPy
 
 ## Best Practices
+
 - Type hints everywhere
 - Async for I/O operations
 - Functional patterns
@@ -117,6 +127,7 @@ The PYTHON-PRO agent will:
 - Comprehensive testing
 
 ## Integration
+
 - **FastAPI**: Modern web APIs
 - **Pydantic**: Data validation
 - **SQLAlchemy**: Async ORM
@@ -124,6 +135,7 @@ The PYTHON-PRO agent will:
 - **OpenTelemetry**: Observability
 
 ## Performance Targets
+
 - Type coverage: 100%
 - Test coverage: >90%
 - Lint score: 0 errors
@@ -131,6 +143,7 @@ The PYTHON-PRO agent will:
 - Memory efficiency: <50MB baseline
 
 ## SLAs
+
 - Tool setup: ≤5 minutes
 - Code optimization: ≤15 minutes
 - Full refactor: ≤30 minutes

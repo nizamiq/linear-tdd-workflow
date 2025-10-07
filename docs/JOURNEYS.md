@@ -9,6 +9,7 @@ Autonomous journeys are self-coordinating workflows that combine multiple agents
 ## Journey Registry
 
 All journeys are registered in `.claude/journeys/registry.yaml` with:
+
 - Trigger conditions
 - Agent orchestration
 - FIL classification rules
@@ -22,6 +23,7 @@ All journeys are registered in `.claude/journeys/registry.yaml` with:
 **Purpose:** Automatic project setup and configuration
 
 **Capabilities:**
+
 - Auto-detects project type (Python/JS/TS)
 - Validates prerequisites
 - Initializes GitFlow
@@ -30,6 +32,7 @@ All journeys are registered in `.claude/journeys/registry.yaml` with:
 - Creates initial test suites
 
 **Invocation:**
+
 ```bash
 make onboard
 # OR
@@ -37,6 +40,7 @@ npm run journey:onboard
 ```
 
 **Autonomous Features:**
+
 - Language detection with 95% confidence threshold
 - Automatic dependency installation
 - Self-healing configuration
@@ -46,6 +50,7 @@ npm run journey:onboard
 **Purpose:** Comprehensive code quality evaluation
 
 **Capabilities:**
+
 - Full codebase scanning
 - Linear task creation
 - Fix Pack generation for FIL-0/FIL-1
@@ -53,6 +58,7 @@ npm run journey:onboard
 - Resource estimation
 
 **Invocation:**
+
 ```bash
 make assess
 # OR
@@ -60,6 +66,7 @@ npm run journey:assess
 ```
 
 **Autonomous Features:**
+
 - Incremental scanning optimization
 - Auto-categorization of issues
 - Smart batching for Linear tasks
@@ -69,6 +76,7 @@ npm run journey:assess
 **Purpose:** TDD-enforced fix implementation
 
 **Capabilities:**
+
 - Implements pre-approved fixes
 - Enforces RED→GREEN→REFACTOR
 - Validates coverage requirements
@@ -76,6 +84,7 @@ npm run journey:assess
 - Automatic rollback on failure
 
 **Invocation:**
+
 ```bash
 make fix-pack
 # OR
@@ -83,6 +92,7 @@ npm run journey:fix-pack
 ```
 
 **Autonomous Features:**
+
 - FIL-0/FIL-1 auto-approval
 - Test generation
 - Coverage validation
@@ -93,6 +103,7 @@ npm run journey:fix-pack
 **Purpose:** Automated pipeline recovery
 
 **Capabilities:**
+
 - Detects pipeline failures
 - Root cause analysis
 - Implements fixes
@@ -100,6 +111,7 @@ npm run journey:fix-pack
 - Updates Linear incidents
 
 **Invocation:**
+
 ```bash
 make ci-recovery
 # OR
@@ -107,6 +119,7 @@ npm run journey:ci-recovery
 ```
 
 **Autonomous Features:**
+
 - Pattern-based recovery
 - Self-healing pipelines
 - Automatic rollback
@@ -117,6 +130,7 @@ npm run journey:ci-recovery
 **Purpose:** Learning from successful patterns
 
 **Capabilities:**
+
 - Analyzes successful PRs
 - Extracts reusable patterns
 - Updates knowledge base
@@ -124,6 +138,7 @@ npm run journey:ci-recovery
 - Generates insights
 
 **Invocation:**
+
 ```bash
 make pattern-mining
 # OR
@@ -131,6 +146,7 @@ npm run journey:pattern
 ```
 
 **Autonomous Features:**
+
 - Cross-project learning
 - Pattern validation
 - Confidence scoring
@@ -141,6 +157,7 @@ npm run journey:pattern
 **Purpose:** Automated release management
 
 **Capabilities:**
+
 - Version bumping
 - Changelog generation
 - GitFlow release branches
@@ -148,6 +165,7 @@ npm run journey:pattern
 - Linear milestone updates
 
 **Invocation:**
+
 ```bash
 make release
 # OR
@@ -155,6 +173,7 @@ npm run journey:release
 ```
 
 **Autonomous Features:**
+
 - Semantic versioning
 - Automated testing
 - Rollback planning
@@ -168,8 +187,8 @@ The system uses confidence-based decision making:
 
 ```yaml
 decision_engine:
-  confidence_threshold: 0.85  # 85% confidence required
-  fil_auto_approve: [0, 1]    # FIL-0 and FIL-1 auto-approved
+  confidence_threshold: 0.85 # 85% confidence required
+  fil_auto_approve: [0, 1] # FIL-0 and FIL-1 auto-approved
   require_human_review:
     - FIL-2 changes
     - FIL-3 changes
@@ -192,7 +211,7 @@ Journeys can trigger each other:
 ```yaml
 triggers:
   - type: schedule
-    cron: "0 2 * * *"  # Daily at 2 AM
+    cron: '0 2 * * *' # Daily at 2 AM
   - type: event
     source: github.pull_request.merged
   - type: cascade
@@ -203,6 +222,7 @@ triggers:
 ## Universal Makefile
 
 The project includes a language-agnostic Makefile that:
+
 - Auto-detects project type
 - Provides consistent commands
 - Works with Python and JS/TS projects
@@ -237,14 +257,14 @@ The journey system is designed for seamless integration with Claude Code:
 
 ## Performance Metrics
 
-| Journey | P50 Duration | P95 Duration | Success Rate |
-|---------|-------------|--------------|--------------|
-| JR-1 Onboarding | 3 min | 5 min | 98% |
-| JR-2 Assessment | 8 min | 12 min | 99% |
-| JR-3 Fix Pack | 10 min | 15 min | 95% |
-| JR-4 CI Recovery | 5 min | 10 min | 92% |
-| JR-5 Pattern Mining | 15 min | 25 min | 97% |
-| JR-6 Release | 10 min | 20 min | 99% |
+| Journey             | P50 Duration | P95 Duration | Success Rate |
+| ------------------- | ------------ | ------------ | ------------ |
+| JR-1 Onboarding     | 3 min        | 5 min        | 98%          |
+| JR-2 Assessment     | 8 min        | 12 min       | 99%          |
+| JR-3 Fix Pack       | 10 min       | 15 min       | 95%          |
+| JR-4 CI Recovery    | 5 min        | 10 min       | 92%          |
+| JR-5 Pattern Mining | 15 min       | 25 min       | 97%          |
+| JR-6 Release        | 10 min       | 20 min       | 99%          |
 
 ## Monitoring and Observability
 
@@ -255,6 +275,7 @@ npm run journey:status
 ```
 
 Shows:
+
 - Active journeys
 - Recent completions
 - Success/failure rates
@@ -263,6 +284,7 @@ Shows:
 ### Journey Logs
 
 Logs are written to:
+
 - `.claude/logs/journeys/`
 - Structured JSON format
 - Automatic rotation

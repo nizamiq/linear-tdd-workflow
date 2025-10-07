@@ -7,15 +7,18 @@ This directory contains Git hooks that enforce code quality standards and TDD pr
 ## Available Hooks
 
 ### TDD Gate Enforcer (`tdd-gate-enforcer.js`)
+
 **Purpose:** Enforces Test-Driven Development cycle
 **Triggers:** Pre-commit and pre-push
 **Validates:**
+
 - Tests exist for new code
 - Tests pass (GREEN phase)
 - Coverage meets thresholds (≥80%)
 - Mutation testing passes (≥30%)
 
 **Usage:**
+
 ```bash
 # Manual validation
 node .claude/git-hooks/tdd-gate-enforcer.js validate
@@ -25,14 +28,17 @@ node .claude/git-hooks/tdd-gate-enforcer.js --verbose
 ```
 
 ### Install Hooks (`install-hooks.js`)
+
 **Purpose:** Installs Git hooks in the repository
 **Features:**
+
 - Symlinks hooks to .git/hooks
 - Preserves existing hooks
 - Makes hooks executable
 - Validates installation
 
 **Usage:**
+
 ```bash
 # Install all hooks
 node .claude/git-hooks/install-hooks.js
@@ -44,6 +50,7 @@ node .claude/git-hooks/install-hooks.js --verify
 ## Hook Enforcement Rules
 
 ### Pre-Commit Checks
+
 1. **Test Coverage**
    - Diff coverage ≥80%
    - Overall coverage maintained
@@ -60,6 +67,7 @@ node .claude/git-hooks/install-hooks.js --verify
    - No console.logs in production code
 
 ### Pre-Push Checks
+
 1. **Full Test Suite**
    - All tests pass
    - Integration tests pass
@@ -77,23 +85,24 @@ The enforcer validates proper TDD cycle:
 ```javascript
 // RED Phase - Test must fail first
 if (!testExistsBeforeCode()) {
-  reject("Write test first (RED phase)");
+  reject('Write test first (RED phase)');
 }
 
 // GREEN Phase - Minimal code to pass
 if (!minimalCodeToPass()) {
-  reject("Too much code - write minimal implementation");
+  reject('Too much code - write minimal implementation');
 }
 
 // REFACTOR Phase - Maintain passing tests
 if (!testsStillPass()) {
-  reject("Tests broken during refactoring");
+  reject('Tests broken during refactoring');
 }
 ```
 
 ## Configuration
 
 ### Settings in `.claude/settings.json`
+
 ```json
 {
   "hooks": {
@@ -109,6 +118,7 @@ if (!testsStillPass()) {
 ```
 
 ### Bypass Options (Use Sparingly!)
+
 ```bash
 # Emergency bypass (logged and reported)
 git commit --no-verify -m "EMERGENCY: Description"
@@ -120,12 +130,15 @@ git commit --no-verify -m "WIP: Not ready for validation"
 ## Hook Installation
 
 ### Automatic Installation
+
 Hooks are installed automatically during:
+
 - `make onboard`
 - `npm run setup`
 - First commit attempt
 
 ### Manual Installation
+
 ```bash
 # Install hooks
 node .claude/git-hooks/install-hooks.js
@@ -135,6 +148,7 @@ npm run hooks:install
 ```
 
 ### Verify Installation
+
 ```bash
 # Check hooks are installed
 ls -la .git/hooks/
@@ -146,7 +160,9 @@ node .claude/git-hooks/tdd-gate-enforcer.js validate
 ## Error Messages and Solutions
 
 ### "No tests found for new code"
+
 **Solution:** Write tests first (RED phase)
+
 ```bash
 # Create test file
 touch tests/feature.test.js
@@ -155,7 +171,9 @@ touch tests/feature.test.js
 ```
 
 ### "Coverage below threshold"
+
 **Solution:** Add more test cases
+
 ```bash
 # Check coverage report
 npm test -- --coverage
@@ -163,7 +181,9 @@ npm test -- --coverage
 ```
 
 ### "Mutation testing failed"
+
 **Solution:** Improve test quality
+
 ```bash
 # Run mutation testing
 npm run test:mutation
@@ -173,12 +193,14 @@ npm run test:mutation
 ## Disabling Hooks (Not Recommended)
 
 ### Temporarily Disable
+
 ```bash
 # Set environment variable
 SKIP_HOOKS=true git commit -m "Message"
 ```
 
 ### Permanently Disable (Project)
+
 ```json
 // .claude/settings.json
 {
@@ -191,6 +213,7 @@ SKIP_HOOKS=true git commit -m "Message"
 ## Custom Hooks
 
 To add custom hooks:
+
 1. Create hook file in this directory
 2. Add to `install-hooks.js` manifest
 3. Implement validation logic
@@ -206,18 +229,19 @@ To add custom hooks:
 
 ## Quick Reference
 
-| Hook Event | Validation | Threshold |
-|------------|------------|-----------|
-| pre-commit | Diff coverage | ≥80% |
-| pre-commit | Linting | Pass |
-| pre-commit | Types | Valid |
-| pre-push | All tests | Pass |
-| pre-push | Mutation | ≥30% |
-| pre-push | Integration | Pass |
+| Hook Event | Validation    | Threshold |
+| ---------- | ------------- | --------- |
+| pre-commit | Diff coverage | ≥80%      |
+| pre-commit | Linting       | Pass      |
+| pre-commit | Types         | Valid     |
+| pre-push   | All tests     | Pass      |
+| pre-push   | Mutation      | ≥30%      |
+| pre-push   | Integration   | Pass      |
 
 ## Troubleshooting
 
 ### Hooks Not Running
+
 ```bash
 # Reinstall hooks
 node .claude/git-hooks/install-hooks.js --force
@@ -227,6 +251,7 @@ chmod +x .git/hooks/*
 ```
 
 ### Hook Errors
+
 ```bash
 # Run validation manually
 node .claude/git-hooks/tdd-gate-enforcer.js --debug

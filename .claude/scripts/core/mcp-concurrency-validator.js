@@ -17,7 +17,7 @@ const colors = {
   cyan: (text) => `[36m${text}[0m`,
   white: (text) => `[37m${text}[0m`,
   gray: (text) => `[90m${text}[0m`,
-  bold: (text) => `[1m${text}[0m`
+  bold: (text) => `[1m${text}[0m`,
 };
 const fs = require('fs').promises;
 const path = require('path');
@@ -28,7 +28,7 @@ class McpConcurrencyValidator {
       linearServer: {},
       sequentialThinking: {},
       playwright: {},
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
     this.testId = `mcp-test-${Date.now()}`;
   }
@@ -53,7 +53,6 @@ class McpConcurrencyValidator {
       await this.generateReport();
 
       console.log(colors.bold.green('\n✅ MCP concurrency validation complete!\n'));
-
     } catch (error) {
       console.error(colors.red(`MCP validation failed: ${error.message}`));
       throw error;
@@ -70,14 +69,14 @@ class McpConcurrencyValidator {
       {
         operation: 'list_teams',
         concurrent: [1, 2, 3],
-        description: 'List teams operation'
+        description: 'List teams operation',
       },
       {
         operation: 'list_issues',
         concurrent: [1, 2],
         description: 'List issues operation',
-        params: { limit: 5 }
-      }
+        params: { limit: 5 },
+      },
     ];
 
     for (const test of tests) {
@@ -88,12 +87,14 @@ class McpConcurrencyValidator {
           const startTime = Date.now();
 
           // Create concurrent Linear operations
-          const operations = Array(concurrency).fill().map((_, i) =>
-            this.simulateLinearOperation(test.operation, {
-              ...test.params,
-              requestId: `test-${i}`
-            })
-          );
+          const operations = Array(concurrency)
+            .fill()
+            .map((_, i) =>
+              this.simulateLinearOperation(test.operation, {
+                ...test.params,
+                requestId: `test-${i}`,
+              }),
+            );
 
           const results = await Promise.all(operations);
           const duration = Date.now() - startTime;
@@ -107,11 +108,10 @@ class McpConcurrencyValidator {
             duration,
             results: results.length,
             avgResponseTime: duration / results.length,
-            errors: results.filter(r => r.error).length
+            errors: results.filter((r) => r.error).length,
           };
 
           console.log(colors.green(`    ✅ ${concurrency} concurrent - ${duration}ms avg`));
-
         } catch (error) {
           if (!this.results.linearServer[test.operation]) {
             this.results.linearServer[test.operation] = {};
@@ -119,7 +119,7 @@ class McpConcurrencyValidator {
 
           this.results.linearServer[test.operation][concurrency] = {
             success: false,
-            error: error.message
+            error: error.message,
           };
 
           console.log(colors.red(`    ❌ ${concurrency} concurrent failed - ${error.message}`));
@@ -146,14 +146,16 @@ class McpConcurrencyValidator {
         const startTime = Date.now();
 
         // Create concurrent thinking operations
-        const operations = Array(concurrency).fill().map((_, i) =>
-          this.simulateSequentialThinking(`analysis-${i}`, {
-            thought: `Analyzing concurrency test scenario ${i}`,
-            thoughtNumber: 1,
-            totalThoughts: 2,
-            nextThoughtNeeded: true
-          })
-        );
+        const operations = Array(concurrency)
+          .fill()
+          .map((_, i) =>
+            this.simulateSequentialThinking(`analysis-${i}`, {
+              thought: `Analyzing concurrency test scenario ${i}`,
+              thoughtNumber: 1,
+              totalThoughts: 2,
+              nextThoughtNeeded: true,
+            }),
+          );
 
         const results = await Promise.all(operations);
         const duration = Date.now() - startTime;
@@ -163,15 +165,14 @@ class McpConcurrencyValidator {
           duration,
           results: results.length,
           avgResponseTime: duration / results.length,
-          errors: results.filter(r => r.error).length
+          errors: results.filter((r) => r.error).length,
         };
 
         console.log(colors.green(`    ✅ ${concurrency} concurrent - ${duration}ms avg`));
-
       } catch (error) {
         this.results.sequentialThinking[concurrency] = {
           success: false,
-          error: error.message
+          error: error.message,
         };
 
         console.log(colors.red(`    ❌ ${concurrency} concurrent failed - ${error.message}`));
@@ -211,26 +212,27 @@ class McpConcurrencyValidator {
 
     try {
       // Simulate library lookup operations
-      const operations = Array(2).fill().map((_, i) =>
-        this.simulateContext7Operation('resolve-library-id', {
-          libraryName: `test-lib-${i}`
-        })
-      );
+      const operations = Array(2)
+        .fill()
+        .map((_, i) =>
+          this.simulateContext7Operation('resolve-library-id', {
+            libraryName: `test-lib-${i}`,
+          }),
+        );
 
       const results = await Promise.all(operations);
 
       this.results.context7 = {
         concurrent: 2,
         success: true,
-        results: results.length
+        results: results.length,
       };
 
       console.log(colors.green('    ✅ Context7 concurrent operations successful'));
-
     } catch (error) {
       this.results.context7 = {
         success: false,
-        error: error.message
+        error: error.message,
       };
       console.log(colors.red(`    ❌ Context7 test failed - ${error.message}`));
     }
@@ -244,24 +246,23 @@ class McpConcurrencyValidator {
 
     try {
       // Simulate kubectl operations
-      const operations = Array(2).fill().map((_, i) =>
-        this.simulateKubernetesOperation('ping', {})
-      );
+      const operations = Array(2)
+        .fill()
+        .map((_, i) => this.simulateKubernetesOperation('ping', {}));
 
       const results = await Promise.all(operations);
 
       this.results.kubernetes = {
         concurrent: 2,
         success: true,
-        results: results.length
+        results: results.length,
       };
 
       console.log(colors.green('    ✅ Kubernetes concurrent operations successful'));
-
     } catch (error) {
       this.results.kubernetes = {
         success: false,
-        error: error.message
+        error: error.message,
       };
       console.log(colors.red(`    ❌ Kubernetes test failed - ${error.message}`));
     }
@@ -297,7 +298,7 @@ class McpConcurrencyValidator {
       mcpConcurrencyLimits: {},
       safeOperationLimits: {},
       recommendations: [],
-      riskFactors: []
+      riskFactors: [],
     };
 
     // Analyze Linear server limits
@@ -306,7 +307,7 @@ class McpConcurrencyValidator {
       const maxConcurrent = Math.max(
         ...Object.entries(results)
           .filter(([_, result]) => result.success)
-          .map(([concurrency, _]) => parseInt(concurrency))
+          .map(([concurrency, _]) => parseInt(concurrency)),
       );
       analysis.mcpConcurrencyLimits[`linear_${operation}`] = maxConcurrent;
     }
@@ -316,7 +317,7 @@ class McpConcurrencyValidator {
     const maxThinking = Math.max(
       ...Object.entries(thinkingResults)
         .filter(([_, result]) => result.success)
-        .map(([concurrency, _]) => parseInt(concurrency))
+        .map(([concurrency, _]) => parseInt(concurrency)),
     );
     analysis.mcpConcurrencyLimits.sequential_thinking = maxThinking;
 
@@ -354,12 +355,15 @@ class McpConcurrencyValidator {
 ## Concurrency Limits by Server
 
 ### Linear Server
-${Object.entries(this.results.linearServer).map(([op, results]) =>
-  `- **${op}**: Max ${Math.max(...Object.keys(results).map(k => parseInt(k)))} concurrent operations`
-).join('\n')}
+${Object.entries(this.results.linearServer)
+  .map(
+    ([op, results]) =>
+      `- **${op}**: Max ${Math.max(...Object.keys(results).map((k) => parseInt(k)))} concurrent operations`,
+  )
+  .join('\n')}
 
 ### Sequential Thinking
-- **Max concurrent**: ${Math.max(...Object.keys(this.results.sequentialThinking).map(k => parseInt(k)))} operations
+- **Max concurrent**: ${Math.max(...Object.keys(this.results.sequentialThinking).map((k) => parseInt(k)))} operations
 
 ### Other Servers
 ${this.results.context7 ? `- **Context7**: ${this.results.context7.success ? '✅' : '❌'} concurrent operations` : '- Context7: Not tested'}
@@ -371,13 +375,14 @@ ${this.results.kubernetes ? `- **Kubernetes**: ${this.results.kubernetes.success
 **${analysis.safeOperationLimits.recommended}** concurrent MCP operations
 
 ### Risk Factors
-${analysis.riskFactors.length > 0
-  ? analysis.riskFactors.map(r => `- ${r}`).join('\n')
-  : '- No significant risk factors identified'
+${
+  analysis.riskFactors.length > 0
+    ? analysis.riskFactors.map((r) => `- ${r}`).join('\n')
+    : '- No significant risk factors identified'
 }
 
 ### Recommendations
-${analysis.recommendations.map(r => `- ${r}`).join('\n')}
+${analysis.recommendations.map((r) => `- ${r}`).join('\n')}
 
 ## Impact on Agent Design
 
@@ -393,7 +398,8 @@ Based on these findings:
     // Simulate API call latency and potential failures
     await this.sleep(Math.random() * 300 + 100);
 
-    if (Math.random() < 0.1) { // 10% failure rate
+    if (Math.random() < 0.1) {
+      // 10% failure rate
       return { error: 'Simulated API timeout', operation, params };
     }
 
@@ -401,7 +407,7 @@ Based on these findings:
       operation,
       params,
       result: { success: true, data: `mock_${operation}_result` },
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
   }
 
@@ -409,7 +415,8 @@ Based on these findings:
     // Simulate thinking operation
     await this.sleep(Math.random() * 500 + 200);
 
-    if (Math.random() < 0.05) { // 5% failure rate
+    if (Math.random() < 0.05) {
+      // 5% failure rate
       return { error: 'Simulated thinking timeout', thoughtId, params };
     }
 
@@ -417,7 +424,7 @@ Based on these findings:
       thoughtId,
       params,
       result: { thoughtCompleted: true },
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
   }
 
@@ -432,14 +439,14 @@ Based on these findings:
   }
 
   sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
 
 // CLI execution
 if (require.main === module) {
   const validator = new McpConcurrencyValidator();
-  validator.runValidation().catch(error => {
+  validator.runValidation().catch((error) => {
     console.error(colors.red(`\nMCP validation failed: ${error.message}`));
     process.exit(1);
   });

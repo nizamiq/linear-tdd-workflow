@@ -40,6 +40,7 @@ graph TD
 ## Operational States
 
 ### System States
+
 ```yaml
 states:
   - idle: No active operations
@@ -52,6 +53,7 @@ states:
 ```
 
 ### Task States
+
 ```yaml
 task_states:
   - pending: Not yet started
@@ -67,6 +69,7 @@ task_states:
 ## Guardrails
 
 ### Execution Guardrails
+
 1. **Maximum Execution Time**: 30 minutes per task
 2. **Resource Limits**: 4GB RAM, 2 CPU cores per agent
 3. **Concurrent Tasks**: Max 5 per repository
@@ -74,6 +77,7 @@ task_states:
 5. **Rollback Trigger**: >2 consecutive failures
 
 ### Quality Guardrails
+
 1. **Test Coverage**: Must maintain or improve
 2. **Performance**: No degradation >10%
 3. **Security**: Zero new vulnerabilities
@@ -83,6 +87,7 @@ task_states:
 ## Agent Capabilities
 
 ### AUDITOR
+
 ```yaml
 capabilities:
   read:
@@ -101,6 +106,7 @@ capabilities:
 ```
 
 ### EXECUTOR
+
 ```yaml
 capabilities:
   read:
@@ -118,6 +124,7 @@ capabilities:
 ```
 
 ### GUARDIAN
+
 ```yaml
 capabilities:
   monitor:
@@ -135,6 +142,7 @@ capabilities:
 ```
 
 ### STRATEGIST
+
 ```yaml
 capabilities:
   coordinate:
@@ -152,6 +160,7 @@ capabilities:
 ```
 
 ### SCHOLAR
+
 ```yaml
 capabilities:
   analyze:
@@ -171,6 +180,7 @@ capabilities:
 ## Workflow Steps
 
 ### 1. Code Assessment
+
 ```yaml
 name: code_assessment
 trigger: [push, schedule, manual]
@@ -198,6 +208,7 @@ steps:
 ```
 
 ### 2. Fix Implementation
+
 ```yaml
 name: fix_implementation
 trigger: [task_assigned]
@@ -212,7 +223,7 @@ steps:
   - name: write_test
     agent: EXECUTOR
     timeout: 300s
-    tag: "[RED]"
+    tag: '[RED]'
     outputs:
       - test_file
       - test_name
@@ -220,7 +231,7 @@ steps:
   - name: implement_fix
     agent: EXECUTOR
     timeout: 600s
-    tag: "[GREEN]"
+    tag: '[GREEN]'
     validations:
       - test_passes
       - no_breaking_changes
@@ -228,7 +239,7 @@ steps:
   - name: refactor
     agent: EXECUTOR
     timeout: 300s
-    tag: "[REFACTOR]"
+    tag: '[REFACTOR]'
     condition: code_quality_score < 0.8
 
   - name: create_pr
@@ -241,6 +252,7 @@ steps:
 ```
 
 ### 3. Pipeline Recovery
+
 ```yaml
 name: pipeline_recovery
 trigger: [pipeline_failure]
@@ -276,9 +288,10 @@ steps:
 ```
 
 ### 4. Pattern Learning
+
 ```yaml
 name: pattern_learning
-trigger: [schedule: "0 2 * * 0"]
+trigger: [schedule: '0 2 * * 0']
 steps:
   - name: collect_fixes
     agent: SCHOLAR
@@ -313,29 +326,30 @@ steps:
 ## Change Control
 
 ### Change Classification
+
 ```yaml
-FIL-0:  # Auto-approved
+FIL-0: # Auto-approved
   criteria:
     - formatting_only
     - comment_changes
     - dead_code_removal
   approval: none
 
-FIL-1:  # Low risk
+FIL-1: # Low risk
   criteria:
     - loc < 50
     - no_api_changes
     - no_dependency_changes
   approval: none
 
-FIL-2:  # Medium risk
+FIL-2: # Medium risk
   criteria:
     - loc < 200
     - internal_api_changes
     - config_changes
   approval: tech_lead
 
-FIL-3:  # High risk
+FIL-3: # High risk
   criteria:
     - external_api_changes
     - database_changes
@@ -344,6 +358,7 @@ FIL-3:  # High risk
 ```
 
 ### Approval Flow
+
 ```yaml
 approval_workflow:
   - classify_change
@@ -356,6 +371,7 @@ approval_workflow:
 ## Communication
 
 ### Inter-Agent Messages
+
 ```yaml
 message_schema:
   id: uuid
@@ -374,11 +390,12 @@ message_schema:
 ```
 
 ### External Notifications
+
 ```yaml
 notification_channels:
   - slack:
       events: [pipeline_failure, pr_created, incident]
-      channel: "#dev-notifications"
+      channel: '#dev-notifications'
   - email:
       events: [approval_required, escalation]
       recipients: [tech_lead, on_call]
@@ -390,6 +407,7 @@ notification_channels:
 ## Error Handling
 
 ### Error Categories
+
 ```yaml
 transient:
   - network_timeout
@@ -411,6 +429,7 @@ recoverable:
 ```
 
 ### Recovery Strategies
+
 ```yaml
 strategies:
   retry:
@@ -430,6 +449,7 @@ strategies:
 ## Monitoring
 
 ### Key Metrics
+
 ```yaml
 metrics:
   - agent_availability
@@ -441,6 +461,7 @@ metrics:
 ```
 
 ### Alerting Rules
+
 ```yaml
 alerts:
   - name: agent_down
@@ -459,6 +480,7 @@ alerts:
 ## Compliance
 
 ### Audit Requirements
+
 ```yaml
 audit:
   - all_agent_actions
@@ -470,6 +492,7 @@ audit:
 ```
 
 ### Security Policies
+
 ```yaml
 security:
   - no_hardcoded_secrets
@@ -482,6 +505,7 @@ security:
 ## Version Control
 
 ### Supported Workflows
+
 ```yaml
 gitflow:
   branches:
@@ -498,6 +522,7 @@ github_flow:
 ```
 
 ### Branch Protection
+
 ```yaml
 protection_rules:
   - require_pr_reviews: 1
@@ -510,6 +535,7 @@ protection_rules:
 ## Integration Points
 
 ### GitHub
+
 ```yaml
 webhooks:
   - push
@@ -525,6 +551,7 @@ api_operations:
 ```
 
 ### Linear
+
 ```yaml
 sync:
   - task_creation: immediate
@@ -539,6 +566,7 @@ operations:
 ```
 
 ### CI/CD
+
 ```yaml
 pipelines:
   - test: on_every_commit
@@ -554,4 +582,4 @@ quality_gates:
 
 ---
 
-*This specification is authoritative for agent operations. Any modifications require approval from the Engineering Excellence team and must be backwards compatible.*
+_This specification is authoritative for agent operations. Any modifications require approval from the Engineering Excellence team and must be backwards compatible._

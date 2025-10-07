@@ -7,14 +7,17 @@ This directory contains configuration files that control the behavior of the Lin
 ## Available Configurations
 
 ### Environments Configuration (`environments.js`)
+
 **Purpose:** Defines environment-specific settings
 **Environments:**
+
 - Development
 - Staging
 - Production
 - Testing
 
 **Structure:**
+
 ```javascript
 module.exports = {
   development: {
@@ -23,8 +26,8 @@ module.exports = {
     mockMode: false,
     coverage: {
       threshold: 80,
-      enforced: true
-    }
+      enforced: true,
+    },
   },
   production: {
     apiUrl: 'https://api.production.com',
@@ -32,15 +35,16 @@ module.exports = {
     mockMode: false,
     coverage: {
       threshold: 90,
-      enforced: true
-    }
-  }
+      enforced: true,
+    },
+  },
 };
 ```
 
 ## Environment Detection
 
 The system automatically detects the environment:
+
 ```javascript
 // Priority order:
 1. NODE_ENV environment variable
@@ -52,6 +56,7 @@ The system automatically detects the environment:
 ## Configuration Hierarchy
 
 Settings are merged in this order:
+
 1. Default configuration (base)
 2. Environment-specific overrides
 3. Local settings (.claude/settings.json)
@@ -61,6 +66,7 @@ Settings are merged in this order:
 ## Common Configurations
 
 ### Development Environment
+
 ```javascript
 {
   "environment": "development",
@@ -83,6 +89,7 @@ Settings are merged in this order:
 ```
 
 ### Production Environment
+
 ```javascript
 {
   "environment": "production",
@@ -107,6 +114,7 @@ Settings are merged in this order:
 ## Feature Flags
 
 Control system features dynamically:
+
 ```javascript
 {
   "featureFlags": {
@@ -132,6 +140,7 @@ Control system features dynamically:
 ## Configuration Validation
 
 Configurations are validated on load:
+
 ```javascript
 // Validation rules
 {
@@ -157,12 +166,15 @@ Configurations are validated on load:
 ## Loading Configuration
 
 ### Automatic Loading
+
 Configuration is loaded automatically when:
+
 - System starts
 - Agents initialize
 - Journeys execute
 
 ### Manual Loading
+
 ```javascript
 const config = require('./.claude/config/environments');
 const env = process.env.NODE_ENV || 'development';
@@ -172,6 +184,7 @@ const settings = config[env];
 ## Override Mechanisms
 
 ### Environment Variables
+
 ```bash
 # Override any setting with env vars
 LINEAR_API_KEY=xxx
@@ -180,13 +193,16 @@ ENABLE_AUTO_FIX=false
 ```
 
 ### Command Line Flags
+
 ```bash
 # Override at runtime
 node script.js --coverage-threshold 85 --dry-run
 ```
 
 ### Local Overrides
+
 Create `.claude/settings.local.json` (gitignored):
+
 ```json
 {
   "overrides": {
@@ -199,7 +215,9 @@ Create `.claude/settings.local.json` (gitignored):
 ## Configuration Profiles
 
 ### Strict Mode
+
 For maximum quality enforcement:
+
 ```javascript
 {
   "profile": "strict",
@@ -212,7 +230,9 @@ For maximum quality enforcement:
 ```
 
 ### Fast Mode
+
 For rapid development:
+
 ```javascript
 {
   "profile": "fast",
@@ -225,7 +245,9 @@ For rapid development:
 ```
 
 ### CI/CD Mode
+
 For pipeline execution:
+
 ```javascript
 {
   "profile": "ci",
@@ -240,6 +262,7 @@ For pipeline execution:
 ## Secrets Management
 
 Never store secrets in config files:
+
 ```javascript
 // ❌ Wrong
 {
@@ -255,11 +278,12 @@ Never store secrets in config files:
 ## Dynamic Configuration
 
 Some settings can be changed at runtime:
+
 ```javascript
 // Update configuration dynamically
 await updateConfig({
   'features.autoFix': false,
-  'thresholds.coverage': 85
+  'thresholds.coverage': 85,
 });
 
 // Changes take effect immediately
@@ -268,6 +292,7 @@ await updateConfig({
 ## Configuration Debugging
 
 ### View Current Configuration
+
 ```bash
 # Show active configuration
 node -e "console.log(require('./.claude/config/environments')[process.env.NODE_ENV || 'development'])"
@@ -277,6 +302,7 @@ npm run config:show
 ```
 
 ### Validate Configuration
+
 ```bash
 # Check configuration validity
 node .claude/scripts/validate-config.js
@@ -295,17 +321,18 @@ NODE_ENV=production node .claude/scripts/validate-config.js
 
 ## Quick Reference
 
-| Setting | Dev | Staging | Prod |
-|---------|-----|---------|------|
-| Coverage | 80% | 85% | 90% |
-| Auto-fix | ✅ | ✅ | ❌ |
-| Dry-run | ❌ | ✅ | ✅ |
-| Debug | ✅ | ✅ | ❌ |
-| Parallel | 5 | 3 | 2 |
+| Setting  | Dev | Staging | Prod |
+| -------- | --- | ------- | ---- |
+| Coverage | 80% | 85%     | 90%  |
+| Auto-fix | ✅  | ✅      | ❌   |
+| Dry-run  | ❌  | ✅      | ✅   |
+| Debug    | ✅  | ✅      | ❌   |
+| Parallel | 5   | 3       | 2    |
 
 ## Troubleshooting
 
 ### Configuration Not Loading
+
 ```bash
 # Check environment
 echo $NODE_ENV
@@ -318,6 +345,7 @@ npm run config:validate
 ```
 
 ### Wrong Environment Detected
+
 ```bash
 # Force environment
 NODE_ENV=production npm run command

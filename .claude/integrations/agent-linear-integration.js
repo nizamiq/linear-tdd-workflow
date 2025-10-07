@@ -24,8 +24,8 @@ class AgentLinearIntegration {
     }
 
     // Filter findings that warrant Linear tasks
-    const taskableFindings = auditResult.patterns.filter(finding =>
-      finding.type !== 'comment' || finding.severity === 'high'
+    const taskableFindings = auditResult.patterns.filter(
+      (finding) => finding.type !== 'comment' || finding.severity === 'high',
     );
 
     if (taskableFindings.length === 0) {
@@ -36,14 +36,16 @@ class AgentLinearIntegration {
     // Create Linear tasks via MCP
     const taskResults = await this.linearMCP.createTasksFromFindings(taskableFindings);
 
-    console.log(`📋 AUDITOR → Linear: ${taskResults.created.length} tasks created, ${taskResults.failed.length} failed`);
+    console.log(
+      `📋 AUDITOR → Linear: ${taskResults.created.length} tasks created, ${taskResults.failed.length} failed`,
+    );
 
     return {
       success: true,
       tasksCreated: taskResults.created.length,
       tasksFailed: taskResults.failed.length,
       createdTasks: taskResults.created,
-      method: 'MCP Linear'
+      method: 'MCP Linear',
     };
   }
 
@@ -77,7 +79,7 @@ class AgentLinearIntegration {
           await this.linearMCP.updateIssueStatus(
             issue.id,
             'In Progress',
-            `🔧 EXECUTOR is implementing this fix using TDD cycle.\n\nCurrent phase: ${executorResult.currentPhase || 'Implementation'}`
+            `🔧 EXECUTOR is implementing this fix using TDD cycle.\n\nCurrent phase: ${executorResult.currentPhase || 'Implementation'}`,
           );
           updatedTasks++;
         }
@@ -87,11 +89,10 @@ class AgentLinearIntegration {
           await this.linearMCP.updateIssueStatus(
             issue.id,
             'Done',
-            `✅ EXECUTOR completed this task successfully.\n\n**TDD Cycle:** ${executorResult.tddCycle ? 'RED → GREEN → REFACTOR' : 'Standard'}\n**Files Modified:** ${executorResult.filesModified?.length || 0}\n**Tests Added:** ${executorResult.testsAdded?.length || 0}`
+            `✅ EXECUTOR completed this task successfully.\n\n**TDD Cycle:** ${executorResult.tddCycle ? 'RED → GREEN → REFACTOR' : 'Standard'}\n**Files Modified:** ${executorResult.filesModified?.length || 0}\n**Tests Added:** ${executorResult.testsAdded?.length || 0}`,
           );
           updatedTasks++;
         }
-
       } catch (error) {
         console.error(`❌ Failed to update task ${issue.identifier}:`, error.message);
       }
@@ -103,7 +104,7 @@ class AgentLinearIntegration {
       success: true,
       tasksUpdated: updatedTasks,
       totalTasks: issuesResult.issues.length,
-      method: 'MCP Linear'
+      method: 'MCP Linear',
     };
   }
 
@@ -125,7 +126,7 @@ class AgentLinearIntegration {
       description: this.generateIncidentDescription(guardianResult),
       priority: this.mapSeverityToPriority(guardianResult.severity || 'medium'),
       labels: ['incident', 'guardian', guardianResult.type].filter(Boolean),
-      assignee: 'STRATEGIST' // STRATEGIST handles incidents
+      assignee: 'STRATEGIST', // STRATEGIST handles incidents
     };
 
     const incidentResult = await this.linearMCP.createIssue(incidentData);
@@ -136,13 +137,13 @@ class AgentLinearIntegration {
         success: true,
         incidentsCreated: 1,
         incidentId: incidentResult.id,
-        method: 'MCP Linear'
+        method: 'MCP Linear',
       };
     } else {
       console.error('❌ Failed to create incident in Linear:', incidentResult.error);
       return {
         success: false,
-        error: incidentResult.error
+        error: incidentResult.error,
       };
     }
   }
@@ -160,12 +161,12 @@ class AgentLinearIntegration {
     }
 
     // Create improvement suggestions based on learned patterns
-    const improvementTasks = scholarResult.insights.map(insight => ({
+    const improvementTasks = scholarResult.insights.map((insight) => ({
       title: `💡 SCHOLAR Insight: ${insight.pattern}`,
       description: this.generateInsightDescription(insight),
       priority: this.mapConfidenceToPriority(insight.confidence),
       labels: ['insight', 'scholar', 'improvement'],
-      assignee: 'STRATEGIST' // STRATEGIST evaluates insights
+      assignee: 'STRATEGIST', // STRATEGIST evaluates insights
     }));
 
     const results = await this.linearMCP.createTasksFromFindings(improvementTasks);
@@ -175,7 +176,7 @@ class AgentLinearIntegration {
     return {
       success: true,
       insightsShared: results.created.length,
-      method: 'MCP Linear'
+      method: 'MCP Linear',
     };
   }
 
@@ -192,10 +193,10 @@ class AgentLinearIntegration {
     const issues = issuesResult.issues;
     const workload = {
       total: issues.length,
-      todo: issues.filter(i => i.status === 'Todo').length,
-      inProgress: issues.filter(i => i.status === 'In Progress').length,
-      blocked: issues.filter(i => i.status === 'Blocked').length,
-      high_priority: issues.filter(i => i.priority <= 2).length
+      todo: issues.filter((i) => i.status === 'Todo').length,
+      inProgress: issues.filter((i) => i.status === 'In Progress').length,
+      blocked: issues.filter((i) => i.status === 'Blocked').length,
+      high_priority: issues.filter((i) => i.priority <= 2).length,
     };
 
     return {
@@ -203,7 +204,7 @@ class AgentLinearIntegration {
       agent: agentName,
       workload,
       issues,
-      method: 'MCP Linear'
+      method: 'MCP Linear',
     };
   }
 
@@ -289,10 +290,10 @@ class AgentLinearIntegration {
    */
   mapSeverityToPriority(severity) {
     const severityMap = {
-      'critical': 'urgent',
-      'high': 'high',
-      'medium': 'medium',
-      'low': 'low'
+      critical: 'urgent',
+      high: 'high',
+      medium: 'medium',
+      low: 'low',
     };
     return severityMap[severity] || 'medium';
   }
@@ -316,7 +317,7 @@ class AgentLinearIntegration {
       auditor: false,
       executor: false,
       guardian: false,
-      scholar: false
+      scholar: false,
     };
 
     try {
@@ -330,9 +331,9 @@ class AgentLinearIntegration {
             message: 'Test finding for MCP integration',
             severity: 'low',
             path: 'test.js',
-            line: 1
-          }
-        ]
+            line: 1,
+          },
+        ],
       };
 
       const auditorResult = await this.processAuditorFindings(mockAuditResult);
@@ -344,7 +345,7 @@ class AgentLinearIntegration {
         completedTasks: ['CLEAN-TEST-001'],
         tddCycle: true,
         filesModified: ['test.js'],
-        testsAdded: ['test.test.js']
+        testsAdded: ['test.test.js'],
       };
 
       const executorResult = await this.processExecutorWork(mockExecutorResult);
@@ -356,7 +357,7 @@ class AgentLinearIntegration {
         success: false,
         type: 'test_failure',
         severity: 'medium',
-        error: 'Test failure for integration testing'
+        error: 'Test failure for integration testing',
       };
 
       const guardianResult = await this.processGuardianAlerts(mockGuardianResult);
@@ -369,15 +370,15 @@ class AgentLinearIntegration {
           {
             pattern: 'test-pattern',
             confidence: 0.95,
-            description: 'Test pattern for MCP integration'
-          }
-        ]
+            description: 'Test pattern for MCP integration',
+          },
+        ],
       };
 
       const scholarResult = await this.processScholarInsights(mockScholarResult);
       testResults.scholar = scholarResult.success;
 
-      const allPassed = Object.values(testResults).every(result => result === true);
+      const allPassed = Object.values(testResults).every((result) => result === true);
 
       console.log('🧪 Agent → Linear MCP Integration Test Results:');
       console.log(`   AUDITOR: ${testResults.auditor ? '✅' : '❌'}`);
@@ -389,15 +390,14 @@ class AgentLinearIntegration {
       return {
         success: allPassed,
         results: testResults,
-        method: 'MCP Linear Integration'
+        method: 'MCP Linear Integration',
       };
-
     } catch (error) {
       console.error('❌ Integration test failed:', error.message);
       return {
         success: false,
         error: error.message,
-        results: testResults
+        results: testResults,
       };
     }
   }

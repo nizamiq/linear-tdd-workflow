@@ -44,14 +44,14 @@ The **Linear TDD Workflow System** is an advanced multi-agent AI development fra
 
 ### System Goals & Current Metrics
 
-| Metric | Target | Current | Status |
-|--------|--------|---------|--------|
-| Test Coverage | >90% | 87.4% | 🟡 Near Target |
-| Cyclomatic Complexity | <10 avg | 8.2 | ✅ Achieved |
-| Security Vulnerabilities | 0 critical | 0 | ✅ Achieved |
-| Pipeline Uptime | 99.9% | 99.5% | 🟡 Near Target |
-| Auto-fix Success Rate | 95% | 92% | 🟡 Near Target |
-| Technical Debt Reduction | 15% monthly | 18% | ✅ Exceeded |
+| Metric                   | Target      | Current | Status         |
+| ------------------------ | ----------- | ------- | -------------- |
+| Test Coverage            | >90%        | 87.4%   | 🟡 Near Target |
+| Cyclomatic Complexity    | <10 avg     | 8.2     | ✅ Achieved    |
+| Security Vulnerabilities | 0 critical  | 0       | ✅ Achieved    |
+| Pipeline Uptime          | 99.9%       | 99.5%   | 🟡 Near Target |
+| Auto-fix Success Rate    | 95%         | 92%     | 🟡 Near Target |
+| Technical Debt Reduction | 15% monthly | 18%     | ✅ Exceeded    |
 
 ---
 
@@ -60,20 +60,24 @@ The **Linear TDD Workflow System** is an advanced multi-agent AI development fra
 **Ready to begin?** Choose your onboarding path:
 
 ### For New Projects (5 minutes)
+
 ```bash
 mkdir my-project && cd my-project
 git clone https://github.com/your-org/claude-workflow .claude
 node .claude/setup.js
 ```
+
 **→ [Complete New Project Guide](ONBOARDING-NEW-PROJECT.md)**
 
 ### For Existing Projects (10 minutes)
+
 ```bash
 cd your-existing-project
 git clone https://github.com/your-org/claude-workflow .claude
 node .claude/setup.js
 make validate
 ```
+
 **→ [Complete Existing Project Guide](ONBOARDING-EXISTING-PROJECT.md)**
 
 ### Prerequisites
@@ -105,55 +109,55 @@ make validate
 
 ### 🚀 Onboarding Guides (START HERE)
 
-| Document | Purpose | Time | Audience |
-|----------|---------|------|----------|
-| [**Onboarding Overview**](ONBOARDING-OVERVIEW.md) | Choose your path | 5 min | Everyone |
-| [**New Project Guide**](ONBOARDING-NEW-PROJECT.md) | Complete new setup | 10-20 min | New projects |
+| Document                                                     | Purpose                    | Time      | Audience           |
+| ------------------------------------------------------------ | -------------------------- | --------- | ------------------ |
+| [**Onboarding Overview**](ONBOARDING-OVERVIEW.md)            | Choose your path           | 5 min     | Everyone           |
+| [**New Project Guide**](ONBOARDING-NEW-PROJECT.md)           | Complete new setup         | 10-20 min | New projects       |
 | [**Existing Project Guide**](ONBOARDING-EXISTING-PROJECT.md) | Non-disruptive integration | 20-30 min | Existing codebases |
-| [**Quick Start**](ONBOARDING-QUICKSTART.md) | Immediate evaluation | 5 min | Demos & trials |
+| [**Quick Start**](ONBOARDING-QUICKSTART.md)                  | Immediate evaluation       | 5 min     | Demos & trials     |
 
 ### 🏗️ Architecture & Design
 
-| Document | Description | Key Topics |
-|----------|-------------|------------|
-| [System Architecture](ARCHITECTURE-AGENTS.md) | Complete system design and components | Multi-agent architecture, MCP integration, Data flow |
-| [Agent Specifications](ARCHITECTURE-AGENTS.md) | Detailed agent roles and capabilities | AUDITOR, EXECUTOR, GUARDIAN, STRATEGIST, SCHOLAR |
-| [MCP Tools Integration](INTEGRATION-MCP-TOOLS.md) | Model Context Protocol tools setup | Sequential thinking, Kubernetes, Playwright, Linear API |
-| [Product Requirements](PRD.md) | Complete system specification | Requirements, metrics, roadmap |
+| Document                                          | Description                           | Key Topics                                              |
+| ------------------------------------------------- | ------------------------------------- | ------------------------------------------------------- |
+| [System Architecture](ARCHITECTURE-AGENTS.md)     | Complete system design and components | Multi-agent architecture, MCP integration, Data flow    |
+| [Agent Specifications](ARCHITECTURE-AGENTS.md)    | Detailed agent roles and capabilities | AUDITOR, EXECUTOR, GUARDIAN, STRATEGIST, SCHOLAR        |
+| [MCP Tools Integration](INTEGRATION-MCP-TOOLS.md) | Model Context Protocol tools setup    | Sequential thinking, Kubernetes, Playwright, Linear API |
+| [Product Requirements](PRD.md)                    | Complete system specification         | Requirements, metrics, roadmap                          |
 
 ### 🔧 Development Protocols
 
-| Document | Description | Key Topics |
-|----------|-------------|------------|
-| [TDD Protocol](./development-protocols/tdd-protocol.md) | Strict Test-Driven Development guide | Red-Green-Refactor, Testing strategy, Quality gates |
-| [GitFlow Guide](./development-protocols/gitflow.md) | Version control workflow | Branching strategy, Release management, PR process |
-| [Coding Standards](./development-protocols/coding-standards.md) | Code quality and style guidelines | Clean code, Naming conventions, Best practices |
-| [Testing Strategy](./development-protocols/testing-strategy.md) | Comprehensive testing approach | Unit, Integration, E2E, Performance testing |
+| Document                                                        | Description                          | Key Topics                                          |
+| --------------------------------------------------------------- | ------------------------------------ | --------------------------------------------------- |
+| [TDD Protocol](./development-protocols/tdd-protocol.md)         | Strict Test-Driven Development guide | Red-Green-Refactor, Testing strategy, Quality gates |
+| [GitFlow Guide](./development-protocols/gitflow.md)             | Version control workflow             | Branching strategy, Release management, PR process  |
+| [Coding Standards](./development-protocols/coding-standards.md) | Code quality and style guidelines    | Clean code, Naming conventions, Best practices      |
+| [Testing Strategy](./development-protocols/testing-strategy.md) | Comprehensive testing approach       | Unit, Integration, E2E, Performance testing         |
 
 ### 🔌 Integrations
 
-| Document | Description | Key Topics |
-|----------|-------------|------------|
-| [Linear Setup](./integrations/linear-setup.md) | Linear.app configuration guide | API setup, Workspace config, Webhook integration |
-| [CI/CD Integration](./integrations/ci-cd-setup.md) | Pipeline configuration | GitHub Actions, GitLab CI, Jenkins setup |
-| [MCP Server Setup](./integrations/mcp-servers.md) | MCP tool configuration | Server installation, Tool contracts, Usage patterns |
+| Document                                           | Description                    | Key Topics                                          |
+| -------------------------------------------------- | ------------------------------ | --------------------------------------------------- |
+| [Linear Setup](./integrations/linear-setup.md)     | Linear.app configuration guide | API setup, Workspace config, Webhook integration    |
+| [CI/CD Integration](./integrations/ci-cd-setup.md) | Pipeline configuration         | GitHub Actions, GitLab CI, Jenkins setup            |
+| [MCP Server Setup](./integrations/mcp-servers.md)  | MCP tool configuration         | Server installation, Tool contracts, Usage patterns |
 
 ### 🔄 Workflows & Operations
 
-| Document | Description | Key Topics |
-|----------|-------------|------------|
-| [Clean Code Assessment](./workflows/clean-code-assessment.md) | Code quality evaluation process | Metrics, Analysis tools, Report generation |
+| Document                                                        | Description                          | Key Topics                                             |
+| --------------------------------------------------------------- | ------------------------------------ | ------------------------------------------------------ |
+| [Clean Code Assessment](./workflows/clean-code-assessment.md)   | Code quality evaluation process      | Metrics, Analysis tools, Report generation             |
 | [Action Plan Generation](./workflows/action-plan-generation.md) | Task prioritization from assessments | Priority calculation, Sprint planning, Execution order |
-| [Execution Workflow](./workflows/execution-workflow.md) | Implementation process | Task selection, TDD cycle, PR creation |
-| [Pipeline Management](./operations/pipeline-management.md) | CI/CD operations | Monitoring, Recovery, Optimization |
+| [Execution Workflow](./workflows/execution-workflow.md)         | Implementation process               | Task selection, TDD cycle, PR creation                 |
+| [Pipeline Management](./operations/pipeline-management.md)      | CI/CD operations                     | Monitoring, Recovery, Optimization                     |
 
 ### 📊 Product & Planning
 
-| Document | Description | Key Topics |
-|----------|-------------|------------|
-| [Product Requirements (PRD)](./product/prd.md) | Complete product specification | Requirements, Success metrics, Roadmap |
-| [Cycle Planning](./planning/cycle-planning.md) | Sprint and iteration management | Planning, Execution, Retrospectives |
-| [Metrics & KPIs](./planning/metrics-kpis.md) | Performance indicators | Velocity, Quality, Technical debt tracking |
+| Document                                       | Description                     | Key Topics                                 |
+| ---------------------------------------------- | ------------------------------- | ------------------------------------------ |
+| [Product Requirements (PRD)](./product/prd.md) | Complete product specification  | Requirements, Success metrics, Roadmap     |
+| [Cycle Planning](./planning/cycle-planning.md) | Sprint and iteration management | Planning, Execution, Retrospectives        |
+| [Metrics & KPIs](./planning/metrics-kpis.md)   | Performance indicators          | Velocity, Quality, Technical debt tracking |
 
 ---
 
@@ -168,14 +172,14 @@ graph TB
         G --> SCH[SCHOLAR<br/>Learning Engine]
         SCH --> A
     end
-    
+
     subgraph "External Systems"
         CI[CI/CD Pipeline]
         L[Linear.app]
         GH[GitHub/GitLab]
         MCP[MCP Tools]
     end
-    
+
     S <--> CI
     S <--> L
     E <--> GH
@@ -185,13 +189,13 @@ graph TB
 
 ### Agent Responsibilities
 
-| Agent | Role | Primary Functions | Tools Used |
-|-------|------|------------------|------------|
-| **AUDITOR** | Code Quality Analyst | Continuous scanning, Issue detection, Debt identification | AST parsers, Security scanners, Pattern matchers |
-| **EXECUTOR** | Implementation Specialist | Fix implementation, Test creation, Code refactoring | Refactoring tools, Test generators, Formatters |
-| **GUARDIAN** | Pipeline SRE | CI/CD monitoring, Failure recovery, Test optimization | Pipeline monitors, Rollback automation, Alert systems |
-| **STRATEGIST** | Workflow Orchestrator | Task prioritization, Resource allocation, Progress tracking | Task engines, Schedulers, Analytics dashboards |
-| **SCHOLAR** | Learning Engine | Pattern recognition, Knowledge synthesis, Agent training | ML models, Pattern matching, Knowledge graphs |
+| Agent          | Role                      | Primary Functions                                           | Tools Used                                            |
+| -------------- | ------------------------- | ----------------------------------------------------------- | ----------------------------------------------------- |
+| **AUDITOR**    | Code Quality Analyst      | Continuous scanning, Issue detection, Debt identification   | AST parsers, Security scanners, Pattern matchers      |
+| **EXECUTOR**   | Implementation Specialist | Fix implementation, Test creation, Code refactoring         | Refactoring tools, Test generators, Formatters        |
+| **GUARDIAN**   | Pipeline SRE              | CI/CD monitoring, Failure recovery, Test optimization       | Pipeline monitors, Rollback automation, Alert systems |
+| **STRATEGIST** | Workflow Orchestrator     | Task prioritization, Resource allocation, Progress tracking | Task engines, Schedulers, Analytics dashboards        |
+| **SCHOLAR**    | Learning Engine           | Pattern recognition, Knowledge synthesis, Agent training    | ML models, Pattern matching, Knowledge graphs         |
 
 ---
 
@@ -209,6 +213,7 @@ graph LR
 ```
 
 **Enforcement Points:**
+
 - Pre-commit hooks validate test presence
 - CI/CD blocks PRs without tests
 - Mutation testing ensures test quality
@@ -312,7 +317,7 @@ ENABLE_AUTO_ROLLBACK=true
 ```yaml
 agents:
   auditor:
-    schedule: "*/4 * * * *"  # Every 4 hours
+    schedule: '*/4 * * * *' # Every 4 hours
     priorities:
       - security
       - performance
@@ -322,13 +327,13 @@ agents:
       complexity: 10
       coverage: 80
       duplication: 5
-    
+
   executor:
     max_concurrent_tasks: 3
     commit_strategy: atomic
     test_before_commit: true
     rollback_on_failure: true
-    
+
   guardian:
     fail_fast: true
     max_recovery_attempts: 3
@@ -336,13 +341,13 @@ agents:
     alert_channels:
       - slack
       - email
-    
+
   strategist:
     planning_horizon: 7d
     sprint_duration: 2w
     priority_algorithm: weighted_shortest_job
     resource_allocation: dynamic
-    
+
   scholar:
     pattern_confidence_threshold: 0.8
     learning_batch_size: 50
@@ -460,15 +465,15 @@ Access the monitoring dashboard at: `http://localhost:3000/dashboard`
 
 ### Key Performance Indicators
 
-| Category | Metric | Current | Trend | Target |
-|----------|--------|---------|-------|--------|
-| **Velocity** | Tasks/Day | 22 | ↑ | 20+ |
-| **Quality** | Code Score | 8.7/10 | ↑ | 9.0+ |
-| **Coverage** | Test Coverage | 87.4% | ↑ | 90%+ |
-| **Reliability** | Pipeline Uptime | 99.5% | → | 99.9% |
-| **Efficiency** | Auto-fix Success | 92% | ↑ | 95% |
-| **Learning** | Patterns/Week | 7 | ↑ | 5+ |
-| **Debt** | Monthly Reduction | 18% | ↑ | 15% |
+| Category        | Metric            | Current | Trend | Target |
+| --------------- | ----------------- | ------- | ----- | ------ |
+| **Velocity**    | Tasks/Day         | 22      | ↑     | 20+    |
+| **Quality**     | Code Score        | 8.7/10  | ↑     | 9.0+   |
+| **Coverage**    | Test Coverage     | 87.4%   | ↑     | 90%+   |
+| **Reliability** | Pipeline Uptime   | 99.5%   | →     | 99.9%  |
+| **Efficiency**  | Auto-fix Success  | 92%     | ↑     | 95%    |
+| **Learning**    | Patterns/Week     | 7       | ↑     | 5+     |
+| **Debt**        | Monthly Reduction | 18%     | ↑     | 15%    |
 
 ### Monitoring Endpoints
 
@@ -503,6 +508,7 @@ GET http://localhost:3000/api/activities?limit=50
 **Problem**: System fails to start due to missing configuration
 
 **Solution**:
+
 ```bash
 # Verify all required variables are set
 npm run config:validate
@@ -513,6 +519,7 @@ npm run setup:wizard
 # Check specific variable
 npm run config:check --var=LINEAR_API_KEY
 ```
+
 </details>
 
 <details>
@@ -521,6 +528,7 @@ npm run config:check --var=LINEAR_API_KEY
 **Problem**: MCP servers are not accessible
 
 **Solution**:
+
 ```bash
 # Reinstall MCP tools
 npm run setup:mcp-tools --force
@@ -531,6 +539,7 @@ npm run mcp:status
 # Test specific MCP tool
 npm run mcp:test --tool=sequential-thinking
 ```
+
 </details>
 
 #### Agent Issues
@@ -541,6 +550,7 @@ npm run mcp:test --tool=sequential-thinking
 **Problem**: An agent stops processing tasks
 
 **Solution**:
+
 ```bash
 # Check agent logs
 npm run logs:agent --name=executor --tail=100
@@ -551,6 +561,7 @@ npm run agent:restart --name=executor
 # Clear agent task queue
 npm run agent:clear-queue --name=executor
 ```
+
 </details>
 
 <details>
@@ -559,6 +570,7 @@ npm run agent:clear-queue --name=executor
 **Problem**: Agents consuming too much CPU/memory
 
 **Solution**:
+
 ```bash
 # Check resource usage
 npm run monitor:resources
@@ -569,6 +581,7 @@ npm run config:set --key=AGENT_CONCURRENCY --value=3
 # Enable resource limits
 npm run config:set --key=ENABLE_RESOURCE_LIMITS --value=true
 ```
+
 </details>
 
 #### Pipeline Issues
@@ -579,6 +592,7 @@ npm run config:set --key=ENABLE_RESOURCE_LIMITS --value=true
 **Problem**: Pipeline consistently failing
 
 **Solution**:
+
 ```bash
 # Trigger Guardian recovery
 npm run guardian:recover --force
@@ -589,6 +603,7 @@ npm run pipeline:analyze --days=7
 # Disable auto-fix temporarily
 npm run config:set --key=ENABLE_AUTO_FIX --value=false
 ```
+
 </details>
 
 #### Linear.app Issues
@@ -599,6 +614,7 @@ npm run config:set --key=ENABLE_AUTO_FIX --value=false
 **Problem**: Tasks not appearing in Linear.app
 
 **Solution**:
+
 ```bash
 # Test Linear connection
 npm run linear:test-connection
@@ -612,6 +628,7 @@ npm run linear:webhook:status
 # Regenerate webhook secret
 npm run linear:webhook:regenerate
 ```
+
 </details>
 
 ### Debug Mode
@@ -673,12 +690,14 @@ We welcome contributions! Please follow our strict TDD workflow:
 ### Development Process
 
 1. **Fork and Clone**
+
    ```bash
    git clone https://github.com/your-username/linear-tdd-workflow.git
    cd linear-tdd-workflow
    ```
 
 2. **Create Feature Branch**
+
    ```bash
    git flow feature start your-feature-name
    ```
@@ -756,6 +775,7 @@ MIT License - See [LICENSE](../LICENSE) file for details
 ### Acknowledgments
 
 Built with:
+
 - Claude Code AI by Anthropic
 - Model Context Protocol (MCP) tools
 - Linear.app for project management
@@ -786,4 +806,4 @@ npm run support:collect     # Gather debug info
 
 ---
 
-*For detailed information on any topic, navigate to the specific documentation section linked above.*
+_For detailed information on any topic, navigate to the specific documentation section linked above._

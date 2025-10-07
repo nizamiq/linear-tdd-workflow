@@ -9,6 +9,7 @@ tags: [integration, git, gitflow, version-control, branching]
 # GitFlow Integration Documentation
 
 ## Table of Contents
+
 1. [Overview](#1-overview)
 2. [GitFlow Model](#2-gitflow-model)
 3. [Branch Management](#3-branch-management)
@@ -74,6 +75,7 @@ gitGraph
 ## Core Branches
 
 ### Main (Production)
+
 ```yaml
 branch: main
 purpose: Production-ready code
@@ -85,6 +87,7 @@ protection:
 ```
 
 ### Develop (Integration)
+
 ```yaml
 branch: develop
 purpose: Latest development changes
@@ -101,6 +104,7 @@ protection:
 ## Feature Branches
 
 ### Creation
+
 ```bash
 # Start new feature
 git flow feature start FEATURE_NAME
@@ -109,6 +113,7 @@ git checkout -b feature/JIRA-123-user-authentication develop
 ```
 
 ### Naming Convention
+
 ```
 feature/[ticket-id]-[brief-description]
 Examples:
@@ -118,6 +123,7 @@ Examples:
 ```
 
 ### Lifecycle
+
 ```typescript
 class FeatureBranch {
   async start(name: string): Promise<void> {
@@ -129,7 +135,7 @@ class FeatureBranch {
     // Create Linear issue
     await linear.createIssue({
       title: `Feature: ${name}`,
-      state: "in_progress"
+      state: 'in_progress',
     });
   }
 
@@ -141,13 +147,13 @@ class FeatureBranch {
     const pr = await github.createPR({
       base: 'develop',
       head: `feature/${name}`,
-      title: `Feature: ${name}`
+      title: `Feature: ${name}`,
     });
 
     // Update Linear
     await linear.updateIssue({
-      state: "in_review",
-      pr: pr.url
+      state: 'in_review',
+      pr: pr.url,
     });
   }
 }
@@ -156,6 +162,7 @@ class FeatureBranch {
 ## Release Branches
 
 ### Release Process
+
 ```yaml
 release_workflow:
   1_create_branch:
@@ -178,6 +185,7 @@ release_workflow:
 ## Hotfix Branches
 
 ### Emergency Fix Process
+
 ```typescript
 async function createHotfix(issue: SecurityIssue): Promise<void> {
   // Branch from main
@@ -193,7 +201,7 @@ async function createHotfix(issue: SecurityIssue): Promise<void> {
     base: 'main',
     head: `hotfix/${issue.version}`,
     title: `HOTFIX: ${issue.title}`,
-    labels: ['hotfix', 'critical']
+    labels: ['hotfix', 'critical'],
   });
 
   // Deploy immediately after merge
@@ -212,13 +220,14 @@ async function createHotfix(issue: SecurityIssue): Promise<void> {
 ## Agent Integration
 
 ### Automated Branch Creation
+
 ```typescript
 class GitFlowAutomation {
   async handleLinearIssue(issue: LinearIssue): Promise<void> {
     const branchType = this.determineBranchType(issue);
     const branchName = this.generateBranchName(issue);
 
-    switch(branchType) {
+    switch (branchType) {
       case 'feature':
         await this.createFeatureBranch(branchName);
         break;
@@ -233,13 +242,14 @@ class GitFlowAutomation {
     // Update Linear with branch info
     await linear.updateIssue(issue.id, {
       branchName: branchName,
-      state: "in_progress"
+      state: 'in_progress',
     });
   }
 }
 ```
 
 ### Commit Automation
+
 ```typescript
 interface CommitTemplate {
   type: 'feat' | 'fix' | 'docs' | 'style' | 'refactor' | 'test' | 'chore';
@@ -255,7 +265,7 @@ function generateCommit(changes: Changes): string {
     scope: changes.scope,
     subject: changes.summary,
     body: changes.details,
-    footer: `Fixes: ${changes.issueId}`
+    footer: `Fixes: ${changes.issueId}`,
   };
 
   return formatConventionalCommit(template);
@@ -265,6 +275,7 @@ function generateCommit(changes: Changes): string {
 ## Protection Rules
 
 ### Branch Protection Configuration
+
 ```yaml
 main:
   protection_rules:
@@ -282,8 +293,8 @@ main:
 
     enforce_admins: true
     restrictions:
-      users: ["release-bot"]
-      teams: ["release-managers"]
+      users: ['release-bot']
+      teams: ['release-managers']
 
 develop:
   protection_rules:
@@ -303,6 +314,7 @@ develop:
 ## Pipeline Configuration
 
 ### GitHub Actions Workflow
+
 ```yaml
 name: GitFlow CI/CD
 
@@ -353,24 +365,25 @@ jobs:
 ## Quality Gates
 
 ### Merge Requirements
+
 ```typescript
 interface MergeRequirements {
   develop: {
-    tests: "all passing",
-    coverage: "≥80% diff coverage",
-    reviews: 1,
-    conflicts: "none",
-    ci: "green"
-  },
+    tests: 'all passing';
+    coverage: '≥80% diff coverage';
+    reviews: 1;
+    conflicts: 'none';
+    ci: 'green';
+  };
   main: {
-    tests: "all passing",
-    coverage: "≥90% diff coverage",
-    reviews: 2,
-    conflicts: "none",
-    ci: "green",
-    security: "no critical issues",
-    performance: "no regressions"
-  }
+    tests: 'all passing';
+    coverage: '≥90% diff coverage';
+    reviews: 2;
+    conflicts: 'none';
+    ci: 'green';
+    security: 'no critical issues';
+    performance: 'no regressions';
+  };
 }
 ```
 
@@ -381,6 +394,7 @@ interface MergeRequirements {
 ## Commit Guidelines
 
 ### Conventional Commits
+
 ```
 <type>(<scope>): <subject>
 
@@ -396,6 +410,7 @@ refactor(user): simplify validation logic
 ```
 
 ### Commit Hygiene
+
 - Atomic commits (one logical change)
 - Clear, descriptive messages
 - Reference issue numbers
@@ -404,6 +419,7 @@ refactor(user): simplify validation logic
 ## Merge Strategies
 
 ### Feature to Develop
+
 ```bash
 # Squash merge for clean history
 git checkout develop
@@ -412,6 +428,7 @@ git commit -m "feat: complete feature description"
 ```
 
 ### Release to Main
+
 ```bash
 # Regular merge to preserve history
 git checkout main
@@ -422,6 +439,7 @@ git tag -a v1.0.0 -m "Release version 1.0.0"
 ## Version Management
 
 ### Semantic Versioning
+
 ```yaml
 version_format: MAJOR.MINOR.PATCH
 
@@ -449,6 +467,7 @@ increment_rules:
 ## Common Issues
 
 ### Merge Conflicts
+
 ```bash
 # Resolution workflow
 git checkout develop
@@ -464,11 +483,12 @@ git rebase --continue
 ```
 
 ### Failed CI Checks
+
 ```typescript
 async function debugCIFailure(): Promise<void> {
   // Get failure details
   const checks = await github.getCheckRuns(pr.head.sha);
-  const failed = checks.filter(c => c.status === 'failure');
+  const failed = checks.filter((c) => c.status === 'failure');
 
   for (const check of failed) {
     console.log(`Failed: ${check.name}`);
@@ -485,6 +505,7 @@ async function debugCIFailure(): Promise<void> {
 ```
 
 ### Rollback Procedures
+
 ```bash
 # Rollback a release
 git checkout main
@@ -502,6 +523,7 @@ git push
 ## Summary
 
 GitFlow integration provides:
+
 1. **Structured Development**: Clear branching strategy
 2. **Parallel Workflows**: Multiple features and releases
 3. **Production Safety**: Protected main branch
@@ -512,4 +534,4 @@ The system ensures code quality through automated testing, protection rules, and
 
 ---
 
-*This document is maintained by the Engineering Excellence Team.*
+_This document is maintained by the Engineering Excellence Team._

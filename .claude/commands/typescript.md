@@ -2,9 +2,7 @@
 name: typescript
 description: TypeScript development with advanced type system, React/Next.js, and end-to-end type safety. Use PROACTIVELY for TypeScript migration, type system design, or React architecture.
 agent: TYPESCRIPT-PRO
-usage: "/typescript [--task=<types|react|api|migration|testing>] [--strict] [--monorepo]"
-allowed-tools: [Read, Write, Edit, Grep, Glob, Bash, mcp__context7__*]
-argument-hint: "[--task=types|react|api|migration|testing|optimization|all] [--strict] [--monorepo]"
+usage: '/typescript [--task=<types|react|api|migration|testing>] [--strict] [--monorepo]'
 parameters:
   - name: task
     description: TypeScript task type
@@ -26,17 +24,21 @@ parameters:
 Expert TypeScript 5.x development with the TYPESCRIPT-PRO agent, specializing in advanced type systems and React/Next.js architectures.
 
 ## Usage
+
 ```
 /typescript [--task=<types|react|api|migration|testing>] [--strict] [--monorepo]
 ```
 
 ## Parameters
+
 - `--task`: Development focus - types, react, api, migration, testing, optimization, or all (default: all)
 - `--strict`: Enable strictest TypeScript settings (default: true)
 - `--monorepo`: Configure for monorepo with Turborepo (default: false)
 
 ## What This Command Does
+
 The TYPESCRIPT-PRO agent will:
+
 1. Design advanced type systems with branded types
 2. Implement React/Next.js with full type safety
 3. Create end-to-end type safe APIs with tRPC
@@ -47,6 +49,7 @@ The TYPESCRIPT-PRO agent will:
 8. Migrate JavaScript to strict TypeScript
 
 ## Expected Output
+
 - **Type Definitions**: Comprehensive type system
 - **React Components**: Type-safe, polymorphic components
 - **API Types**: tRPC routers with full inference
@@ -57,6 +60,7 @@ The TYPESCRIPT-PRO agent will:
 - **Documentation**: Type utilities and patterns
 
 ## Examples
+
 ```bash
 # Full TypeScript setup
 /typescript --strict
@@ -83,6 +87,7 @@ The TYPESCRIPT-PRO agent will:
 ## TypeScript Patterns
 
 ### Type System
+
 - Branded types for domain modeling
 - Template literal types
 - Conditional types
@@ -90,6 +95,7 @@ The TYPESCRIPT-PRO agent will:
 - Discriminated unions
 
 ### React Patterns
+
 - Polymorphic components
 - Type-safe context
 - Server components
@@ -97,6 +103,7 @@ The TYPESCRIPT-PRO agent will:
 - Compound components
 
 ### API Safety
+
 - tRPC for end-to-end types
 - Zod for validation
 - Prisma for database
@@ -104,6 +111,7 @@ The TYPESCRIPT-PRO agent will:
 - OpenAPI types
 
 ### Testing
+
 - Vitest framework
 - Type-safe mocks
 - Testing Library
@@ -111,6 +119,7 @@ The TYPESCRIPT-PRO agent will:
 - E2E with Playwright
 
 ## Build Tools
+
 - **Vite**: Fast bundling
 - **esbuild**: Lightning-fast transpilation
 - **SWC**: Rust-based compiler
@@ -118,6 +127,7 @@ The TYPESCRIPT-PRO agent will:
 - **tsup**: Library bundling
 
 ## Best Practices
+
 - No explicit any types
 - Strict null checks
 - Exhaustive switches
@@ -125,6 +135,7 @@ The TYPESCRIPT-PRO agent will:
 - Type inference over annotation
 
 ## Integration
+
 - **Next.js**: Full-stack React
 - **Prisma**: Type-safe ORM
 - **tRPC**: End-to-end types
@@ -132,6 +143,7 @@ The TYPESCRIPT-PRO agent will:
 - **Tailwind**: Type-safe styles
 
 ## Performance Targets
+
 - Type coverage: 100%
 - Bundle size: <200KB gzipped
 - Build time: <10s
@@ -139,6 +151,7 @@ The TYPESCRIPT-PRO agent will:
 - Type checking: <5s
 
 ## SLAs
+
 - Type system design: ≤15 minutes
 - Component creation: ≤10 minutes
 - API setup: ≤20 minutes

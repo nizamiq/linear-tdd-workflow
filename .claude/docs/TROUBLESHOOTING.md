@@ -55,11 +55,13 @@ npm run linear:sync
 ### Issue: System Won't Start
 
 **Symptoms:**
+
 - Commands hang or timeout
 - "System not initialized" errors
 - Agent health checks fail
 
 **Diagnosis:**
+
 ```bash
 # Check system initialization
 npm run validate -- --full
@@ -77,18 +79,21 @@ npm config list
 **Solutions:**
 
 1. **Re-initialize System**
+
    ```bash
    npm run setup -- --reset
    npm run validate
    ```
 
 2. **Check Dependencies**
+
    ```bash
    npm install
    npm run build
    ```
 
 3. **Verify Environment**
+
    ```bash
    # Check required environment variables
    echo $CLAUDE_LINEAR_API_KEY
@@ -102,6 +107,7 @@ npm config list
 ### Issue: Permission Errors
 
 **Symptoms:**
+
 - "Permission denied" errors
 - Cannot write to `.claude/` directory
 - MCP tool access failures
@@ -109,18 +115,21 @@ npm config list
 **Solutions:**
 
 1. **Fix Directory Permissions**
+
    ```bash
    sudo chown -R $USER:$USER .claude/
    chmod -R 755 .claude/
    ```
 
 2. **Check File System Permissions**
+
    ```bash
    ls -la .claude/
    # Ensure files are readable/writable by user
    ```
 
 3. **MCP Tool Permissions**
+
    ```bash
    # Check MCP configuration
    cat .claude/mcp.json
@@ -134,11 +143,13 @@ npm config list
 ### Issue: Agents Not Responding
 
 **Symptoms:**
+
 - Agent commands timeout
 - "Agent not available" errors
 - Health checks fail
 
 **Diagnosis:**
+
 ```bash
 # Check agent system status
 npm run agents:status
@@ -153,12 +164,14 @@ npm run agent:logs -- --agent AUDITOR
 **Solutions:**
 
 1. **Restart Agent System**
+
    ```bash
    npm run agents:restart
    npm run agents:status
    ```
 
 2. **Check Agent Configuration**
+
    ```bash
    npm run config:validate -- --agents
    cat .claude/agents/auditor.json
@@ -173,11 +186,13 @@ npm run agent:logs -- --agent AUDITOR
 ### Issue: Agent Performance Problems
 
 **Symptoms:**
+
 - Slow agent responses
 - Timeouts during operations
 - High resource usage
 
 **Diagnosis:**
+
 ```bash
 # Check performance metrics
 npm run agent:invoke SCHOLAR:performance-analysis
@@ -192,6 +207,7 @@ npm run config:show -- --section concurrency
 **Solutions:**
 
 1. **Adjust Concurrency Settings**
+
    ```bash
    # Reduce concurrent agents
    export CLAUDE_MAX_CONCURRENT_AGENTS=2
@@ -218,11 +234,13 @@ npm run config:show -- --section concurrency
 ### Issue: MCP Tool Failures
 
 **Symptoms:**
+
 - "MCP operation failed" errors
 - Tool connectivity issues
 - Circuit breaker triggered
 
 **Diagnosis:**
+
 ```bash
 # Check MCP tool status
 npm run mcp:status
@@ -237,6 +255,7 @@ npm run agent:invoke GUARDIAN:circuit-breaker-status
 **Solutions:**
 
 1. **Reset MCP Tools**
+
    ```bash
    npm run mcp:reset
    npm run mcp:test-connection
@@ -260,11 +279,13 @@ npm run agent:invoke GUARDIAN:circuit-breaker-status
 ### Issue: TDD Enforcement Blocking Valid Changes
 
 **Symptoms:**
+
 - "TDD violation" errors for valid code
 - Coverage requirements too strict
 - Tests required for config files
 
 **Diagnosis:**
+
 ```bash
 # Check TDD configuration
 npm run config:show -- --section tdd
@@ -279,23 +300,21 @@ npm test -- --coverage
 **Solutions:**
 
 1. **Adjust TDD Configuration**
+
    ```json
    // .claude/settings.local.json
    {
      "tdd": {
        "enforcement_mode": "moderate",
        "exemptions": {
-         "file_patterns": [
-           "**/*.config.{js,ts}",
-           "**/scripts/**",
-           "**/docs/**"
-         ]
+         "file_patterns": ["**/*.config.{js,ts}", "**/scripts/**", "**/docs/**"]
        }
      }
    }
    ```
 
 2. **Fix Coverage Issues**
+
    ```bash
    # Generate coverage report with details
    npm test -- --coverage --verbose
@@ -308,11 +327,13 @@ npm test -- --coverage
 ### Issue: Tests Failing Unexpectedly
 
 **Symptoms:**
+
 - Tests pass locally but fail in CI
 - Intermittent test failures
 - Environment-specific failures
 
 **Diagnosis:**
+
 ```bash
 # Run tests with verbose output
 npm test -- --verbose
@@ -327,6 +348,7 @@ npm run diagnose:test-environment
 **Solutions:**
 
 1. **Environment Consistency**
+
    ```bash
    # Check Node.js version consistency
    node --version
@@ -340,6 +362,7 @@ npm run diagnose:test-environment
    ```
 
 2. **Fix Flaky Tests**
+
    ```bash
    # Identify flaky tests
    npm run test:flaky-detection
@@ -353,11 +376,13 @@ npm run diagnose:test-environment
 ### Issue: Coverage Gate Failures
 
 **Symptoms:**
+
 - "Coverage below threshold" errors
 - Diff coverage requirements not met
 - Coverage reports showing gaps
 
 **Diagnosis:**
+
 ```bash
 # Generate detailed coverage report
 npm test -- --coverage --coverage-html
@@ -372,6 +397,7 @@ npm run coverage:critical-paths
 **Solutions:**
 
 1. **Add Missing Tests**
+
    ```bash
    # Generate test stubs for uncovered files
    npm run generate:test-stubs -- --coverage-threshold 80
@@ -400,11 +426,13 @@ npm run coverage:critical-paths
 ### Issue: Linting Failures
 
 **Symptoms:**
+
 - ESLint errors blocking commits
 - Formatting inconsistencies
 - TypeScript type errors
 
 **Diagnosis:**
+
 ```bash
 # Check linting errors
 npm run lint -- --no-fix
@@ -419,6 +447,7 @@ npm run typecheck
 **Solutions:**
 
 1. **Auto-fix Issues**
+
    ```bash
    # Fix linting and formatting
    npm run lint
@@ -436,7 +465,7 @@ npm run typecheck
        // Temporarily disable problematic rules
        '@typescript-eslint/no-explicit-any': 'warn',
        '@typescript-eslint/no-unused-vars': 'warn',
-     }
+     },
    };
    ```
 
@@ -445,11 +474,13 @@ npm run typecheck
 ### Issue: Linear API Connection Failures
 
 **Symptoms:**
+
 - "Linear API error" messages
 - Tasks not syncing
 - Authentication failures
 
 **Diagnosis:**
+
 ```bash
 # Test Linear connection
 npm run linear:test-connection
@@ -464,6 +495,7 @@ npm run linear:logs
 **Solutions:**
 
 1. **Fix Authentication**
+
    ```bash
    # Set correct API key
    export CLAUDE_LINEAR_API_KEY=your_valid_key
@@ -485,11 +517,13 @@ npm run linear:logs
 ### Issue: Tasks Not Being Created
 
 **Symptoms:**
+
 - AUDITOR finds issues but no Linear tasks appear
 - Task creation permissions errors
 - Wrong team/project assignment
 
 **Diagnosis:**
+
 ```bash
 # Check task creation logs
 npm run agent:logs -- --agent AUDITOR
@@ -504,6 +538,7 @@ npm run linear:create-test-task
 **Solutions:**
 
 1. **Fix Permissions**
+
    ```bash
    # Check Linear team permissions
    npm run linear:check-team-access
@@ -532,11 +567,13 @@ npm run linear:create-test-task
 ### Issue: Slow Assessment Performance
 
 **Symptoms:**
+
 - Assessments taking >15 minutes
 - System becomes unresponsive
 - Memory usage spikes
 
 **Diagnosis:**
+
 ```bash
 # Check current performance
 npm run agent:invoke MONITOR:performance-metrics
@@ -551,6 +588,7 @@ npm run monitor:resources
 **Solutions:**
 
 1. **Optimize Assessment Scope**
+
    ```bash
    # Run incremental assessment only
    npm run assess -- --scope incremental
@@ -574,11 +612,13 @@ npm run monitor:resources
 ### Issue: High Memory Usage
 
 **Symptoms:**
+
 - Out of memory errors
 - System slowdowns
 - Process crashes
 
 **Diagnosis:**
+
 ```bash
 # Check memory usage
 npm run monitor:memory
@@ -593,6 +633,7 @@ node --max-old-space-size=4096 npm run assess
 **Solutions:**
 
 1. **Increase Memory Limits**
+
    ```bash
    # Set Node.js memory limit
    export NODE_OPTIONS="--max-old-space-size=4096"
@@ -618,11 +659,13 @@ node --max-old-space-size=4096 npm run assess
 ### Issue: Invalid Configuration
 
 **Symptoms:**
+
 - "Configuration validation failed" errors
 - System won't start
 - Missing required settings
 
 **Diagnosis:**
+
 ```bash
 # Validate all configuration
 npm run config:validate
@@ -637,6 +680,7 @@ npm run config:show
 **Solutions:**
 
 1. **Fix Configuration Errors**
+
    ```bash
    # Reset to default configuration
    npm run config:reset
@@ -646,6 +690,7 @@ npm run config:show
    ```
 
 2. **Restore from Backup**
+
    ```bash
    # List available backups
    npm run config:list-backups
@@ -657,11 +702,13 @@ npm run config:show
 ### Issue: Environment Variable Problems
 
 **Symptoms:**
+
 - "Environment variable not set" errors
 - Configuration not loading
 - Feature toggles not working
 
 **Diagnosis:**
+
 ```bash
 # Check all environment variables
 npm run config:env-check
@@ -676,6 +723,7 @@ npm run validate:environment
 **Solutions:**
 
 1. **Set Missing Variables**
+
    ```bash
    # Create .env file
    cat > .env << EOF
@@ -689,6 +737,7 @@ npm run validate:environment
    ```
 
 2. **Fix Variable Format**
+
    ```bash
    # Check variable format
    echo $CLAUDE_LINEAR_API_KEY | wc -c  # Should be proper length
@@ -702,11 +751,13 @@ npm run validate:environment
 ### Issue: Pipeline Failures
 
 **Symptoms:**
+
 - CI/CD builds failing unexpectedly
 - Quality gates blocking deployment
 - GUARDIAN not recovering pipelines
 
 **Diagnosis:**
+
 ```bash
 # Check pipeline status
 npm run agent:invoke GUARDIAN:check-pipelines
@@ -721,6 +772,7 @@ npm run validate:quality-gates
 **Solutions:**
 
 1. **Fix Quality Gate Issues**
+
    ```bash
    # Run quality checks locally
    npm run precommit
@@ -733,6 +785,7 @@ npm run validate:quality-gates
    ```
 
 2. **Configure Pipeline Recovery**
+
    ```bash
    # Enable auto-recovery
    npm run agent:invoke GUARDIAN:enable-auto-recovery
@@ -744,11 +797,13 @@ npm run validate:quality-gates
 ### Issue: GUARDIAN Auto-Recovery Failures
 
 **Symptoms:**
+
 - Pipelines failing repeatedly
 - Recovery attempts unsuccessful
 - Alert fatigue from failed recoveries
 
 **Diagnosis:**
+
 ```bash
 # Check recovery statistics
 npm run agent:invoke GUARDIAN:recovery-stats
@@ -763,6 +818,7 @@ npm run agent:invoke GUARDIAN:health-trends
 **Solutions:**
 
 1. **Improve Recovery Strategy**
+
    ```json
    // .claude/agents/guardian.json
    {
@@ -775,6 +831,7 @@ npm run agent:invoke GUARDIAN:health-trends
    ```
 
 2. **Manual Pipeline Recovery**
+
    ```bash
    # Manually trigger recovery
    npm run agent:invoke GUARDIAN:manual-recovery -- --pipeline main
@@ -870,6 +927,7 @@ npm run config:export -- --sanitize
 ### Support Channels
 
 1. **Self-Diagnosis**
+
    ```bash
    npm run doctor
    npm run diagnose:auto-fix
@@ -887,24 +945,25 @@ npm run config:export -- --sanitize
 
 ### Common Error Codes
 
-| Error Code | Description | Quick Fix |
-|------------|-------------|-----------|
-| `CLAUDE_001` | System not initialized | `npm run setup` |
-| `CLAUDE_002` | Agent timeout | Increase timeout or reduce concurrency |
-| `CLAUDE_003` | Configuration invalid | `npm run config:validate` |
-| `CLAUDE_004` | Linear API error | Check API key and permissions |
-| `CLAUDE_005` | Quality gate failure | Fix tests/coverage/linting |
-| `CLAUDE_006` | MCP tool failure | `npm run mcp:reset` |
-| `CLAUDE_007` | Memory exhaustion | Increase memory limits |
-| `CLAUDE_008` | Permission denied | Fix file/directory permissions |
-| `CLAUDE_009` | Network timeout | Check connectivity |
-| `CLAUDE_010` | Circuit breaker open | Wait for recovery or reset |
+| Error Code   | Description            | Quick Fix                              |
+| ------------ | ---------------------- | -------------------------------------- |
+| `CLAUDE_001` | System not initialized | `npm run setup`                        |
+| `CLAUDE_002` | Agent timeout          | Increase timeout or reduce concurrency |
+| `CLAUDE_003` | Configuration invalid  | `npm run config:validate`              |
+| `CLAUDE_004` | Linear API error       | Check API key and permissions          |
+| `CLAUDE_005` | Quality gate failure   | Fix tests/coverage/linting             |
+| `CLAUDE_006` | MCP tool failure       | `npm run mcp:reset`                    |
+| `CLAUDE_007` | Memory exhaustion      | Increase memory limits                 |
+| `CLAUDE_008` | Permission denied      | Fix file/directory permissions         |
+| `CLAUDE_009` | Network timeout        | Check connectivity                     |
+| `CLAUDE_010` | Circuit breaker open   | Wait for recovery or reset             |
 
 ---
 
 **Remember:** Most issues can be resolved with `npm run doctor` followed by the suggested fixes. When in doubt, try a system reset with `npm run reset` - it's designed to be safe and preserve your important data.
 
 **For additional help, see:**
+
 - [FAQ](FAQ.md) - Frequently asked questions
 - [User Guide](USER-GUIDE.md) - Complete system documentation
 - [Commands Reference](COMMANDS.md) - All available commands

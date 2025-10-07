@@ -50,7 +50,7 @@ function generateAgentDocs(agent) {
   // Capabilities
   if (capabilities && capabilities.length > 0) {
     doc += `## Capabilities\n\n`;
-    capabilities.forEach(cap => {
+    capabilities.forEach((cap) => {
       doc += `- ${cap.replace(/_/g, ' ')}\n`;
     });
     doc += `\n`;
@@ -60,9 +60,9 @@ function generateAgentDocs(agent) {
   if (tools && tools.length > 0) {
     doc += `## Tools Available\n\n`;
     doc += `This agent has access to the following Claude Code tools:\n\n`;
-    tools.forEach(tool => {
+    tools.forEach((tool) => {
       doc += `- **${tool}**: `;
-      switch(tool) {
+      switch (tool) {
         case 'Read':
           doc += 'Read files from the filesystem\n';
           break;
@@ -92,9 +92,9 @@ function generateAgentDocs(agent) {
   if (mcp_servers && mcp_servers.length > 0) {
     doc += `## MCP Server Integration\n\n`;
     doc += `This agent integrates with the following MCP servers:\n\n`;
-    mcp_servers.forEach(server => {
+    mcp_servers.forEach((server) => {
       doc += `- **${server}**: `;
-      switch(server) {
+      switch (server) {
         case 'linear-server':
           doc += 'Linear.app task management\n';
           break;
@@ -137,14 +137,14 @@ function generateAgentDocs(agent) {
 
     if (loop_controls.success_criteria && loop_controls.success_criteria.length > 0) {
       doc += `\n**Success Criteria**:\n\n`;
-      loop_controls.success_criteria.forEach(criterion => {
+      loop_controls.success_criteria.forEach((criterion) => {
         doc += `- ${criterion}\n`;
       });
     }
 
     if (loop_controls.ground_truth_checks && loop_controls.ground_truth_checks.length > 0) {
       doc += `\n**Ground Truth Validation**:\n\n`;
-      loop_controls.ground_truth_checks.forEach(check => {
+      loop_controls.ground_truth_checks.forEach((check) => {
         doc += `- Verify via **${check.tool}**: ${check.verify || check.command || check.file}\n`;
       });
     }
@@ -188,21 +188,33 @@ function generateIndexDocs(agents) {
   // Group agents by category
   const categories = {
     'Core Workflow': [],
-    'Development': [],
-    'Infrastructure': [],
+    Development: [],
+    Infrastructure: [],
     'Quality Engineering': [],
-    'Monitoring & Security': []
+    'Monitoring & Security': [],
   };
 
-  agents.forEach(agent => {
+  agents.forEach((agent) => {
     const name = agent.name;
     if (['AUDITOR', 'EXECUTOR', 'GUARDIAN', 'STRATEGIST', 'SCHOLAR', 'PLANNER'].includes(name)) {
       categories['Core Workflow'].push(agent);
     } else if (['DJANGO-PRO', 'PYTHON-PRO', 'TYPESCRIPT-PRO'].includes(name)) {
       categories['Development'].push(agent);
-    } else if (['KUBERNETES-ARCHITECT', 'DEPLOYMENT-ENGINEER', 'DATABASE-OPTIMIZER'].includes(name)) {
+    } else if (
+      ['KUBERNETES-ARCHITECT', 'DEPLOYMENT-ENGINEER', 'DATABASE-OPTIMIZER'].includes(name)
+    ) {
       categories['Infrastructure'].push(agent);
-    } else if (['CODE-REVIEWER', 'TEST-AUTOMATOR', 'LEGACY-MODERNIZER', 'TESTER', 'VALIDATOR', 'LINTER', 'TYPECHECKER'].includes(name)) {
+    } else if (
+      [
+        'CODE-REVIEWER',
+        'TEST-AUTOMATOR',
+        'LEGACY-MODERNIZER',
+        'TESTER',
+        'VALIDATOR',
+        'LINTER',
+        'TYPECHECKER',
+      ].includes(name)
+    ) {
       categories['Quality Engineering'].push(agent);
     } else {
       categories['Monitoring & Security'].push(agent);
@@ -213,7 +225,7 @@ function generateIndexDocs(agents) {
     if (agentList.length === 0) return;
 
     doc += `### ${category}\n\n`;
-    agentList.forEach(agent => {
+    agentList.forEach((agent) => {
       const filename = agent.name.toLowerCase().replace(/_/g, '-');
       doc += `- [**${agent.name}**](./agents/${filename}.md) - ${agent.role || agent.description?.split('.')[0]}\n`;
     });
@@ -226,10 +238,10 @@ function generateIndexDocs(agents) {
   doc += `| Agent | Read | Write | Edit | Bash | Grep | Glob |\n`;
   doc += `|-------|------|-------|------|------|------|------|\n`;
 
-  agents.forEach(agent => {
+  agents.forEach((agent) => {
     const filename = agent.name.toLowerCase().replace(/_/g, '-');
     doc += `| [${agent.name}](./agents/${filename}.md) `;
-    ['Read', 'Write', 'Edit', 'Bash', 'Grep', 'Glob'].forEach(tool => {
+    ['Read', 'Write', 'Edit', 'Bash', 'Grep', 'Glob'].forEach((tool) => {
       doc += `| ${agent.tools?.includes(tool) ? '✓' : ''} `;
     });
     doc += `|\n`;
@@ -238,14 +250,14 @@ function generateIndexDocs(agents) {
   doc += `\n## MCP Server Integration Matrix\n\n`;
   doc += `This matrix shows which MCP servers each agent uses:\n\n`;
 
-  const allMcpServers = [...new Set(agents.flatMap(a => a.mcp_servers || []))].sort();
+  const allMcpServers = [...new Set(agents.flatMap((a) => a.mcp_servers || []))].sort();
   doc += `| Agent | ${allMcpServers.join(' | ')} |\n`;
   doc += `|-------|${allMcpServers.map(() => '---').join('|')}|\n`;
 
-  agents.forEach(agent => {
+  agents.forEach((agent) => {
     const filename = agent.name.toLowerCase().replace(/_/g, '-');
     doc += `| [${agent.name}](./agents/${filename}.md) `;
-    allMcpServers.forEach(server => {
+    allMcpServers.forEach((server) => {
       doc += `| ${agent.mcp_servers?.includes(server) ? '✓' : ''} `;
     });
     doc += `|\n`;
@@ -255,13 +267,13 @@ function generateIndexDocs(agents) {
   doc += `| Agent | Max Iterations | Max Time | Max Tokens |\n`;
   doc += `|-------|----------------|----------|------------|\n`;
 
-  agents.forEach(agent => {
+  agents.forEach((agent) => {
     const filename = agent.name.toLowerCase().replace(/_/g, '-');
     const lc = agent.loop_controls || {};
     doc += `| [${agent.name}](./agents/${filename}.md) `;
     doc += `| ${lc.max_iterations || 'N/A'} `;
     doc += `| ${lc.max_time_seconds ? Math.round(lc.max_time_seconds / 60) + ' min' : 'N/A'} `;
-    doc += `| ${lc.max_cost_tokens ? (lc.max_cost_tokens / 1000) + 'k' : 'N/A'} |\n`;
+    doc += `| ${lc.max_cost_tokens ? lc.max_cost_tokens / 1000 + 'k' : 'N/A'} |\n`;
   });
 
   return doc;
@@ -276,28 +288,31 @@ function main() {
   ensureDir(path.join(OUTPUT_DIR, 'agents'));
 
   // Find all agent files
-  const agentFiles = fs.readdirSync(AGENTS_DIR)
-    .filter(f => f.endsWith('.md') && f !== 'index.md' && f !== 'CLAUDE.md' && !f.startsWith('.'))
-    .map(f => path.join(AGENTS_DIR, f));
+  const agentFiles = fs
+    .readdirSync(AGENTS_DIR)
+    .filter((f) => f.endsWith('.md') && f !== 'index.md' && f !== 'CLAUDE.md' && !f.startsWith('.'))
+    .map((f) => path.join(AGENTS_DIR, f));
 
   console.log(`Found ${agentFiles.length} agent specification files\n`);
 
   // Parse all agents
-  const agents = agentFiles.map(file => {
-    try {
-      const agent = parseAgentFile(file);
-      console.log(`✓ Parsed ${agent.name}`);
-      return agent;
-    } catch (error) {
-      console.error(`✗ Error parsing ${file}:`, error.message);
-      return null;
-    }
-  }).filter(Boolean);
+  const agents = agentFiles
+    .map((file) => {
+      try {
+        const agent = parseAgentFile(file);
+        console.log(`✓ Parsed ${agent.name}`);
+        return agent;
+      } catch (error) {
+        console.error(`✗ Error parsing ${file}:`, error.message);
+        return null;
+      }
+    })
+    .filter(Boolean);
 
   console.log(`\n📝 Generating documentation for ${agents.length} agents...\n`);
 
   // Generate individual agent docs
-  agents.forEach(agent => {
+  agents.forEach((agent) => {
     const filename = agent.name.toLowerCase().replace(/_/g, '-');
     const outputPath = path.join(OUTPUT_DIR, 'agents', `${filename}.md`);
     const doc = generateAgentDocs(agent);

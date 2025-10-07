@@ -34,8 +34,11 @@
       "Bash(while read f)",
       "Bash(awk:*)",
       "Read(//Users/cnross/.claude/**)",
-      "WebSearch",
-      "WebFetch(domain:www.anthropic.com)"
+      "Bash(gh run list:*)",
+      "Bash(gh run view:*)",
+      "Bash(test:*)",
+      "Read(//home/cnross/.claude/**)",
+      "Bash(npm test:*)"
     ],
     "deny": [],
     "ask": []

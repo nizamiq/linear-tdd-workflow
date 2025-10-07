@@ -29,5 +29,5 @@ global.createAsyncMockFunction = (resolveValue) => {
 module.exports = {
   createMockPromise: global.createMockPromise,
   createMockFunction: global.createMockFunction,
-  createAsyncMockFunction: global.createAsyncMockFunction
+  createAsyncMockFunction: global.createAsyncMockFunction,
 };

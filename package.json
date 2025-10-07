@@ -1,7 +1,7 @@
 {
   "name": "linear-tdd-workflow",
-  "version": "1.4.0",
-  "description": "Linear TDD Workflow System - Autonomous Clean Code Development with Test-Driven Excellence and Functional Release Management",
+  "version": "1.6.0",
+  "description": "Linear TDD Workflow System - Autonomous Clean Code Development with Test-Driven Excellence",
   "main": "index.js",
   "scripts": {
     "test": "jest --coverage --verbose --passWithNoTests",
@@ -66,6 +66,8 @@
     "journey:status": "node .claude/cli.js journey status",
     "guardian": "node .claude/cli.js guardian",
     "scholar": "node .claude/cli.js scholar",
+    "scholar:update": "node scripts/scholar-update.js",
+    "scholar:recommend": "node scripts/scholar-recommend.js",
     "release": "node .claude/cli.js release",
     "validator": "node .claude/cli.js validator",
     "cycle:analyze": "node .claude/scripts/cycle/cycle-analyzer.js",
@@ -79,12 +81,7 @@
     "docs:validate:xrefs": "bash scripts/validate-docs.sh --check-xrefs",
     "docs:fix": "bash scripts/validate-docs.sh --fix",
     "docs:generate-api": "node scripts/generate-api-docs.js",
-    "docs:audit": "bash scripts/validate-docs.sh && node scripts/generate-api-docs.js",
-    "release:validate-functional": "node .claude/scripts/release/functional-gate.js",
-    "release:user-stories": "node .claude/scripts/user-stories/registry-helper.js coverage",
-    "release:add-story": "node .claude/scripts/user-stories/registry-helper.js add",
-    "e2e:validate": "node .claude/scripts/testing/e2e-parser.js validate",
-    "e2e:report": "node .claude/scripts/testing/e2e-parser.js report"
+    "docs:audit": "bash scripts/validate-docs.sh && node scripts/generate-api-docs.js"
   },
   "keywords": [
     "tdd",

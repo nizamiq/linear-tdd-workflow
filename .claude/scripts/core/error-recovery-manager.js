@@ -23,7 +23,7 @@ const colors = {
   cyan: (text) => `\x1b[36m${text}\x1b[0m`,
   white: (text) => `\x1b[37m${text}\x1b[0m`,
   gray: (text) => `\x1b[90m${text}\x1b[0m`,
-  bold: (text) => `\x1b[1m${text}\x1b[0m`
+  bold: (text) => `\x1b[1m${text}\x1b[0m`,
 };
 
 class ErrorRecoveryManager extends EventEmitter {
@@ -33,26 +33,26 @@ class ErrorRecoveryManager extends EventEmitter {
     this.config = {
       // Circuit breaker settings
       circuitBreaker: {
-        failureThreshold: 5,      // Failures before opening circuit
-        resetTimeout: 60000,      // 1 minute before attempting reset
-        halfOpenMaxCalls: 3,      // Max calls in half-open state
-        successThreshold: 2       // Successes needed to close circuit
+        failureThreshold: 5, // Failures before opening circuit
+        resetTimeout: 60000, // 1 minute before attempting reset
+        halfOpenMaxCalls: 3, // Max calls in half-open state
+        successThreshold: 2, // Successes needed to close circuit
       },
       // Retry settings
       retry: {
         maxAttempts: 3,
-        baseDelay: 1000,          // 1 second base delay
-        maxDelay: 30000,          // 30 second max delay
-        backoffMultiplier: 2      // Exponential backoff
+        baseDelay: 1000, // 1 second base delay
+        maxDelay: 30000, // 30 second max delay
+        backoffMultiplier: 2, // Exponential backoff
       },
       // Health check settings
       healthCheck: {
-        interval: 30000,          // 30 second health checks
-        timeout: 10000,           // 10 second timeout
-        degradedThreshold: 70,    // 70% success rate = degraded
-        criticalThreshold: 50     // 50% success rate = critical
+        interval: 30000, // 30 second health checks
+        timeout: 10000, // 10 second timeout
+        degradedThreshold: 70, // 70% success rate = degraded
+        criticalThreshold: 50, // 50% success rate = critical
       },
-      ...options
+      ...options,
     };
 
     // Circuit breaker state per service
@@ -63,21 +63,21 @@ class ErrorRecoveryManager extends EventEmitter {
       mcp: {
         'linear-server': { failures: 0, successes: 0, lastError: null },
         'sequential-thinking': { failures: 0, successes: 0, lastError: null },
-        'context7': { failures: 0, successes: 0, lastError: null },
-        'kubernetes': { failures: 0, successes: 0, lastError: null },
-        'playwright': { failures: 0, successes: 0, lastError: null }
+        context7: { failures: 0, successes: 0, lastError: null },
+        kubernetes: { failures: 0, successes: 0, lastError: null },
+        playwright: { failures: 0, successes: 0, lastError: null },
       },
       agents: {
         failures: 0,
         timeouts: 0,
         recoveries: 0,
-        lastError: null
+        lastError: null,
       },
       system: {
         degradedCount: 0,
         criticalCount: 0,
-        lastDegradation: null
-      }
+        lastDegradation: null,
+      },
     };
 
     // Recovery strategies
@@ -87,7 +87,6 @@ class ErrorRecoveryManager extends EventEmitter {
     // Health monitoring
     this.healthTimer = null;
     this.isMonitoring = false;
-
   }
 
   /**
@@ -106,7 +105,7 @@ class ErrorRecoveryManager extends EventEmitter {
         await this.sleep(this.config.retry.baseDelay);
 
         return { recovered: true, action: 'circuit_breaker_opened' };
-      }
+      },
     });
 
     // Agent failure recovery
@@ -128,14 +127,13 @@ class ErrorRecoveryManager extends EventEmitter {
         } else {
           return { recovered: false, action: 'permanent_failure' };
         }
-      }
+      },
     });
 
     // System overload recovery
     this.recoveryStrategies.set('system_overload', {
       name: 'System Overload Recovery',
       action: async (context) => {
-
         this.errorStats.system.degradedCount++;
         this.errorStats.system.lastDegradation = Date.now();
 
@@ -146,10 +144,10 @@ class ErrorRecoveryManager extends EventEmitter {
           recommendations: [
             'Reduce concurrent agent limit',
             'Increase MCP operation timeouts',
-            'Enable request queuing'
-          ]
+            'Enable request queuing',
+          ],
         };
-      }
+      },
     });
 
     // Network connectivity recovery
@@ -160,13 +158,13 @@ class ErrorRecoveryManager extends EventEmitter {
 
         const delay = Math.min(
           this.config.retry.baseDelay * Math.pow(2, context.attempt || 1),
-          this.config.retry.maxDelay
+          this.config.retry.maxDelay,
         );
 
         await this.sleep(delay);
 
         return { recovered: true, action: 'network_retry', delay };
-      }
+      },
     });
   }
 
@@ -192,7 +190,6 @@ class ErrorRecoveryManager extends EventEmitter {
    * Handle error with appropriate recovery strategy
    */
   async handleError(errorType, context = {}) {
-
     try {
       // Get recovery strategy
       const strategy = this.recoveryStrategies.get(errorType);
@@ -215,11 +212,10 @@ class ErrorRecoveryManager extends EventEmitter {
         strategy: strategy.name,
         result,
         context,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
 
       return result;
-
     } catch (error) {
       return { recovered: false, action: 'recovery_error', error: error.message };
     }
@@ -235,7 +231,6 @@ class ErrorRecoveryManager extends EventEmitter {
       breaker.state = 'open';
       breaker.openTime = Date.now();
       breaker.failures = 0; // Reset failure count
-
 
       // Schedule reset attempt
       setTimeout(() => {
@@ -337,7 +332,7 @@ class ErrorRecoveryManager extends EventEmitter {
         failures: 0,
         openTime: null,
         halfOpenCalls: 0,
-        halfOpenSuccesses: 0
+        halfOpenSuccesses: 0,
       });
     }
     return this.circuitBreakers.get(serverName);
@@ -354,18 +349,19 @@ class ErrorRecoveryManager extends EventEmitter {
       /temporary/i,
       /503/,
       /502/,
-      /429/ // Rate limiting
+      /429/, // Rate limiting
     ];
 
     const errorMessage = error.message || error.toString();
-    return transientPatterns.some(pattern => pattern.test(errorMessage));
+    return transientPatterns.some((pattern) => pattern.test(errorMessage));
   }
 
   /**
    * Calculate retry delay with exponential backoff
    */
   calculateRetryDelay(attempt) {
-    const delay = this.config.retry.baseDelay * Math.pow(this.config.retry.backoffMultiplier, attempt - 1);
+    const delay =
+      this.config.retry.baseDelay * Math.pow(this.config.retry.backoffMultiplier, attempt - 1);
     return Math.min(delay, this.config.retry.maxDelay);
   }
 
@@ -390,13 +386,14 @@ class ErrorRecoveryManager extends EventEmitter {
     const health = {
       status: 'healthy',
       timestamp: now,
-      issues: []
+      issues: [],
     };
 
     // Check MCP server health
     for (const [serverName, stats] of Object.entries(this.errorStats.mcp)) {
       const total = stats.failures + stats.successes;
-      if (total > 10) { // Only assess if we have enough data
+      if (total > 10) {
+        // Only assess if we have enough data
         const successRate = (stats.successes / total) * 100;
 
         if (successRate < this.config.healthCheck.criticalThreshold) {
@@ -432,7 +429,7 @@ class ErrorRecoveryManager extends EventEmitter {
     return {
       ...this.errorStats,
       circuitBreakers: Object.fromEntries(this.circuitBreakers),
-      systemHealth: this.assessSystemHealth()
+      systemHealth: this.assessSystemHealth(),
     };
   }
 
@@ -454,14 +451,13 @@ class ErrorRecoveryManager extends EventEmitter {
     this.errorStats.system.degradedCount = 0;
     this.errorStats.system.criticalCount = 0;
     this.errorStats.system.lastDegradation = null;
-
   }
 
   /**
    * Sleep utility
    */
   sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   /**

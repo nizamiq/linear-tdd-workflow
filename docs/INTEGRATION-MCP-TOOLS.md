@@ -9,6 +9,7 @@ tags: [integration, mcp, tools, model-context-protocol, automation]
 # Model Context Protocol (MCP) Tools Integration
 
 ## Table of Contents
+
 1. [Overview](#1-overview)
 2. [Available MCP Tools](#2-available-mcp-tools)
 3. [Tool Specifications](#3-tool-specifications)
@@ -39,14 +40,14 @@ Model Context Protocol (MCP) provides standardized tool interfaces for AI agents
 
 ## Core MCP Tools
 
-| Tool | Purpose | Assigned Agents | Use Cases |
-|------|---------|-----------------|-----------|
-| **Sequential Thinking** | Problem solving | OPTIMIZER, ARCHITECT | Complex refactoring, architecture decisions |
-| **Context7** | Code search | RESEARCHER, SECURITYGUARD | Pattern matching, vulnerability detection |
-| **Linear** | Task management | All agents | Issue tracking, sprint planning |
-| **Playwright** | E2E testing | VALIDATOR | UI testing, visual regression |
-| **Kubernetes** | Deployment | DEPLOYER | Container management, scaling |
-| **TimeServer** | Time services | MONITOR | Scheduling, time-based triggers |
+| Tool                    | Purpose         | Assigned Agents           | Use Cases                                   |
+| ----------------------- | --------------- | ------------------------- | ------------------------------------------- |
+| **Sequential Thinking** | Problem solving | OPTIMIZER, ARCHITECT      | Complex refactoring, architecture decisions |
+| **Context7**            | Code search     | RESEARCHER, SECURITYGUARD | Pattern matching, vulnerability detection   |
+| **Linear**              | Task management | All agents                | Issue tracking, sprint planning             |
+| **Playwright**          | E2E testing     | VALIDATOR                 | UI testing, visual regression               |
+| **Kubernetes**          | Deployment      | DEPLOYER                  | Container management, scaling               |
+| **TimeServer**          | Time services   | MONITOR                   | Scheduling, time-based triggers             |
 
 ---
 
@@ -55,19 +56,21 @@ Model Context Protocol (MCP) provides standardized tool interfaces for AI agents
 ## 3.1 Sequential Thinking
 
 ### Purpose
+
 Enable agents to break down complex problems into manageable thinking steps with revision capability.
 
 ### Operations
+
 ```yaml
 operations:
   sequentialthinking:
     parameters:
-      thought: string             # Current thinking step
-      nextThoughtNeeded: boolean  # Continue thinking?
-      thoughtNumber: number       # Current step number
-      totalThoughts: number       # Estimated total steps
-      isRevision?: boolean       # Revising previous thought?
-      revisesThought?: number    # Which thought to revise
+      thought: string # Current thinking step
+      nextThoughtNeeded: boolean # Continue thinking?
+      thoughtNumber: number # Current step number
+      totalThoughts: number # Estimated total steps
+      isRevision?: boolean # Revising previous thought?
+      revisesThought?: number # Which thought to revise
 
     capabilities:
       - Multi-step reasoning
@@ -77,24 +80,25 @@ operations:
 ```
 
 ### Usage Example
+
 ```typescript
 async function solveComplexRefactoring(code: Code): Promise<Solution> {
   const thinking = new SequentialThinking();
 
   // Step 1: Analyze current structure
   await thinking.think({
-    thought: "Analyzing code structure and dependencies",
+    thought: 'Analyzing code structure and dependencies',
     thoughtNumber: 1,
     totalThoughts: 5,
-    nextThoughtNeeded: true
+    nextThoughtNeeded: true,
   });
 
   // Step 2: Identify refactoring opportunities
   await thinking.think({
-    thought: "Identifying patterns and anti-patterns",
+    thought: 'Identifying patterns and anti-patterns',
     thoughtNumber: 2,
     totalThoughts: 5,
-    nextThoughtNeeded: true
+    nextThoughtNeeded: true,
   });
 
   // Continue through solution...
@@ -105,9 +109,11 @@ async function solveComplexRefactoring(code: Code): Promise<Solution> {
 ## 3.2 Context7
 
 ### Purpose
+
 Retrieve up-to-date documentation and code examples for any library or framework.
 
 ### Operations
+
 ```yaml
 operations:
   resolve-library-id:
@@ -120,26 +126,27 @@ operations:
   get-library-docs:
     parameters:
       context7CompatibleLibraryID: string
-      tokens?: number        # Max tokens (default: 5000)
-      topic?: string         # Focus area
+      tokens?: number # Max tokens (default: 5000)
+      topic?: string # Focus area
     returns:
       documentation: string
       examples: CodeExample[]
 ```
 
 ### Usage Pattern
+
 ```typescript
 async function getFrameworkDocs(framework: string): Promise<Documentation> {
   // First resolve the library ID
   const resolution = await context7.resolveLibraryId({
-    libraryName: framework
+    libraryName: framework,
   });
 
   // Then get documentation
   const docs = await context7.getLibraryDocs({
     context7CompatibleLibraryID: resolution.libraryId,
     tokens: 10000,
-    topic: "authentication"
+    topic: 'authentication',
   });
 
   return docs;
@@ -149,9 +156,11 @@ async function getFrameworkDocs(framework: string): Promise<Documentation> {
 ## 3.3 Playwright Testing
 
 ### Purpose
+
 Automated browser testing and UI validation.
 
 ### Key Operations
+
 ```yaml
 operations:
   browser_navigate:
@@ -180,6 +189,7 @@ operations:
 ```
 
 ### Test Implementation
+
 ```typescript
 class E2ETestRunner {
   async runTest(testSpec: TestSpec): Promise<TestResult> {
@@ -188,7 +198,7 @@ class E2ETestRunner {
 
     // Fill and submit form
     await playwright.fillForm({
-      fields: testSpec.formData
+      fields: testSpec.formData,
     });
 
     // Verify results
@@ -201,9 +211,11 @@ class E2ETestRunner {
 ## 3.4 Kubernetes Management
 
 ### Purpose
+
 Container orchestration and deployment automation.
 
 ### Core Operations
+
 ```yaml
 operations:
   kubectl_apply:
@@ -232,21 +244,22 @@ operations:
 ```
 
 ### Deployment Workflow
+
 ```typescript
 async function deployService(service: Service): Promise<DeploymentResult> {
   // Apply manifest
   await kubernetes.apply({
     manifest: service.manifest,
     namespace: service.namespace,
-    dryRun: true // Validate first
+    dryRun: true, // Validate first
   });
 
   // Monitor rollout
   const status = await kubernetes.rollout({
-    subCommand: "status",
-    resourceType: "deployment",
+    subCommand: 'status',
+    resourceType: 'deployment',
     name: service.name,
-    namespace: service.namespace
+    namespace: service.namespace,
   });
 
   return status;
@@ -260,33 +273,34 @@ async function deployService(service: Service): Promise<DeploymentResult> {
 ## 4.1 Tool Chaining
 
 ### Sequential Processing
+
 ```typescript
 async function completeWorkflow(issue: Issue): Promise<Result> {
   // 1. Search for similar issues using Context7
   const similar = await context7.search({
-    query: issue.description
+    query: issue.description,
   });
 
   // 2. Reason about solution using Sequential Thinking
   const solution = await sequentialThinking.solve({
     problem: issue,
-    context: similar
+    context: similar,
   });
 
   // 3. Create task in Linear
   const task = await linear.createIssue({
     title: solution.title,
-    description: solution.plan
+    description: solution.plan,
   });
 
   // 4. Implement and test with Playwright
   const tests = await playwright.runTests({
-    spec: solution.testSpec
+    spec: solution.testSpec,
   });
 
   // 5. Deploy with Kubernetes
   const deployment = await kubernetes.deploy({
-    service: solution.service
+    service: solution.service,
   });
 
   return { task, tests, deployment };
@@ -296,25 +310,21 @@ async function completeWorkflow(issue: Issue): Promise<Result> {
 ## 4.2 Parallel Processing
 
 ### Concurrent Tool Usage
+
 ```typescript
 async function parallelAnalysis(codebase: Codebase): Promise<Analysis> {
-  const [
-    securityScan,
-    documentation,
-    testResults,
-    deployment
-  ] = await Promise.all([
+  const [securityScan, documentation, testResults, deployment] = await Promise.all([
     context7.scanSecurity(codebase),
     context7.getDocumentation(codebase.dependencies),
     playwright.runAllTests(codebase.tests),
-    kubernetes.validateManifests(codebase.k8s)
+    kubernetes.validateManifests(codebase.k8s),
   ]);
 
   return combineResults({
     securityScan,
     documentation,
     testResults,
-    deployment
+    deployment,
   });
 }
 ```
@@ -326,6 +336,7 @@ async function parallelAnalysis(codebase: Codebase): Promise<Analysis> {
 ## 5.1 Tool Selection
 
 ### Decision Matrix
+
 ```yaml
 when_to_use:
   sequential_thinking:
@@ -357,11 +368,12 @@ when_to_use:
 ## 5.2 Error Handling
 
 ### Robust Tool Usage
+
 ```typescript
 async function safeToolExecution<T>(
   tool: MCPTool,
   operation: string,
-  params: any
+  params: any,
 ): Promise<T | null> {
   try {
     const result = await tool[operation](params);
@@ -392,15 +404,12 @@ async function safeToolExecution<T>(
 ## 6.1 Performance Optimization
 
 ### Caching Strategies
+
 ```typescript
 class MCPCache {
   private cache = new Map<string, CachedResult>();
 
-  async get<T>(
-    tool: string,
-    operation: string,
-    params: any
-  ): Promise<T> {
+  async get<T>(tool: string, operation: string, params: any): Promise<T> {
     const key = this.generateKey(tool, operation, params);
 
     if (this.cache.has(key)) {
@@ -413,7 +422,7 @@ class MCPCache {
     const result = await this.execute(tool, operation, params);
     this.cache.set(key, {
       data: result,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
 
     return result;
@@ -424,12 +433,13 @@ class MCPCache {
 ## 6.2 Rate Limiting
 
 ### Tool Usage Throttling
+
 ```typescript
 class RateLimiter {
   private limits = {
     context7: { requests: 100, window: 3600000 },
     playwright: { requests: 50, window: 3600000 },
-    kubernetes: { requests: 200, window: 3600000 }
+    kubernetes: { requests: 200, window: 3600000 },
   };
 
   async executeWithLimit(tool: string, fn: Function): Promise<any> {
@@ -448,6 +458,7 @@ class RateLimiter {
 ## 6.3 Monitoring
 
 ### Tool Usage Metrics
+
 ```yaml
 metrics_to_track:
   - tool_invocations_total
@@ -479,4 +490,4 @@ Proper integration and usage of these tools enables agents to operate more effec
 
 ---
 
-*This document is maintained by the Engineering Excellence Team.*
+_This document is maintained by the Engineering Excellence Team._

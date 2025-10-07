@@ -21,17 +21,14 @@ const colors = {
   blue: (text) => `\x1b[34m${text}\x1b[0m`,
   cyan: (text) => `\x1b[36m${text}\x1b[0m`,
   magenta: (text) => `\x1b[35m${text}\x1b[0m`,
-  bold: Object.assign(
-    (text) => `\x1b[1m${text}\x1b[0m`,
-    {
-      cyan: (text) => `\x1b[1m\x1b[36m${text}\x1b[0m`,
-      green: (text) => `\x1b[1m\x1b[32m${text}\x1b[0m`,
-      yellow: (text) => `\x1b[1m\x1b[33m${text}\x1b[0m`,
-      blue: (text) => `\x1b[1m\x1b[34m${text}\x1b[0m`,
-      red: (text) => `\x1b[1m\x1b[31m${text}\x1b[0m`,
-      magenta: (text) => `\x1b[1m\x1b[35m${text}\x1b[0m`
-    }
-  )
+  bold: Object.assign((text) => `\x1b[1m${text}\x1b[0m`, {
+    cyan: (text) => `\x1b[1m\x1b[36m${text}\x1b[0m`,
+    green: (text) => `\x1b[1m\x1b[32m${text}\x1b[0m`,
+    yellow: (text) => `\x1b[1m\x1b[33m${text}\x1b[0m`,
+    blue: (text) => `\x1b[1m\x1b[34m${text}\x1b[0m`,
+    red: (text) => `\x1b[1m\x1b[31m${text}\x1b[0m`,
+    magenta: (text) => `\x1b[1m\x1b[35m${text}\x1b[0m`,
+  }),
 };
 
 class ClaudeCLI {
@@ -62,7 +59,7 @@ class ClaudeCLI {
       this.config = {
         version: '1.0.0',
         supportedLanguages: ['javascript', 'typescript', 'python'],
-        defaultConcurrency: 10
+        defaultConcurrency: 10,
       };
     }
   }
@@ -242,7 +239,10 @@ class ClaudeCLI {
     this.program
       .command('agent:invoke')
       .description('Invoke specific agent with command')
-      .argument('<agent-command>', 'Agent command in format AGENT:COMMAND (e.g., AUDITOR:assess-code)')
+      .argument(
+        '<agent-command>',
+        'Agent command in format AGENT:COMMAND (e.g., AUDITOR:assess-code)',
+      )
       .option('--scope <scope>', 'Assessment scope (full, changed, critical)', 'changed')
       .option('--depth <depth>', 'Analysis depth (deep, standard, quick)', 'standard')
       .option('--language <language>', 'Target language filter')
@@ -311,7 +311,6 @@ class ClaudeCLI {
       }
 
       this.execCommand(cmd);
-
     } catch (error) {
       console.error(colors.red(`Assessment failed: ${error.message}`));
       process.exit(1);
@@ -337,7 +336,6 @@ class ClaudeCLI {
       if (options.autoCommit) {
         await this.autoCommitChanges(taskId);
       }
-
     } catch (error) {
       console.error(colors.red(`Fix implementation failed: ${error.message}`));
       process.exit(1);
@@ -358,11 +356,14 @@ class ClaudeCLI {
         await this.runPythonTests(options);
       }
 
-      if (targetLanguage === 'javascript' || targetLanguage === 'typescript' ||
-          languages.includes('javascript') || languages.includes('typescript')) {
+      if (
+        targetLanguage === 'javascript' ||
+        targetLanguage === 'typescript' ||
+        languages.includes('javascript') ||
+        languages.includes('typescript')
+      ) {
         await this.runJSTests(options);
       }
-
     } catch (error) {
       console.error(colors.red(`Testing failed: ${error.message}`));
       process.exit(1);
@@ -383,7 +384,6 @@ class ClaudeCLI {
       } else {
         this.execCommand(`node "${statusScript}" dashboard`);
       }
-
     } catch (error) {
       console.error(colors.red(`Status check failed: ${error.message}`));
       process.exit(1);
@@ -399,7 +399,6 @@ class ClaudeCLI {
     try {
       const setupScript = path.join(this.claudeDir, 'setup.js');
       this.execCommand(`node "${setupScript}"`);
-
     } catch (error) {
       console.error(colors.red(`Setup failed: ${error.message}`));
       process.exit(1);
@@ -414,7 +413,12 @@ class ClaudeCLI {
 
     try {
       if (options.permissions) {
-        const validatorScript = path.join(this.claudeDir, 'scripts', 'core', 'tool-permission-validator.js');
+        const validatorScript = path.join(
+          this.claudeDir,
+          'scripts',
+          'core',
+          'tool-permission-validator.js',
+        );
         this.execCommand(`node "${validatorScript}" check-all`);
       }
 
@@ -427,7 +431,6 @@ class ClaudeCLI {
         // Run all validations
         await this.handleValidate({ permissions: true, tdd: true });
       }
-
     } catch (error) {
       console.error(colors.red(`Validation failed: ${error.message}`));
       process.exit(1);
@@ -444,7 +447,7 @@ class ClaudeCLI {
     const suggestions = [];
 
     // Check if .claude is properly configured
-    if (!await this.fileExists(path.join(this.claudeDir, 'agents'))) {
+    if (!(await this.fileExists(path.join(this.claudeDir, 'agents')))) {
       issues.push('❌ Agents directory not found');
       suggestions.push('Run: ./claude setup');
     }
@@ -473,10 +476,10 @@ class ClaudeCLI {
       console.log(colors.green('\n🎉 No issues detected! System is healthy.\n'));
     } else {
       console.log(colors.red('\n🚨 Issues detected:\n'));
-      issues.forEach(issue => console.log(`  ${issue}`));
+      issues.forEach((issue) => console.log(`  ${issue}`));
 
       console.log(colors.yellow('\n💡 Suggestions:\n'));
-      suggestions.forEach(suggestion => console.log(`  ${suggestion}`));
+      suggestions.forEach((suggestion) => console.log(`  ${suggestion}`));
     }
   }
 
@@ -493,7 +496,7 @@ class ClaudeCLI {
       '.coverage',
       'coverage',
       '.nyc_output',
-      '.stryker-tmp'
+      '.stryker-tmp',
     ];
 
     if (options.all) {
@@ -522,7 +525,7 @@ class ClaudeCLI {
       version: this.config.version,
       timestamp: new Date().toISOString(),
       agents: await this.loadAgentConfigs(),
-      settings: await this.loadSettings()
+      settings: await this.loadSettings(),
     };
 
     const filename = `claude-config.${options.format}`;
@@ -565,7 +568,6 @@ class ClaudeCLI {
       await this.applyImportedConfig(config);
 
       console.log(colors.green('✅ Configuration imported successfully\n'));
-
     } catch (error) {
       console.error(colors.red(`Import failed: ${error.message}`));
       process.exit(1);
@@ -579,7 +581,9 @@ class ClaudeCLI {
     console.log(colors.bold.cyan('🔬 Running Concurrency Analysis\n'));
 
     try {
-      const ConcurrencyTester = require(path.join(this.claudeDir, 'scripts', 'core', 'concurrency-tester.js'));
+      const ConcurrencyTester = require(
+        path.join(this.claudeDir, 'scripts', 'core', 'concurrency-tester.js'),
+      );
       const tester = new ConcurrencyTester();
 
       await tester.runAnalysis();
@@ -588,7 +592,6 @@ class ClaudeCLI {
         const reportPath = path.join(this.claudeDir, 'analysis', `${tester.testId}.json`);
         console.log(colors.blue(`\nDetailed results: ${reportPath}`));
       }
-
     } catch (error) {
       console.error(colors.red(`Concurrency analysis failed: ${error.message}`));
       process.exit(1);
@@ -602,11 +605,13 @@ class ClaudeCLI {
     console.log(colors.bold.cyan('🧪 Running Phase B.1 Comprehensive Testing\n'));
 
     try {
-      const PhaseB1Tester = require(path.join(this.claudeDir, 'scripts', 'core', 'phase-b1-tester.js'));
+      const PhaseB1Tester = require(
+        path.join(this.claudeDir, 'scripts', 'core', 'phase-b1-tester.js'),
+      );
 
       const testerConfig = {
         testDuration: parseInt(options.duration),
-        exportPath: options.exportResults
+        exportPath: options.exportResults,
       };
 
       const tester = new PhaseB1Tester(testerConfig);
@@ -617,7 +622,6 @@ class ClaudeCLI {
       }
 
       process.exit(success ? 0 : 1);
-
     } catch (error) {
       console.error(colors.red(`Phase B.1 testing failed: ${error.message}`));
       console.error(error.stack);
@@ -631,15 +635,15 @@ class ClaudeCLI {
   async detectLanguages() {
     const languages = [];
 
-    if (await this.fileExists('package.json') || await this.hasFiles(['**/*.js', '**/*.ts'])) {
+    if ((await this.fileExists('package.json')) || (await this.hasFiles(['**/*.js', '**/*.ts']))) {
       languages.push('javascript');
     }
 
-    if (await this.fileExists('tsconfig.json') || await this.hasFiles(['**/*.ts'])) {
+    if ((await this.fileExists('tsconfig.json')) || (await this.hasFiles(['**/*.ts']))) {
       languages.push('typescript');
     }
 
-    if (await this.fileExists('pyproject.toml') || await this.hasFiles(['**/*.py'])) {
+    if ((await this.fileExists('pyproject.toml')) || (await this.hasFiles(['**/*.py']))) {
       languages.push('python');
     }
 
@@ -669,7 +673,10 @@ class ClaudeCLI {
   async autoCommitChanges(taskId) {
     try {
       execSync('git add .', { stdio: 'inherit' });
-      execSync(`git commit -m "feat: implement fix pack ${taskId}\n\n🤖 Generated with Claude Code\n\nCo-Authored-By: Claude <noreply@anthropic.com>"`, { stdio: 'inherit' });
+      execSync(
+        `git commit -m "feat: implement fix pack ${taskId}\n\n🤖 Generated with Claude Code\n\nCo-Authored-By: Claude <noreply@anthropic.com>"`,
+        { stdio: 'inherit' },
+      );
       console.log(colors.green(`✅ Changes committed for ${taskId}`));
     } catch (error) {
       console.warn(colors.yellow(`Warning: Auto-commit failed: ${error.message}`));
@@ -734,8 +741,8 @@ class ClaudeCLI {
         const response = await fetch('https://api.linear.app/graphql', {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json'
+            Authorization: `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify({
             query: `
@@ -750,8 +757,8 @@ class ClaudeCLI {
                   name
                 }
               }
-            `
-          })
+            `,
+          }),
         });
 
         if (!response.ok) {
@@ -785,7 +792,6 @@ class ClaudeCLI {
         }
 
         console.log(colors.bold.green('\n🎉 Linear integration ready!'));
-
       } catch (error) {
         console.log(colors.red('❌ Linear API connection failed'));
         console.log(colors.red(`   Error: ${error.message}`));
@@ -794,12 +800,11 @@ class ClaudeCLI {
           console.log(colors.yellow('\n💡 Troubleshooting:'));
           console.log(colors.gray('   • Check your API key is correct'));
           console.log(colors.gray('   • Ensure the key has proper permissions'));
-          console.log(colors.gray('   • Verify the key hasn\'t expired'));
+          console.log(colors.gray("   • Verify the key hasn't expired"));
         }
 
         process.exit(1);
       }
-
     } catch (error) {
       console.error(colors.red(`Connection test failed: ${error.message}`));
       process.exit(1);
@@ -815,7 +820,7 @@ class ClaudeCLI {
     return {
       success: false,
       server: 'mcp-linear-server',
-      error: 'MCP integration testing not yet implemented'
+      error: 'MCP integration testing not yet implemented',
     };
   }
 
@@ -829,53 +834,53 @@ class ClaudeCLI {
           description: 'Code quality assessment → Linear tasks',
           entrypoint: 'make assess [SCOPE=full|changed]',
           script: 'node .claude/journeys/jr2-assessment.js',
-          sla: '≤12min for 150k LOC'
+          sla: '≤12min for 150k LOC',
         },
         fix: {
           description: 'TDD fix implementation',
           entrypoint: 'make fix TASK=CLEAN-XXX',
           script: 'node .claude/journeys/jr3-fix-pack.js',
-          sla: '≤30min per fix'
+          sla: '≤30min per fix',
         },
         recover: {
           description: 'CI/CD pipeline recovery',
           entrypoint: 'make recover',
           script: 'node .claude/journeys/jr4-ci-recovery.js',
-          sla: '≤10min recovery'
+          sla: '≤10min recovery',
         },
         learn: {
           description: 'Pattern mining from PRs',
           entrypoint: 'make learn',
           script: 'node .claude/journeys/jr5-pattern-mining.js',
-          sla: 'Weekly analysis'
+          sla: 'Weekly analysis',
         },
         release: {
           description: 'Production release management',
           entrypoint: 'make release',
           script: 'node .claude/journeys/jr6-release.js',
-          sla: '≤2hr release cycle'
-        }
+          sla: '≤2hr release cycle',
+        },
       },
       workflow: {
         status: {
           description: 'Current workflow status',
           entrypoint: 'make status',
           script: 'node .claude/cli.js status',
-          sla: 'Real-time'
+          sla: 'Real-time',
         },
         validate: {
           description: 'Run quality gates',
           entrypoint: 'make validate',
           script: 'npm test && npm run lint',
-          sla: '≤5min'
+          sla: '≤5min',
         },
         monitor: {
           description: 'Live monitoring dashboard',
           entrypoint: 'make monitor',
           script: 'node .claude/cli.js monitor',
-          sla: 'Continuous'
-        }
-      }
+          sla: 'Continuous',
+        },
+      },
     };
 
     if (options.json) {
@@ -936,7 +941,7 @@ class ClaudeCLI {
       const syncData = {
         lastSync: new Date().toISOString(),
         syncMethod: 'MCP',
-        message: 'Sync uses Linear MCP tools - no webhooks needed!'
+        message: 'Sync uses Linear MCP tools - no webhooks needed!',
       };
 
       await fs.mkdir(path.dirname(cacheFile), { recursive: true });
@@ -944,9 +949,10 @@ class ClaudeCLI {
 
       console.log(colors.green('\n✅ Sync completed successfully!'));
       console.log(colors.gray(`   Cache updated at: ${cacheFile}`));
-      console.log(colors.cyan('\n💡 Tip: Linear MCP tools provide real-time access without webhooks'));
+      console.log(
+        colors.cyan('\n💡 Tip: Linear MCP tools provide real-time access without webhooks'),
+      );
       console.log(colors.gray('   No infrastructure needed - works directly in Claude Code!'));
-
     } catch (error) {
       console.error(colors.red(`Sync failed: ${error.message}`));
       process.exit(1);
@@ -970,16 +976,32 @@ class ClaudeCLI {
 
       // Validate agent exists
       const validAgents = [
-        'AUDITOR', 'EXECUTOR', 'GUARDIAN', 'STRATEGIST', 'SCHOLAR',
-        'TESTER', 'VALIDATOR', 'ANALYZER', 'OPTIMIZER', 'CLEANER',
-        'REVIEWER', 'DEPLOYER', 'MONITOR', 'MIGRATOR', 'ARCHITECT',
-        'REFACTORER', 'RESEARCHER', 'SECURITYGUARD', 'DOCUMENTER', 'INTEGRATOR'
+        'AUDITOR',
+        'EXECUTOR',
+        'GUARDIAN',
+        'STRATEGIST',
+        'SCHOLAR',
+        'TESTER',
+        'VALIDATOR',
+        'ANALYZER',
+        'OPTIMIZER',
+        'CLEANER',
+        'REVIEWER',
+        'DEPLOYER',
+        'MONITOR',
+        'MIGRATOR',
+        'ARCHITECT',
+        'REFACTORER',
+        'RESEARCHER',
+        'SECURITYGUARD',
+        'DOCUMENTER',
+        'INTEGRATOR',
       ];
 
       if (!validAgents.includes(agent.toUpperCase())) {
         console.log(colors.red(`❌ Unknown agent: ${agent}`));
         console.log(colors.yellow('Available agents:'));
-        validAgents.forEach(a => console.log(colors.gray(`   • ${a}`)));
+        validAgents.forEach((a) => console.log(colors.gray(`   • ${a}`)));
         process.exit(1);
       }
 
@@ -1033,7 +1055,7 @@ class ClaudeCLI {
       const { spawn } = require('child_process');
       const child = spawn('sh', ['-c', cmd], {
         stdio: 'inherit',
-        cwd: process.cwd()
+        cwd: process.cwd(),
       });
 
       // Process cleanup handlers for long-running LLM calls
@@ -1075,7 +1097,6 @@ class ClaudeCLI {
         cleanup();
         process.exit(1);
       });
-
     } catch (error) {
       console.error(colors.red(`Agent invocation failed: ${error.message}`));
       process.exit(1);
@@ -1157,7 +1178,6 @@ class ClaudeCLI {
           console.log(colors.yellow('Available actions: start, list, status, stop'));
           process.exit(1);
       }
-
     } catch (error) {
       console.error(colors.red(`Journey command failed: ${error.message}`));
       process.exit(1);
@@ -1178,7 +1198,6 @@ class ClaudeCLI {
       if (options.projectType) cmd += ` --project-type ${options.projectType}`;
 
       this.execCommand(cmd);
-
     } catch (error) {
       console.error(colors.red(`Guardian command failed: ${error.message}`));
       process.exit(1);
@@ -1199,7 +1218,6 @@ class ClaudeCLI {
       if (options.languages) cmd += ` --languages ${options.languages}`;
 
       this.execCommand(cmd);
-
     } catch (error) {
       console.error(colors.red(`Scholar command failed: ${error.message}`));
       process.exit(1);
@@ -1220,7 +1238,6 @@ class ClaudeCLI {
       if (options.projectType) cmd += ` --project-type ${options.projectType}`;
 
       this.execCommand(cmd);
-
     } catch (error) {
       console.error(colors.red(`Release command failed: ${error.message}`));
       process.exit(1);
@@ -1242,7 +1259,6 @@ class ClaudeCLI {
       if (options.lintCmd) cmd += ` --lint-cmd "${options.lintCmd}"`;
 
       this.execCommand(cmd);
-
     } catch (error) {
       console.error(colors.red(`Validator command failed: ${error.message}`));
       process.exit(1);
@@ -1277,7 +1293,9 @@ class ClaudeCLI {
       console.log(colors.gray('\n⚙️  Configuration:'));
       const settingsPath = path.join(this.claudeDir, 'settings.local.json');
       const hasSettings = require('fs').existsSync(settingsPath);
-      console.log(`   Local settings: ${hasSettings ? colors.green('✅ Found') : colors.yellow('⚠️  Not found')}`);
+      console.log(
+        `   Local settings: ${hasSettings ? colors.green('✅ Found') : colors.yellow('⚠️  Not found')}`,
+      );
 
       if (!hasApiKey) {
         console.log(colors.yellow('\n💡 Next steps:'));
@@ -1285,7 +1303,6 @@ class ClaudeCLI {
         console.log(colors.gray('   2. Run: npm run linear:test-connection'));
         console.log(colors.gray('   3. Configure team settings in .claude/settings.local.json'));
       }
-
     } catch (error) {
       console.error(colors.red(`Status check failed: ${error.message}`));
       process.exit(1);
@@ -1296,7 +1313,7 @@ class ClaudeCLI {
 // CLI execution
 if (require.main === module) {
   const cli = new ClaudeCLI();
-  cli.run().catch(error => {
+  cli.run().catch((error) => {
     console.error(colors.red(`CLI Error: ${error.message}`));
     process.exit(1);
   });

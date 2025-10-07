@@ -17,13 +17,14 @@ class ProcessCleanup {
   }
 
   log(message, type = 'info') {
-    const emoji = {
-      info: '📝',
-      success: '✅',
-      error: '❌',
-      warning: '⚠️',
-      cleanup: '🧹'
-    }[type] || '📝';
+    const emoji =
+      {
+        info: '📝',
+        success: '✅',
+        error: '❌',
+        warning: '⚠️',
+        cleanup: '🧹',
+      }[type] || '📝';
     console.log(`${emoji} ${message}`);
   }
 
@@ -37,9 +38,9 @@ class ProcessCleanup {
       'comprehensive-workflow',
       'agent:invoke',
       'assess',
-      '.claude'
+      '.claude',
     ];
-    return llmIndicators.some(indicator => command.includes(indicator));
+    return llmIndicators.some((indicator) => command.includes(indicator));
   }
 
   /**
@@ -50,33 +51,33 @@ class ProcessCleanup {
       // Find Node.js processes that might be from our project
       const psOutput = execSync('ps aux | grep node', {
         encoding: 'utf8',
-        timeout: 5000
+        timeout: 5000,
       });
 
-      const lines = psOutput.split('\n').filter(line =>
-        line.includes('node') &&
-        !line.includes('grep') &&
-        !line.includes('cleanup-processes') && // Don't kill ourselves
-        (line.includes('.claude') ||
-         line.includes('tdd-gate-enforcer') ||
-         line.includes('memory-safe-router') ||
-         line.includes('comprehensive-workflow') ||
-         line.includes('agent-command-router') ||
-         line.includes('linear-tdd-workflow') ||
-         line.includes('jest') ||
-         line.includes('npm'))
+      const lines = psOutput.split('\n').filter(
+        (line) =>
+          line.includes('node') &&
+          !line.includes('grep') &&
+          !line.includes('cleanup-processes') && // Don't kill ourselves
+          (line.includes('.claude') ||
+            line.includes('tdd-gate-enforcer') ||
+            line.includes('memory-safe-router') ||
+            line.includes('comprehensive-workflow') ||
+            line.includes('agent-command-router') ||
+            line.includes('linear-tdd-workflow') ||
+            line.includes('jest') ||
+            line.includes('npm')),
       );
 
-      return lines.map(line => {
+      return lines.map((line) => {
         const parts = line.trim().split(/\s+/);
         const command = line.substring(line.indexOf('node'));
         return {
           pid: parts[1],
           command,
-          isLLM: this.isLLMProcess(command)
+          isLLM: this.isLLMProcess(command),
         };
       });
-
     } catch (error) {
       this.log(`Error finding processes: ${error.message}`, 'error');
       return [];
@@ -90,7 +91,7 @@ class ProcessCleanup {
     try {
       execSync(`kill -${signal} ${pid}`, {
         timeout: 2000,
-        stdio: 'ignore'
+        stdio: 'ignore',
       });
       return true;
     } catch (error) {
@@ -105,7 +106,7 @@ class ProcessCleanup {
     try {
       execSync(`kill -SIGKILL ${pid}`, {
         timeout: 2000,
-        stdio: 'ignore'
+        stdio: 'ignore',
       });
       return true;
     } catch (error) {
@@ -137,7 +138,9 @@ class ProcessCleanup {
     for (const process of processes) {
       const isLLM = process.isLLM;
       const emoji = isLLM ? '🤖' : '⚙️';
-      this.log(`${emoji} Process ${process.pid}${isLLM ? ' [LLM]' : ''}: ${process.command.substring(0, 80)}...`);
+      this.log(
+        `${emoji} Process ${process.pid}${isLLM ? ' [LLM]' : ''}: ${process.command.substring(0, 80)}...`,
+      );
 
       if (dryRun) {
         this.log(`[DRY RUN] Would kill process ${process.pid}`, 'info');
@@ -151,7 +154,7 @@ class ProcessCleanup {
       if (this.killProcess(process.pid, 'SIGTERM')) {
         if (isLLM) {
           this.log(`⏳ Waiting for LLM process ${process.pid} to finish gracefully...`);
-          await new Promise(resolve => setTimeout(resolve, gracefulTimeout));
+          await new Promise((resolve) => setTimeout(resolve, gracefulTimeout));
         }
         this.log(`✓ Gracefully terminated process ${process.pid}`, 'success');
         cleaned++;
@@ -164,11 +167,13 @@ class ProcessCleanup {
       }
 
       // Wait a bit between kills
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
     }
 
-    this.log(`Cleanup complete: ${cleaned} processes cleaned, ${errors} errors`,
-             errors > 0 ? 'warning' : 'success');
+    this.log(
+      `Cleanup complete: ${cleaned} processes cleaned, ${errors} errors`,
+      errors > 0 ? 'warning' : 'success',
+    );
 
     return { cleaned, errors };
   }
@@ -181,12 +186,12 @@ class ProcessCleanup {
       // Check memory usage
       const memInfo = execSync('ps -eo pid,ppid,cmd,%mem,%cpu --sort=-%mem | head -20', {
         encoding: 'utf8',
-        timeout: 5000
+        timeout: 5000,
       });
 
-      const nodeProcesses = memInfo.split('\n').filter(line =>
-        line.includes('node') && !line.includes('grep')
-      );
+      const nodeProcesses = memInfo
+        .split('\n')
+        .filter((line) => line.includes('node') && !line.includes('grep'));
 
       if (nodeProcesses.length > 5) {
         this.log(`Warning: ${nodeProcesses.length} Node.js processes running`, 'warning');
@@ -230,18 +235,19 @@ Examples:
   const options = {
     dryRun: args.includes('--dry-run'),
     force: args.includes('--force'),
-    check: args.includes('--check')
+    check: args.includes('--check'),
   };
 
   if (options.check) {
     const count = cleanup.checkSystemResources();
     process.exit(count > 10 ? 1 : 0);
   } else {
-    cleanup.cleanup(options)
-      .then(result => {
+    cleanup
+      .cleanup(options)
+      .then((result) => {
         process.exit(result.errors > 0 ? 1 : 0);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Cleanup failed:', error.message);
         process.exit(1);
       });

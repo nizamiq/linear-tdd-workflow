@@ -34,6 +34,7 @@ Traditional tools are reactive - they report issues after you write code. Our sy
 ### What languages are supported?
 
 Currently supported:
+
 - **JavaScript** (full support)
 - **TypeScript** (full support)
 - **Python** (full support)
@@ -43,6 +44,7 @@ Currently supported:
 ### Is this system safe for production use?
 
 Yes! The system includes multiple safety mechanisms:
+
 - **Human approval required** for all changes
 - **≤300 LOC limit** per Fix Pack
 - **Automatic rollback** capability
@@ -55,6 +57,7 @@ Yes! The system includes multiple safety mechanisms:
 ### How do I know if the system is working?
 
 Run these quick checks:
+
 ```bash
 npm run status          # Should show all systems operational
 npm run assess          # Should complete within 12 minutes
@@ -65,6 +68,7 @@ npm test               # Should pass with ≥80% coverage
 ### What if I have an existing test suite?
 
 The system enhances your existing tests rather than replacing them:
+
 - **Preserves existing tests** and configurations
 - **Adds TDD enforcement** for new code
 - **Improves coverage** incrementally
@@ -73,6 +77,7 @@ The system enhances your existing tests rather than replacing them:
 ### Can I use this with my existing CI/CD pipeline?
 
 Absolutely! The system integrates with your existing pipeline:
+
 - **Enhances** existing GitHub Actions/GitLab CI
 - **Adds quality gates** without breaking workflows
 - **Provides auto-recovery** for pipeline failures
@@ -89,6 +94,7 @@ Absolutely! The system integrates with your existing pipeline:
 ### What do the 23 agents do?
 
 **Core Agents (Always Active):**
+
 - **AUDITOR**: Finds code quality issues, creates Linear tasks
 - **EXECUTOR**: Implements fixes using strict TDD (≤300 LOC)
 - **GUARDIAN**: Monitors CI/CD, provides auto-recovery
@@ -96,6 +102,7 @@ Absolutely! The system integrates with your existing pipeline:
 - **SCHOLAR**: Learns patterns, optimizes system performance
 
 **Specialized Agents (Context-Activated):**
+
 - **Testing**: TESTER, VALIDATOR
 - **Quality**: ANALYZER, OPTIMIZER, CLEANER, REVIEWER
 - **Infrastructure**: DEPLOYER, MONITOR, MIGRATOR
@@ -128,6 +135,7 @@ npm run agent:invoke SCHOLAR:optimize-performance
 ### Can agents make changes without my approval?
 
 **No.** By default, all agents require human approval:
+
 - **AUDITOR**: Only creates assessment reports and Linear tasks
 - **EXECUTOR**: Requires explicit approval to implement fixes
 - **GUARDIAN**: Can monitor and alert, but changes require approval
@@ -151,6 +159,7 @@ npm run agents:status
 ### What exactly is enforced by TDD?
 
 Every code change must follow the **RED→GREEN→REFACTOR** cycle:
+
 1. **RED**: Write a failing test first
 2. **GREEN**: Write minimal code to pass the test
 3. **REFACTOR**: Improve code while keeping tests green
@@ -158,6 +167,7 @@ Every code change must follow the **RED→GREEN→REFACTOR** cycle:
 ### What if I need to make a quick hotfix?
 
 For emergencies, you can temporarily bypass TDD enforcement:
+
 ```bash
 # Emergency mode (use sparingly)
 export CLAUDE_TDD_ENFORCEMENT=false
@@ -171,6 +181,7 @@ export CLAUDE_TDD_ENFORCEMENT=true
 ### How strict are the coverage requirements?
 
 Default requirements:
+
 - **80% minimum** for all code
 - **95% for critical paths** (payment, security, core business logic)
 - **80% diff coverage** for new changes
@@ -180,19 +191,13 @@ You can adjust these in configuration if needed.
 ### Can I exclude files from TDD enforcement?
 
 Yes, configure exemptions in `.claude/settings.json`:
+
 ```json
 {
   "tdd": {
     "exemptions": {
-      "file_patterns": [
-        "**/*.config.{js,ts}",
-        "**/scripts/**",
-        "**/docs/**"
-      ],
-      "directories": [
-        "vendor/",
-        "third-party/"
-      ]
+      "file_patterns": ["**/*.config.{js,ts}", "**/scripts/**", "**/docs/**"],
+      "directories": ["vendor/", "third-party/"]
     }
   }
 }
@@ -203,6 +208,7 @@ Yes, configure exemptions in `.claude/settings.json`:
 ### Why are my commits being blocked?
 
 Quality gates enforce minimum standards:
+
 - **Test coverage** below 80%
 - **Linting errors** present
 - **TypeScript errors** present
@@ -210,6 +216,7 @@ Quality gates enforce minimum standards:
 - **Security vulnerabilities** detected
 
 Fix with:
+
 ```bash
 npm run precommit      # Runs all quality checks
 npm run lint           # Fix linting issues
@@ -220,13 +227,14 @@ npm run typecheck      # Fix TypeScript issues
 ### Can I temporarily lower quality thresholds?
 
 For legacy projects, you can start with lower thresholds and increase over time:
+
 ```json
 {
   "quality_gates": {
     "coverage": {
       "thresholds": {
         "global": {
-          "lines": 60  // Start lower, increase gradually
+          "lines": 60 // Start lower, increase gradually
         }
       }
     }
@@ -239,11 +247,13 @@ For legacy projects, you can start with lower thresholds and increase over time:
 Mutation testing validates test quality by introducing small code changes ("mutations") and checking if tests catch them. A 30% mutation score means your tests catch 30% of introduced bugs.
 
 **Benefits:**
+
 - **Validates test effectiveness**
 - **Finds weak tests**
 - **Improves overall quality**
 
 **Disable if needed:**
+
 ```json
 {
   "quality_gates": {
@@ -259,6 +269,7 @@ Mutation testing validates test quality by introducing small code changes ("muta
 ### Do I need Linear to use this system?
 
 **No.** Linear integration is optional but recommended:
+
 - **Without Linear**: Assessment results shown in console/files
 - **With Linear**: Automatic task creation, progress tracking, sprint planning
 
@@ -279,6 +290,7 @@ Mutation testing validates test quality by introducing small code changes ("muta
 ### Why aren't tasks being created in Linear?
 
 Common issues:
+
 1. **API key invalid**: `npm run linear:validate-credentials`
 2. **Wrong team ID**: Check team URL slug
 3. **Permission issues**: Ensure API key has write permissions
@@ -287,6 +299,7 @@ Common issues:
 ### Can I customize how tasks are created?
 
 Yes, configure task creation in `.claude/settings.json`:
+
 ```json
 {
   "linear": {
@@ -312,6 +325,7 @@ Yes, configure task creation in `.claude/settings.json`:
 For large codebases (>150k LOC), assessments might exceed the 12-minute SLA:
 
 **Optimizations:**
+
 ```bash
 # Run incremental assessment
 npm run assess -- --scope incremental
@@ -328,6 +342,7 @@ export CLAUDE_MAX_CONCURRENT_AGENTS=2
 Large codebases require more memory:
 
 **Solutions:**
+
 ```bash
 # Increase Node.js memory limit
 export NODE_OPTIONS="--max-old-space-size=4096"
@@ -342,6 +357,7 @@ npm run config:set performance.memory_optimization true
 ### How can I improve system performance?
 
 **Performance tuning:**
+
 1. **Adjust concurrency**: Lower concurrent agents for slower systems
 2. **Exclude unnecessary files**: Update ignore patterns
 3. **Optimize cache**: Clear caches regularly with `npm run cache:clear`
@@ -366,6 +382,7 @@ npm run config:set performance.memory_optimization true
 ### How do I override configuration locally?
 
 Create `.claude/settings.local.json` for local overrides:
+
 ```json
 {
   "quality_gates": {
@@ -385,6 +402,7 @@ This file is gitignored and won't affect other team members.
 ### Can I have different settings for different environments?
 
 Yes, use environment variables:
+
 ```bash
 # Development
 export CLAUDE_MODE=development
@@ -400,6 +418,7 @@ export CLAUDE_COVERAGE_THRESHOLD=90
 ### The system isn't working at all. What should I do?
 
 **Emergency diagnostic procedure:**
+
 ```bash
 # 1. Check system status
 npm run doctor
@@ -420,6 +439,7 @@ npm run setup
 ### How do I get detailed error information?
 
 **Enable debug logging:**
+
 ```bash
 export CLAUDE_LOG_LEVEL=debug
 npm run status
@@ -429,12 +449,14 @@ npm run logs:view -- --level debug
 ### Tests are failing but they work locally. Why?
 
 **Common causes:**
+
 1. **Environment differences**: Node.js version, dependencies
 2. **Timing issues**: Increase test timeouts
 3. **Resource constraints**: CI environment has less memory/CPU
 4. **File system differences**: Path separators, case sensitivity
 
 **Debug steps:**
+
 ```bash
 # Compare environments
 npm run diagnose:environment
@@ -449,6 +471,7 @@ npm run test:flaky-detection
 ### How do I completely remove the system?
 
 **Complete removal:**
+
 ```bash
 # Remove all system files
 rm -rf .claude/
@@ -469,6 +492,7 @@ rm -rf .git/hooks/pre-commit
 ### Can I create custom agents?
 
 **Yes!** The system supports custom agent development:
+
 ```bash
 # Create new agent
 npm run agent:create -- --name CustomAgent --template specialized
@@ -485,6 +509,7 @@ See the [User Guide](USER-GUIDE.md) for detailed custom agent development instru
 ### How do I extend the system for new languages?
 
 **Language extension process:**
+
 1. **Define language configuration** in `.claude/languages/`
 2. **Create tool configurations** (linter, formatter, test framework)
 3. **Add agent extensions** for language-specific operations
@@ -493,11 +518,13 @@ See the [User Guide](USER-GUIDE.md) for detailed custom agent development instru
 ### Can I integrate with tools other than Linear?
 
 **Current integrations:**
+
 - **Linear**: Full task management integration
 - **GitHub Actions**: CI/CD integration
 - **GitLab CI**: CI/CD integration
 
 **Planned integrations:**
+
 - **Jira**: Task management
 - **Azure DevOps**: CI/CD and task management
 - **Jenkins**: CI/CD integration
@@ -505,6 +532,7 @@ See the [User Guide](USER-GUIDE.md) for detailed custom agent development instru
 ### How do I contribute to the system?
 
 **Contribution areas:**
+
 1. **Custom agents** for specific use cases
 2. **Language support** for new programming languages
 3. **Tool integrations** for additional services
@@ -514,6 +542,7 @@ See the [User Guide](USER-GUIDE.md) for detailed custom agent development instru
 ### What's the roadmap for new features?
 
 **Upcoming features:**
+
 - **AI pair programming** mode
 - **Predictive testing** based on code changes
 - **Auto-refactoring** for architectural improvements
@@ -525,6 +554,7 @@ See the [User Guide](USER-GUIDE.md) for detailed custom agent development instru
 ## Still Have Questions?
 
 ### Quick Help Commands
+
 ```bash
 npm run help                    # General help
 npm run doctor                  # System diagnostics
@@ -532,12 +562,14 @@ npm run agent:invoke AGENT:help # Agent-specific help
 ```
 
 ### Documentation Resources
+
 - **[User Guide](USER-GUIDE.md)** - Complete system overview
 - **[Troubleshooting](TROUBLESHOOTING.md)** - Problem resolution
 - **[Configuration](CONFIGURATION.md)** - System setup and customization
 - **[Commands Reference](COMMANDS.md)** - Complete CLI documentation
 
 ### Getting Support
+
 1. **Run diagnostics**: `npm run doctor`
 2. **Check troubleshooting guide**: [TROUBLESHOOTING.md](TROUBLESHOOTING.md)
 3. **Search existing issues**: Check GitHub issues/team knowledge base

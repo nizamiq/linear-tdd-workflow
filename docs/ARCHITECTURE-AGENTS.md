@@ -9,6 +9,7 @@ tags: [architecture, agents, ai, orchestration, multi-agent]
 # Multi-Agent Architecture Documentation
 
 ## Table of Contents
+
 1. [System Overview](#1-system-overview)
 2. [Core Agent Specifications](#2-core-agent-specifications)
 3. [Specialized Agent Specifications](#3-specialized-agent-specifications)
@@ -75,6 +76,7 @@ graph TD
 ## System Capabilities
 
 ### Current Capabilities (v1.3)
+
 - Code assessment and quality scoring
 - Fix Pack implementation with TDD
 - Pipeline failure recovery
@@ -83,6 +85,7 @@ graph TD
 - GitHub PR creation and management
 
 ### Planned Capabilities
+
 - Multi-repository orchestration
 - Cross-language support expansion
 - Real-time collaboration features
@@ -96,15 +99,18 @@ graph TD
 ## 2.1 🔍 AUDITOR - Clean Code Assessment Specialist
 
 ### Purpose
+
 The AUDITOR serves as the system's quality gatekeeper, continuously scanning codebases to identify improvement opportunities and maintain high standards.
 
 ### Core Responsibilities
+
 - **Continuous Code Scanning**: Regular automated analysis of entire codebase
 - **Quality Assessment**: Evaluation against clean code principles and best practices
 - **Technical Debt Quantification**: Identification and measurement of debt hotspots
 - **Task Generation**: Creation of actionable improvement tasks in Linear
 
 ### Technical Capabilities
+
 ```yaml
 analysis_methods:
   - ast_parsing: Abstract Syntax Tree analysis
@@ -134,6 +140,7 @@ quality_dimensions:
 ### Command Specifications
 
 #### `assess-code`
+
 ```bash
 npm run agent:invoke AUDITOR:assess-code -- [options]
 
@@ -146,11 +153,13 @@ Options:
 ```
 
 **Performance SLA**:
+
 - Full scan: ≤12min for 150k LOC (JS/TS)
 - Incremental: ≤3min for typical changes
 - Deep analysis: ≤20min with security scanning
 
 #### `generate-backlog`
+
 ```bash
 npm run agent:invoke AUDITOR:generate-backlog -- [options]
 
@@ -162,6 +171,7 @@ Options:
 ```
 
 ### Integration Points
+
 - **Inputs**: GitHub repositories, GitLab projects, local codebases
 - **Outputs**: Linear tasks, assessment reports, metrics dashboards
 - **Triggers**: Scheduled scans, commit hooks, manual invocation
@@ -169,15 +179,18 @@ Options:
 ## 2.2 ⚡ EXECUTOR - Implementation Specialist
 
 ### Purpose
+
 The EXECUTOR is the system's implementation engine, responsible for safely and efficiently implementing code improvements following strict TDD principles.
 
 ### Core Responsibilities
+
 - **Fix Pack Implementation**: Execute pre-approved improvement categories
 - **TDD Compliance**: Enforce RED→GREEN→REFACTOR cycle
 - **Atomic Commits**: Ensure changes are small and reversible
 - **Documentation**: Maintain comprehensive change documentation
 
 ### Implementation Workflow
+
 ```mermaid
 graph LR
     A[Receive Task] --> B[Write Failing Test]
@@ -192,19 +205,20 @@ graph LR
 
 ### Fix Pack Categories
 
-| Category | Risk Level | Examples | Constraints |
-|----------|------------|----------|-------------|
-| **Linting** | Minimal | ESLint, Prettier, Black | Style only, no logic changes |
-| **Dead Code** | Low | Unused imports, variables, functions | Must verify no references |
-| **Documentation** | Minimal | JSDoc, docstrings, README | No code logic changes |
-| **Simple Refactoring** | Low | Extract constants, rename variables | <50 LOC, maintain behavior |
-| **Type Annotations** | Low | TypeScript types, Python hints | No runtime changes |
-| **Test Scaffolding** | Low | Basic test structure | Must not break existing |
-| **Dependency Updates** | Medium | Patch versions only | No breaking changes |
+| Category               | Risk Level | Examples                             | Constraints                  |
+| ---------------------- | ---------- | ------------------------------------ | ---------------------------- |
+| **Linting**            | Minimal    | ESLint, Prettier, Black              | Style only, no logic changes |
+| **Dead Code**          | Low        | Unused imports, variables, functions | Must verify no references    |
+| **Documentation**      | Minimal    | JSDoc, docstrings, README            | No code logic changes        |
+| **Simple Refactoring** | Low        | Extract constants, rename variables  | <50 LOC, maintain behavior   |
+| **Type Annotations**   | Low        | TypeScript types, Python hints       | No runtime changes           |
+| **Test Scaffolding**   | Low        | Basic test structure                 | Must not break existing      |
+| **Dependency Updates** | Medium     | Patch versions only                  | No breaking changes          |
 
 ### Command Specifications
 
 #### `implement-fix`
+
 ```bash
 npm run agent:invoke EXECUTOR:implement-fix -- [options]
 
@@ -216,6 +230,7 @@ Options:
 ```
 
 ### Constraints & Guardrails
+
 - **LOC Limit**: Maximum 300 lines per PR
 - **Coverage Requirements**: ≥80% diff coverage, ≥30% mutation score
 - **Test First**: Must write failing test before implementation
@@ -225,9 +240,11 @@ Options:
 ## 2.3 🛡️ GUARDIAN - Pipeline Protector
 
 ### Purpose
+
 The GUARDIAN ensures CI/CD pipeline stability and automatically recovers from failures, maintaining continuous deployment readiness.
 
 ### Core Responsibilities
+
 - **Pipeline Monitoring**: Real-time health tracking
 - **Failure Analysis**: Root cause identification
 - **Auto-Recovery**: Implement fixes for common failures
@@ -235,18 +252,19 @@ The GUARDIAN ensures CI/CD pipeline stability and automatically recovers from fa
 
 ### Failure Response Matrix
 
-| Failure Type | Detection Method | Recovery Strategy | Success Rate |
-|--------------|------------------|-------------------|--------------|
-| **Test Failures** | Exit codes, assertions | Fix flaky tests, update snapshots | 92% |
-| **Build Errors** | Compilation failures | Fix syntax, update dependencies | 88% |
-| **Dependency Issues** | Package manager errors | Clear cache, update lockfile | 95% |
-| **Resource Limits** | Timeout, OOM | Increase limits, optimize | 85% |
-| **Integration Failures** | API errors | Retry with backoff, mock services | 78% |
-| **Configuration** | Validation errors | Rollback, fix config | 90% |
+| Failure Type             | Detection Method       | Recovery Strategy                 | Success Rate |
+| ------------------------ | ---------------------- | --------------------------------- | ------------ |
+| **Test Failures**        | Exit codes, assertions | Fix flaky tests, update snapshots | 92%          |
+| **Build Errors**         | Compilation failures   | Fix syntax, update dependencies   | 88%          |
+| **Dependency Issues**    | Package manager errors | Clear cache, update lockfile      | 95%          |
+| **Resource Limits**      | Timeout, OOM           | Increase limits, optimize         | 85%          |
+| **Integration Failures** | API errors             | Retry with backoff, mock services | 78%          |
+| **Configuration**        | Validation errors      | Rollback, fix config              | 90%          |
 
 ### Command Specifications
 
 #### `monitor-pipeline`
+
 ```bash
 npm run agent:invoke GUARDIAN:monitor-pipeline -- [options]
 
@@ -257,6 +275,7 @@ Options:
 ```
 
 #### `recover-pipeline`
+
 ```bash
 npm run agent:invoke GUARDIAN:recover-pipeline -- [options]
 
@@ -267,6 +286,7 @@ Options:
 ```
 
 ### Recovery Workflow
+
 1. **Detection**: Identify failure within 5 minutes
 2. **Analysis**: Determine root cause and impact
 3. **Planning**: Select appropriate recovery strategy
@@ -277,9 +297,11 @@ Options:
 ## 2.4 📊 STRATEGIST - Workflow Orchestrator
 
 ### Purpose
+
 The STRATEGIST coordinates all agents, manages resources, and ensures optimal system performance while maintaining stakeholder visibility.
 
 ### Core Responsibilities
+
 - **Agent Orchestration**: Coordinate multi-agent workflows
 - **Resource Management**: Optimize allocation and utilization
 - **Project Integration**: Manage Linear boards and sprints
@@ -288,6 +310,7 @@ The STRATEGIST coordinates all agents, manages resources, and ensures optimal sy
 ### Orchestration Patterns
 
 #### Sequential Orchestration
+
 ```yaml
 pattern: sequential
 use_case: Dependent tasks requiring order
@@ -299,6 +322,7 @@ example:
 ```
 
 #### Parallel Orchestration
+
 ```yaml
 pattern: parallel
 use_case: Independent tasks for throughput
@@ -311,6 +335,7 @@ example:
 ```
 
 #### Pipeline Orchestration
+
 ```yaml
 pattern: pipeline
 use_case: Continuous processing flow
@@ -325,6 +350,7 @@ example:
 ### Command Specifications
 
 #### `coordinate-workflow`
+
 ```bash
 npm run agent:invoke STRATEGIST:coordinate-workflow -- [options]
 
@@ -335,6 +361,7 @@ Options:
 ```
 
 ### Resource Allocation Algorithm
+
 ```python
 def allocate_resources(task_queue, agent_pool):
     """
@@ -351,15 +378,18 @@ def allocate_resources(task_queue, agent_pool):
 ## 2.5 🧠 SCHOLAR - Learning Engine
 
 ### Purpose
+
 The SCHOLAR drives continuous improvement by learning from system actions, identifying patterns, and optimizing agent performance.
 
 ### Core Responsibilities
+
 - **Pattern Recognition**: Identify successful solution patterns
 - **Knowledge Management**: Maintain best practices database
 - **Agent Training**: Improve agent capabilities over time
 - **Anti-Pattern Detection**: Prevent recurring issues
 
 ### Learning Pipeline
+
 ```mermaid
 graph LR
     A[Collect Data] --> B[Analyze Outcomes]
@@ -373,17 +403,18 @@ graph LR
 
 ### Pattern Categories
 
-| Category | Description | Example Patterns |
-|----------|-------------|------------------|
-| **Code Transformations** | Reusable refactoring patterns | Extract method, inline variable |
-| **Bug Fixes** | Common bug resolution patterns | Null checks, boundary conditions |
-| **Test Patterns** | Effective testing strategies | Mocking patterns, test data factories |
-| **Performance** | Optimization patterns | Caching, algorithm improvements |
-| **Security** | Vulnerability remediation | Input validation, sanitization |
+| Category                 | Description                    | Example Patterns                      |
+| ------------------------ | ------------------------------ | ------------------------------------- |
+| **Code Transformations** | Reusable refactoring patterns  | Extract method, inline variable       |
+| **Bug Fixes**            | Common bug resolution patterns | Null checks, boundary conditions      |
+| **Test Patterns**        | Effective testing strategies   | Mocking patterns, test data factories |
+| **Performance**          | Optimization patterns          | Caching, algorithm improvements       |
+| **Security**             | Vulnerability remediation      | Input validation, sanitization        |
 
 ### Command Specifications
 
 #### `extract-patterns`
+
 ```bash
 npm run agent:invoke SCHOLAR:extract-patterns -- [options]
 
@@ -394,21 +425,22 @@ Options:
 ```
 
 ### Knowledge Base Structure
+
 ```yaml
 pattern:
   id: PAT-2024-001
   category: refactoring
-  name: "Extract Complex Conditional"
-  description: "Simplify nested conditionals"
+  name: 'Extract Complex Conditional'
+  description: 'Simplify nested conditionals'
   applicability:
-    complexity: ">5"
-    nesting: ">3"
+    complexity: '>5'
+    nesting: '>3'
   implementation:
-    template: "patterns/extract-conditional.tpl"
+    template: 'patterns/extract-conditional.tpl'
   metrics:
     usage_count: 47
     success_rate: 0.94
-    avg_improvement: "15% complexity reduction"
+    avg_improvement: '15% complexity reduction'
   examples: [...]
 ```
 
@@ -419,6 +451,7 @@ pattern:
 ## 3.1 Testing & Validation Group
 
 ### VALIDATOR - Comprehensive Testing Specialist
+
 ```yaml
 purpose: End-to-end test execution and validation
 capabilities:
@@ -434,6 +467,7 @@ mcp_tools: [playwright, pytest, jest]
 ```
 
 ### TESTER - Test Generation Specialist
+
 ```yaml
 purpose: Automated test creation and maintenance
 capabilities:
@@ -448,6 +482,7 @@ commands:
 ```
 
 ### REVIEWER - Code Review Automation
+
 ```yaml
 purpose: Automated PR review and feedback
 capabilities:
@@ -464,6 +499,7 @@ commands:
 ## 3.2 Development & Optimization Group
 
 ### OPTIMIZER - Performance Enhancement
+
 ```yaml
 purpose: Code and system performance optimization
 capabilities:
@@ -479,6 +515,7 @@ mcp_tools: [sequential-thinking, profiler]
 ```
 
 ### REFACTORER - Code Modernization
+
 ```yaml
 purpose: Systematic code refactoring and modernization
 capabilities:
@@ -493,6 +530,7 @@ commands:
 ```
 
 ### CLEANER - Dead Code Elimination
+
 ```yaml
 purpose: Remove unused and redundant code
 capabilities:
@@ -509,6 +547,7 @@ commands:
 ## 3.3 Infrastructure & Operations Group
 
 ### DEPLOYER - Deployment Automation
+
 ```yaml
 purpose: Safe and reliable deployment automation
 capabilities:
@@ -524,6 +563,7 @@ mcp_tools: [kubernetes, docker, kubectl]
 ```
 
 ### MONITOR - Observability Specialist
+
 ```yaml
 purpose: System monitoring and alerting
 capabilities:
@@ -539,6 +579,7 @@ mcp_tools: [timeserver, prometheus, grafana]
 ```
 
 ### MIGRATOR - Migration Management
+
 ```yaml
 purpose: Database and code migration handling
 capabilities:
@@ -555,6 +596,7 @@ commands:
 ## 3.4 Architecture & Documentation Group
 
 ### ARCHITECT - System Design Specialist
+
 ```yaml
 purpose: System architecture and design decisions
 capabilities:
@@ -570,6 +612,7 @@ mcp_tools: [sequential-thinking, context7]
 ```
 
 ### RESEARCHER - Code Understanding Expert
+
 ```yaml
 purpose: Deep code analysis and comprehension
 capabilities:
@@ -585,6 +628,7 @@ mcp_tools: [context7, ast-analyzer]
 ```
 
 ### DOCUMENTER - Documentation Specialist
+
 ```yaml
 purpose: Comprehensive documentation management
 capabilities:
@@ -601,6 +645,7 @@ commands:
 ## 3.5 Security & Integration Group
 
 ### SECURITYGUARD - Security Specialist
+
 ```yaml
 purpose: Security vulnerability detection and remediation
 capabilities:
@@ -616,6 +661,7 @@ mcp_tools: [context7, snyk, semgrep]
 ```
 
 ### INTEGRATOR - External Integration Manager
+
 ```yaml
 purpose: Manage external service integrations
 capabilities:
@@ -630,6 +676,7 @@ commands:
 ```
 
 ### ANALYZER - Code Complexity Analyst
+
 ```yaml
 purpose: Analyze code complexity and structure
 capabilities:
@@ -654,36 +701,37 @@ All inter-agent communication follows a standardized protocol:
 ```typescript
 interface AgentMessage {
   // Message metadata
-  id: string;                    // Unique message ID
-  timestamp: ISO8601;            // Message timestamp
-  correlation_id: string;        // Trace request flow
+  id: string; // Unique message ID
+  timestamp: ISO8601; // Message timestamp
+  correlation_id: string; // Trace request flow
 
   // Routing information
-  from: AgentID;                // Sender agent
-  to: AgentID | "BROADCAST";    // Recipient(s)
-  reply_to?: string;             // For responses
+  from: AgentID; // Sender agent
+  to: AgentID | 'BROADCAST'; // Recipient(s)
+  reply_to?: string; // For responses
 
   // Message content
-  type: MessageType;             // request|response|event|command
-  action: string;                // Specific action/command
-  priority: Priority;            // low|normal|high|critical
+  type: MessageType; // request|response|event|command
+  action: string; // Specific action/command
+  priority: Priority; // low|normal|high|critical
 
   // Payload
   payload: {
-    params: object;              // Action parameters
-    context: Context;            // Execution context
-    constraints?: Constraints;   // Execution constraints
+    params: object; // Action parameters
+    context: Context; // Execution context
+    constraints?: Constraints; // Execution constraints
   };
 
   // Control
-  timeout_ms: number;            // Response timeout
-  retry_policy?: RetryPolicy;   // Retry configuration
+  timeout_ms: number; // Response timeout
+  retry_policy?: RetryPolicy; // Retry configuration
 }
 ```
 
 ## Communication Patterns
 
 ### Request-Response
+
 ```mermaid
 sequenceDiagram
     STRATEGIST->>AUDITOR: assess-code request
@@ -693,6 +741,7 @@ sequenceDiagram
 ```
 
 ### Event Broadcasting
+
 ```mermaid
 sequenceDiagram
     GUARDIAN->>BROADCAST: pipeline-failure event
@@ -702,6 +751,7 @@ sequenceDiagram
 ```
 
 ### Command Chain
+
 ```mermaid
 sequenceDiagram
     STRATEGIST->>AUDITOR: start-assessment
@@ -712,14 +762,14 @@ sequenceDiagram
 
 ## Event Types
 
-| Event | Emitted By | Consumed By | Purpose |
-|-------|------------|-------------|---------|
-| `assessment.complete` | AUDITOR | STRATEGIST, LINEAR | Signal assessment completion |
-| `fix.ready` | STRATEGIST | EXECUTOR | Trigger implementation |
-| `pipeline.failure` | GUARDIAN | STRATEGIST, SCHOLAR | Alert to failures |
-| `pr.created` | EXECUTOR | LINEAR, REVIEWER | New PR notification |
-| `pattern.discovered` | SCHOLAR | ALL | Share new patterns |
-| `deployment.success` | DEPLOYER | MONITOR, LINEAR | Deployment notification |
+| Event                 | Emitted By | Consumed By         | Purpose                      |
+| --------------------- | ---------- | ------------------- | ---------------------------- |
+| `assessment.complete` | AUDITOR    | STRATEGIST, LINEAR  | Signal assessment completion |
+| `fix.ready`           | STRATEGIST | EXECUTOR            | Trigger implementation       |
+| `pipeline.failure`    | GUARDIAN   | STRATEGIST, SCHOLAR | Alert to failures            |
+| `pr.created`          | EXECUTOR   | LINEAR, REVIEWER    | New PR notification          |
+| `pattern.discovered`  | SCHOLAR    | ALL                 | Share new patterns           |
+| `deployment.success`  | DEPLOYER   | MONITOR, LINEAR     | Deployment notification      |
 
 ---
 
@@ -759,6 +809,7 @@ def select_agent(task, available_agents):
 ### 5.3 Workflow Templates
 
 #### Assessment-Fix-Validate Workflow
+
 ```yaml
 name: assessment-fix-validate
 trigger: scheduled | manual
@@ -785,23 +836,25 @@ steps:
     parallel: true
     success_criteria:
       tests_pass: true
-      coverage: ">=80%"
+      coverage: '>=80%'
 ```
 
 ## Resource Management
 
 ### Budget Allocation
+
 ```yaml
-monthly_budget: 10000  # USD
+monthly_budget: 10000 # USD
 allocation:
-  assessment: 20%      # AUDITOR, ANALYZER
-  implementation: 40%  # EXECUTOR, REFACTORER
-  validation: 15%     # VALIDATOR, TESTER
-  operations: 15%     # GUARDIAN, MONITOR
-  learning: 10%       # SCHOLAR
+  assessment: 20% # AUDITOR, ANALYZER
+  implementation: 40% # EXECUTOR, REFACTORER
+  validation: 15% # VALIDATOR, TESTER
+  operations: 15% # GUARDIAN, MONITOR
+  learning: 10% # SCHOLAR
 ```
 
 ### Concurrency Limits
+
 ```yaml
 global:
   max_concurrent_agents: 10
@@ -822,6 +875,7 @@ per_agent:
 ## Pattern Learning Pipeline
 
 ### 6.1 Data Collection
+
 ```yaml
 data_sources:
   - pull_requests: Success/failure outcomes
@@ -871,6 +925,7 @@ graph LR
 ## Optimization Strategies
 
 ### Agent Performance Tuning
+
 ```yaml
 optimization_dimensions:
   - speed: Reduce execution time
@@ -886,6 +941,7 @@ tuning_methods:
 ```
 
 ### System-Level Improvements
+
 1. **Workflow Optimization**: Streamline common sequences
 2. **Resource Pooling**: Share resources across agents
 3. **Predictive Scheduling**: Anticipate workload patterns
@@ -898,6 +954,7 @@ tuning_methods:
 ## Global Commands
 
 ### System Management
+
 ```bash
 # Initialize agent system
 npm run agents:init
@@ -913,6 +970,7 @@ npm run agents:stop -- --force
 ```
 
 ### Workflow Execution
+
 ```bash
 # Run full assessment workflow
 npm run workflow:assessment -- --scope full
@@ -927,11 +985,13 @@ npm run workflow:validate
 ## Agent-Specific Commands
 
 ### Standard Invocation Pattern
+
 ```bash
 npm run agent:invoke <AGENT>:<COMMAND> -- [parameters]
 ```
 
 ### Common Parameters
+
 - `--async`: Run asynchronously
 - `--timeout <ms>`: Set timeout
 - `--priority <level>`: Set priority
@@ -940,18 +1000,18 @@ npm run agent:invoke <AGENT>:<COMMAND> -- [parameters]
 
 ## Quick Reference Table
 
-| Agent | Primary Commands | Common Usage |
-|-------|-----------------|--------------|
-| AUDITOR | assess-code, generate-backlog | Daily assessment |
-| EXECUTOR | implement-fix, validate-tdd | Fix implementation |
-| GUARDIAN | monitor-pipeline, recover | Pipeline maintenance |
-| STRATEGIST | coordinate, allocate | Orchestration |
-| SCHOLAR | extract-patterns, train | Learning cycles |
-| VALIDATOR | run-tests, validate-e2e | Testing |
-| OPTIMIZER | profile, optimize | Performance |
-| SECURITYGUARD | scan, remediate | Security |
-| ARCHITECT | design, document-adr | Architecture |
-| DEPLOYER | deploy, rollback | Deployment |
+| Agent         | Primary Commands              | Common Usage         |
+| ------------- | ----------------------------- | -------------------- |
+| AUDITOR       | assess-code, generate-backlog | Daily assessment     |
+| EXECUTOR      | implement-fix, validate-tdd   | Fix implementation   |
+| GUARDIAN      | monitor-pipeline, recover     | Pipeline maintenance |
+| STRATEGIST    | coordinate, allocate          | Orchestration        |
+| SCHOLAR       | extract-patterns, train       | Learning cycles      |
+| VALIDATOR     | run-tests, validate-e2e       | Testing              |
+| OPTIMIZER     | profile, optimize             | Performance          |
+| SECURITYGUARD | scan, remediate               | Security             |
+| ARCHITECT     | design, document-adr          | Architecture         |
+| DEPLOYER      | deploy, rollback              | Deployment           |
 
 ---
 
@@ -959,37 +1019,42 @@ npm run agent:invoke <AGENT>:<COMMAND> -- [parameters]
 
 ## System-Level Metrics
 
-| Metric | Target | Current | Measurement |
-|--------|--------|---------|-------------|
-| **Agent Availability** | 99.0% | - | Uptime monitoring |
-| **Task Throughput** | 20+ tasks/day | - | Completion tracking |
-| **Response Latency** | <2s p95 | - | Message timing |
-| **Resource Utilization** | 75-85% | - | CPU/Memory usage |
-| **Pattern Reuse Rate** | 25% | - | Pattern analytics |
+| Metric                   | Target        | Current | Measurement         |
+| ------------------------ | ------------- | ------- | ------------------- |
+| **Agent Availability**   | 99.0%         | -       | Uptime monitoring   |
+| **Task Throughput**      | 20+ tasks/day | -       | Completion tracking |
+| **Response Latency**     | <2s p95       | -       | Message timing      |
+| **Resource Utilization** | 75-85%        | -       | CPU/Memory usage    |
+| **Pattern Reuse Rate**   | 25%           | -       | Pattern analytics   |
 
 ## Agent-Specific KPIs
 
 ### AUDITOR
+
 - Scan completion time: ≤12min (150k LOC)
 - Issue detection accuracy: ≥90%
 - False positive rate: ≤10%
 
 ### EXECUTOR
+
 - Implementation throughput: ≥8 PRs/day
 - TDD compliance: 100%
 - Rollback rate: ≤0.3%
 
 ### GUARDIAN
+
 - Failure detection time: ≤5min
 - Recovery success rate: ≥90%
 - Pipeline uptime: ≥95%
 
 ### STRATEGIST
+
 - Orchestration overhead: ≤5%
 - Resource allocation efficiency: ≥75%
 - On-time delivery: ≥90%
 
 ### SCHOLAR
+
 - Pattern discovery rate: ≥2/month
 - Pattern validation accuracy: ≥85%
 - Learning impact: ≥10% improvement
@@ -999,21 +1064,21 @@ npm run agent:invoke <AGENT>:<COMMAND> -- [parameters]
 ```yaml
 code_quality:
   coverage:
-    line: ">=80%"
-    branch: ">=75%"
-    diff: ">=80%"
+    line: '>=80%'
+    branch: '>=75%'
+    diff: '>=80%'
 
   complexity:
-    cyclomatic: "<10 avg"
-    cognitive: "<15 avg"
+    cyclomatic: '<10 avg'
+    cognitive: '<15 avg'
 
   maintainability:
-    index: ">65"
-    debt_ratio: "<5%"
+    index: '>65'
+    debt_ratio: '<5%'
 
   security:
     critical_vulns: 0
-    high_vulns: "<=2"
+    high_vulns: '<=2'
 ```
 
 ---
@@ -1023,6 +1088,7 @@ code_quality:
 ## Development Standards
 
 ### Agent Implementation Checklist
+
 - [ ] Define clear agent purpose and scope
 - [ ] Implement standard message protocol
 - [ ] Add comprehensive error handling
@@ -1037,6 +1103,7 @@ code_quality:
 - [ ] Add monitoring instrumentation
 
 ### Code Organization
+
 ```
 /agents
   /<agent-name>
@@ -1057,15 +1124,17 @@ code_quality:
 ## Testing Requirements
 
 ### Test Coverage Matrix
-| Component | Unit | Integration | E2E | Performance |
-|-----------|------|-------------|-----|-------------|
-| Commands | ✓ | ✓ | ✓ | - |
-| Message Handling | ✓ | ✓ | - | ✓ |
-| Error Recovery | ✓ | ✓ | - | - |
-| Pattern Learning | ✓ | - | - | ✓ |
-| Orchestration | ✓ | ✓ | ✓ | ✓ |
+
+| Component        | Unit | Integration | E2E | Performance |
+| ---------------- | ---- | ----------- | --- | ----------- |
+| Commands         | ✓    | ✓           | ✓   | -           |
+| Message Handling | ✓    | ✓           | -   | ✓           |
+| Error Recovery   | ✓    | ✓           | -   | -           |
+| Pattern Learning | ✓    | -           | -   | ✓           |
+| Orchestration    | ✓    | ✓           | ✓   | ✓           |
 
 ### Test Scenarios
+
 1. **Happy Path**: Normal operation flow
 2. **Error Handling**: Network failures, timeouts
 3. **Edge Cases**: Empty inputs, large datasets
@@ -1075,6 +1144,7 @@ code_quality:
 ## Deployment Configuration
 
 ### Container Deployment
+
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -1091,26 +1161,27 @@ spec:
         app: agent
     spec:
       containers:
-      - name: agent
-        image: agent:latest
-        resources:
-          requests:
-            memory: "512Mi"
-            cpu: "500m"
-          limits:
-            memory: "1Gi"
-            cpu: "1000m"
-        env:
-        - name: AGENT_TYPE
-          value: "EXECUTOR"
-        - name: LINEAR_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: linear-secret
-              key: api-key
+        - name: agent
+          image: agent:latest
+          resources:
+            requests:
+              memory: '512Mi'
+              cpu: '500m'
+            limits:
+              memory: '1Gi'
+              cpu: '1000m'
+          env:
+            - name: AGENT_TYPE
+              value: 'EXECUTOR'
+            - name: LINEAR_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: linear-secret
+                  key: api-key
 ```
 
 ### Monitoring Setup
+
 ```yaml
 monitoring:
   metrics:
@@ -1126,7 +1197,7 @@ monitoring:
   tracing:
     provider: opentelemetry
     sampling_rate: 0.1
-    endpoint: "http://collector:4317"
+    endpoint: 'http://collector:4317'
 
   alerts:
     - name: agent_down
@@ -1143,6 +1214,7 @@ monitoring:
 ## Security Guidelines
 
 ### Access Control
+
 ```yaml
 rbac:
   roles:
@@ -1160,6 +1232,7 @@ rbac:
 ```
 
 ### Secret Management
+
 1. Never hardcode credentials
 2. Use environment variables or secret stores
 3. Rotate API keys regularly
@@ -1173,6 +1246,7 @@ rbac:
 The Linear TDD Workflow System's 20-agent architecture represents a comprehensive approach to autonomous code quality management. By combining specialized expertise, intelligent orchestration, and continuous learning, the system delivers measurable improvements in code quality, developer productivity, and system reliability.
 
 Key success factors:
+
 1. **Specialization** enables deep expertise in each domain
 2. **Orchestration** ensures efficient resource utilization
 3. **Learning** drives continuous improvement
@@ -1183,4 +1257,4 @@ The architecture is designed to scale with your needs, from single-repository ma
 
 ---
 
-*This document serves as the authoritative reference for the multi-agent architecture. It is maintained by the Engineering Excellence Team and updated with each system enhancement.*
+_This document serves as the authoritative reference for the multi-agent architecture. It is maintained by the Engineering Excellence Team and updated with each system enhancement._

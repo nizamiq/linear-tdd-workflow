@@ -16,6 +16,7 @@ The Linear TDD Workflow System provides comprehensive support for Python project
 ### Testing Frameworks
 
 #### pytest (Primary)
+
 ```bash
 # Installation
 pip install pytest pytest-cov pytest-mock pytest-asyncio
@@ -30,6 +31,7 @@ addopts = --cov=src --cov-report=html --cov-report=term
 ```
 
 #### unittest (Alternative)
+
 ```bash
 # Built into Python standard library
 python -m unittest discover -s tests -p "test_*.py"
@@ -38,6 +40,7 @@ python -m unittest discover -s tests -p "test_*.py"
 ### Code Quality Tools
 
 #### Black (Formatting)
+
 ```bash
 # Installation
 pip install black
@@ -50,6 +53,7 @@ include = '\.pyi?$'
 ```
 
 #### Ruff (Linting)
+
 ```bash
 # Installation
 pip install ruff
@@ -63,6 +67,7 @@ target-version = "py310"
 ```
 
 #### mypy (Type Checking)
+
 ```bash
 # Installation
 pip install mypy
@@ -78,6 +83,7 @@ disallow_untyped_defs = True
 ### Coverage Analysis
 
 #### coverage.py
+
 ```bash
 # Installation
 pip install coverage
@@ -91,6 +97,7 @@ coverage html
 ## Agent-Specific Python Support
 
 ### AUDITOR
+
 - Analyzes Python code using AST parsing
 - Detects Python-specific anti-patterns
 - Checks PEP 8 compliance
@@ -101,6 +108,7 @@ npm run agent:invoke AUDITOR:assess-code -- --language python --scope src/
 ```
 
 ### EXECUTOR
+
 - Implements fixes following Python best practices
 - Generates pytest tests first (TDD)
 - Uses Black for formatting
@@ -111,6 +119,7 @@ npm run agent:invoke EXECUTOR:implement-fix -- --task-id CLEAN-123 --language py
 ```
 
 ### GUARDIAN
+
 - Monitors Python CI/CD pipelines
 - Detects pytest failures
 - Handles pip dependency issues
@@ -121,6 +130,7 @@ npm run agent:invoke GUARDIAN:analyze-failure -- --language python --auto-fix
 ```
 
 ### VALIDATOR
+
 - Runs pytest suites
 - Performs mutation testing with mutmut
 - Validates coverage thresholds
@@ -131,6 +141,7 @@ npm run agent:invoke VALIDATOR:run-tests -- --suite pytest --coverage
 ```
 
 ### OPTIMIZER
+
 - Profiles Python code with cProfile
 - Optimizes algorithm complexity
 - Reduces memory usage
@@ -143,6 +154,7 @@ npm run agent:invoke OPTIMIZER:profile-performance -- --language python --type m
 ## TDD Workflow for Python
 
 ### 1. RED Phase - Write Failing Test
+
 ```python
 # test_calculator.py
 import pytest
@@ -155,6 +167,7 @@ def test_add_two_numbers():
 ```
 
 ### 2. GREEN Phase - Minimal Implementation
+
 ```python
 # src/calculator.py
 class Calculator:
@@ -163,6 +176,7 @@ class Calculator:
 ```
 
 ### 3. REFACTOR Phase - Improve Code
+
 ```python
 # src/calculator.py
 from typing import Union
@@ -189,6 +203,7 @@ class Calculator:
 ## Fix Pack Examples for Python
 
 ### 1. Linting & Formatting
+
 ```python
 # Before
 def calculate_total(items,tax_rate):
@@ -207,6 +222,7 @@ def calculate_total(items: list, tax_rate: float) -> float:
 ```
 
 ### 2. Type Hints Addition
+
 ```python
 # Before
 def process_data(data, config):
@@ -232,6 +248,7 @@ def process_data(
 ```
 
 ### 3. Docstring Addition
+
 ```python
 # Before
 def calculate_metrics(data):
@@ -290,6 +307,7 @@ python-project/
 ## Configuration Files
 
 ### pyproject.toml
+
 ```toml
 [build-system]
 requires = ["setuptools>=61.0", "wheel"]
@@ -320,6 +338,7 @@ select = ["E", "F", "B", "W", "I", "N", "UP"]
 ```
 
 ### requirements-dev.txt
+
 ```
 pytest>=7.4.0
 pytest-cov>=4.1.0
@@ -335,6 +354,7 @@ mutmut>=2.4.3
 ## CI/CD Integration
 
 ### GitHub Actions for Python
+
 ```yaml
 name: Python CI
 
@@ -348,36 +368,37 @@ jobs:
         python-version: [3.8, 3.9, 3.10, 3.11]
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements-dev.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
 
-    - name: Format check with Black
-      run: black --check src tests
+      - name: Format check with Black
+        run: black --check src tests
 
-    - name: Lint with Ruff
-      run: ruff check src tests
+      - name: Lint with Ruff
+        run: ruff check src tests
 
-    - name: Type check with mypy
-      run: mypy src
+      - name: Type check with mypy
+        run: mypy src
 
-    - name: Test with pytest
-      run: pytest --cov=src --cov-report=xml
+      - name: Test with pytest
+        run: pytest --cov=src --cov-report=xml
 
-    - name: Upload coverage
-      uses: codecov/codecov-action@v3
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
 ```
 
 ## Common Python Patterns
 
 ### Dependency Injection
+
 ```python
 from typing import Protocol
 
@@ -394,6 +415,7 @@ class Service:
 ```
 
 ### Context Managers
+
 ```python
 from contextlib import contextmanager
 
@@ -407,6 +429,7 @@ def database_connection():
 ```
 
 ### Decorators
+
 ```python
 import functools
 import time
@@ -425,6 +448,7 @@ def timing_decorator(func):
 ## Performance Optimization
 
 ### Profiling
+
 ```bash
 # Using cProfile
 python -m cProfile -o profile.stats src/main.py
@@ -435,6 +459,7 @@ kernprof -l -v src/main.py
 ```
 
 ### Memory Optimization
+
 ```python
 # Use generators for large datasets
 def read_large_file(file_path):
@@ -454,6 +479,7 @@ class Point:
 ## Security Best Practices
 
 ### Input Validation
+
 ```python
 from typing import Optional
 import re
@@ -466,6 +492,7 @@ def validate_email(email: str) -> Optional[str]:
 ```
 
 ### Safe File Operations
+
 ```python
 import os
 from pathlib import Path
@@ -488,7 +515,7 @@ def safe_file_read(file_path: str) -> str:
 1. **Import errors**
    - Check PYTHONPATH
    - Verify virtual environment activation
-   - Ensure __init__.py files exist
+   - Ensure **init**.py files exist
 
 2. **Type checking failures**
    - Install type stubs: `pip install types-requests`
@@ -496,7 +523,7 @@ def safe_file_read(file_path: str) -> str:
    - Check mypy configuration
 
 3. **Test discovery issues**
-   - Follow naming conventions (test_*.py)
+   - Follow naming conventions (test\_\*.py)
    - Check pytest.ini configuration
    - Verify test directory structure
 

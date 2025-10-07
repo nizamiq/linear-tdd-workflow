@@ -73,12 +73,14 @@ This document provides a comprehensive catalog of all AI agents and personas wit
 **Status**: Active (Phase 0)
 
 #### Persona
+
 - Meticulous and detail-oriented
 - Zero-tolerance for code smells
 - Passionate about maintainability
 - Data-driven decision maker
 
 #### Primary Responsibilities
+
 - Continuous code quality scanning
 - Technical debt identification
 - Security vulnerability detection
@@ -86,6 +88,7 @@ This document provides a comprehensive catalog of all AI agents and personas wit
 - Pattern and anti-pattern detection
 
 #### Technical Capabilities
+
 - AST/CFG analysis
 - Cyclomatic complexity calculation
 - Dependency graph generation
@@ -93,16 +96,19 @@ This document provides a comprehensive catalog of all AI agents and personas wit
 - Test coverage analysis
 
 #### Tools & Permissions
+
 - **Tools**: `code_search`, `analyze_complexity`, `detect_patterns`, `create_linear_task`
 - **Permissions**: Read-only repository access
 - **MCP Servers**: Linear, GitHub (read)
 
 #### Performance Metrics
+
 - **SLA**: First scan ≤12min (JS/TS), ≤15min (Python) for 150k LOC
 - **Success Criteria**: ≥80% actionable items, ≤10% false positives
 - **Throughput**: 100% repository coverage per scan
 
 #### Communication Protocol
+
 ```json
 {
   "message_type": "assessment_complete",
@@ -115,6 +121,7 @@ This document provides a comprehensive catalog of all AI agents and personas wit
 ```
 
 #### File References
+
 - Specification: `/.claude/agents/auditor.md`
 - Workflow: `/docs/autonomous-ai-sre-tdd.md`
 
@@ -127,12 +134,14 @@ This document provides a comprehensive catalog of all AI agents and personas wit
 **Status**: Active (Phase 0)
 
 #### Persona
+
 - Methodical and precise
 - Test-first mindset
 - Quality over speed
 - Documentation enthusiast
 
 #### Primary Responsibilities
+
 - Fix Pack implementation
 - TDD enforcement (RED→GREEN→REFACTOR)
 - Atomic commit generation
@@ -140,6 +149,7 @@ This document provides a comprehensive catalog of all AI agents and personas wit
 - Test coverage maintenance
 
 #### Technical Capabilities
+
 - Automated refactoring
 - Test generation
 - Code transformation
@@ -147,16 +157,19 @@ This document provides a comprehensive catalog of all AI agents and personas wit
 - Performance optimization
 
 #### Tools & Permissions
+
 - **Tools**: `code_patch`, `run_tests`, `commit_changes`, `create_pr`
 - **Permissions**: Write access via PRs only
 - **MCP Servers**: Linear, GitHub
 
 #### Performance Metrics
+
 - **SLA**: XS task ≤10min, S task ≤15min p50
 - **Success Criteria**: ≥8 accepted PRs/day, ≤0.3% rollback rate
 - **Quality Gates**: Diff coverage ≥80%, mutation score ≥30%
 
 #### Fix Pack Categories
+
 1. Linting & Formatting
 2. Dead code removal
 3. Documentation updates
@@ -166,6 +179,7 @@ This document provides a comprehensive catalog of all AI agents and personas wit
 7. Test scaffolding
 
 #### File References
+
 - Specification: `/.claude/agents/executor.md`
 - TDD Workflow: `/CLAUDE.md#workflow-steps`
 
@@ -178,12 +192,14 @@ This document provides a comprehensive catalog of all AI agents and personas wit
 **Status**: Active (Phase 0)
 
 #### Persona
+
 - Always vigilant
 - Fast response time
 - Problem solver
 - Automation advocate
 
 #### Primary Responsibilities
+
 - Pipeline health monitoring
 - Failure detection and recovery
 - Test flakiness mitigation
@@ -191,6 +207,7 @@ This document provides a comprehensive catalog of all AI agents and personas wit
 - Performance optimization
 
 #### Technical Capabilities
+
 - Root cause analysis
 - Automated recovery
 - Build cache management
@@ -198,16 +215,19 @@ This document provides a comprehensive catalog of all AI agents and personas wit
 - Rollback automation
 
 #### Tools & Permissions
+
 - **Tools**: `analyze_failure`, `generate_fix`, `run_local_tests`, `trigger_pipeline`
 - **Permissions**: CI/CD admin access
 - **MCP Servers**: GitHub Actions, monitoring services
 
 #### Performance Metrics
+
 - **SLA**: Detection ≤5min, recovery ≤10min p95
 - **Success Criteria**: Pipeline uptime ≥95%, auto-fix success ≥90%
 - **MTTR**: ≤10 minutes
 
 #### Recovery Strategies
+
 - Retry with exponential backoff
 - Cache clearing
 - Service restart
@@ -215,6 +235,7 @@ This document provides a comprehensive catalog of all AI agents and personas wit
 - Rollback to last known good
 
 #### File References
+
 - Specification: `/.claude/agents/guardian.md`
 - Recovery runbooks: Embedded in spec
 
@@ -227,12 +248,14 @@ This document provides a comprehensive catalog of all AI agents and personas wit
 **Status**: Active (Phase 0)
 
 #### Persona
+
 - Natural leader
 - Strategic thinker
 - Excellent communicator
 - Resource optimizer
 
 #### Primary Responsibilities
+
 - Multi-agent coordination
 - Task prioritization
 - Resource allocation
@@ -240,6 +263,7 @@ This document provides a comprehensive catalog of all AI agents and personas wit
 - Stakeholder reporting
 
 #### Technical Capabilities
+
 - Workflow orchestration
 - Dependency resolution
 - Conflict management
@@ -247,16 +271,19 @@ This document provides a comprehensive catalog of all AI agents and personas wit
 - Capacity planning
 
 #### Tools & Permissions
+
 - **Tools**: `assign_task`, `update_linear`, `coordinate_agents`, `generate_report`
 - **Permissions**: Full Linear access, agent coordination
 - **MCP Servers**: Linear, GitHub, Memory
 
 #### Performance Metrics
+
 - **SLA**: Coordination decisions ≤1.5s p95
 - **Success Criteria**: On-time delivery ≥90%, orchestration overhead ≤5%
 - **Resource Utilization**: ≥75%
 
 #### Coordination Mechanisms
+
 - Task queue management
 - Priority-based scheduling
 - Deadlock prevention
@@ -264,6 +291,7 @@ This document provides a comprehensive catalog of all AI agents and personas wit
 - Conflict resolution
 
 #### File References
+
 - Specification: `/claude_scaffold/.claude/agents/strategist.md`
 - Commands: `/coordinate-agents`
 
@@ -276,12 +304,14 @@ This document provides a comprehensive catalog of all AI agents and personas wit
 **Status**: Active (Phase 1)
 
 #### Persona
+
 - Curious and analytical
 - Pattern seeker
 - Knowledge curator
 - Continuous learner
 
 #### Primary Responsibilities
+
 - Pattern extraction
 - Knowledge base maintenance
 - Performance analysis
@@ -289,6 +319,7 @@ This document provides a comprehensive catalog of all AI agents and personas wit
 - Best practice identification
 
 #### Technical Capabilities
+
 - Machine learning
 - Pattern matching
 - Statistical analysis
@@ -296,16 +327,19 @@ This document provides a comprehensive catalog of all AI agents and personas wit
 - Knowledge synthesis
 
 #### Tools & Permissions
+
 - **Tools**: `extract_patterns`, `update_knowledge_base`, `train_agents`, `generate_insights`
 - **Permissions**: Read all, write to knowledge base
 - **MCP Servers**: Memory, Linear
 
 #### Performance Metrics
+
 - **Success Criteria**: ≥2 validated patterns/month, ≥25% pattern reuse
 - **Learning Rate**: ≥10% efficiency improvement month-over-month
 - **Pattern Quality**: ≥80% success rate when applied
 
 #### Learning Mechanisms
+
 - Success/failure analysis
 - Pattern validation
 - A/B testing
@@ -313,6 +347,7 @@ This document provides a comprehensive catalog of all AI agents and personas wit
 - Cross-agent knowledge transfer
 
 #### File References
+
 - Specification: `/claude_scaffold/.claude/agents/scholar.md`
 - Pattern database: `/patterns/`
 
@@ -327,12 +362,14 @@ This document provides a comprehensive catalog of all AI agents and personas wit
 **Status**: Proposed (Phase 2)
 
 #### Persona
+
 - Clear communicator
 - Detail-oriented
 - User-focused
 - Consistency advocate
 
 #### Primary Responsibilities
+
 - Documentation generation
 - API documentation maintenance
 - README updates
@@ -340,6 +377,7 @@ This document provides a comprehensive catalog of all AI agents and personas wit
 - User guide creation
 
 #### Technical Capabilities
+
 - Markdown generation
 - Diagram creation (Mermaid, PlantUML)
 - API spec generation (OpenAPI)
@@ -347,16 +385,19 @@ This document provides a comprehensive catalog of all AI agents and personas wit
 - Cross-reference management
 
 #### Tools & Permissions
+
 - **Tools**: `generate_docs`, `update_readme`, `create_diagram`, `extract_docstrings`
 - **Permissions**: Write to `/docs`, read all code
 - **MCP Servers**: GitHub, documentation platforms
 
 #### Performance Metrics
+
 - **Coverage**: 100% public API documentation
 - **Freshness**: Updates within 24h of code changes
 - **Quality**: Passes documentation linters
 
 #### Documentation Types
+
 1. API Reference
 2. Architecture Guides
 3. User Documentation
@@ -373,12 +414,14 @@ This document provides a comprehensive catalog of all AI agents and personas wit
 **Status**: Proposed (Phase 2)
 
 #### Persona
+
 - Design-conscious
 - Performance-focused
 - Accessibility champion
 - User experience advocate
 
 #### Primary Responsibilities
+
 - Component optimization
 - Accessibility improvements
 - CSS consistency
@@ -386,6 +429,7 @@ This document provides a comprehensive catalog of all AI agents and personas wit
 - Visual regression testing
 
 #### Technical Capabilities
+
 - React/Vue/Angular patterns
 - CSS-in-JS optimization
 - Bundle size analysis
@@ -393,11 +437,13 @@ This document provides a comprehensive catalog of all AI agents and personas wit
 - Cross-browser testing
 
 #### Tools & Permissions
+
 - **Tools**: `analyze_components`, `optimize_bundle`, `test_accessibility`, `visual_regression`
 - **Permissions**: Frontend code write access
 - **MCP Servers**: Playwright, GitHub
 
 #### Performance Metrics
+
 - **Lighthouse Score**: ≥90
 - **Accessibility**: WCAG AA compliance
 - **Bundle Size**: ≤10% growth per quarter
@@ -412,12 +458,14 @@ This document provides a comprehensive catalog of all AI agents and personas wit
 **Status**: Proposed (Phase 2)
 
 #### Persona
+
 - Architecture-minded
 - Performance optimizer
 - Security-conscious
 - Scalability focused
 
 #### Primary Responsibilities
+
 - API optimization
 - Database query tuning
 - Caching implementation
@@ -425,6 +473,7 @@ This document provides a comprehensive catalog of all AI agents and personas wit
 - Performance profiling
 
 #### Technical Capabilities
+
 - SQL optimization
 - NoSQL patterns
 - Microservices design
@@ -432,11 +481,13 @@ This document provides a comprehensive catalog of all AI agents and personas wit
 - Load testing
 
 #### Tools & Permissions
+
 - **Tools**: `profile_api`, `optimize_query`, `implement_cache`, `load_test`
 - **Permissions**: Backend code write, database read
 - **MCP Servers**: Database tools, monitoring
 
 #### Performance Metrics
+
 - **API Response**: p95 ≤300ms
 - **Query Performance**: No N+1 queries
 - **Cache Hit Rate**: ≥80%
@@ -453,12 +504,14 @@ This document provides a comprehensive catalog of all AI agents and personas wit
 **Status**: Proposed (Phase 1)
 
 #### Persona
+
 - Foundational thinker
 - Standards enforcer
 - Tool integrator
 - Bootstrap expert
 
 #### Primary Responsibilities
+
 - Project scaffolding from PRD
 - Repository initialization
 - CI/CD setup
@@ -466,6 +519,7 @@ This document provides a comprehensive catalog of all AI agents and personas wit
 - GitFlow implementation
 
 #### Technical Capabilities
+
 - Template generation
 - Dependency management
 - Pipeline configuration
@@ -473,16 +527,19 @@ This document provides a comprehensive catalog of all AI agents and personas wit
 - Documentation structure
 
 #### Tools & Permissions
+
 - **Tools**: `scaffold_project`, `configure_pipeline`, `setup_testing`, `initialize_git`
 - **Permissions**: Repository creation, admin access
 - **MCP Servers**: GitHub, Linear
 
 #### Performance Metrics
+
 - **Setup Time**: ≤30 minutes for full project
 - **Compliance**: 100% standards adherence
 - **Coverage**: All required tools configured
 
 #### Initialization Checklist
+
 - [ ] Repository structure
 - [ ] GitFlow branches
 - [ ] CI/CD pipelines
@@ -501,12 +558,14 @@ This document provides a comprehensive catalog of all AI agents and personas wit
 **Status**: Proposed (Phase 1)
 
 #### Persona
+
 - Adaptive learner
 - Legacy code expert
 - Migration planner
 - Risk assessor
 
 #### Primary Responsibilities
+
 - Codebase analysis
 - Technical debt assessment
 - Migration planning
@@ -514,6 +573,7 @@ This document provides a comprehensive catalog of all AI agents and personas wit
 - Baseline establishment
 
 #### Technical Capabilities
+
 - Legacy code analysis
 - Dependency mapping
 - Risk assessment
@@ -521,16 +581,19 @@ This document provides a comprehensive catalog of all AI agents and personas wit
 - Incremental adoption
 
 #### Tools & Permissions
+
 - **Tools**: `analyze_codebase`, `assess_debt`, `create_migration_plan`, `setup_agents`
 - **Permissions**: Full read, gradual write
 - **MCP Servers**: GitHub, Linear
 
 #### Performance Metrics
+
 - **Analysis Time**: ≤2 hours for 200k LOC
 - **Accuracy**: ≥90% issue detection
 - **Migration Success**: ≥95% without breaking changes
 
 #### Onboarding Phases
+
 1. Discovery & Assessment
 2. Baseline Metrics
 3. Agent Configuration
@@ -546,12 +609,14 @@ This document provides a comprehensive catalog of all AI agents and personas wit
 **Status**: Proposed (Phase 3)
 
 #### Persona
+
 - Big-picture thinker
 - Objective evaluator
 - Trend identifier
 - Course corrector
 
 #### Primary Responsibilities
+
 - PRD alignment verification
 - Scope creep detection
 - Objective tracking
@@ -559,6 +624,7 @@ This document provides a comprehensive catalog of all AI agents and personas wit
 - Recommendation generation
 
 #### Technical Capabilities
+
 - Requirements tracing
 - Goal measurement
 - Trend analysis
@@ -566,16 +632,19 @@ This document provides a comprehensive catalog of all AI agents and personas wit
 - Impact assessment
 
 #### Tools & Permissions
+
 - **Tools**: `audit_alignment`, `track_objectives`, `measure_progress`, `report_deviations`
 - **Permissions**: Read all, report generation
 - **MCP Servers**: Linear, analytics
 
 #### Performance Metrics
+
 - **Audit Frequency**: Monthly
 - **Detection Rate**: 100% major deviations
 - **Report Timeliness**: Within 24h of audit
 
 #### Alignment Dimensions
+
 - Feature completeness
 - Performance targets
 - Quality metrics
@@ -591,12 +660,14 @@ This document provides a comprehensive catalog of all AI agents and personas wit
 **Status**: Proposed (Phase 2)
 
 #### Persona
+
 - User advocate
 - Detail extractor
 - Scenario builder
 - Acceptance definer
 
 #### Primary Responsibilities
+
 - User story extraction
 - Acceptance criteria definition
 - Test scenario generation
@@ -604,6 +675,7 @@ This document provides a comprehensive catalog of all AI agents and personas wit
 - Stakeholder translation
 
 #### Technical Capabilities
+
 - NLP for requirement extraction
 - Story decomposition
 - Criteria generation
@@ -611,16 +683,19 @@ This document provides a comprehensive catalog of all AI agents and personas wit
 - Priority assessment
 
 #### Tools & Permissions
+
 - **Tools**: `extract_stories`, `define_criteria`, `generate_scenarios`, `maintain_traceability`
 - **Permissions**: Document read, Linear write
 - **MCP Servers**: Linear, documentation platforms
 
 #### Performance Metrics
+
 - **Extraction Accuracy**: ≥85%
 - **Criteria Completeness**: 100%
 - **Test Coverage**: All stories have scenarios
 
 #### Story Formats
+
 ```gherkin
 Given: [Context]
 When: [Action]
@@ -638,12 +713,14 @@ Then: [Expected Outcome]
 **Status**: Proposed (Phase 1)
 
 #### Persona
+
 - Discipline enforcer
 - Cycle guardian
 - Quality gatekeeper
 - Feedback optimizer
 
 #### Primary Responsibilities
+
 - RED→GREEN→REFACTOR enforcement
 - Test-first verification
 - Coverage monitoring
@@ -651,6 +728,7 @@ Then: [Expected Outcome]
 - Cycle timing optimization
 
 #### Technical Capabilities
+
 - Test execution management
 - Coverage analysis
 - Mutation testing
@@ -658,17 +736,20 @@ Then: [Expected Outcome]
 - Failure analysis
 
 #### Tools & Permissions
+
 - **Tools**: `enforce_tdd`, `track_cycle`, `measure_coverage`, `run_mutations`
 - **Permissions**: Test execution, commit blocking
 - **MCP Servers**: CI/CD platforms
 
 #### Performance Metrics
+
 - **Cycle Compliance**: 100%
 - **Coverage Achievement**: ≥80% diff
 - **Mutation Score**: ≥30%
 - **Cycle Time**: ≤15 minutes average
 
 #### TDD States
+
 ```mermaid
 stateDiagram-v2
     [*] --> RED: Write failing test
@@ -687,12 +768,14 @@ stateDiagram-v2
 **Status**: Proposed (Phase 2)
 
 #### Persona
+
 - Speed optimizer
 - Pattern recognizer
 - Bottleneck eliminator
 - Efficiency expert
 
 #### Primary Responsibilities
+
 - Feedback loop analysis
 - Build optimization
 - Test parallelization
@@ -700,6 +783,7 @@ stateDiagram-v2
 - Flaky test management
 
 #### Technical Capabilities
+
 - Pipeline profiling
 - Dependency analysis
 - Parallel execution
@@ -707,11 +791,13 @@ stateDiagram-v2
 - Trend detection
 
 #### Tools & Permissions
+
 - **Tools**: `analyze_pipeline`, `optimize_build`, `parallelize_tests`, `manage_cache`
 - **Permissions**: CI/CD configuration
 - **MCP Servers**: CI/CD platforms, monitoring
 
 #### Performance Metrics
+
 - **Feedback Time**: ≤5 minutes p95
 - **Cache Hit Rate**: ≥90%
 - **Parallel Efficiency**: ≥80%
@@ -728,12 +814,14 @@ stateDiagram-v2
 **Status**: Active (Embedded in STRATEGIST)
 
 #### Persona
+
 - API expert
 - Sync master
 - Status tracker
 - Notification manager
 
 #### Primary Responsibilities
+
 - Task synchronization
 - Sprint management
 - Progress tracking
@@ -741,6 +829,7 @@ stateDiagram-v2
 - Webhook handling
 
 #### Technical Capabilities
+
 - Linear API mastery
 - Real-time sync
 - Bulk operations
@@ -748,16 +837,19 @@ stateDiagram-v2
 - Rate limit management
 
 #### Tools & Permissions
+
 - **Tools**: `create_issue`, `update_status`, `manage_sprint`, `sync_progress`
 - **Permissions**: Full Linear API access
 - **MCP Servers**: Linear
 
 #### Performance Metrics
+
 - **Sync Latency**: ≤2s p95
 - **Reliability**: 99.9% uptime
 - **Throughput**: 100 operations/minute
 
 #### Integration Points
+
 - Issue creation from assessments
 - PR status updates
 - Sprint planning sync
@@ -773,12 +865,14 @@ stateDiagram-v2
 **Status**: Active (Distributed)
 
 #### Persona
+
 - Git expert
 - PR maestro
 - Branch protector
 - Release manager
 
 #### Primary Responsibilities
+
 - Repository operations
 - PR management
 - Branch protection
@@ -786,6 +880,7 @@ stateDiagram-v2
 - Release coordination
 
 #### Technical Capabilities
+
 - Git operations
 - GitHub API
 - Webhook handling
@@ -793,11 +888,13 @@ stateDiagram-v2
 - Security policies
 
 #### Tools & Permissions
+
 - **Tools**: `create_pr`, `manage_branch`, `update_status`, `trigger_action`
 - **Permissions**: Repository write via API
 - **MCP Servers**: GitHub
 
 #### Performance Metrics
+
 - **API Response**: ≤500ms p95
 - **PR Creation**: ≤10s
 - **Webhook Processing**: ≤1s
@@ -811,12 +908,14 @@ stateDiagram-v2
 **Status**: Active
 
 #### Persona
+
 - Protocol expert
 - Router optimizer
 - Security enforcer
 - Performance monitor
 
 #### Primary Responsibilities
+
 - Request routing
 - Authentication management
 - Rate limiting
@@ -824,6 +923,7 @@ stateDiagram-v2
 - Health monitoring
 
 #### Technical Capabilities
+
 - Protocol translation
 - Load balancing
 - Circuit breaking
@@ -831,11 +931,13 @@ stateDiagram-v2
 - Metric collection
 
 #### Tools & Permissions
+
 - **Tools**: `route_request`, `manage_auth`, `enforce_limits`, `monitor_health`
 - **Permissions**: MCP server access
 - **MCP Servers**: All configured servers
 
 #### Performance Metrics
+
 - **Routing Latency**: ≤50ms
 - **Availability**: 99.99%
 - **Error Rate**: ≤0.01%
@@ -851,12 +953,14 @@ stateDiagram-v2
 **Status**: Active (Implicit)
 
 #### Persona
+
 - Master strategist
 - Ultimate decision maker
 - Conflict resolver
 - Human interface
 
 #### Primary Responsibilities
+
 - Top-level orchestration
 - Human command interpretation
 - Agent lifecycle management
@@ -864,6 +968,7 @@ stateDiagram-v2
 - System-wide optimization
 
 #### Technical Capabilities
+
 - Natural language understanding
 - Multi-agent coordination
 - Resource management
@@ -871,11 +976,13 @@ stateDiagram-v2
 - System monitoring
 
 #### Tools & Permissions
+
 - **Tools**: All agent control APIs
 - **Permissions**: Full system access
 - **MCP Servers**: All
 
 #### Performance Metrics
+
 - **Command Processing**: ≤2s
 - **Orchestration Efficiency**: ≥95%
 - **Conflict Resolution**: ≤30s
@@ -889,12 +996,14 @@ stateDiagram-v2
 **Status**: Active
 
 #### Persona
+
 - Risk assessor
 - Policy enforcer
 - Approval router
 - Change guardian
 
 #### Primary Responsibilities
+
 - Impact classification (FIL-0 to FIL-3)
 - Approval routing
 - Policy enforcement
@@ -902,6 +1011,7 @@ stateDiagram-v2
 - Compliance verification
 
 #### Technical Capabilities
+
 - Static analysis
 - Diff interpretation
 - Policy evaluation
@@ -909,23 +1019,25 @@ stateDiagram-v2
 - Approval workflow
 
 #### Tools & Permissions
+
 - **Tools**: `classify_change`, `route_approval`, `enforce_policy`, `assess_risk`
 - **Permissions**: Read all, block merges
 - **MCP Servers**: GitHub, policy engine
 
 #### Performance Metrics
+
 - **Classification Time**: ≤2s p95
 - **Accuracy**: ≥98%
 - **False Positive Rate**: ≤2%
 
 #### Classification Matrix
 
-| Level | Description | Approval Required | Examples |
-|-------|-------------|------------------|----------|
-| FIL-0 | No impact | None | Formatting, comments |
-| FIL-1 | Low impact | None | Variable renames, refactors |
-| FIL-2 | Medium impact | Tech Lead | New utilities, configs |
-| FIL-3 | High impact | Tech Lead + PM | APIs, migrations, UI |
+| Level | Description   | Approval Required | Examples                    |
+| ----- | ------------- | ----------------- | --------------------------- |
+| FIL-0 | No impact     | None              | Formatting, comments        |
+| FIL-1 | Low impact    | None              | Variable renames, refactors |
+| FIL-2 | Medium impact | Tech Lead         | New utilities, configs      |
+| FIL-3 | High impact   | Tech Lead + PM    | APIs, migrations, UI        |
 
 ---
 
@@ -936,12 +1048,14 @@ stateDiagram-v2
 **Status**: Active
 
 #### Persona
+
 - Data aggregator
 - Trend spotter
 - Performance tracker
 - Insight generator
 
 #### Primary Responsibilities
+
 - Metric collection
 - KPI tracking
 - Report generation
@@ -949,6 +1063,7 @@ stateDiagram-v2
 - Optimization recommendations
 
 #### Technical Capabilities
+
 - Time-series analysis
 - Statistical processing
 - Dashboard generation
@@ -956,16 +1071,19 @@ stateDiagram-v2
 - Predictive analytics
 
 #### Tools & Permissions
+
 - **Tools**: `collect_metrics`, `generate_dashboard`, `detect_anomalies`, `predict_trends`
 - **Permissions**: Read all metrics
 - **MCP Servers**: Monitoring platforms
 
 #### Performance Metrics
+
 - **Collection Interval**: 1 minute
 - **Dashboard Update**: Real-time
 - **Anomaly Detection**: ≤5 minute lag
 
 #### Key Metrics Tracked
+
 - Agent performance (latency, throughput)
 - System health (uptime, errors)
 - Business KPIs (velocity, quality)
@@ -978,13 +1096,13 @@ stateDiagram-v2
 
 ### Communication Patterns
 
-| From → To | AUDITOR | EXECUTOR | GUARDIAN | STRATEGIST | SCHOLAR |
-|-----------|---------|----------|----------|------------|---------|
-| **AUDITOR** | - | Tasks | Alerts | Reports | Patterns |
-| **EXECUTOR** | Queries | - | Tests | Status | Learning |
-| **GUARDIAN** | Issues | Rollback | - | Failures | Incidents |
-| **STRATEGIST** | Assign | Prioritize | Monitor | - | Insights |
-| **SCHOLAR** | Patterns | Training | Analysis | Metrics | - |
+| From → To      | AUDITOR  | EXECUTOR   | GUARDIAN | STRATEGIST | SCHOLAR   |
+| -------------- | -------- | ---------- | -------- | ---------- | --------- |
+| **AUDITOR**    | -        | Tasks      | Alerts   | Reports    | Patterns  |
+| **EXECUTOR**   | Queries  | -          | Tests    | Status     | Learning  |
+| **GUARDIAN**   | Issues   | Rollback   | -        | Failures   | Incidents |
+| **STRATEGIST** | Assign   | Prioritize | Monitor  | -          | Insights  |
+| **SCHOLAR**    | Patterns | Training   | Analysis | Metrics    | -         |
 
 ### Event Flow
 
@@ -1082,30 +1200,35 @@ graph TB
 ## Evolution Roadmap
 
 ### Phase 0: Foundation (Current)
+
 - ✅ Core 5 agents active
 - ✅ Basic Linear integration
 - ✅ Fix Pack implementation
 - ✅ TDD enforcement
 
 ### Phase 1: Expansion (Q1 2025)
+
 - [ ] GENESIS agent for project init
 - [ ] ONBOARDER for legacy projects
 - [ ] TDD_ORCHESTRATOR activation
 - [ ] Enhanced pattern learning
 
 ### Phase 2: Specialization (Q2 2025)
+
 - [ ] DOCUMENTARIAN activation
 - [ ] FRONTEND_SPECIALIST deployment
 - [ ] BACKEND_SPECIALIST deployment
 - [ ] STORYTELLER for requirements
 
 ### Phase 3: Intelligence (Q3 2025)
+
 - [ ] VISIONARY for alignment audits
 - [ ] FEEDBACK_ANALYST optimization
 - [ ] Advanced SCHOLAR patterns
 - [ ] Predictive capabilities
 
 ### Phase 4: Autonomy (Q4 2025)
+
 - [ ] Self-organizing agents
 - [ ] Automatic agent spawning
 - [ ] Cross-project learning
@@ -1155,6 +1278,7 @@ graph TB
 ## Best Practices
 
 ### Agent Communication
+
 1. Use structured JSON messages
 2. Include correlation IDs
 3. Implement timeouts
@@ -1162,6 +1286,7 @@ graph TB
 5. Log all interactions
 
 ### Task Management
+
 1. Atomic task definition
 2. Clear acceptance criteria
 3. Proper effort estimation
@@ -1169,6 +1294,7 @@ graph TB
 5. Dependency tracking
 
 ### Quality Assurance
+
 1. Enforce TDD cycle
 2. Maintain coverage thresholds
 3. Run mutation testing
@@ -1176,6 +1302,7 @@ graph TB
 5. Monitor rollback rates
 
 ### Performance Optimization
+
 1. Parallelize where possible
 2. Cache frequently accessed data
 3. Implement circuit breakers
@@ -1189,24 +1316,28 @@ graph TB
 ### Common Issues
 
 #### Agent Not Responding
+
 - Check agent health status
 - Verify MCP connections
 - Review recent errors
 - Restart if necessary
 
 #### Task Stuck in Queue
+
 - Check dependencies
 - Verify resource availability
 - Review priority settings
 - Manual intervention if needed
 
 #### Pipeline Failures
+
 - GUARDIAN auto-recovery first
 - Check logs for root cause
 - Manual fix if auto-recovery fails
 - Update patterns for future
 
 #### Sync Issues
+
 - Verify API credentials
 - Check rate limits
 - Review webhook configuration
@@ -1230,19 +1361,21 @@ graph TB
 ## References
 
 ### Internal Documentation
+
 - [CLAUDE.md](/CLAUDE.md) - System specifications
 - [Agent Workflow](.claude/docs/AGENT_WORKFLOW.md) - Detailed workflows
 - [PRD](docs/PRD.md) - Product requirements
 - [Coding Rules](docs/coding-rules.md) - Standards
 
 ### External Resources
+
 - [Linear API Documentation](https://developers.linear.app)
 - [GitHub API Reference](https://docs.github.com/en/rest)
 - [MCP Specification](https://modelcontextprotocol.org)
 
 ---
 
-*This document serves as the authoritative reference for all AI agents within the Linear TDD Workflow System. It will be updated as new agents are added and capabilities evolve.*
+_This document serves as the authoritative reference for all AI agents within the Linear TDD Workflow System. It will be updated as new agents are added and capabilities evolve._
 
 **Maintained by**: Engineering Excellence Team
 **Review Frequency**: Monthly
