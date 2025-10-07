@@ -49,8 +49,11 @@ jobs:
         run: |
           commits=$(git log --format=%s origin/${{ github.base_ref }}..HEAD)
           while IFS= read -r commit; do
-            # Skip merge commits (e.g., "Merge abc123 into def456")
-            if echo "$commit" | grep -qE '^Merge [0-9a-f]+ into [0-9a-f]+$'; then
+            # Skip merge commits (multiple formats)
+            # - "Merge abc123 into def456" (GitHub auto-merge)
+            # - "Merge branch 'X' into Y"
+            # - "Merge pull request #N from..."
+            if echo "$commit" | grep -qE '^Merge '; then
               echo "Skipping merge commit: $commit"
               continue
             fi
