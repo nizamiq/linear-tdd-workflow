@@ -14,7 +14,7 @@ const path = require('path');
 function parseArgs() {
   const args = process.argv.slice(2);
   const options = {
-    format: 'text'
+    format: 'text',
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -31,11 +31,11 @@ function generateRecommendations(format) {
   const recommendations = [
     'Pattern learning system is in development',
     'Currently operating in stub mode for CI/CD compatibility',
-    'No active recommendations at this time'
+    'No active recommendations at this time',
   ];
 
   if (format === 'markdown') {
-    return recommendations.map(r => `- ${r}`).join('\n');
+    return recommendations.map((r) => `- ${r}`).join('\n');
   } else if (format === 'json') {
     return JSON.stringify({ recommendations }, null, 2);
   } else {

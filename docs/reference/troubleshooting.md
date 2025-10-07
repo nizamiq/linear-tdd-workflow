@@ -9,12 +9,14 @@ This guide helps you resolve common issues with the Linear TDD Workflow System.
 #### Problem: npm install fails with permission errors
 
 **Symptoms**:
+
 ```
 npm ERR! code EACCES
 npm ERR! syscall access
 ```
 
 **Solution**:
+
 1. Clear npm cache:
    ```bash
    npm cache clean --force
@@ -36,12 +38,15 @@ npm ERR! syscall access
 #### Problem: GitFlow commands not found
 
 **Symptoms**:
+
 ```bash
 git: 'flow' is not a git command
 ```
 
 **Solution**:
+
 1. Install git-flow:
+
    ```bash
    # macOS
    brew install git-flow-avh
@@ -65,13 +70,16 @@ git: 'flow' is not a git command
 #### Problem: Linear API connection fails
 
 **Symptoms**:
+
 ```
 Error: Failed to connect to Linear API
 401 Unauthorized
 ```
 
 **Solution**:
+
 1. Verify API key in `.env`:
+
    ```bash
    LINEAR_API_KEY=lin_api_xxxxxxxxxxxx
    ```
@@ -90,11 +98,14 @@ Error: Failed to connect to Linear API
 #### Problem: Linear tasks not syncing
 
 **Symptoms**:
+
 - Tasks created locally don't appear in Linear
 - Status updates not reflected
 
 **Solution**:
+
 1. Check team and project IDs:
+
    ```bash
    LINEAR_TEAM_ID=your_team_uuid
    LINEAR_PROJECT_ID=your_project_uuid
@@ -118,12 +129,15 @@ Error: Failed to connect to Linear API
 #### Problem: Tests fail with coverage below threshold
 
 **Symptoms**:
+
 ```
 Jest: "global" coverage threshold for lines (80%) not met: 75.5%
 ```
 
 **Solution**:
+
 1. Check which files lack coverage:
+
    ```bash
    npm test -- --coverage --coverageReporters=text
    ```
@@ -145,16 +159,19 @@ Jest: "global" coverage threshold for lines (80%) not met: 75.5%
 #### Problem: Mutation tests timeout
 
 **Symptoms**:
+
 ```
 Stryker timeout: Test run timed out
 ```
 
 **Solution**:
+
 1. Increase timeout in `stryker.conf.js`:
+
    ```javascript
    module.exports = {
-     timeoutMS: 10000,  // Increase from default 5000
-     timeoutFactor: 2    // Multiply timeout by 2
+     timeoutMS: 10000, // Increase from default 5000
+     timeoutFactor: 2, // Multiply timeout by 2
    };
    ```
 
@@ -170,16 +187,20 @@ Stryker timeout: Test run timed out
 #### Problem: AUDITOR agent takes too long
 
 **Symptoms**:
+
 - Assessment exceeds 15-minute timeout
 - Process hangs during scanning
 
 **Solution**:
+
 1. Run incremental scan instead:
+
    ```bash
    npm run assess:incremental
    ```
 
 2. Limit scope to specific directories:
+
    ```bash
    npm run assess -- --path src/services
    ```
@@ -191,20 +212,24 @@ Stryker timeout: Test run timed out
 #### Problem: EXECUTOR creates PRs with failing tests
 
 **Symptoms**:
+
 - PR created but CI fails
 - Tests pass locally but fail in CI
 
 **Solution**:
+
 1. Ensure environment parity:
+
    ```bash
    # Run tests in CI mode locally
    npm run test:ci
    ```
 
 2. Check for timing issues:
+
    ```javascript
    // Add explicit waits in tests
-   await new Promise(resolve => setTimeout(resolve, 100));
+   await new Promise((resolve) => setTimeout(resolve, 100));
    ```
 
 3. Verify all dependencies are committed:
@@ -220,12 +245,15 @@ Stryker timeout: Test run timed out
 #### Problem: GitHub Actions workflow fails
 
 **Symptoms**:
+
 ```
 Error: Process completed with exit code 1
 ```
 
 **Solution**:
+
 1. Check workflow syntax:
+
    ```bash
    # Validate workflow files
    npm install -g @action-validator/cli
@@ -248,11 +276,14 @@ Error: Process completed with exit code 1
 #### Problem: GUARDIAN doesn't auto-recover pipeline
 
 **Symptoms**:
+
 - Pipeline failures not detected
 - Recovery attempts fail
 
 **Solution**:
+
 1. Check GUARDIAN agent status:
+
    ```bash
    npm run agents:status
    ```
@@ -273,11 +304,14 @@ Error: Process completed with exit code 1
 #### Problem: System runs slowly
 
 **Symptoms**:
+
 - Commands take excessive time
 - High CPU/memory usage
 
 **Solution**:
+
 1. Check resource usage:
+
    ```bash
    # macOS/Linux
    top -p $(pgrep -f "node")
@@ -287,6 +321,7 @@ Error: Process completed with exit code 1
    ```
 
 2. Clear caches:
+
    ```bash
    npm cache clean --force
    rm -rf node_modules
@@ -349,18 +384,18 @@ npm run monitor:agents
 
 ## 📊 Error Codes Reference
 
-| Code | Description | Solution |
-|------|-------------|----------|
-| E001 | Invalid configuration | Check .env file |
-| E002 | API authentication failed | Verify API keys |
-| E003 | Repository access denied | Check permissions |
-| E004 | Test coverage below threshold | Add more tests |
-| E005 | Mutation score too low | Improve test quality |
-| E006 | Pipeline timeout | Optimize long-running tasks |
-| E007 | Agent communication failure | Check agent status |
-| E008 | Linear sync failed | Verify Linear configuration |
-| E009 | GitFlow not initialized | Run `git flow init` |
-| E010 | Invalid Fix Pack | Review Fix Pack constraints |
+| Code | Description                   | Solution                    |
+| ---- | ----------------------------- | --------------------------- |
+| E001 | Invalid configuration         | Check .env file             |
+| E002 | API authentication failed     | Verify API keys             |
+| E003 | Repository access denied      | Check permissions           |
+| E004 | Test coverage below threshold | Add more tests              |
+| E005 | Mutation score too low        | Improve test quality        |
+| E006 | Pipeline timeout              | Optimize long-running tasks |
+| E007 | Agent communication failure   | Check agent status          |
+| E008 | Linear sync failed            | Verify Linear configuration |
+| E009 | GitFlow not initialized       | Run `git flow init`         |
+| E010 | Invalid Fix Pack              | Review Fix Pack constraints |
 
 ---
 
@@ -369,6 +404,7 @@ npm run monitor:agents
 If you can't resolve an issue:
 
 1. **Search existing issues**:
+
    ```bash
    gh issue list --search "your error message"
    ```
@@ -379,6 +415,7 @@ If you can't resolve an issue:
    - [Agent Specs](../../.claude/agents/)
 
 3. **Create detailed issue**:
+
    ```bash
    gh issue create --title "Brief description" \
                    --body "Full error details"
@@ -422,5 +459,5 @@ npm run debug:report > debug-report.txt
 
 ---
 
-*Last updated: 2024*
-*Version: 1.2.0*
+_Last updated: 2024_
+_Version: 1.2.0_

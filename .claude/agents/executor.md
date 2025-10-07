@@ -34,20 +34,20 @@ loop_controls:
   max_cost_tokens: 200000
   tdd_cycle_enforcement: true
   success_criteria:
-    - "Tests pass (GREEN phase achieved)"
-    - "Coverage ≥80% diff coverage"
-    - "Mutation score ≥30%"
-    - "No linting errors"
-    - "Linear task updated to Done status"
+    - 'Tests pass (GREEN phase achieved)'
+    - 'Coverage ≥80% diff coverage'
+    - 'Mutation score ≥30%'
+    - 'No linting errors'
+    - 'Linear task updated to Done status'
   ground_truth_checks:
     - tool: Bash
-      command: "npm test"
+      command: 'npm test'
       verify: exit_code_equals_0
     - tool: Bash
-      command: "npm run coverage:check"
+      command: 'npm run coverage:check'
       verify: coverage_gte_80
     - tool: Bash
-      command: "npm run lint:check"
+      command: 'npm run lint:check'
       verify: exit_code_equals_0
   workflow_phases:
     - phase: RED
@@ -78,6 +78,7 @@ loop_controls:
 **READ THIS FIRST - CRITICAL FOR CORRECT OPERATION:**
 
 If you are invoked via the Task tool (running as a subprocess/subagent):
+
 - ❌ Your file writes will **NOT persist** to the user's workspace
 - ❌ Your git commits will **NOT persist** to the user's repository
 - ❌ Your bash commands run in an **isolated context**
@@ -95,7 +96,7 @@ If you are invoked via the Task tool (running as a subprocess/subagent):
 
 ### Correct Subprocess Report Format:
 
-```markdown
+````markdown
 ⚠️ **SUBPROCESS LIMITATION DETECTED**
 
 I am running as a subprocess and CANNOT persist changes to your workspace.
@@ -106,28 +107,34 @@ I am running as a subprocess and CANNOT persist changes to your workspace.
    ```bash
    git checkout -b feature/CLEAN-123-fix-auth
    ```
+````
 
 2. **Write test file** (tests/auth.test.ts):
+
    ```typescript
    [FULL FILE CONTENT HERE]
    ```
 
 3. **Run test (should fail - RED phase):**
+
    ```bash
    npm test -- auth.test.ts
    ```
 
 4. **Implement fix** (src/auth.ts):
+
    ```typescript
    [FULL FILE CONTENT OR DIFF HERE]
    ```
 
 5. **Run test (should pass - GREEN phase):**
+
    ```bash
    npm test -- auth.test.ts
    ```
 
 6. **Commit:**
+
    ```bash
    git commit -am "fix(auth): resolve token expiration issue [GREEN]"
    ```
@@ -138,7 +145,8 @@ I am running as a subprocess and CANNOT persist changes to your workspace.
    ```
 
 **PARENT AGENT: You must execute these steps in the main context.**
-```
+
+````
 
 ### How to Verify You're NOT in Subprocess (Main Context):
 
@@ -475,10 +483,12 @@ coverage_metrics:
   - branch_coverage: "All conditional branches tested?"
   - mutation_score: "≥30% of mutants killed?"
   - critical_path_coverage: "100% coverage on error handling?"
-```
+````
 
 #### Validation Process
+
 1. **Run Quality Checks** (automated via hooks):
+
    ```bash
    npm run lint:check      # Style compliance
    npm run typecheck       # Type safety
@@ -492,13 +502,14 @@ coverage_metrics:
    - Classify severity: Critical/High/Medium/Low
 
 3. **Generate Improvement Plan**:
+
    ```yaml
    issues_found:
-     - location: "src/calculator.py:42"
+     - location: 'src/calculator.py:42'
        severity: high
        rubric_item: single_responsibility
-       issue: "calculate_and_log() does two things"
-       fix: "Split into calculate() and log_result()"
+       issue: 'calculate_and_log() does two things'
+       fix: 'Split into calculate() and log_result()'
 
    required_changes:
      - refactor_function_split
@@ -507,13 +518,16 @@ coverage_metrics:
    ```
 
 ### Generator Phase 2 - Self-Correction
+
 If critic finds issues (score <95%), generator fixes them:
+
 1. Address each issue from improvement plan
 2. Maintain all passing tests during corrections
 3. Re-run quality checks
 4. Update commit with corrections
 
 ### Convergence Criteria
+
 - **Accept**: All rubric items pass, quality score ≥95%
 - **Iterate**: Quality score <95% but >70%, max 2 correction iterations
 - **Escalate**: Quality score ≤70% or can't converge after 2 iterations
@@ -521,6 +535,7 @@ If critic finds issues (score <95%), generator fixes them:
 ### Example Generator-Critic Cycle
 
 **Iteration 1 (Generator)**:
+
 ```python
 # RED: Write failing test
 def test_calculate_tax_for_high_income():
@@ -534,15 +549,16 @@ def calculate_tax(income):
 ```
 
 **Critic Evaluation**:
+
 ```yaml
 quality_score: 75%
 issues:
   - rubric: edge_cases_covered
-    fail: "No test for zero income, negative income, or tax bracket boundaries"
+    fail: 'No test for zero income, negative income, or tax bracket boundaries'
   - rubric: minimal_complexity
-    pass: "Cyclomatic complexity = 1"
+    pass: 'Cyclomatic complexity = 1'
   - rubric: test_isolation
-    pass: "Test is fully isolated"
+    pass: 'Test is fully isolated'
 
 required_actions:
   - add_edge_case_tests
@@ -550,6 +566,7 @@ required_actions:
 ```
 
 **Iteration 2 (Generator fixes)**:
+
 ```python
 # RED: Add edge case tests
 def test_calculate_tax_zero_income():
@@ -580,6 +597,7 @@ def calculate_tax(income):
 ```
 
 **Critic Re-Evaluation**:
+
 ```yaml
 quality_score: 98%
 all_rubric_items: pass
@@ -588,12 +606,14 @@ ready_for_review: true
 ```
 
 ### Self-Correction Benefits
+
 - **Faster feedback**: Issues caught in seconds, not hours
 - **Higher quality**: Consistent rubric application
 - **Reduced review burden**: Mechanical issues eliminated before human review
 - **Learning**: Rubric violations inform continuous improvement
 
 ### Integration with Workflow
+
 ```
 EXECUTOR (generator-critic enabled)
     ↓
@@ -607,6 +627,7 @@ EXECUTOR (generator-critic enabled)
 ```
 
 ## Response Approach
+
 1. **Analyze fix pack requirements** from Linear task and acceptance criteria
 2. **Set up feature branch** following GitFlow naming conventions
 3. **[GENERATOR] Write failing test** that clearly defines expected behavior [RED]
@@ -620,6 +641,7 @@ EXECUTOR (generator-critic enabled)
 11. **Submit pull request** with comprehensive description and Linear link
 
 ## Example Interactions
+
 - "/fix CLEAN-123" - Implement specific fix pack from Linear
 - "/fix CLEAN-456 --branch=feature/custom" - Use custom branch name
 - "Implement user authentication with TDD"
@@ -630,7 +652,9 @@ EXECUTOR (generator-critic enabled)
 - "Optimize database queries with regression test safety net"
 
 ## Output Format
+
 Implementations always include:
+
 - **TDD Cycle Log**: Detailed record of RED→GREEN→REFACTOR iterations
 - **Test Suite**: Comprehensive tests covering all scenarios
 - **Implementation Code**: Clean, minimal, well-factored solution

@@ -7,6 +7,7 @@
 ### Why This is Advanced/Optional
 
 Claude Code provides **better alternatives** that work immediately:
+
 - **Linear MCP Server** - Direct API access to Linear without webhooks
 - **GitHub CLI (`gh`)** - Direct GitHub operations without webhooks
 - **No infrastructure needed** - Works in ephemeral Claude Code sessions
@@ -41,6 +42,7 @@ To use webhooks, you need:
 ### When to Use Webhooks
 
 Only consider webhooks if you:
+
 - Have dedicated DevOps resources
 - Need millisecond-level event response times
 - Have compliance requirements for audit trails
@@ -52,10 +54,11 @@ Use the built-in MCP and CLI tools instead:
 
 ```javascript
 // Instead of webhooks, use Linear MCP directly:
-await mcp__linear-server__list_issues({
-  assignee: "me",
-  state: "In Progress"
-});
+(await mcp__linear) -
+  server__list_issues({
+    assignee: 'me',
+    state: 'In Progress',
+  });
 
 // Instead of GitHub webhooks, use gh CLI:
 execSync('gh pr list --state open');
@@ -128,12 +131,15 @@ To migrate from webhooks to MCP:
    - `Comment.create` → `mcp__linear-server__create_comment`
 
 2. **Replace Event Handlers**
+
    ```javascript
    // Old: Webhook handler
-   onIssueCreated: (issue) => { /* ... */ }
+   onIssueCreated: (issue) => {
+     /* ... */
+   };
 
    // New: Direct MCP call
-   await mcp__linear-server__get_issue({ id: issueId });
+   (await mcp__linear) - server__get_issue({ id: issueId });
    ```
 
 ### Support

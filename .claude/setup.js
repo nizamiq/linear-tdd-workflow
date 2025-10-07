@@ -18,7 +18,7 @@ const colors = {
   red: (text) => `\x1b[31m${text}\x1b[0m`,
   yellow: (text) => `\x1b[33m${text}\x1b[0m`,
   cyan: (text) => `\x1b[36m${text}\x1b[0m`,
-  bold: (text) => `\x1b[1m${text}\x1b[0m`
+  bold: (text) => `\x1b[1m${text}\x1b[0m`,
 };
 
 class Setup {
@@ -61,9 +61,8 @@ class Setup {
       // Create marker file
       await fs.writeFile(
         path.join(this.projectRoot, '.claude-installed'),
-        `Claude Code Workflow System v2.0\nInstalled: ${new Date().toISOString()}\n`
+        `Claude Code Workflow System v2.0\nInstalled: ${new Date().toISOString()}\n`,
       );
-
     } catch (error) {
       console.error(colors.red(`Setup failed: ${error.message}`));
       process.exit(1);
@@ -83,7 +82,7 @@ class Setup {
   async checkAgents() {
     const agentDir = path.join(this.claudeDir, 'agents');
     const files = await fs.readdir(agentDir);
-    const mdAgents = files.filter(f => f.endsWith('.md'));
+    const mdAgents = files.filter((f) => f.endsWith('.md'));
 
     if (mdAgents.length === 0) {
       console.error(colors.red('✗') + ' No agent files found');
@@ -94,7 +93,7 @@ class Setup {
 
     // Verify core agents exist
     const coreAgents = ['auditor.md', 'executor.md', 'guardian.md', 'strategist.md', 'scholar.md'];
-    const missingCore = coreAgents.filter(agent => !mdAgents.includes(agent));
+    const missingCore = coreAgents.filter((agent) => !mdAgents.includes(agent));
 
     if (missingCore.length > 0) {
       console.warn(colors.yellow('⚠') + ` Missing core agents: ${missingCore.join(', ')}`);
@@ -104,7 +103,7 @@ class Setup {
   async checkCommands() {
     const commandDir = path.join(this.claudeDir, 'commands');
     const files = await fs.readdir(commandDir);
-    const mdCommands = files.filter(f => f.endsWith('.md') && !f.includes('README'));
+    const mdCommands = files.filter((f) => f.endsWith('.md') && !f.includes('README'));
 
     if (mdCommands.length === 0) {
       console.error(colors.red('✗') + ' No command files found');
@@ -114,8 +113,15 @@ class Setup {
     console.log(colors.green('✓') + ` ${mdCommands.length} slash commands configured`);
 
     // Verify core commands exist
-    const coreCommands = ['assess.md', 'fix.md', 'recover.md', 'learn.md', 'release.md', 'status.md'];
-    const missingCommands = coreCommands.filter(cmd => !mdCommands.includes(cmd));
+    const coreCommands = [
+      'assess.md',
+      'fix.md',
+      'recover.md',
+      'learn.md',
+      'release.md',
+      'status.md',
+    ];
+    const missingCommands = coreCommands.filter((cmd) => !mdCommands.includes(cmd));
 
     if (missingCommands.length > 0) {
       console.warn(colors.yellow('⚠') + ` Missing core commands: ${missingCommands.join(', ')}`);
@@ -192,12 +198,14 @@ NODE_ENV=development
 
       // Check for required dependencies
       const required = ['commander', 'dotenv'];
-      const missing = required.filter(dep =>
-        !packageJson.dependencies?.[dep] && !packageJson.devDependencies?.[dep]
+      const missing = required.filter(
+        (dep) => !packageJson.dependencies?.[dep] && !packageJson.devDependencies?.[dep],
       );
 
       if (missing.length > 0) {
-        console.log(colors.yellow('⚠') + ` Installing missing dependencies: ${missing.join(', ')}`);
+        console.log(
+          colors.yellow('⚠') + ` Installing missing dependencies: ${missing.join(', ')}`,
+        );
         execSync(`npm install ${missing.join(' ')}`, { stdio: 'inherit' });
       }
 
@@ -211,7 +219,7 @@ NODE_ENV=development
 // Run setup
 if (require.main === module) {
   const setup = new Setup();
-  setup.run().catch(error => {
+  setup.run().catch((error) => {
     console.error(colors.red(`Setup failed: ${error.message}`));
     process.exit(1);
   });

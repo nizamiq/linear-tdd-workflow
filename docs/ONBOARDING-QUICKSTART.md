@@ -23,6 +23,7 @@ make onboard
 ```
 
 **The onboarding journey automatically:**
+
 - ✅ Detects project type (Python/JS/TS)
 - ✅ Validates prerequisites
 - ✅ Initializes GitFlow
@@ -46,6 +47,7 @@ make onboard
 ```
 
 **The system will:**
+
 - Auto-detect your project type
 - Preserve existing structure
 - Enhance with TDD workflow
@@ -76,6 +78,7 @@ make help              # Show all commands
 ## 🎯 First TDD Cycle
 
 ### 1. Write Failing Test (RED)
+
 ```bash
 # JavaScript/TypeScript
 echo 'import { add } from "../src/math"; test("add", () => expect(add(2, 3)).toBe(5));' > tests/math.test.js
@@ -85,11 +88,13 @@ echo 'from src.math import add\ndef test_add(): assert add(2, 3) == 5' > tests/t
 ```
 
 ### 2. Run Tests (Should Fail)
+
 ```bash
 make test  # RED phase - test should fail
 ```
 
 ### 3. Write Minimal Code (GREEN)
+
 ```bash
 # JavaScript/TypeScript
 mkdir -p src && echo 'export const add = (a, b) => a + b;' > src/math.js
@@ -99,11 +104,13 @@ mkdir -p src && echo 'def add(a, b): return a + b' > src/math.py
 ```
 
 ### 4. Verify Tests Pass
+
 ```bash
 make test  # GREEN phase - test should pass
 ```
 
 ### 5. Refactor (if needed)
+
 ```bash
 # Improve code while keeping tests green
 make test  # Ensure tests still pass after refactoring
@@ -130,14 +137,14 @@ npm run agent:invoke GUARDIAN:analyze-failure -- --auto-fix
 
 The system operates through 6 autonomous journeys:
 
-| Journey | Purpose | Command |
-|---------|---------|---------|
-| **JR-1** | Automatic onboarding | `make onboard` |
-| **JR-2** | Code assessment | `make assess` |
-| **JR-3** | Fix implementation | `make fix-pack` |
-| **JR-4** | CI/CD recovery | `make ci-recovery` |
-| **JR-5** | Pattern mining | `make pattern-mining` |
-| **JR-6** | Release management | `make release` |
+| Journey  | Purpose              | Command               |
+| -------- | -------------------- | --------------------- |
+| **JR-1** | Automatic onboarding | `make onboard`        |
+| **JR-2** | Code assessment      | `make assess`         |
+| **JR-3** | Fix implementation   | `make fix-pack`       |
+| **JR-4** | CI/CD recovery       | `make ci-recovery`    |
+| **JR-5** | Pattern mining       | `make pattern-mining` |
+| **JR-6** | Release management   | `make release`        |
 
 Each journey combines multiple agents with decision engines for autonomous operation.
 
@@ -158,6 +165,7 @@ make validate-tdd
 ## 🔧 Language-Specific Setup
 
 ### JavaScript/TypeScript
+
 ```bash
 node .claude/setup.js --language typescript
 make test-js
@@ -165,6 +173,7 @@ make lint-js
 ```
 
 ### Python
+
 ```bash
 node .claude/setup.js --language python
 make test-py
@@ -172,6 +181,7 @@ make lint-py
 ```
 
 ### Polyglot (JS + Python)
+
 ```bash
 node .claude/setup.js --language javascript,python
 make test      # Tests both languages

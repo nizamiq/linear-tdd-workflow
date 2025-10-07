@@ -36,7 +36,7 @@ class LinearMCPIntegration {
         project: this.config.projectId,
         priority: this.mapPriorityToLinear(issueData.priority),
         labels: issueData.labels || [],
-        assignee: issueData.assignee
+        assignee: issueData.assignee,
       });
 
       console.log(`✅ Created Linear issue via MCP: ${result.identifier} - ${result.title}`);
@@ -46,14 +46,13 @@ class LinearMCPIntegration {
         identifier: result.identifier,
         title: result.title,
         url: result.url,
-        success: true
+        success: true,
       };
-
     } catch (error) {
       console.error('❌ Failed to create Linear issue via MCP:', error.message);
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -70,14 +69,14 @@ class LinearMCPIntegration {
       // Update issue status via MCP
       const result = await this.callMCPLinear('update_issue', {
         id: issueId,
-        state: status
+        state: status,
       });
 
       // Add comment if provided
       if (comment) {
         await this.callMCPLinear('create_comment', {
           issueId: issueId,
-          body: `${comment}\n\n---\n🤖 Automated comment from Claude Agentic Workflow System`
+          body: `${comment}\n\n---\n🤖 Automated comment from Claude Agentic Workflow System`,
         });
       }
 
@@ -87,14 +86,13 @@ class LinearMCPIntegration {
         success: true,
         issueId: result.id,
         identifier: result.identifier,
-        newState: status
+        newState: status,
       };
-
     } catch (error) {
       console.error('❌ Failed to update Linear issue via MCP:', error.message);
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -112,31 +110,30 @@ class LinearMCPIntegration {
       const result = await this.callMCPLinear('list_issues', {
         team: this.config.teamId,
         assignee: assignee,
-        includeArchived: false
+        includeArchived: false,
       });
 
       console.log(`📋 Retrieved ${result.length} issues for ${assignee} via MCP`);
 
       return {
         success: true,
-        issues: result.map(issue => ({
+        issues: result.map((issue) => ({
           id: issue.id,
           identifier: issue.identifier,
           title: issue.title,
           description: issue.description,
           status: issue.state?.name,
           priority: issue.priority,
-          labels: issue.labels?.map(label => label.name) || [],
-          url: issue.url
-        }))
+          labels: issue.labels?.map((label) => label.name) || [],
+          url: issue.url,
+        })),
       };
-
     } catch (error) {
       console.error('❌ Failed to get agent issues via MCP:', error.message);
       return {
         success: false,
         error: error.message,
-        issues: []
+        issues: [],
       };
     }
   }
@@ -151,26 +148,37 @@ class LinearMCPIntegration {
 
     try {
       // Check if we have access to MCP Linear tools
-      if (typeof mcp__linear_server__create_issue !== 'undefined' && functionName === 'create_issue') {
+      if (
+        typeof mcp__linear_server__create_issue !== 'undefined' &&
+        functionName === 'create_issue'
+      ) {
         return await mcp__linear_server__create_issue(parameters);
       }
 
-      if (typeof mcp__linear_server__update_issue !== 'undefined' && functionName === 'update_issue') {
+      if (
+        typeof mcp__linear_server__update_issue !== 'undefined' &&
+        functionName === 'update_issue'
+      ) {
         return await mcp__linear_server__update_issue(parameters);
       }
 
-      if (typeof mcp__linear_server__list_issues !== 'undefined' && functionName === 'list_issues') {
+      if (
+        typeof mcp__linear_server__list_issues !== 'undefined' &&
+        functionName === 'list_issues'
+      ) {
         return await mcp__linear_server__list_issues(parameters);
       }
 
-      if (typeof mcp__linear_server__create_comment !== 'undefined' && functionName === 'create_comment') {
+      if (
+        typeof mcp__linear_server__create_comment !== 'undefined' &&
+        functionName === 'create_comment'
+      ) {
         return await mcp__linear_server__create_comment(parameters);
       }
 
       // Fallback: simulate MCP call for development
       console.log(`🔗 MCP Linear call: ${functionName}`, parameters);
       return this.simulateMCPCall(functionName, parameters);
-
     } catch (error) {
       console.error(`❌ MCP Linear call failed: ${functionName}`, error.message);
       throw error;
@@ -187,14 +195,14 @@ class LinearMCPIntegration {
           id: `mcp-issue-${Date.now()}`,
           identifier: `CLEAN-${Math.floor(Math.random() * 1000)}`,
           title: parameters.title,
-          url: `https://linear.app/${parameters.team}/issue/CLEAN-${Math.floor(Math.random() * 1000)}`
+          url: `https://linear.app/${parameters.team}/issue/CLEAN-${Math.floor(Math.random() * 1000)}`,
         };
 
       case 'update_issue':
         return {
           id: parameters.id,
           identifier: 'CLEAN-123',
-          state: { name: parameters.state }
+          state: { name: parameters.state },
         };
 
       case 'list_issues':
@@ -207,14 +215,14 @@ class LinearMCPIntegration {
             state: { name: 'In Progress' },
             priority: 2,
             labels: [{ name: 'automated' }],
-            url: 'https://linear.app/a-coders/issue/CLEAN-001'
-          }
+            url: 'https://linear.app/a-coders/issue/CLEAN-001',
+          },
         ];
 
       case 'create_comment':
         return {
           id: `mcp-comment-${Date.now()}`,
-          body: parameters.body
+          body: parameters.body,
         };
 
       default:
@@ -231,7 +239,7 @@ class LinearMCPIntegration {
       description: this.generateIssueDescription(finding),
       priority: this.mapSeverityToPriority(finding.severity),
       labels: [finding.type, finding.category, 'automated'].filter(Boolean),
-      assignee: 'EXECUTOR'
+      assignee: 'EXECUTOR',
     };
 
     return await this.createIssue(issueData);
@@ -246,7 +254,7 @@ class LinearMCPIntegration {
     const results = {
       created: [],
       failed: [],
-      total: findings.length
+      total: findings.length,
     };
 
     // Process findings in batches to be respectful to Linear API
@@ -271,11 +279,13 @@ class LinearMCPIntegration {
 
       // Delay between batches
       if (i + batchSize < findings.length) {
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        await new Promise((resolve) => setTimeout(resolve, 1500));
       }
     }
 
-    console.log(`✅ Linear MCP task creation complete: ${results.created.length} created, ${results.failed.length} failed`);
+    console.log(
+      `✅ Linear MCP task creation complete: ${results.created.length} created, ${results.failed.length} failed`,
+    );
 
     return results;
   }
@@ -297,12 +307,16 @@ class LinearMCPIntegration {
       // Update issue statuses based on work result
       for (const issue of activeIssues) {
         if (workResult.completedTasks?.includes(issue.identifier)) {
-          await this.updateIssueStatus(issue.id, 'Done',
-            `Task completed by ${agentName}.\n\nWork summary:\n${JSON.stringify(workResult, null, 2)}`
+          await this.updateIssueStatus(
+            issue.id,
+            'Done',
+            `Task completed by ${agentName}.\n\nWork summary:\n${JSON.stringify(workResult, null, 2)}`,
           );
         } else if (workResult.inProgressTasks?.includes(issue.identifier)) {
-          await this.updateIssueStatus(issue.id, 'In Progress',
-            `Work in progress by ${agentName}.\n\nCurrent status:\n${JSON.stringify(workResult, null, 2)}`
+          await this.updateIssueStatus(
+            issue.id,
+            'In Progress',
+            `Work in progress by ${agentName}.\n\nCurrent status:\n${JSON.stringify(workResult, null, 2)}`,
           );
         }
       }
@@ -310,14 +324,13 @@ class LinearMCPIntegration {
       return {
         success: true,
         synced: activeIssues.length,
-        method: 'MCP Linear'
+        method: 'MCP Linear',
       };
-
     } catch (error) {
       console.error(`❌ Failed to sync ${agentName} work via MCP:`, error.message);
       return {
         success: false,
-        error: error.message
+        error: error.message,
       };
     }
   }
@@ -327,10 +340,10 @@ class LinearMCPIntegration {
    */
   mapPriorityToLinear(priority) {
     const priorityMap = {
-      'low': 4,
-      'medium': 3,
-      'high': 2,
-      'urgent': 1
+      low: 4,
+      medium: 3,
+      high: 2,
+      urgent: 1,
     };
 
     return priorityMap[priority] || 4;
@@ -341,10 +354,10 @@ class LinearMCPIntegration {
    */
   mapSeverityToPriority(severity) {
     const severityMap = {
-      'critical': 'urgent',
-      'high': 'high',
-      'medium': 'medium',
-      'low': 'low'
+      critical: 'urgent',
+      high: 'high',
+      medium: 'medium',
+      low: 'low',
     };
 
     return severityMap[severity] || 'low';
@@ -406,7 +419,7 @@ class LinearMCPIntegration {
       identifier: `CLEAN-${Math.floor(Math.random() * 1000)}`,
       title: issueData.title,
       url: `https://linear.app/mock/issue/CLEAN-${Math.floor(Math.random() * 1000)}`,
-      success: true
+      success: true,
     };
 
     console.log(`🎭 Mock MCP: Created issue ${mockIssue.identifier}`);
@@ -418,7 +431,7 @@ class LinearMCPIntegration {
       success: true,
       issueId: issueId,
       identifier: 'CLEAN-MOCK',
-      newState: status
+      newState: status,
     };
 
     console.log(`🎭 Mock MCP: Updated issue ${issueId} to ${status}`);
@@ -435,15 +448,15 @@ class LinearMCPIntegration {
         status: 'In Progress',
         priority: 2,
         labels: ['mock', 'automated'],
-        url: 'https://linear.app/mock/issue/CLEAN-001'
-      }
+        url: 'https://linear.app/mock/issue/CLEAN-001',
+      },
     ];
 
     console.log(`🎭 Mock MCP: Retrieved ${mockIssues.length} issues for ${assignee}`);
 
     return Promise.resolve({
       success: true,
-      issues: mockIssues
+      issues: mockIssues,
     });
   }
 }

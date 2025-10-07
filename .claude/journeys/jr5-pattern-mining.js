@@ -22,7 +22,7 @@ class PatternMiningJourney {
       extracted: [],
       validated: [],
       applied: [],
-      metrics: {}
+      metrics: {},
     };
   }
 
@@ -57,7 +57,6 @@ class PatternMiningJourney {
 
       console.log('✅ Pattern mining complete!');
       return this.results;
-
     } catch (error) {
       console.error('❌ Pattern mining failed:', error.message);
       throw error;
@@ -75,13 +74,10 @@ class PatternMiningJourney {
       pullRequests: await this.collectPullRequests(),
       fixes: await this.collectFixPacks(),
       tests: await this.collectTestPatterns(),
-      reviews: await this.collectReviews()
+      reviews: await this.collectReviews(),
     };
 
-    const totalItems =
-      sources.commits.length +
-      sources.pullRequests.length +
-      sources.fixes.length;
+    const totalItems = sources.commits.length + sources.pullRequests.length + sources.fixes.length;
 
     console.log(`   📦 Collected ${totalItems} data points:`);
     console.log(`      - Commits: ${sources.commits.length}`);
@@ -101,13 +97,16 @@ class PatternMiningJourney {
       const since = this.calculateSinceDate(period);
       const log = execSync(
         `git log --since="${since}" --pretty=format:'%H|%s|%b|%an|%ad' --date=iso`,
-        { encoding: 'utf8' }
+        { encoding: 'utf8' },
       );
 
-      return log.split('\n').filter(l => l).map(line => {
-        const [hash, subject, body, author, date] = line.split('|');
-        return { hash, subject, body, author, date };
-      });
+      return log
+        .split('\n')
+        .filter((l) => l)
+        .map((line) => {
+          const [hash, subject, body, author, date] = line.split('|');
+          return { hash, subject, body, author, date };
+        });
     } catch {
       return [];
     }
@@ -120,7 +119,7 @@ class PatternMiningJourney {
     try {
       const prs = execSync(
         'gh pr list --state merged --limit 20 --json number,title,body,files,additions,deletions',
-        { encoding: 'utf8' }
+        { encoding: 'utf8' },
       );
 
       return JSON.parse(prs);
@@ -140,7 +139,7 @@ class PatternMiningJourney {
       const files = await fs.readdir(fixPackDir);
       const fixes = [];
 
-      for (const file of files.filter(f => f.endsWith('.json'))) {
+      for (const file of files.filter((f) => f.endsWith('.json'))) {
         const content = await fs.readFile(path.join(fixPackDir, file), 'utf8');
         fixes.push(JSON.parse(content));
       }
@@ -162,13 +161,17 @@ class PatternMiningJourney {
       { type: 'describe-it', count: 0 },
       { type: 'test-suite', count: 0 },
       { type: 'pytest', count: 0 },
-      { type: 'unittest', count: 0 }
+      { type: 'unittest', count: 0 },
     ];
 
     // Simplified pattern detection
     try {
-      const jsTests = execSync('find . -name "*.test.js" -o -name "*.spec.js" | wc -l', { encoding: 'utf8' });
-      const pyTests = execSync('find . -name "test_*.py" -o -name "*_test.py" | wc -l', { encoding: 'utf8' });
+      const jsTests = execSync('find . -name "*.test.js" -o -name "*.spec.js" | wc -l', {
+        encoding: 'utf8',
+      });
+      const pyTests = execSync('find . -name "test_*.py" -o -name "*_test.py" | wc -l', {
+        encoding: 'utf8',
+      });
 
       if (parseInt(jsTests) > 0) {
         patterns.push({ type: 'javascript-tests', count: parseInt(jsTests) });
@@ -186,10 +189,9 @@ class PatternMiningJourney {
    */
   async collectReviews() {
     try {
-      const reviews = execSync(
-        'gh pr list --state merged --limit 10 --json reviews',
-        { encoding: 'utf8' }
-      );
+      const reviews = execSync('gh pr list --state merged --limit 10 --json reviews', {
+        encoding: 'utf8',
+      });
 
       return JSON.parse(reviews);
     } catch {
@@ -239,8 +241,8 @@ class PatternMiningJourney {
     const patterns = [];
 
     // Conventional commit patterns
-    const conventionalCommits = commits.filter(c =>
-      /^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert):/.test(c.subject)
+    const conventionalCommits = commits.filter((c) =>
+      /^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert):/.test(c.subject),
     );
 
     if (conventionalCommits.length > commits.length * 0.8) {
@@ -249,13 +251,13 @@ class PatternMiningJourney {
         name: 'Conventional Commits',
         description: 'Team follows conventional commit format',
         confidence: conventionalCommits.length / commits.length,
-        occurrences: conventionalCommits.length
+        occurrences: conventionalCommits.length,
       });
     }
 
     // TDD evidence patterns
-    const tddCommits = commits.filter(c =>
-      /\b(RED|GREEN|REFACTOR|test.first|TDD)\b/i.test(c.subject + c.body)
+    const tddCommits = commits.filter((c) =>
+      /\b(RED|GREEN|REFACTOR|test.first|TDD)\b/i.test(c.subject + c.body),
     );
 
     if (tddCommits.length > 5) {
@@ -264,7 +266,7 @@ class PatternMiningJourney {
         name: 'TDD Adoption',
         description: 'Team practices Test-Driven Development',
         confidence: tddCommits.length / commits.length,
-        occurrences: tddCommits.length
+        occurrences: tddCommits.length,
       });
     }
 
@@ -296,7 +298,7 @@ class PatternMiningJourney {
           description: `Recurring ${type} issues that need addressing`,
           confidence: count / fixes.length,
           occurrences: count,
-          recommendation: `Create automated detection for ${type} issues`
+          recommendation: `Create automated detection for ${type} issues`,
         });
       }
     }
@@ -317,7 +319,7 @@ class PatternMiningJourney {
           name: `${test.type} test pattern`,
           description: `Team uses ${test.type} testing structure`,
           confidence: 0.9,
-          occurrences: test.count
+          occurrences: test.count,
         });
       }
     }
@@ -336,7 +338,7 @@ class PatternMiningJourney {
       'test-missing': 0,
       'coverage-low': 0,
       'naming-issue': 0,
-      'complexity-high': 0
+      'complexity-high': 0,
     };
 
     // Simplified pattern extraction
@@ -346,7 +348,7 @@ class PatternMiningJourney {
         name: 'Active code reviews',
         description: 'Team actively reviews pull requests',
         confidence: 0.8,
-        occurrences: reviews.length
+        occurrences: reviews.length,
       });
     }
 
@@ -359,8 +361,8 @@ class PatternMiningJourney {
   extractRefactoringPatterns(pullRequests) {
     const patterns = [];
 
-    const refactorPRs = pullRequests.filter(pr =>
-      /refactor|cleanup|simplify|extract/i.test(pr.title)
+    const refactorPRs = pullRequests.filter((pr) =>
+      /refactor|cleanup|simplify|extract/i.test(pr.title),
     );
 
     if (refactorPRs.length > 3) {
@@ -369,7 +371,7 @@ class PatternMiningJourney {
         name: 'Regular refactoring',
         description: 'Team regularly refactors code',
         confidence: refactorPRs.length / pullRequests.length,
-        occurrences: refactorPRs.length
+        occurrences: refactorPRs.length,
       });
     }
 
@@ -390,7 +392,7 @@ class PatternMiningJourney {
       if (validation.isValid) {
         validated.push({
           ...pattern,
-          validation
+          validation,
         });
       }
     }
@@ -410,7 +412,7 @@ class PatternMiningJourney {
     const criteria = {
       minOccurrences: 3,
       minConfidence: 0.6,
-      maxFalsePositiveRate: 0.2
+      maxFalsePositiveRate: 0.2,
     };
 
     const isValid =
@@ -420,7 +422,7 @@ class PatternMiningJourney {
     return {
       isValid,
       score: pattern.confidence * Math.log(pattern.occurrences + 1),
-      criteria
+      criteria,
     };
   }
 
@@ -432,13 +434,14 @@ class PatternMiningJourney {
 
     const applied = [];
 
-    for (const pattern of patterns.slice(0, 5)) { // Apply top 5 patterns
+    for (const pattern of patterns.slice(0, 5)) {
+      // Apply top 5 patterns
       const application = await this.applyPattern(pattern);
 
       if (application.success) {
         applied.push({
           pattern,
-          application
+          application,
         });
       }
     }
@@ -500,7 +503,7 @@ class PatternMiningJourney {
       return {
         success: true,
         action: 'Configured commit template',
-        file: templatePath
+        file: templatePath,
       };
     } catch (error) {
       return { success: false, error: error.message };
@@ -519,9 +522,9 @@ class PatternMiningJourney {
         confidence: pattern.confidence,
         hooks: {
           preCommit: 'Check for test files',
-          preMerge: 'Verify test coverage'
-        }
-      }
+          preMerge: 'Verify test coverage',
+        },
+      },
     };
 
     const configPath = path.join(this.claudeDir, 'patterns', 'tdd-config.json');
@@ -533,7 +536,7 @@ class PatternMiningJourney {
       return {
         success: true,
         action: 'Configured TDD enforcement',
-        file: configPath
+        file: configPath,
       };
     } catch (error) {
       return { success: false, error: error.message };
@@ -549,14 +552,10 @@ class PatternMiningJourney {
       pattern: pattern.name,
       detection: pattern.description,
       autoFix: pattern.confidence > 0.8,
-      priority: Math.ceil(pattern.confidence * 3)
+      priority: Math.ceil(pattern.confidence * 3),
     };
 
-    const rulePath = path.join(
-      this.claudeDir,
-      'patterns',
-      `fix-rule-${Date.now()}.json`
-    );
+    const rulePath = path.join(this.claudeDir, 'patterns', `fix-rule-${Date.now()}.json`);
 
     try {
       await this.ensureDirectory(path.dirname(rulePath));
@@ -565,7 +564,7 @@ class PatternMiningJourney {
       return {
         success: true,
         action: 'Created fix detection rule',
-        file: rulePath
+        file: rulePath,
       };
     } catch (error) {
       return { success: false, error: error.message };
@@ -579,11 +578,7 @@ class PatternMiningJourney {
     // Create test template based on pattern
     const testTemplate = this.generateTestTemplate(pattern);
 
-    const templatePath = path.join(
-      this.claudeDir,
-      'templates',
-      'test-template.js'
-    );
+    const templatePath = path.join(this.claudeDir, 'templates', 'test-template.js');
 
     try {
       await this.ensureDirectory(path.dirname(templatePath));
@@ -592,7 +587,7 @@ class PatternMiningJourney {
       return {
         success: true,
         action: 'Created test template',
-        file: templatePath
+        file: templatePath,
       };
     } catch (error) {
       return { success: false, error: error.message };
@@ -608,7 +603,7 @@ class PatternMiningJourney {
     const analysis = {
       improvements: [],
       metrics: {},
-      recommendations: []
+      recommendations: [],
     };
 
     // Measure improvements
@@ -619,7 +614,7 @@ class PatternMiningJourney {
         analysis.improvements.push({
           pattern: item.pattern.name,
           metric: effectiveness.metric,
-          improvement: effectiveness.improvement
+          improvement: effectiveness.improvement,
         });
       }
     }
@@ -628,7 +623,7 @@ class PatternMiningJourney {
     analysis.metrics = {
       patternsApplied: applied.length,
       improvementRate: analysis.improvements.length / applied.length,
-      averageConfidence: this.calculateAverageConfidence(applied)
+      averageConfidence: this.calculateAverageConfidence(applied),
     };
 
     // Generate recommendations
@@ -653,12 +648,12 @@ class PatternMiningJourney {
   async measureEffectiveness(applied) {
     // Simplified effectiveness measurement
     const baseline = Math.random() * 50 + 50; // 50-100
-    const current = baseline + (applied.pattern.confidence * 20);
+    const current = baseline + applied.pattern.confidence * 20;
 
     return {
       improved: current > baseline,
       metric: 'efficiency',
-      improvement: `${Math.round(current - baseline)}%`
+      improvement: `${Math.round(current - baseline)}%`,
     };
   }
 
@@ -674,14 +669,10 @@ class PatternMiningJourney {
       patterns: this.patterns,
       insights: this.insights,
       improvements: effectiveness.improvements,
-      metrics: effectiveness.metrics
+      metrics: effectiveness.metrics,
     };
 
-    const catalogPath = path.join(
-      this.claudeDir,
-      'patterns',
-      `catalog-${Date.now()}.json`
-    );
+    const catalogPath = path.join(this.claudeDir, 'patterns', `catalog-${Date.now()}.json`);
 
     await this.ensureDirectory(path.dirname(catalogPath));
     await fs.writeFile(catalogPath, JSON.stringify(catalog, null, 2));
@@ -717,17 +708,24 @@ class PatternMiningJourney {
 ## Key Insights
 
 ### Top Patterns
-${this.patterns.slice(0, 5).map(p => `- **${p.name}** (${Math.round(p.confidence * 100)}% confidence)
+${this.patterns
+  .slice(0, 5)
+  .map(
+    (p) => `- **${p.name}** (${Math.round(p.confidence * 100)}% confidence)
   - Type: ${p.type}
   - Occurrences: ${p.occurrences}
-  - Description: ${p.description}`).join('\n')}
+  - Description: ${p.description}`,
+  )
+  .join('\n')}
 
 ### Improvements
-${this.improvements.map(i => `- ${i.pattern}: ${i.improvement} ${i.metric} improvement`).join('\n') || '- Collecting baseline metrics...'}
+${this.improvements.map((i) => `- ${i.pattern}: ${i.improvement} ${i.metric} improvement`).join('\n') || '- Collecting baseline metrics...'}
 
 ## Recommendations
 
-${this.generateRecommendations().map(r => `- ${r}`).join('\n')}
+${this.generateRecommendations()
+  .map((r) => `- ${r}`)
+  .join('\n')}
 
 ## Next Steps
 1. Review applied patterns for effectiveness
@@ -739,11 +737,7 @@ ${this.generateRecommendations().map(r => `- ${r}`).join('\n')}
 Generated by JR-5 Pattern Mining Journey
 `;
 
-    const reportPath = path.join(
-      this.projectRoot,
-      'insights',
-      `pattern-insights-${Date.now()}.md`
-    );
+    const reportPath = path.join(this.projectRoot, 'insights', `pattern-insights-${Date.now()}.md`);
 
     await this.ensureDirectory(path.dirname(reportPath));
     await fs.writeFile(reportPath, report);
@@ -757,7 +751,7 @@ Generated by JR-5 Pattern Mining Journey
       validated: this.results.validated,
       applied: this.results.applied,
       improvements: this.improvements,
-      metrics: this.results.metrics
+      metrics: this.results.metrics,
     };
 
     const jsonPath = reportPath.replace('.md', '.json');
@@ -772,10 +766,10 @@ Generated by JR-5 Pattern Mining Journey
 
     const [, num, unit] = match;
     const units = {
-      'd': 'day',
-      'w': 'week',
-      'm': 'month',
-      'y': 'year'
+      d: 'day',
+      w: 'week',
+      m: 'month',
+      y: 'year',
     };
 
     return `${num} ${units[unit]}${num > 1 ? 's' : ''} ago`;
@@ -788,7 +782,7 @@ Generated by JR-5 Pattern Mining Journey
       const files = await fs.readdir(prDir);
       const prs = [];
 
-      for (const file of files.filter(f => f.endsWith('.json'))) {
+      for (const file of files.filter((f) => f.endsWith('.json'))) {
         const content = await fs.readFile(path.join(prDir, file), 'utf8');
         prs.push(JSON.parse(content));
       }
@@ -801,7 +795,7 @@ Generated by JR-5 Pattern Mining Journey
 
   deduplicatePatterns(patterns) {
     const seen = new Set();
-    return patterns.filter(p => {
+    return patterns.filter((p) => {
       const key = `${p.type}-${p.name}`;
       if (seen.has(key)) return false;
       seen.add(key);
@@ -811,9 +805,9 @@ Generated by JR-5 Pattern Mining Journey
 
   scorePatterns(patterns) {
     return patterns
-      .map(p => ({
+      .map((p) => ({
         ...p,
-        score: p.confidence * Math.log(p.occurrences + 1)
+        score: p.confidence * Math.log(p.occurrences + 1),
       }))
       .sort((a, b) => b.score - a.score);
   }
@@ -850,11 +844,11 @@ describe('Component', () => {
     const recommendations = [];
 
     // Based on patterns found
-    if (this.patterns.some(p => p.type === 'tdd-practice')) {
+    if (this.patterns.some((p) => p.type === 'tdd-practice')) {
       recommendations.push('Continue enforcing TDD practices');
     }
 
-    if (this.patterns.some(p => p.type === 'fix-pattern' && p.occurrences > 5)) {
+    if (this.patterns.some((p) => p.type === 'fix-pattern' && p.occurrences > 5)) {
       recommendations.push('Implement proactive detection for recurring issues');
     }
 

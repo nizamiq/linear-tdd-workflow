@@ -7,8 +7,10 @@ This directory contains monitoring and observability tools that track system hea
 ## Available Monitors
 
 ### Production Monitor (`production-monitor.js`)
+
 **Purpose:** Monitors production system health
 **Tracks:**
+
 - Agent performance metrics
 - Pipeline success rates
 - Error frequencies
@@ -16,6 +18,7 @@ This directory contains monitoring and observability tools that track system hea
 - SLA compliance
 
 **Usage:**
+
 ```bash
 # Start monitoring
 node .claude/monitoring/production-monitor.js
@@ -30,12 +33,14 @@ node .claude/monitoring/production-monitor.js --dashboard
 ## Metrics Collected
 
 ### System Metrics
+
 - **CPU Usage**: Agent and journey execution
 - **Memory**: Heap usage and garbage collection
 - **I/O**: File operations and network requests
 - **Queue Depth**: Pending tasks and operations
 
 ### Agent Metrics
+
 ```javascript
 {
   "agent": "AUDITOR",
@@ -51,6 +56,7 @@ node .claude/monitoring/production-monitor.js --dashboard
 ```
 
 ### Pipeline Metrics
+
 - **Build Success Rate**: Percentage of successful builds
 - **Test Pass Rate**: Test suite success percentage
 - **Deployment Frequency**: Releases per day/week
@@ -58,6 +64,7 @@ node .claude/monitoring/production-monitor.js --dashboard
 - **Lead Time**: Commit to production time
 
 ### Quality Metrics
+
 - **Code Coverage**: Overall and diff coverage
 - **Mutation Score**: Test effectiveness
 - **Technical Debt**: Issues by severity
@@ -66,6 +73,7 @@ node .claude/monitoring/production-monitor.js --dashboard
 ## Monitoring Configuration
 
 ### Environment Variables
+
 ```bash
 # Monitoring settings
 MONITOR_ENABLED=true
@@ -75,6 +83,7 @@ ALERT_THRESHOLD_ERROR_RATE=0.05  # 5% error rate triggers alert
 ```
 
 ### Settings Configuration
+
 ```json
 {
   "monitoring": {
@@ -88,7 +97,7 @@ ALERT_THRESHOLD_ERROR_RATE=0.05  # 5% error rate triggers alert
     },
     "alerts": {
       "errorRate": 0.05,
-      "memoryUsage": 0.90,
+      "memoryUsage": 0.9,
       "pipelineFailure": 3,
       "slaBreachMinutes": 15
     },
@@ -103,39 +112,43 @@ ALERT_THRESHOLD_ERROR_RATE=0.05  # 5% error rate triggers alert
 ## Alert Rules
 
 ### Critical Alerts
+
 Immediate notification required:
+
 ```javascript
 // Error rate exceeds threshold
 if (errorRate > 0.05) {
   alert('CRITICAL', 'Error rate exceeds 5%', {
     current: errorRate,
-    threshold: 0.05
+    threshold: 0.05,
   });
 }
 
 // Pipeline failures
 if (consecutiveFailures >= 3) {
   alert('CRITICAL', 'Pipeline failing repeatedly', {
-    failures: consecutiveFailures
+    failures: consecutiveFailures,
   });
 }
 ```
 
 ### Warning Alerts
+
 Attention needed:
+
 ```javascript
 // Memory usage high
-if (memoryUsage > 0.80) {
+if (memoryUsage > 0.8) {
   alert('WARNING', 'Memory usage above 80%', {
-    usage: memoryUsage
+    usage: memoryUsage,
   });
 }
 
 // SLA at risk
-if (timeToResolution > sla * 0.90) {
+if (timeToResolution > sla * 0.9) {
   alert('WARNING', 'SLA at risk', {
     elapsed: timeToResolution,
-    sla: sla
+    sla: sla,
   });
 }
 ```
@@ -143,6 +156,7 @@ if (timeToResolution > sla * 0.90) {
 ## Dashboard Views
 
 ### Real-time Dashboard
+
 ```bash
 # Start dashboard
 node .claude/monitoring/production-monitor.js --dashboard
@@ -152,6 +166,7 @@ node .claude/monitoring/production-monitor.js --dashboard --refresh 1000
 ```
 
 Dashboard shows:
+
 ```
 ╔══════════════════════════════════════════════╗
 ║         System Health Dashboard              ║
@@ -172,6 +187,7 @@ Dashboard shows:
 ## Metrics Export
 
 ### Prometheus Format
+
 ```bash
 # Export metrics for Prometheus
 node .claude/monitoring/production-monitor.js --export prometheus
@@ -184,6 +200,7 @@ linear_tdd_error_rate 0.02
 ```
 
 ### JSON Format
+
 ```bash
 # Export as JSON
 node .claude/monitoring/production-monitor.js --export json > metrics.json
@@ -192,6 +209,7 @@ node .claude/monitoring/production-monitor.js --export json > metrics.json
 ## Health Checks
 
 ### System Health
+
 ```javascript
 GET /health
 Response: {
@@ -208,6 +226,7 @@ Response: {
 ```
 
 ### Agent Health
+
 ```javascript
 GET /health/agents
 Response: {
@@ -222,6 +241,7 @@ Response: {
 ## Performance Profiling
 
 ### CPU Profiling
+
 ```bash
 # Start with profiling
 node --prof .claude/monitoring/production-monitor.js
@@ -231,6 +251,7 @@ node --prof-process isolate-*.log > profile.txt
 ```
 
 ### Memory Profiling
+
 ```bash
 # Heap snapshot
 node --inspect .claude/monitoring/production-monitor.js
@@ -240,11 +261,12 @@ node --inspect .claude/monitoring/production-monitor.js
 ## Historical Analysis
 
 ### Trend Analysis
+
 ```javascript
 // Weekly trend
 const weeklyTrend = analyzeMetrics({
   period: '7d',
-  metrics: ['errorRate', 'successRate', 'avgDuration']
+  metrics: ['errorRate', 'successRate', 'avgDuration'],
 });
 
 // Identify patterns
@@ -254,12 +276,13 @@ if (weeklyTrend.errorRate.increasing) {
 ```
 
 ### Anomaly Detection
+
 ```javascript
 // Detect anomalies
 const anomalies = detectAnomalies({
   metric: 'executionDuration',
   method: 'zscore',
-  threshold: 3
+  threshold: 3,
 });
 
 if (anomalies.length > 0) {
@@ -270,17 +293,19 @@ if (anomalies.length > 0) {
 ## Integration Points
 
 ### Linear Integration
+
 - Create incidents for critical alerts
 - Update dashboard metrics
 - Track SLA compliance
 
 ### Slack/Discord Notifications
+
 ```javascript
 // Send alerts
 await sendAlert({
   channel: '#monitoring',
   severity: 'critical',
-  message: 'Pipeline failure rate above threshold'
+  message: 'Pipeline failure rate above threshold',
 });
 ```
 
@@ -294,10 +319,10 @@ await sendAlert({
 
 ## Quick Reference
 
-| Metric | Command | Purpose |
-|--------|---------|---------|
-| System health | `node production-monitor.js` | Overall health |
-| Agent metrics | `--metrics agents` | Agent performance |
-| Pipeline status | `--metrics pipeline` | CI/CD health |
-| Dashboard | `--dashboard` | Real-time view |
-| Export | `--export json` | Export metrics |
+| Metric          | Command                      | Purpose           |
+| --------------- | ---------------------------- | ----------------- |
+| System health   | `node production-monitor.js` | Overall health    |
+| Agent metrics   | `--metrics agents`           | Agent performance |
+| Pipeline status | `--metrics pipeline`         | CI/CD health      |
+| Dashboard       | `--dashboard`                | Real-time view    |
+| Export          | `--export json`              | Export metrics    |

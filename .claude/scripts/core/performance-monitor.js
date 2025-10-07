@@ -24,7 +24,7 @@ const colors = {
   cyan: (text) => `\x1b[36m${text}\x1b[0m`,
   white: (text) => `\x1b[37m${text}\x1b[0m`,
   gray: (text) => `\x1b[90m${text}\x1b[0m`,
-  bold: (text) => `\x1b[1m${text}\x1b[0m`
+  bold: (text) => `\x1b[1m${text}\x1b[0m`,
 };
 
 class PerformanceMonitor extends EventEmitter {
@@ -32,17 +32,17 @@ class PerformanceMonitor extends EventEmitter {
     super();
 
     this.config = {
-      sampleInterval: 5000,     // 5 second sampling
-      reportInterval: 30000,    // 30 second reports
+      sampleInterval: 5000, // 5 second sampling
+      reportInterval: 30000, // 30 second reports
       alertThresholds: {
-        mcpResponseTime: 1000,    // 1 second max
-        mcpSuccessRate: 90,       // 90% minimum
-        agentUtilization: 95,     // 95% max utilization
-        queueDepth: 10,           // 10 operations max
-        throughputDrop: 50        // 50% throughput drop
+        mcpResponseTime: 1000, // 1 second max
+        mcpSuccessRate: 90, // 90% minimum
+        agentUtilization: 95, // 95% max utilization
+        queueDepth: 10, // 10 operations max
+        throughputDrop: 50, // 50% throughput drop
       },
-      retentionHours: 24,       // Keep 24 hours of data
-      ...options
+      retentionHours: 24, // Keep 24 hours of data
+      ...options,
     };
 
     // Performance data storage
@@ -51,21 +51,21 @@ class PerformanceMonitor extends EventEmitter {
         startTime: null,
         totalRequests: 0,
         totalErrors: 0,
-        uptime: 0
+        uptime: 0,
       },
       mcp: {
         responseTimeSamples: [],
         successRateSamples: [],
         errorCounts: {},
-        throughputSamples: []
+        throughputSamples: [],
       },
       agents: {
         utilizationSamples: [],
         completionRateSamples: [],
         taskDurationSamples: [],
-        queueDepthSamples: []
+        queueDepthSamples: [],
       },
-      alerts: []
+      alerts: [],
     };
 
     // Component references
@@ -77,7 +77,6 @@ class PerformanceMonitor extends EventEmitter {
     this.isMonitoring = false;
     this.sampleTimer = null;
     this.reportTimer = null;
-
   }
 
   /**
@@ -134,9 +133,7 @@ class PerformanceMonitor extends EventEmitter {
 
       // Clean old data
       this.cleanOldData(timestamp);
-
-    } catch (error) {
-    }
+    } catch (error) {}
   }
 
   /**
@@ -149,7 +146,7 @@ class PerformanceMonitor extends EventEmitter {
     if (metrics.averageResponseTime > 0) {
       this.metrics.mcp.responseTimeSamples.push({
         timestamp,
-        value: metrics.averageResponseTime
+        value: metrics.averageResponseTime,
       });
     }
 
@@ -158,7 +155,7 @@ class PerformanceMonitor extends EventEmitter {
     if (!isNaN(successRate)) {
       this.metrics.mcp.successRateSamples.push({
         timestamp,
-        value: successRate
+        value: successRate,
       });
     }
 
@@ -168,7 +165,7 @@ class PerformanceMonitor extends EventEmitter {
 
     this.metrics.mcp.throughputSamples.push({
       timestamp,
-      value: throughput
+      value: throughput,
     });
 
     // Error tracking
@@ -189,13 +186,13 @@ class PerformanceMonitor extends EventEmitter {
     const utilization = (current.activeAgents / config.maxConcurrentAgents) * 100;
     this.metrics.agents.utilizationSamples.push({
       timestamp,
-      value: utilization
+      value: utilization,
     });
 
     // Queue depth
     this.metrics.agents.queueDepthSamples.push({
       timestamp,
-      value: current.queuedTasks
+      value: current.queuedTasks,
     });
 
     // Completion rate
@@ -205,14 +202,14 @@ class PerformanceMonitor extends EventEmitter {
 
     this.metrics.agents.completionRateSamples.push({
       timestamp,
-      value: completionRate
+      value: completionRate,
     });
 
     // Average task duration
     if (metrics.averageTaskTime > 0) {
       this.metrics.agents.taskDurationSamples.push({
         timestamp,
-        value: metrics.averageTaskTime
+        value: metrics.averageTaskTime,
       });
     }
   }
@@ -226,14 +223,16 @@ class PerformanceMonitor extends EventEmitter {
     // MCP response time alert
     const recentResponseTimes = this.getRecentSamples(this.metrics.mcp.responseTimeSamples, 5);
     if (recentResponseTimes.length > 0) {
-      const avgResponseTime = recentResponseTimes.reduce((sum, sample) => sum + sample.value, 0) / recentResponseTimes.length;
+      const avgResponseTime =
+        recentResponseTimes.reduce((sum, sample) => sum + sample.value, 0) /
+        recentResponseTimes.length;
       if (avgResponseTime > this.config.alertThresholds.mcpResponseTime) {
         alerts.push({
           type: 'mcp_response_time',
           severity: 'warning',
           message: `High MCP response time: ${avgResponseTime.toFixed(0)}ms (threshold: ${this.config.alertThresholds.mcpResponseTime}ms)`,
           value: avgResponseTime,
-          threshold: this.config.alertThresholds.mcpResponseTime
+          threshold: this.config.alertThresholds.mcpResponseTime,
         });
       }
     }
@@ -241,14 +240,16 @@ class PerformanceMonitor extends EventEmitter {
     // MCP success rate alert
     const recentSuccessRates = this.getRecentSamples(this.metrics.mcp.successRateSamples, 5);
     if (recentSuccessRates.length > 0) {
-      const avgSuccessRate = recentSuccessRates.reduce((sum, sample) => sum + sample.value, 0) / recentSuccessRates.length;
+      const avgSuccessRate =
+        recentSuccessRates.reduce((sum, sample) => sum + sample.value, 0) /
+        recentSuccessRates.length;
       if (avgSuccessRate < this.config.alertThresholds.mcpSuccessRate) {
         alerts.push({
           type: 'mcp_success_rate',
           severity: 'critical',
           message: `Low MCP success rate: ${avgSuccessRate.toFixed(1)}% (threshold: ${this.config.alertThresholds.mcpSuccessRate}%)`,
           value: avgSuccessRate,
-          threshold: this.config.alertThresholds.mcpSuccessRate
+          threshold: this.config.alertThresholds.mcpSuccessRate,
         });
       }
     }
@@ -256,14 +257,15 @@ class PerformanceMonitor extends EventEmitter {
     // Agent utilization alert
     const recentUtilization = this.getRecentSamples(this.metrics.agents.utilizationSamples, 5);
     if (recentUtilization.length > 0) {
-      const avgUtilization = recentUtilization.reduce((sum, sample) => sum + sample.value, 0) / recentUtilization.length;
+      const avgUtilization =
+        recentUtilization.reduce((sum, sample) => sum + sample.value, 0) / recentUtilization.length;
       if (avgUtilization > this.config.alertThresholds.agentUtilization) {
         alerts.push({
           type: 'agent_utilization',
           severity: 'warning',
           message: `High agent utilization: ${avgUtilization.toFixed(1)}% (threshold: ${this.config.alertThresholds.agentUtilization}%)`,
           value: avgUtilization,
-          threshold: this.config.alertThresholds.agentUtilization
+          threshold: this.config.alertThresholds.agentUtilization,
         });
       }
     }
@@ -271,14 +273,15 @@ class PerformanceMonitor extends EventEmitter {
     // Queue depth alert
     const recentQueueDepth = this.getRecentSamples(this.metrics.agents.queueDepthSamples, 3);
     if (recentQueueDepth.length > 0) {
-      const avgQueueDepth = recentQueueDepth.reduce((sum, sample) => sum + sample.value, 0) / recentQueueDepth.length;
+      const avgQueueDepth =
+        recentQueueDepth.reduce((sum, sample) => sum + sample.value, 0) / recentQueueDepth.length;
       if (avgQueueDepth > this.config.alertThresholds.queueDepth) {
         alerts.push({
           type: 'queue_depth',
           severity: 'warning',
           message: `High queue depth: ${avgQueueDepth.toFixed(1)} tasks (threshold: ${this.config.alertThresholds.queueDepth})`,
           value: avgQueueDepth,
-          threshold: this.config.alertThresholds.queueDepth
+          threshold: this.config.alertThresholds.queueDepth,
         });
       }
     }
@@ -296,9 +299,8 @@ class PerformanceMonitor extends EventEmitter {
     // Add timestamp to alert
     alert.timestamp = timestamp;
 
-    const recentAlerts = this.metrics.alerts.filter(a =>
-      a.type === alert.type &&
-      (timestamp - a.timestamp) < 300000 // 5 minutes
+    const recentAlerts = this.metrics.alerts.filter(
+      (a) => a.type === alert.type && timestamp - a.timestamp < 300000, // 5 minutes
     );
 
     if (recentAlerts.length === 0) {
@@ -317,8 +319,8 @@ class PerformanceMonitor extends EventEmitter {
    * Get recent samples within a time window
    */
   getRecentSamples(samples, minutes) {
-    const cutoff = Date.now() - (minutes * 60000);
-    return samples.filter(sample => sample.timestamp > cutoff);
+    const cutoff = Date.now() - minutes * 60000;
+    return samples.filter((sample) => sample.timestamp > cutoff);
   }
 
   /**
@@ -327,7 +329,6 @@ class PerformanceMonitor extends EventEmitter {
   generateReport() {
     const now = Date.now();
     const uptime = (now - this.metrics.system.startTime) / 1000;
-
 
     // System overview
 
@@ -339,32 +340,37 @@ class PerformanceMonitor extends EventEmitter {
 
     // Recent alerts
     this.reportRecentAlerts();
-
   }
 
   /**
    * Report MCP performance metrics
    */
   reportMcpPerformance() {
-
     // Response time
     const recentResponseTimes = this.getRecentSamples(this.metrics.mcp.responseTimeSamples, 10);
     if (recentResponseTimes.length > 0) {
-      const avgResponseTime = recentResponseTimes.reduce((sum, s) => sum + s.value, 0) / recentResponseTimes.length;
-      const color = avgResponseTime > this.config.alertThresholds.mcpResponseTime ? colors.yellow : colors.white;
+      const avgResponseTime =
+        recentResponseTimes.reduce((sum, s) => sum + s.value, 0) / recentResponseTimes.length;
+      const color =
+        avgResponseTime > this.config.alertThresholds.mcpResponseTime
+          ? colors.yellow
+          : colors.white;
     }
 
     // Success rate
     const recentSuccessRates = this.getRecentSamples(this.metrics.mcp.successRateSamples, 10);
     if (recentSuccessRates.length > 0) {
-      const avgSuccessRate = recentSuccessRates.reduce((sum, s) => sum + s.value, 0) / recentSuccessRates.length;
-      const color = avgSuccessRate < this.config.alertThresholds.mcpSuccessRate ? colors.yellow : colors.white;
+      const avgSuccessRate =
+        recentSuccessRates.reduce((sum, s) => sum + s.value, 0) / recentSuccessRates.length;
+      const color =
+        avgSuccessRate < this.config.alertThresholds.mcpSuccessRate ? colors.yellow : colors.white;
     }
 
     // Throughput
     const recentThroughput = this.getRecentSamples(this.metrics.mcp.throughputSamples, 10);
     if (recentThroughput.length > 0) {
-      const avgThroughput = recentThroughput.reduce((sum, s) => sum + s.value, 0) / recentThroughput.length;
+      const avgThroughput =
+        recentThroughput.reduce((sum, s) => sum + s.value, 0) / recentThroughput.length;
     }
   }
 
@@ -372,31 +378,41 @@ class PerformanceMonitor extends EventEmitter {
    * Report agent performance metrics
    */
   reportAgentPerformance() {
-
     // Utilization
     const recentUtilization = this.getRecentSamples(this.metrics.agents.utilizationSamples, 10);
     if (recentUtilization.length > 0) {
-      const avgUtilization = recentUtilization.reduce((sum, s) => sum + s.value, 0) / recentUtilization.length;
-      const color = avgUtilization > this.config.alertThresholds.agentUtilization ? colors.yellow : colors.white;
+      const avgUtilization =
+        recentUtilization.reduce((sum, s) => sum + s.value, 0) / recentUtilization.length;
+      const color =
+        avgUtilization > this.config.alertThresholds.agentUtilization
+          ? colors.yellow
+          : colors.white;
     }
 
     // Queue depth
     const recentQueueDepth = this.getRecentSamples(this.metrics.agents.queueDepthSamples, 10);
     if (recentQueueDepth.length > 0) {
-      const avgQueueDepth = recentQueueDepth.reduce((sum, s) => sum + s.value, 0) / recentQueueDepth.length;
-      const color = avgQueueDepth > this.config.alertThresholds.queueDepth ? colors.yellow : colors.white;
+      const avgQueueDepth =
+        recentQueueDepth.reduce((sum, s) => sum + s.value, 0) / recentQueueDepth.length;
+      const color =
+        avgQueueDepth > this.config.alertThresholds.queueDepth ? colors.yellow : colors.white;
     }
 
     // Completion rate
-    const recentCompletionRate = this.getRecentSamples(this.metrics.agents.completionRateSamples, 10);
+    const recentCompletionRate = this.getRecentSamples(
+      this.metrics.agents.completionRateSamples,
+      10,
+    );
     if (recentCompletionRate.length > 0) {
-      const avgCompletionRate = recentCompletionRate.reduce((sum, s) => sum + s.value, 0) / recentCompletionRate.length;
+      const avgCompletionRate =
+        recentCompletionRate.reduce((sum, s) => sum + s.value, 0) / recentCompletionRate.length;
     }
 
     // Task duration
     const recentTaskDuration = this.getRecentSamples(this.metrics.agents.taskDurationSamples, 10);
     if (recentTaskDuration.length > 0) {
-      const avgTaskDuration = recentTaskDuration.reduce((sum, s) => sum + s.value, 0) / recentTaskDuration.length;
+      const avgTaskDuration =
+        recentTaskDuration.reduce((sum, s) => sum + s.value, 0) / recentTaskDuration.length;
     }
   }
 
@@ -404,12 +420,13 @@ class PerformanceMonitor extends EventEmitter {
    * Report recent alerts
    */
   reportRecentAlerts() {
-    const recentAlerts = this.metrics.alerts.filter(alert =>
-      (Date.now() - alert.timestamp) < 600000 // Last 10 minutes
+    const recentAlerts = this.metrics.alerts.filter(
+      (alert) => Date.now() - alert.timestamp < 600000, // Last 10 minutes
     );
 
     if (recentAlerts.length > 0) {
-      for (const alert of recentAlerts.slice(-5)) { // Show last 5
+      for (const alert of recentAlerts.slice(-5)) {
+        // Show last 5
         const color = alert.severity === 'critical' ? colors.red : colors.yellow;
         const timeAgo = Math.round((Date.now() - alert.timestamp) / 60000);
       }
@@ -420,21 +437,35 @@ class PerformanceMonitor extends EventEmitter {
    * Clean old data to prevent memory issues
    */
   cleanOldData(timestamp) {
-    const cutoff = timestamp - (this.config.retentionHours * 60 * 60 * 1000);
+    const cutoff = timestamp - this.config.retentionHours * 60 * 60 * 1000;
 
     // Clean MCP data
-    this.metrics.mcp.responseTimeSamples = this.metrics.mcp.responseTimeSamples.filter(s => s.timestamp > cutoff);
-    this.metrics.mcp.successRateSamples = this.metrics.mcp.successRateSamples.filter(s => s.timestamp > cutoff);
-    this.metrics.mcp.throughputSamples = this.metrics.mcp.throughputSamples.filter(s => s.timestamp > cutoff);
+    this.metrics.mcp.responseTimeSamples = this.metrics.mcp.responseTimeSamples.filter(
+      (s) => s.timestamp > cutoff,
+    );
+    this.metrics.mcp.successRateSamples = this.metrics.mcp.successRateSamples.filter(
+      (s) => s.timestamp > cutoff,
+    );
+    this.metrics.mcp.throughputSamples = this.metrics.mcp.throughputSamples.filter(
+      (s) => s.timestamp > cutoff,
+    );
 
     // Clean agent data
-    this.metrics.agents.utilizationSamples = this.metrics.agents.utilizationSamples.filter(s => s.timestamp > cutoff);
-    this.metrics.agents.completionRateSamples = this.metrics.agents.completionRateSamples.filter(s => s.timestamp > cutoff);
-    this.metrics.agents.taskDurationSamples = this.metrics.agents.taskDurationSamples.filter(s => s.timestamp > cutoff);
-    this.metrics.agents.queueDepthSamples = this.metrics.agents.queueDepthSamples.filter(s => s.timestamp > cutoff);
+    this.metrics.agents.utilizationSamples = this.metrics.agents.utilizationSamples.filter(
+      (s) => s.timestamp > cutoff,
+    );
+    this.metrics.agents.completionRateSamples = this.metrics.agents.completionRateSamples.filter(
+      (s) => s.timestamp > cutoff,
+    );
+    this.metrics.agents.taskDurationSamples = this.metrics.agents.taskDurationSamples.filter(
+      (s) => s.timestamp > cutoff,
+    );
+    this.metrics.agents.queueDepthSamples = this.metrics.agents.queueDepthSamples.filter(
+      (s) => s.timestamp > cutoff,
+    );
 
     // Clean alerts
-    this.metrics.alerts = this.metrics.alerts.filter(a => a.timestamp > cutoff);
+    this.metrics.alerts = this.metrics.alerts.filter((a) => a.timestamp > cutoff);
 
     // Clean MCP error counts
     for (const [ts, count] of Object.entries(this.metrics.mcp.errorCounts)) {
@@ -456,15 +487,15 @@ class PerformanceMonitor extends EventEmitter {
       mcp: {
         averageResponseTime: this.calculateAverage(this.metrics.mcp.responseTimeSamples, 10),
         averageSuccessRate: this.calculateAverage(this.metrics.mcp.successRateSamples, 10),
-        currentThroughput: this.calculateAverage(this.metrics.mcp.throughputSamples, 5)
+        currentThroughput: this.calculateAverage(this.metrics.mcp.throughputSamples, 5),
       },
       agents: {
         averageUtilization: this.calculateAverage(this.metrics.agents.utilizationSamples, 10),
         averageQueueDepth: this.calculateAverage(this.metrics.agents.queueDepthSamples, 10),
         averageCompletionRate: this.calculateAverage(this.metrics.agents.completionRateSamples, 10),
-        averageTaskDuration: this.calculateAverage(this.metrics.agents.taskDurationSamples, 10)
+        averageTaskDuration: this.calculateAverage(this.metrics.agents.taskDurationSamples, 10),
       },
-      recentAlerts: this.metrics.alerts.filter(a => (now - a.timestamp) < 600000)
+      recentAlerts: this.metrics.alerts.filter((a) => now - a.timestamp < 600000),
     };
   }
 
@@ -484,8 +515,7 @@ class PerformanceMonitor extends EventEmitter {
     try {
       const summary = this.getMetricsSummary();
       await fs.writeFile(filePath, JSON.stringify(summary, null, 2));
-    } catch (error) {
-    }
+    } catch (error) {}
   }
 
   /**

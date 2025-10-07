@@ -5,15 +5,18 @@
 ### Phase 2: .claude Directory Cleanup
 
 ## Summary
+
 Cleaned up the `.claude` directory by removing 33 obsolete files, reducing from 105 to 72 files. All development artifacts, test files, backup files, and obsolete implementations have been archived.
 
 ### .claude Directory Cleanup
 
 #### Backup Files (→ `/archive/claude-obsolete/backup-files/`)
+
 - 13 backup files (.bak, .bak2, .backup) from scripts/core/
 - Including: agent-pool, concurrency-orchestrator, concurrency-tester, mcp-validator, etc.
 
 #### Test/Development Files (→ `/archive/claude-obsolete/test-files/`)
+
 - phase-b1-tester.js - Phase B1 development testing
 - concurrency-tester.js - Concurrency testing utility
 - real-mcp-tester.js - MCP testing utility
@@ -21,24 +24,28 @@ Cleaned up the `.claude` directory by removing 33 obsolete files, reducing from 
 - test-tdd-enforcer.js - TDD enforcer testing
 
 #### Phase Development (→ `/archive/claude-obsolete/phase-development/`)
+
 - phase-b0-comprehensive-findings.md
 - phase-b1-implementation-summary.md
-- concurrency-test-*.json and summary files
-- real-mcp-test-*.json and findings files
+- concurrency-test-\*.json and summary files
+- real-mcp-test-\*.json and findings files
 
 #### Old Workflows (→ `/archive/claude-obsolete/old-workflows/`)
+
 - simple-workflow-kickoff.sh - Replaced by journeys
 - workflow-kickoff.sh - Replaced by journeys
 - vision-alignment-validator.js - Development validation tool
 - real-multi-agent-workflow.js - Replaced by journey system
 
 #### Obsolete Routers (→ `/archive/claude-obsolete/obsolete-routers/`)
+
 - emergency-minimal-router.js - Emergency workaround
 - memory-optimized-router.js - Replaced by journeys
 - memory-safe-router.js - Replaced by journeys
 - real-agent-orchestrator.js - Replaced by journey orchestration
 
 #### Local Files (→ `/archive/claude-obsolete/local-files/`)
+
 - settings.local.json - Local override configuration
 
 ### Phase 1: Root Directory Cleanup
@@ -46,28 +53,34 @@ Cleaned up the `.claude` directory by removing 33 obsolete files, reducing from 
 ### Files Moved to Archive
 
 #### Root Directory Scripts (→ `/archive/root-scripts/`)
+
 - `self-improvement-workflow.js` - Old workflow testing script
 - `test-memory-safe-router.js` - Memory testing script
 - `validate-fixes.js` - Fix validation script
 - `validate-memory-fix.js` - Memory fix validation script
 
 #### API Documentation (→ `/archive/api-docs/`)
+
 - 269 API documentation JSON files from `docs/api/`
 - These were auto-generated snapshots that accumulated over time
 
 #### Report Files (→ `/archive/reports/`)
+
 - 300 architecture analysis JSON files
 - 273 refactoring analysis JSON files
 - These were automated reports that can be regenerated as needed
 
 #### Scripts Directory (→ `/archive/scripts/`)
+
 - Old Linear Python scripts (`create_linear_*.py`, `test_linear_*.py`)
 - Shell scripts (`*.sh`) - replaced by Makefile and journeys
 
 ### Updated Files
 
 #### `.gitignore`
+
 Added patterns to prevent accumulation of:
+
 - Archive directory
 - Generated JSON reports
 - Root-level test scripts

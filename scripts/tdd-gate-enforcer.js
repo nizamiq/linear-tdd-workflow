@@ -89,10 +89,9 @@ class TDDGateEnforcer {
           green: greenValidation,
           refactor: refactorValidation,
           mutation: validateMutation ? mutationValidation : { skipped: true },
-          fil: filValidation
-        }
+          fil: filValidation,
+        },
       };
-
     } catch (error) {
       spinner.fail(`TDD validation error: ${error.message}`);
       throw error;
@@ -103,15 +102,15 @@ class TDDGateEnforcer {
    * RED Phase: Ensure failing tests exist before implementation
    */
   async validateRedPhase(changedFiles) {
-    const sourceFiles = changedFiles.filter(f =>
-      f.match(/\.(js|ts|py)$/) && !f.match(/\.(test|spec)\./));
+    const sourceFiles = changedFiles.filter(
+      (f) => f.match(/\.(js|ts|py)$/) && !f.match(/\.(test|spec)\./),
+    );
 
     if (sourceFiles.length === 0) {
       return { valid: true, reason: 'no-source-files' };
     }
 
-    const testFiles = changedFiles.filter(f =>
-      f.match(/\.(test|spec)\.(js|ts|py)$/));
+    const testFiles = changedFiles.filter((f) => f.match(/\.(test|spec)\.(js|ts|py)$/));
 
     if (testFiles.length === 0) {
       return {
@@ -119,7 +118,7 @@ class TDDGateEnforcer {
         phase: 'RED',
         reason: 'no-tests-found',
         message: 'TDD requires tests to be written first (RED phase)',
-        requiredAction: 'Create failing tests for changed source files'
+        requiredAction: 'Create failing tests for changed source files',
       };
     }
 
@@ -134,7 +133,7 @@ class TDDGateEnforcer {
         phase: 'RED',
         reason: 'source-before-tests',
         message: 'Source files modified without corresponding tests',
-        requiredAction: 'Write failing tests first'
+        requiredAction: 'Write failing tests first',
       };
     }
 
@@ -142,7 +141,7 @@ class TDDGateEnforcer {
       valid: true,
       phase: 'RED',
       testFiles: testFiles.length,
-      sourceFiles: sourceFiles.length
+      sourceFiles: sourceFiles.length,
     };
   }
 
@@ -158,7 +157,7 @@ class TDDGateEnforcer {
         phase: 'GREEN',
         reason: 'failing-tests',
         message: 'Tests must pass in GREEN phase',
-        failures: testResult.failures
+        failures: testResult.failures,
       };
     }
 
@@ -170,7 +169,7 @@ class TDDGateEnforcer {
         phase: 'GREEN',
         reason: 'insufficient-coverage',
         message: `Diff coverage ${coverage.percentage}% below threshold ${this.coverageThreshold}%`,
-        requiredAction: 'Add tests to increase coverage of changed lines'
+        requiredAction: 'Add tests to increase coverage of changed lines',
       };
     }
 
@@ -182,7 +181,7 @@ class TDDGateEnforcer {
         phase: 'GREEN',
         reason: 'excessive-changes',
         message: `Changed ${totalLOC} LOC exceeds Fix Pack limit ${this.maxLinesOfCode}`,
-        requiredAction: 'Break into smaller Fix Packs'
+        requiredAction: 'Break into smaller Fix Packs',
       };
     }
 
@@ -191,7 +190,7 @@ class TDDGateEnforcer {
       phase: 'GREEN',
       coverage: coverage.percentage,
       linesOfCode: totalLOC,
-      testResults: testResult
+      testResults: testResult,
     };
   }
 
@@ -201,9 +200,9 @@ class TDDGateEnforcer {
   async validateRefactorPhase() {
     // Check git commit messages for TDD phase indicators
     const recentCommits = await this.getRecentCommits();
-    const hasRefactorCommits = recentCommits.some(commit =>
-      commit.message.toLowerCase().includes('refactor') ||
-      commit.message.includes('[REFACTOR]')
+    const hasRefactorCommits = recentCommits.some(
+      (commit) =>
+        commit.message.toLowerCase().includes('refactor') || commit.message.includes('[REFACTOR]'),
     );
 
     if (!hasRefactorCommits) {
@@ -218,15 +217,15 @@ class TDDGateEnforcer {
         phase: 'REFACTOR',
         reason: 'refactor-broke-tests',
         message: 'Refactoring broke existing tests',
-        failures: testResult.failures
+        failures: testResult.failures,
       };
     }
 
     return {
       valid: true,
       phase: 'REFACTOR',
-      refactorCommits: recentCommits.filter(c =>
-        c.message.toLowerCase().includes('refactor')).length
+      refactorCommits: recentCommits.filter((c) => c.message.toLowerCase().includes('refactor'))
+        .length,
     };
   }
 
@@ -234,8 +233,9 @@ class TDDGateEnforcer {
    * Validate mutation testing on changed files
    */
   async validateMutationTesting(changedFiles) {
-    const sourceFiles = changedFiles.filter(f =>
-      f.match(/\.(js|ts)$/) && !f.match(/\.(test|spec)\./));
+    const sourceFiles = changedFiles.filter(
+      (f) => f.match(/\.(js|ts)$/) && !f.match(/\.(test|spec)\./),
+    );
 
     if (sourceFiles.length === 0) {
       return { valid: true, reason: 'no-source-files' };
@@ -250,7 +250,7 @@ class TDDGateEnforcer {
           valid: false,
           reason: 'insufficient-mutation-coverage',
           message: `Mutation score ${mutationResult.score}% below threshold ${this.mutationThreshold}%`,
-          requiredAction: 'Improve test quality to catch more mutations'
+          requiredAction: 'Improve test quality to catch more mutations',
         };
       }
 
@@ -258,15 +258,14 @@ class TDDGateEnforcer {
         valid: true,
         mutationScore: mutationResult.score,
         mutationsKilled: mutationResult.killed,
-        totalMutations: mutationResult.total
+        totalMutations: mutationResult.total,
       };
-
     } catch (error) {
       // Mutation testing failure is warning, not blocker
       return {
         valid: true,
         warning: `Mutation testing failed: ${error.message}`,
-        reason: 'mutation-test-error'
+        reason: 'mutation-test-error',
       };
     }
   }
@@ -278,7 +277,7 @@ class TDDGateEnforcer {
     const classification = await this.classifyFIL(changedFiles);
 
     // Block FIL-2/3 changes without proper approval
-    if ((classification.level === 'FIL-2' || classification.level === 'FIL-3')) {
+    if (classification.level === 'FIL-2' || classification.level === 'FIL-3') {
       const hasApproval = await this.checkFILApproval(classification.level);
 
       if (!hasApproval) {
@@ -287,14 +286,14 @@ class TDDGateEnforcer {
           reason: 'fil-approval-required',
           level: classification.level,
           message: `${classification.level} changes require tech lead approval`,
-          requiredAction: 'Get approval before proceeding'
+          requiredAction: 'Get approval before proceeding',
         };
       }
     }
 
     return {
       valid: true,
-      fil: classification
+      fil: classification,
     };
   }
 
@@ -304,7 +303,10 @@ class TDDGateEnforcer {
   async getChangedFiles(baseBranch) {
     try {
       const { stdout } = await execAsync(`git diff --name-only ${baseBranch}...HEAD`);
-      return stdout.trim().split('\n').filter(line => line.length > 0);
+      return stdout
+        .trim()
+        .split('\n')
+        .filter((line) => line.length > 0);
     } catch (error) {
       throw new Error(`Failed to get changed files: ${error.message}`);
     }
@@ -323,10 +325,13 @@ class TDDGateEnforcer {
    */
   async getRecentCommits() {
     const { stdout } = await execAsync('git log --format="%h|%s|%an|%ad" -10');
-    return stdout.trim().split('\n').map(line => {
-      const [hash, message, author, date] = line.split('|');
-      return { hash, message, author, date };
-    });
+    return stdout
+      .trim()
+      .split('\n')
+      .map((line) => {
+        const [hash, message, author, date] = line.split('|');
+        return { hash, message, author, date };
+      });
   }
 
   /**
@@ -338,13 +343,13 @@ class TDDGateEnforcer {
       return {
         success: true,
         output: stdout,
-        coverage: this.parseCoverageFromOutput(stdout)
+        coverage: this.parseCoverageFromOutput(stdout),
       };
     } catch (error) {
       return {
         success: false,
         failures: error.stderr || error.message,
-        output: error.stdout
+        output: error.stdout,
       };
     }
   }
@@ -372,7 +377,7 @@ class TDDGateEnforcer {
           if (fileCoverage) {
             const lines = fileCoverage.l;
             totalLines += Object.keys(lines).length;
-            coveredLines += Object.values(lines).filter(hits => hits > 0).length;
+            coveredLines += Object.values(lines).filter((hits) => hits > 0).length;
           }
         }
       }
@@ -383,9 +388,8 @@ class TDDGateEnforcer {
         percentage,
         coveredLines,
         totalLines,
-        files: changedFiles.length
+        files: changedFiles.length,
       };
-
     } catch (error) {
       throw new Error(`Failed to calculate diff coverage: ${error.message}`);
     }
@@ -435,7 +439,7 @@ class TDDGateEnforcer {
     return {
       score: scoreMatch ? parseFloat(scoreMatch[1]) : 0,
       killed: killedMatch ? parseInt(killedMatch[1]) : 0,
-      total: totalMatch ? parseInt(totalMatch[1]) : 0
+      total: totalMatch ? parseInt(totalMatch[1]) : 0,
     };
   }
 
@@ -450,26 +454,29 @@ class TDDGateEnforcer {
       const content = await fs.readFile(file, 'utf8').catch(() => '');
 
       // FIL-3: High impact (APIs, migrations, UI)
-      if (content.includes('app.') || // Express routes
-          content.includes('router.') ||
-          content.includes('migration') ||
-          content.includes('@api') ||
-          file.includes('migration') ||
-          file.includes('schema')) {
+      if (
+        content.includes('app.') || // Express routes
+        content.includes('router.') ||
+        content.includes('migration') ||
+        content.includes('@api') ||
+        file.includes('migration') ||
+        file.includes('schema')
+      ) {
         maxLevel = 'FIL-3';
         indicators.push(`${file}: API/Migration changes`);
       }
       // FIL-2: Medium impact (utilities, configs)
-      else if (content.includes('config') ||
-               content.includes('util') ||
-               file.includes('config') ||
-               file.includes('.env')) {
+      else if (
+        content.includes('config') ||
+        content.includes('util') ||
+        file.includes('config') ||
+        file.includes('.env')
+      ) {
         if (maxLevel !== 'FIL-3') maxLevel = 'FIL-2';
         indicators.push(`${file}: Configuration changes`);
       }
       // FIL-1: Low impact (renames, constants)
-      else if (content.match(/const\s+\w+\s*=/) ||
-               content.includes('rename')) {
+      else if (content.match(/const\s+\w+\s*=/) || content.includes('rename')) {
         if (maxLevel === 'FIL-0') maxLevel = 'FIL-1';
         indicators.push(`${file}: Constants/Renames`);
       }
@@ -482,7 +489,7 @@ class TDDGateEnforcer {
     return {
       level: maxLevel,
       indicators,
-      requiresApproval: ['FIL-2', 'FIL-3'].includes(maxLevel)
+      requiresApproval: ['FIL-2', 'FIL-3'].includes(maxLevel),
     };
   }
 
@@ -525,13 +532,14 @@ class TDDGateEnforcer {
           }
         }
 
-        const hasRelevantFiles = files.some(file =>
-          commitFiles.some(commitFile => commitFile.includes(file)));
+        const hasRelevantFiles = files.some((file) =>
+          commitFiles.some((commitFile) => commitFile.includes(file)),
+        );
 
         if (hasRelevantFiles) {
           commits.push({
             hash: line.split(' ')[0],
-            files: commitFiles
+            files: commitFiles,
           });
         }
       }
@@ -549,10 +557,8 @@ class TDDGateEnforcer {
     try {
       // Get changed files
       const changedFiles = await this.getChangedFiles('origin/develop');
-      const sourceFiles = changedFiles.filter(file =>
-        file.match(/\.(js|ts)$/) &&
-        !file.includes('test') &&
-        !file.includes('spec')
+      const sourceFiles = changedFiles.filter(
+        (file) => file.match(/\.(js|ts)$/) && !file.includes('test') && !file.includes('spec'),
       );
 
       if (sourceFiles.length === 0) {
@@ -567,7 +573,7 @@ class TDDGateEnforcer {
         return {
           valid: false,
           message: 'Tests must pass before diff coverage validation',
-          requiredAction: 'Fix failing tests'
+          requiredAction: 'Fix failing tests',
         };
       }
 
@@ -577,7 +583,9 @@ class TDDGateEnforcer {
       spinner.text = `Diff coverage: ${diffCoverage.percentage.toFixed(2)}%`;
 
       if (diffCoverage.percentage >= threshold) {
-        spinner.succeed(`✅ Diff coverage ${diffCoverage.percentage.toFixed(2)}% meets threshold ${threshold}%`);
+        spinner.succeed(
+          `✅ Diff coverage ${diffCoverage.percentage.toFixed(2)}% meets threshold ${threshold}%`,
+        );
         return {
           valid: true,
           details: {
@@ -585,25 +593,26 @@ class TDDGateEnforcer {
             threshold,
             coveredLines: diffCoverage.covered,
             totalLines: diffCoverage.total,
-            changedFiles: sourceFiles.length
-          }
+            changedFiles: sourceFiles.length,
+          },
         };
       } else {
-        spinner.fail(`❌ Diff coverage ${diffCoverage.percentage.toFixed(2)}% below threshold ${threshold}%`);
+        spinner.fail(
+          `❌ Diff coverage ${diffCoverage.percentage.toFixed(2)}% below threshold ${threshold}%`,
+        );
         return {
           valid: false,
           message: `Diff coverage ${diffCoverage.percentage.toFixed(2)}% is below required ${threshold}%`,
-          requiredAction: `Add tests to cover ${Math.ceil((threshold * diffCoverage.total / 100) - diffCoverage.covered)} more lines`,
+          requiredAction: `Add tests to cover ${Math.ceil((threshold * diffCoverage.total) / 100 - diffCoverage.covered)} more lines`,
           details: {
             diffCoverage: diffCoverage.percentage,
             threshold,
             coveredLines: diffCoverage.covered,
             totalLines: diffCoverage.total,
-            shortfall: Math.ceil((threshold * diffCoverage.total / 100) - diffCoverage.covered)
-          }
+            shortfall: Math.ceil((threshold * diffCoverage.total) / 100 - diffCoverage.covered),
+          },
         };
       }
-
     } catch (error) {
       spinner.fail(`Diff coverage validation failed: ${error.message}`);
       throw error;
@@ -615,14 +624,14 @@ class TDDGateEnforcer {
 if (require.main === module) {
   const enforcer = new TDDGateEnforcer();
 
-  const [,, command, ...args] = process.argv;
+  const [, , command, ...args] = process.argv;
 
   switch (command) {
     case 'validate':
       const options = {
         validateMutation: args.includes('--mutation'),
         coverageOnly: args.includes('--coverage-only'),
-        threshold: args.find(arg => arg.startsWith('--threshold='))?.split('=')[1] || 80
+        threshold: args.find((arg) => arg.startsWith('--threshold='))?.split('=')[1] || 80,
       };
 
       const validationMethod = options.coverageOnly
@@ -630,29 +639,31 @@ if (require.main === module) {
         : enforcer.validateTDDCycle(options);
 
       validationMethod
-      .then(result => {
-        if (result.valid) {
-          console.log(chalk.green('✓ TDD cycle validation passed'));
-          if (result.details) {
-            console.log(JSON.stringify(result.details, null, 2));
+        .then((result) => {
+          if (result.valid) {
+            console.log(chalk.green('✓ TDD cycle validation passed'));
+            if (result.details) {
+              console.log(JSON.stringify(result.details, null, 2));
+            }
+          } else {
+            console.log(chalk.red('✗ TDD cycle validation failed'));
+            console.log(chalk.yellow(result.message));
+            if (result.requiredAction) {
+              console.log(chalk.cyan(`Required action: ${result.requiredAction}`));
+            }
+            process.exit(1);
           }
-        } else {
-          console.log(chalk.red('✗ TDD cycle validation failed'));
-          console.log(chalk.yellow(result.message));
-          if (result.requiredAction) {
-            console.log(chalk.cyan(`Required action: ${result.requiredAction}`));
-          }
+        })
+        .catch((error) => {
+          console.error(chalk.red(`Validation error: ${error.message}`));
           process.exit(1);
-        }
-      })
-      .catch(error => {
-        console.error(chalk.red(`Validation error: ${error.message}`));
-        process.exit(1);
-      });
+        });
       break;
 
     default:
-      console.log(`Usage: ${process.argv[1]} validate [--mutation] [--coverage-only] [--threshold=N]`);
+      console.log(
+        `Usage: ${process.argv[1]} validate [--mutation] [--coverage-only] [--threshold=N]`,
+      );
       process.exit(1);
   }
 }

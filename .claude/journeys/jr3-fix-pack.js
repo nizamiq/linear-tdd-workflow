@@ -21,14 +21,14 @@ class FixPackJourney {
     this.tddEvidence = {
       red: null,
       green: null,
-      refactor: null
+      refactor: null,
     };
     this.results = {
       task: null,
       implementation: null,
       tests: null,
       coverage: null,
-      pr: null
+      pr: null,
     };
   }
 
@@ -61,7 +61,6 @@ class FixPackJourney {
 
       console.log('✅ Fix Pack implementation complete!');
       return this.results;
-
     } catch (error) {
       console.error('❌ Fix Pack implementation failed:', error.message);
       await this.rollback();
@@ -108,24 +107,27 @@ class FixPackJourney {
 
     try {
       const files = await fs.readdir(assessmentDir);
-      const taskFiles = files.filter(f => f.startsWith('tasks-')).sort().reverse();
+      const taskFiles = files
+        .filter((f) => f.startsWith('tasks-'))
+        .sort()
+        .reverse();
 
       if (taskFiles.length > 0) {
         const latestTasks = JSON.parse(
-          await fs.readFile(path.join(assessmentDir, taskFiles[0]), 'utf8')
+          await fs.readFile(path.join(assessmentDir, taskFiles[0]), 'utf8'),
         );
 
         // Filter for approved FIL-0/1 tasks
         return latestTasks
-          .filter(t => t.labels.includes('FIL-0') || t.labels.includes('FIL-1'))
-          .map(t => ({
+          .filter((t) => t.labels.includes('FIL-0') || t.labels.includes('FIL-1'))
+          .map((t) => ({
             id: `CLEAN-${Math.floor(Math.random() * 1000)}`,
             title: t.title,
             description: t.description,
             fil: t.labels.includes('FIL-0') ? 0 : 1,
             priority: t.priority,
             estimate: t.estimate,
-            metadata: t.metadata
+            metadata: t.metadata,
           }));
       }
     } catch (e) {
@@ -133,14 +135,16 @@ class FixPackJourney {
     }
 
     // Fallback: create sample task
-    return [{
-      id: 'CLEAN-001',
-      title: 'Remove unused code',
-      description: 'Clean up dead code identified in assessment',
-      fil: 0,
-      priority: 3,
-      estimate: 1
-    }];
+    return [
+      {
+        id: 'CLEAN-001',
+        title: 'Remove unused code',
+        description: 'Clean up dead code identified in assessment',
+        fil: 0,
+        priority: 3,
+        estimate: 1,
+      },
+    ];
   }
 
   /**
@@ -154,7 +158,7 @@ class FixPackJourney {
       description: 'Task description from Linear',
       fil: 0,
       priority: 2,
-      estimate: 2
+      estimate: 2,
     };
   }
 
@@ -225,7 +229,7 @@ class FixPackJourney {
     this.tddEvidence.red = {
       testFile,
       testCode,
-      failureOutput: testResult.output
+      failureOutput: testResult.output,
     };
 
     this.results.tests = testFile;
@@ -266,7 +270,7 @@ class FixPackJourney {
     this.tddEvidence.green = {
       implFile,
       implCode,
-      passOutput: testResult.output
+      passOutput: testResult.output,
     };
 
     this.results.implementation = implFile;
@@ -314,7 +318,7 @@ class FixPackJourney {
 
     this.tddEvidence.refactor = {
       applied: refactoredCode !== currentCode,
-      changes: this.diffCode(currentCode, refactoredCode)
+      changes: this.diffCode(currentCode, refactoredCode),
     };
   }
 
@@ -328,7 +332,7 @@ class FixPackJourney {
       coverage: false,
       mutation: false,
       complexity: false,
-      tddEvidence: false
+      tddEvidence: false,
     };
 
     // 1. Diff coverage ≥80%
@@ -351,7 +355,7 @@ class FixPackJourney {
     console.log(`   📝 TDD evidence: ${gates.tddEvidence ? '✅' : '❌'}`);
 
     // Overall gate
-    const allPassed = Object.values(gates).every(v => v);
+    const allPassed = Object.values(gates).every((v) => v);
 
     if (!allPassed) {
       console.log('\n❌ Quality gates failed');
@@ -383,7 +387,7 @@ class FixPackJourney {
       title: `fix: ${this.currentTask.title} [${this.currentTask.id}]`,
       body: this.generatePRDescription(),
       branch: this.branchName,
-      labels: [`FIL-${this.currentTask.fil}`, 'auto-generated', 'tdd']
+      labels: [`FIL-${this.currentTask.fil}`, 'auto-generated', 'tdd'],
     };
 
     // Save PR data (would create actual PR via API)
@@ -409,23 +413,23 @@ class FixPackJourney {
       tddCycle: {
         red: this.tddEvidence.red,
         green: this.tddEvidence.green,
-        refactor: this.tddEvidence.refactor
+        refactor: this.tddEvidence.refactor,
       },
       qualityGates: {
         coverage: this.results.coverage,
-        passed: true
+        passed: true,
       },
       pullRequest: this.results.pr,
       files: {
         test: this.results.tests,
-        implementation: this.results.implementation
-      }
+        implementation: this.results.implementation,
+      },
     };
 
     const reportPath = path.join(
       this.projectRoot,
       'fix-packs',
-      `implementation-${Date.now()}.json`
+      `implementation-${Date.now()}.json`,
     );
 
     await this.ensureDirectory(path.dirname(reportPath));
@@ -444,8 +448,7 @@ class FixPackJourney {
       return 'javascript';
     }
 
-    if (await this.fileExists('requirements.txt') ||
-        await this.fileExists('pyproject.toml')) {
+    if ((await this.fileExists('requirements.txt')) || (await this.fileExists('pyproject.toml'))) {
       return 'python';
     }
 
@@ -554,9 +557,10 @@ def some_function():
   async checkCoverage() {
     // Simplified coverage check
     try {
-      const cmd = this.projectType === 'python'
-        ? 'pytest --cov --cov-report=term | grep TOTAL'
-        : 'npm test -- --coverage | grep "All files"';
+      const cmd =
+        this.projectType === 'python'
+          ? 'pytest --cov --cov-report=term | grep TOTAL'
+          : 'npm test -- --coverage | grep "All files"';
 
       const output = execSync(cmd, { encoding: 'utf8', stdio: 'pipe' });
       const match = output.match(/(\d+(?:\.\d+)?)\s*%/);
@@ -607,7 +611,8 @@ def some_function():
   async commitChanges() {
     try {
       execSync('git add .', { stdio: 'ignore' });
-      execSync(`git commit -m "fix: ${this.currentTask.title} [${this.currentTask.id}]
+      execSync(
+        `git commit -m "fix: ${this.currentTask.title} [${this.currentTask.id}]
 
 TDD implementation with:
 - RED: Failing test written
@@ -616,7 +621,9 @@ TDD implementation with:
 
 Diff coverage: ${this.results.coverage}%
 
-Co-Authored-By: Claude <noreply@anthropic.com>"`, { stdio: 'ignore' });
+Co-Authored-By: Claude <noreply@anthropic.com>"`,
+        { stdio: 'ignore' },
+      );
 
       console.log('   ✅ Changes committed');
     } catch (e) {

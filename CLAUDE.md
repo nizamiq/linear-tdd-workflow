@@ -7,6 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 This project has the **Linear TDD Workflow System** installed. You have access to powerful autonomous capabilities:
 
 ### Quick Discovery
+
 ```bash
 # Check if system is active
 test -d .claude && echo "✅ TDD Workflow System Available" || echo "❌ System not found"
@@ -21,6 +22,7 @@ make onboard
 ### Primary Commands Available to You (Slash Commands)
 
 **Core Workflow Commands** - TDD enforcement and quality management:
+
 - `/assess` - Scan code quality → Create Linear tasks (AUDITOR)
 - `/fix <TASK-ID>` - Implement fix with TDD enforcement (EXECUTOR)
 - `/recover` - Auto-fix broken CI/CD pipeline (GUARDIAN)
@@ -32,16 +34,19 @@ make onboard
 - `/docs` - Documentation validation and generation (DOC-KEEPER)
 
 **Development & Framework Commands** - Tech stack specific:
+
 - `/django` - Django development assistance (DJANGO-PRO)
 - `/python` - Python optimization and modern patterns (PYTHON-PRO)
 - `/typescript` - TypeScript and React development (TYPESCRIPT-PRO)
 
 **Infrastructure & Operations Commands** - Deployment and monitoring:
+
 - `/deploy` - Progressive deployment orchestration (DEPLOYMENT-ENGINEER)
 - `/optimize-db` - Database performance analysis (DATABASE-OPTIMIZER)
 - `/monitor` - Observability and alerting setup (OBSERVABILITY-ENGINEER)
 
 **Alternative Script Entrypoints:**
+
 ```bash
 # Via Makefile (if slash commands not available)
 make assess                  # Code assessment
@@ -64,6 +69,7 @@ ls .claude/commands/*.md     # List available commands
 **Linear TDD Workflow System** - Multi-agent autonomous code quality management system that enforces strict Test-Driven Development.
 
 Linear Configuration:
+
 - Team: Configured via `LINEAR_TEAM_ID` environment variable
 - Project: Configured via `LINEAR_PROJECT_ID` environment variable (optional)
 - Task Prefix: Configured via `LINEAR_TASK_PREFIX` environment variable (optional)
@@ -71,6 +77,7 @@ Linear Configuration:
 ## Essential Commands
 
 ### Testing
+
 ```bash
 # Run all tests with coverage
 npm test
@@ -91,6 +98,7 @@ npm test:watch
 ```
 
 ### Code Quality
+
 ```bash
 # Lint and auto-fix
 npm run lint
@@ -109,12 +117,14 @@ npm run precommit
 ```
 
 ### Build
+
 ```bash
 # TypeScript compilation
 npm run build
 ```
 
 ### Agent Operations
+
 ```bash
 # Assess code quality
 npm run assess
@@ -166,11 +176,13 @@ Migration & Documentation:
 
 **Agent Usage:**
 Claude Code natively discovers and uses agents through:
+
 - **Slash Commands**: `/assess`, `/fix`, `/recover`, `/learn`, `/release`, `/status`, `/cycle`, `/docs`
 - **Agent Files**: `.claude/agents/*.md` - Each agent has comprehensive system prompts
 - **Direct Invocation**: Agents are automatically selected based on the task
 
 **Agent Documentation:**
+
 - `.claude/agents/` - All agent definitions in Markdown with frontmatter
 - `.claude/commands/` - Slash command definitions
 - Each agent file contains complete role description and capabilities
@@ -192,6 +204,7 @@ docs/             # Project documentation
 ### Linear Task Management
 
 **STRATEGIST is the PRIMARY Linear manager**. Other agents have limited roles:
+
 - **STRATEGIST**: Full CRUD - manages all tasks, sprints, assignments
 - **AUDITOR**: CREATE only - quality issues (CLEAN-XXX)
 - **DOC-KEEPER**: CREATE only - documentation issues (DOC-XXX)
@@ -218,27 +231,33 @@ When in doubt about Linear operations, use STRATEGIST.
 ## Critical Constraints
 
 ### Test-Driven Development
+
 **Mandatory cycle for every change:**
+
 1. **[RED]** - Write failing test first
 2. **[GREEN]** - Minimal code to pass
 3. **[REFACTOR]** - Improve with passing tests
 
 ### Fix Pack Limits
+
 - ≤300 LOC per PR
 - Diff coverage ≥80%
 - Only FIL-0/FIL-1 changes (no feature work)
 
 ### Feature Impact Levels (FIL)
+
 - **FIL-0/1**: Auto-approved (formatting, dead code, renames)
 - **FIL-2**: Tech Lead approval (utilities, configs)
 - **FIL-3**: Tech Lead + Product approval (APIs, migrations)
 
 ## Performance SLAs
+
 - Code assessment: ≤12min for 150k LOC (JS/TS)
 - Fix implementation: ≤15min p50
 - Pipeline recovery: ≤10min p95
 
 ## MCP Tools Available
+
 - `sequential-thinking` - Complex reasoning
 - `context7` - Code understanding
 - `linear` - Task management
@@ -263,6 +282,7 @@ When in doubt about Linear operations, use STRATEGIST.
 5. Merge to `develop` after review
 
 GitFlow branches:
+
 - `main` - Production releases only
 - `develop` - Integration branch
 - `feature/*` - New features
@@ -271,6 +291,7 @@ GitFlow branches:
 ## Agent-Specific Notes
 
 When working with agents:
+
 1. Check `.claude/agents/CLAUDE.md` for detailed specifications
 2. Use standardized CLI invocation syntax
 3. All agent PRs require human review
@@ -281,11 +302,13 @@ When working with agents:
 **Primary Integration: MCP Tools + GitHub CLI** (No infrastructure needed!)
 
 The system uses Claude Code's built-in tools for seamless integration:
+
 - **Linear MCP Server** - Direct API access to Linear.app
 - **GitHub CLI (`gh`)** - Direct GitHub operations
 - **No webhooks needed** - Works immediately in Claude Code
 
 ### Integration Modes
+
 - **🟢 Standard (Recommended)** - MCP tools + CLI (zero setup)
 - **🟡 Polling** - Scheduled sync for CI/CD
 - **🔴 Webhooks** - Advanced/Enterprise only (see `.claude/advanced/webhooks/`)
@@ -293,11 +316,14 @@ The system uses Claude Code's built-in tools for seamless integration:
 For details, see `.claude/INTEGRATION-GUIDE.md`
 
 ### How It Works
+
 Tasks are automatically managed via Linear MCP:
+
 - Assessment results → Linear issues (via MCP)
 - Fix Packs → Linear tasks with estimates
 - PR status → GitHub CLI + Linear MCP updates
 
 Always check Linear for task context before implementing fixes.
+
 - This system must support python development
 - you need to ensure that all the aspects of the workflows are working properly with proper E2E testing! you can use this workflow to self improve this project!

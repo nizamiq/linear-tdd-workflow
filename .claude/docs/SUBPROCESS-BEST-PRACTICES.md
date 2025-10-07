@@ -39,9 +39,11 @@ User Workspace: NO CHANGES PERSISTED ❌
 ### Real-World Impact
 
 **Reported Issue:**
+
 > "The EXECUTOR agent's subprocess work never persisted, and I was reporting imaginary results."
 
 **What Users See:**
+
 - Agent reports "Created PR #123"
 - User checks GitHub: No PR exists
 - Agent reports "Committed changes"
@@ -58,27 +60,31 @@ User Workspace: NO CHANGES PERSISTED ❌
 **Use When:** Agent needs to write files, make git commits, create PRs, or modify Linear tasks.
 
 **Commands Using This Pattern:**
+
 - `/fix` - EXECUTOR implements fixes
 - `/recover` - GUARDIAN creates reverts and PRs
 - `/release` - STRATEGIST creates branches, tags, PRs
 - `/docs fix` - DOC-KEEPER modifies documentation files
 
 **How It Works:**
+
 ```yaml
 ---
 name: fix
-execution_mode: DIRECT  # ⚠️ Agent runs in main context
-subprocess_usage: NONE  # No subprocesses for state changes
+execution_mode: DIRECT # ⚠️ Agent runs in main context
+subprocess_usage: NONE # No subprocesses for state changes
 ---
 ```
 
 **Implementation:**
+
 ```markdown
 ## ⚠️ IMPORTANT: Direct Execution (No Subprocess)
 
 This command invokes EXECUTOR **directly in the main context** - NOT via the Task tool.
 
 This ensures:
+
 - ✅ File writes **persist** to your actual workspace
 - ✅ Git commits **persist** to your actual repository
 - ✅ PRs reference **real branches** in your repo
@@ -89,15 +95,18 @@ User → EXECUTOR in main context → Work persists directly ✅
 ```
 
 **Ground Truth Verification (Mandatory):**
-```markdown
+
+````markdown
 After completing work, agent MUST verify using actual tool calls:
 
 1. Verify files exist:
    ```bash
    ls -la path/to/file.ts
    ```
+````
 
 2. Verify commits persisted:
+
    ```bash
    git log --oneline -5
    ```
@@ -108,7 +117,8 @@ After completing work, agent MUST verify using actual tool calls:
    ```
 
 If ANY verification fails → DO NOT report success.
-```
+
+````
 
 ---
 
@@ -129,24 +139,28 @@ name: cycle
 execution_mode: ORCHESTRATOR  # Main agent spawns workers
 subprocess_usage: READ_ONLY_ANALYSIS  # Workers only read
 ---
-```
+````
 
 **Implementation:**
+
 ```markdown
 ## ⚠️ IMPORTANT: Subprocess Architecture
 
 This command uses the **orchestrator-workers pattern**:
+
 - **Main agent (YOU)** orchestrates workflow and makes decisions
 - **Worker subprocesses** perform READ-ONLY analysis (fetch data, calculate metrics)
 - **NO subprocess writes** - all Linear updates happen in main context
 
 **Safe subprocess usage (READ-ONLY):**
+
 - ✅ Fetching Linear issues
 - ✅ Analyzing git history
 - ✅ Calculating metrics
 - ✅ Generating reports
 
 **Prohibited in subprocesses (WRITE operations):**
+
 - ❌ Creating Linear tasks
 - ❌ Updating issue states
 - ❌ Making git commits
@@ -156,6 +170,7 @@ This command uses the **orchestrator-workers pattern**:
 ```
 
 **Architecture Diagram:**
+
 ```
 Main Context (PLANNER)
   ├─> Subprocess Worker 1: Fetch Linear backlog → Return issues
@@ -165,13 +180,15 @@ Main Context (PLANNER)
 ```
 
 **Ground Truth Verification:**
-```markdown
+
+````markdown
 After orchestration, main agent MUST verify state changes:
 
 1. Verify Linear cycle created:
    ```bash
    mcp__linear__search_cycles "status:active"
    ```
+````
 
 2. Verify issues assigned to cycle:
    ```bash
@@ -179,7 +196,8 @@ After orchestration, main agent MUST verify state changes:
    ```
 
 If verification fails → Report incomplete orchestration.
-```
+
+````
 
 ---
 
@@ -199,22 +217,26 @@ name: release
 execution_mode: DIRECT
 subprocess_usage: VALIDATION_THEN_ACTION
 ---
-```
+````
 
 **Implementation:**
+
 ```markdown
 ## ⚠️ IMPORTANT: Direct Execution Required
 
 This command performs **STATE-CHANGING operations**:
+
 - **Validation phase** may use subprocesses (read-only)
 - **Action phase** MUST run in main context (writes)
 
 **Validation phase (safe for subprocess):**
+
 - ✅ Running test suites
 - ✅ Checking coverage
 - ✅ Querying Linear
 
 **Action phase (MUST be in main context):**
+
 - ⚠️ Creating branches
 - ⚠️ Writing files
 - ⚠️ Creating PRs
@@ -223,6 +245,7 @@ This command performs **STATE-CHANGING operations**:
 ```
 
 **Architecture:**
+
 ```
 Main Context (STRATEGIST)
   ├─> Subprocess: Run validation checks → Return results
@@ -263,11 +286,13 @@ Does the agent need to write files, commit code, create PRs, or modify Linear?
 ### Ground Truth = Actual Tool Output
 
 **DO NOT:**
+
 - ❌ Trust agent's memory of what it did
 - ❌ Assume operations succeeded
 - ❌ Report success without verification
 
 **DO:**
+
 - ✅ Use actual tool calls (git, gh, ls, Linear MCP)
 - ✅ Check exit codes and output
 - ✅ Verify timestamped evidence
@@ -275,7 +300,7 @@ Does the agent need to write files, commit code, create PRs, or modify Linear?
 
 ### Verification Template
 
-```markdown
+````markdown
 ## Ground Truth Verification (Mandatory)
 
 After completing [operation], [AGENT] **MUST** verify using actual tool calls:
@@ -286,7 +311,9 @@ After completing [operation], [AGENT] **MUST** verify using actual tool calls:
    ```bash
    [actual command to check]
    ```
-   Expected: [specific verifiable output]
+````
+
+Expected: [specific verifiable output]
 
 2. **Verify [Thing 2]:**
    ```bash
@@ -307,7 +334,8 @@ Actual: [what actually happened based on tool output]
 ```
 
 **Rule:** NEVER report success without verified evidence.
-```
+
+````
 
 ---
 
@@ -322,22 +350,22 @@ agent: AGENT-NAME
 execution_mode: DIRECT | ORCHESTRATOR  # How agent runs
 subprocess_usage: NONE | READ_ONLY_ANALYSIS | VALIDATION_THEN_ACTION  # Subprocess role
 ---
-```
+````
 
 ### Execution Modes
 
-| Mode | Meaning | When to Use |
-|------|---------|-------------|
-| `DIRECT` | Agent runs in main context | State-changing operations |
-| `ORCHESTRATOR` | Agent spawns read-only workers | Parallel analysis |
+| Mode           | Meaning                        | When to Use               |
+| -------------- | ------------------------------ | ------------------------- |
+| `DIRECT`       | Agent runs in main context     | State-changing operations |
+| `ORCHESTRATOR` | Agent spawns read-only workers | Parallel analysis         |
 
 ### Subprocess Usage
 
-| Value | Meaning | Safe Operations |
-|-------|---------|-----------------|
-| `NONE` | No subprocesses used | All work in main context |
-| `READ_ONLY_ANALYSIS` | Subprocesses only read | Fetch data, calculate metrics |
-| `VALIDATION_THEN_ACTION` | Read validation, write action | Validate → Act pattern |
+| Value                    | Meaning                       | Safe Operations               |
+| ------------------------ | ----------------------------- | ----------------------------- |
+| `NONE`                   | No subprocesses used          | All work in main context      |
+| `READ_ONLY_ANALYSIS`     | Subprocesses only read        | Fetch data, calculate metrics |
+| `VALIDATION_THEN_ACTION` | Read validation, write action | Validate → Act pattern        |
 
 ---
 
@@ -361,19 +389,25 @@ Task(
 
 ```markdown
 # WRONG
-I created PR #123 and committed the changes.  # ❌ No verification!
+
+I created PR #123 and committed the changes. # ❌ No verification!
 ```
 
 **Fix:** Actually verify with tool calls.
 
-```markdown
+````markdown
 # CORRECT
+
 Let me verify the PR was created:
+
 ```bash
 gh pr list --state open
 ```
+````
+
 ✅ PR #123 confirmed: https://github.com/user/repo/pull/123
-```
+
+````
 
 ---
 
@@ -385,7 +419,7 @@ Task(
     subagent_type="AUDITOR",
     prompt="Scan code and create CLEAN tasks"  # ❌ Tasks won't exist!
 )
-```
+````
 
 **Fix:** Subprocess returns findings, main context creates tasks.
 
@@ -405,7 +439,8 @@ create_linear_tasks(findings)
 
 ```markdown
 # WRONG
-I created feature branch and committed changes in subprocess.  # ❌ Git state lost!
+
+I created feature branch and committed changes in subprocess. # ❌ Git state lost!
 ```
 
 **Fix:** Git operations MUST be in main context.
@@ -426,6 +461,7 @@ I created feature branch and committed changes in subprocess.  # ❌ Git state l
 ### Integration Test
 
 Create test command that:
+
 1. Spawns subprocess to analyze (read-only) ✅
 2. Returns data to main context ✅
 3. Main context creates file/commit ✅
@@ -439,6 +475,7 @@ Create test command that:
 For each command file:
 
 1. **Add execution metadata to YAML:**
+
    ```yaml
    execution_mode: DIRECT | ORCHESTRATOR
    subprocess_usage: NONE | READ_ONLY_ANALYSIS | VALIDATION_THEN_ACTION
@@ -457,16 +494,19 @@ For each command file:
 ## Examples by Command Type
 
 ### Pure Read-Only (No Persistence Needed)
+
 - `/status` - Query state, display info
 - Pattern: Orchestrator-Workers
 - Verification: Not needed (read-only)
 
 ### State-Changing (Persistence Critical)
+
 - `/fix` - Implement code, create PR
 - Pattern: Direct Execution
 - Verification: **Mandatory** (git log, gh pr list, etc.)
 
 ### Hybrid (Validate Then Act)
+
 - `/release` - Check quality gates → Create release
 - Pattern: Validation-Then-Action
 - Verification: **Mandatory** for action phase

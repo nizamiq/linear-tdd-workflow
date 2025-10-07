@@ -24,24 +24,24 @@ class LinearStandardizationJourney {
         analyzedIssues: 0,
         violationsFound: 0,
         duplicatesFound: 0,
-        orphanedIssues: 0
+        orphanedIssues: 0,
       },
       standardization: {
         updated: 0,
         created: 0,
         archived: 0,
         merged: 0,
-        failed: 0
+        failed: 0,
       },
       compliance: {
         beforeRate: 0,
         afterRate: 0,
-        improvement: 0
+        improvement: 0,
       },
       issues: [],
       violations: [],
       duplicates: [],
-      actions: []
+      actions: [],
     };
 
     this.qualityGates = {
@@ -50,23 +50,23 @@ class LinearStandardizationJourney {
         descriptionMinLength: 50,
         requiresEstimate: true,
         requiresLabels: true,
-        requiresPriority: true
+        requiresPriority: true,
       },
       content: {
         requiresAcceptanceCriteria: true,
         requiresUserStoryFormat: false, // For user-facing features
-        requiresTechnicalDetails: true  // For bugs
+        requiresTechnicalDetails: true, // For bugs
       },
       labels: {
         requiredTypeLabels: ['feature', 'bug', 'task', 'improvement', 'spike'],
         requiredPriorityLabels: ['p0-urgent', 'p1-high', 'p2-medium', 'p3-low'],
-        testingLabels: ['testing', 'coverage', 'tdd', 'specification']
+        testingLabels: ['testing', 'coverage', 'tdd', 'specification'],
       },
       estimation: {
         maxStoryPoints: 13,
         requiresFibonacci: true,
-        suggestBreakdown: 8
-      }
+        suggestBreakdown: 8,
+      },
     };
 
     this.taskTemplates = new TaskTemplates();
@@ -89,9 +89,9 @@ class LinearStandardizationJourney {
       project = null, // Will be determined from LINEAR_PROJECT_ID or detected
       dryRun = false,
       updateMode = 'conservative', // aggressive, conservative, interactive
-      duplicateHandling = 'merge',   // merge, flag, archive
-      scope = 'all',                 // all, mvp, current-cycle, specific-label
-      createTasks = false
+      duplicateHandling = 'merge', // merge, flag, archive
+      scope = 'all', // all, mvp, current-cycle, specific-label
+      createTasks = false,
     } = options;
 
     console.log('🚀 Starting JR-8: Linear Data Quality & Standardization Journey\n');
@@ -152,9 +152,8 @@ class LinearStandardizationJourney {
         success: true,
         results: this.results,
         report,
-        complianceImproved: this.results.compliance.improvement > 0
+        complianceImproved: this.results.compliance.improvement > 0,
       };
-
     } catch (error) {
       console.error('❌ Linear standardization journey failed:', error);
       throw error;
@@ -187,7 +186,6 @@ class LinearStandardizationJourney {
       console.log(`      Unlabeled Issues: ${inventory.unlabeled}\n`);
 
       this.results.audit.orphanedIssues = inventory.orphaned;
-
     } catch (error) {
       console.log('   ⚠️  Could not fetch Linear issues (using mock data)');
       // Use mock data for demonstration
@@ -213,7 +211,7 @@ class LinearStandardizationJourney {
         labels: [],
         state: 'Todo',
         team: project,
-        createdAt: '2024-01-15T10:00:00Z'
+        createdAt: '2024-01-15T10:00:00Z',
       },
       {
         id: this.generateTaskId(taskPrefix, 2),
@@ -233,7 +231,7 @@ So that I can ensure security and reliability
         labels: ['testing', 'coverage', 'p1-high', 'security'],
         state: 'Todo',
         team: project,
-        createdAt: '2024-01-16T10:00:00Z'
+        createdAt: '2024-01-16T10:00:00Z',
       },
       {
         id: this.generateTaskId(taskPrefix, 3),
@@ -244,19 +242,19 @@ So that I can ensure security and reliability
         labels: ['bug'],
         state: 'In Progress',
         team: project,
-        createdAt: '2024-01-17T10:00:00Z'
-      }
+        createdAt: '2024-01-17T10:00:00Z',
+      },
     ];
 
     // Apply scope filtering
     switch (scope) {
       case 'mvp':
-        return mockIssues.filter(issue => issue.labels.includes('mvp'));
+        return mockIssues.filter((issue) => issue.labels.includes('mvp'));
       case 'current-cycle':
         return mockIssues; // Would filter by current cycle in real implementation
       case 'testing':
-        return mockIssues.filter(issue =>
-          issue.labels.some(label => ['testing', 'coverage', 'tdd'].includes(label))
+        return mockIssues.filter((issue) =>
+          issue.labels.some((label) => ['testing', 'coverage', 'tdd'].includes(label)),
         );
       default:
         return mockIssues;
@@ -274,7 +272,7 @@ So that I can ensure security and reliability
       missingDescriptions: 0,
       orphaned: 0,
       unlabeled: 0,
-      potentialDuplicates: 0
+      potentialDuplicates: 0,
     };
 
     for (const issue of issues) {
@@ -312,7 +310,7 @@ So that I can ensure security and reliability
         violations.push({
           issue: issue.id,
           title: issue.title,
-          violations: issueViolations
+          violations: issueViolations,
         });
       }
 
@@ -320,7 +318,7 @@ So that I can ensure security and reliability
       if (this.isTestingTask(issue)) {
         const testingValidation = this.testingValidator.validateTestingTask(issue, {
           strict: false,
-          project: 'linear-tdd-workflow'
+          project: 'linear-tdd-workflow',
         });
 
         if (!testingValidation.isValid) {
@@ -329,7 +327,7 @@ So that I can ensure security and reliability
             title: issue.title,
             type: 'testing-specific',
             violations: testingValidation.violations,
-            recommendations: testingValidation.recommendations
+            recommendations: testingValidation.recommendations,
           });
         }
       }
@@ -340,9 +338,13 @@ So that I can ensure security and reliability
 
     console.log(`   📋 Validation Results:`);
     console.log(`      Issues with violations: ${violationsCount}/${this.results.issues.length}`);
-    console.log(`      Compliance rate: ${Math.round(((this.results.issues.length - violationsCount) / this.results.issues.length) * 100)}%\n`);
+    console.log(
+      `      Compliance rate: ${Math.round(((this.results.issues.length - violationsCount) / this.results.issues.length) * 100)}%\n`,
+    );
 
-    this.results.compliance.beforeRate = Math.round(((this.results.issues.length - violationsCount) / this.results.issues.length) * 100);
+    this.results.compliance.beforeRate = Math.round(
+      ((this.results.issues.length - violationsCount) / this.results.issues.length) * 100,
+    );
   }
 
   /**
@@ -366,14 +368,23 @@ So that I can ensure security and reliability
     }
 
     // Description validation
-    if (!issue.description || issue.description.length < this.qualityGates.format.descriptionMinLength) {
+    if (
+      !issue.description ||
+      issue.description.length < this.qualityGates.format.descriptionMinLength
+    ) {
       violations.push({ field: 'description', issue: 'too_short', severity: 'error' });
     }
 
     // Check for acceptance criteria
-    if (this.qualityGates.content.requiresAcceptanceCriteria &&
-        !this.hasAcceptanceCriteria(issue.description)) {
-      violations.push({ field: 'description', issue: 'missing_acceptance_criteria', severity: 'warning' });
+    if (
+      this.qualityGates.content.requiresAcceptanceCriteria &&
+      !this.hasAcceptanceCriteria(issue.description)
+    ) {
+      violations.push({
+        field: 'description',
+        issue: 'missing_acceptance_criteria',
+        severity: 'warning',
+      });
     }
 
     // Estimate validation
@@ -393,8 +404,8 @@ So that I can ensure security and reliability
       violations.push({ field: 'labels', issue: 'missing', severity: 'error' });
     } else if (issue.labels) {
       // Check for required type labels
-      const hasTypeLabel = this.qualityGates.labels.requiredTypeLabels.some(label =>
-        issue.labels.includes(label)
+      const hasTypeLabel = this.qualityGates.labels.requiredTypeLabels.some((label) =>
+        issue.labels.includes(label),
       );
       if (!hasTypeLabel) {
         violations.push({ field: 'labels', issue: 'missing_type_label', severity: 'warning' });
@@ -409,11 +420,14 @@ So that I can ensure security and reliability
    */
   isTestingTask(issue) {
     const testingKeywords = ['test', 'coverage', 'tdd', 'specification'];
-    return issue.labels?.some(label => testingKeywords.includes(label)) ||
-           testingKeywords.some(keyword =>
-             issue.title?.toLowerCase().includes(keyword) ||
-             issue.description?.toLowerCase().includes(keyword)
-           );
+    return (
+      issue.labels?.some((label) => testingKeywords.includes(label)) ||
+      testingKeywords.some(
+        (keyword) =>
+          issue.title?.toLowerCase().includes(keyword) ||
+          issue.description?.toLowerCase().includes(keyword),
+      )
+    );
   }
 
   /**
@@ -423,12 +437,31 @@ So that I can ensure security and reliability
     if (!title) return false;
 
     const actionVerbs = [
-      'add', 'implement', 'create', 'build', 'develop',
-      'fix', 'resolve', 'correct', 'repair',
-      'update', 'modify', 'change', 'improve', 'enhance',
-      'remove', 'delete', 'clean', 'refactor',
-      'test', 'validate', 'verify', 'check',
-      'investigate', 'research', 'analyze'
+      'add',
+      'implement',
+      'create',
+      'build',
+      'develop',
+      'fix',
+      'resolve',
+      'correct',
+      'repair',
+      'update',
+      'modify',
+      'change',
+      'improve',
+      'enhance',
+      'remove',
+      'delete',
+      'clean',
+      'refactor',
+      'test',
+      'validate',
+      'verify',
+      'check',
+      'investigate',
+      'research',
+      'analyze',
     ];
 
     const firstWord = title.toLowerCase().split(' ')[0];
@@ -441,9 +474,11 @@ So that I can ensure security and reliability
   hasAcceptanceCriteria(description) {
     if (!description) return false;
 
-    return description.includes('Acceptance Criteria') ||
-           description.includes('- [ ]') ||
-           description.includes('- [x]');
+    return (
+      description.includes('Acceptance Criteria') ||
+      description.includes('- [ ]') ||
+      description.includes('- [x]')
+    );
   }
 
   /**
@@ -468,7 +503,7 @@ So that I can ensure security and reliability
             type: similarity.type,
             primary: similarity.score > 0.9 ? issue1.id : null,
             secondary: similarity.score > 0.9 ? issue2.id : null,
-            recommendation: this.getDuplicateRecommendation(similarity)
+            recommendation: this.getDuplicateRecommendation(similarity),
           });
         }
       }
@@ -479,8 +514,10 @@ So that I can ensure security and reliability
 
     console.log(`   🔍 Duplicate Detection Results:`);
     console.log(`      Potential duplicates found: ${duplicates.length}`);
-    console.log(`      High confidence: ${duplicates.filter(d => d.similarity > 0.9).length}`);
-    console.log(`      Medium confidence: ${duplicates.filter(d => d.similarity > 0.7 && d.similarity <= 0.9).length}\n`);
+    console.log(`      High confidence: ${duplicates.filter((d) => d.similarity > 0.9).length}`);
+    console.log(
+      `      Medium confidence: ${duplicates.filter((d) => d.similarity > 0.7 && d.similarity <= 0.9).length}\n`,
+    );
   }
 
   /**
@@ -493,18 +530,18 @@ So that I can ensure security and reliability
     // Description similarity
     const descSimilarity = this.calculateTextSimilarity(
       issue1.description?.substring(0, 200) || '',
-      issue2.description?.substring(0, 200) || ''
+      issue2.description?.substring(0, 200) || '',
     );
 
     // Overall similarity
-    const overallSimilarity = (titleSimilarity * 0.7) + (descSimilarity * 0.3);
+    const overallSimilarity = titleSimilarity * 0.7 + descSimilarity * 0.3;
 
     return {
       isDuplicate: titleSimilarity > 0.8 || overallSimilarity > 0.75,
       score: overallSimilarity,
       type: titleSimilarity > 0.85 ? 'title_match' : 'content_match',
       titleSimilarity,
-      descSimilarity
+      descSimilarity,
     };
   }
 
@@ -517,7 +554,7 @@ So that I can ensure security and reliability
     const words1 = new Set(text1.toLowerCase().split(/\s+/));
     const words2 = new Set(text2.toLowerCase().split(/\s+/));
 
-    const intersection = new Set([...words1].filter(x => words2.has(x)));
+    const intersection = new Set([...words1].filter((x) => words2.has(x)));
     const union = new Set([...words1, ...words2]);
 
     return intersection.size / union.size;
@@ -546,10 +583,14 @@ So that I can ensure security and reliability
 
     // Process violations
     for (const violation of this.results.violations) {
-      const issue = this.results.issues.find(i => i.id === violation.issue);
+      const issue = this.results.issues.find((i) => i.id === violation.issue);
       if (!issue) continue;
 
-      const standardizationActions = this.generateFixActions(issue, violation.violations, updateMode);
+      const standardizationActions = this.generateFixActions(
+        issue,
+        violation.violations,
+        updateMode,
+      );
       actions.push(...standardizationActions);
     }
 
@@ -561,13 +602,13 @@ So that I can ensure security and reliability
           issues: duplicate.issues,
           primary: duplicate.primary,
           secondary: duplicate.secondary,
-          confidence: duplicate.similarity
+          confidence: duplicate.similarity,
         });
       } else if (duplicate.recommendation === 'flag_for_review') {
         actions.push({
           type: 'flag_duplicate',
           issues: duplicate.issues,
-          confidence: duplicate.similarity
+          confidence: duplicate.similarity,
         });
       }
     }
@@ -576,11 +617,15 @@ So that I can ensure security and reliability
 
     console.log(`   📋 Standardization Actions Generated:`);
     console.log(`      Total actions: ${actions.length}`);
-    console.log(`      Title fixes: ${actions.filter(a => a.field === 'title').length}`);
-    console.log(`      Description fixes: ${actions.filter(a => a.field === 'description').length}`);
-    console.log(`      Label fixes: ${actions.filter(a => a.field === 'labels').length}`);
-    console.log(`      Estimate fixes: ${actions.filter(a => a.field === 'estimate').length}`);
-    console.log(`      Duplicate merges: ${actions.filter(a => a.type === 'merge_duplicate').length}\n`);
+    console.log(`      Title fixes: ${actions.filter((a) => a.field === 'title').length}`);
+    console.log(
+      `      Description fixes: ${actions.filter((a) => a.field === 'description').length}`,
+    );
+    console.log(`      Label fixes: ${actions.filter((a) => a.field === 'labels').length}`);
+    console.log(`      Estimate fixes: ${actions.filter((a) => a.field === 'estimate').length}`);
+    console.log(
+      `      Duplicate merges: ${actions.filter((a) => a.type === 'merge_duplicate').length}\n`,
+    );
   }
 
   /**
@@ -616,7 +661,7 @@ So that I can ensure security and reliability
           issueId: issue.id,
           originalIssue: issue,
           violation,
-          updateMode
+          updateMode,
         });
       }
     }
@@ -649,7 +694,7 @@ So that I can ensure security and reliability
       field: 'title',
       oldValue: issue.title,
       newValue: newTitle,
-      confidence: 0.9
+      confidence: 0.9,
     };
   }
 
@@ -664,7 +709,8 @@ So that I can ensure security and reliability
         newDescription = this.generateStandardDescription(issue);
         break;
       case 'missing_acceptance_criteria':
-        newDescription += '\n\n## Acceptance Criteria\n- [ ] [Criterion based on title]\n- [ ] [Quality checks pass]\n- [ ] [Documentation updated]';
+        newDescription +=
+          '\n\n## Acceptance Criteria\n- [ ] [Criterion based on title]\n- [ ] [Quality checks pass]\n- [ ] [Documentation updated]';
         break;
     }
 
@@ -673,7 +719,7 @@ So that I can ensure security and reliability
       field: 'description',
       oldValue: issue.description,
       newValue: newDescription,
-      confidence: 0.8
+      confidence: 0.8,
     };
   }
 
@@ -700,7 +746,7 @@ So that I can ensure security and reliability
       field: 'labels',
       oldValue: issue.labels,
       newValue: [...new Set(newLabels)], // Remove duplicates
-      confidence: 0.7
+      confidence: 0.7,
     };
   }
 
@@ -715,7 +761,7 @@ So that I can ensure security and reliability
       field: 'estimate',
       oldValue: issue.estimate,
       newValue: estimate,
-      confidence: 0.6
+      confidence: 0.6,
     };
   }
 
@@ -730,7 +776,7 @@ So that I can ensure security and reliability
       field: 'priority',
       oldValue: issue.priority,
       newValue: priority,
-      confidence: 0.5
+      confidence: 0.5,
     };
   }
 
@@ -754,9 +800,12 @@ So that I can ensure security and reliability
     const description = issue.description?.toLowerCase() || '';
 
     if (title.includes('bug') || title.includes('fix') || title.includes('error')) return 'bug';
-    if (title.includes('feature') || title.includes('add') || title.includes('implement')) return 'feature';
-    if (title.includes('improve') || title.includes('enhance') || title.includes('optimize')) return 'improvement';
-    if (title.includes('investigate') || title.includes('research') || title.includes('spike')) return 'spike';
+    if (title.includes('feature') || title.includes('add') || title.includes('implement'))
+      return 'feature';
+    if (title.includes('improve') || title.includes('enhance') || title.includes('optimize'))
+      return 'improvement';
+    if (title.includes('investigate') || title.includes('research') || title.includes('spike'))
+      return 'spike';
     if (title.includes('test') || description.includes('test')) return 'task';
 
     return 'task';
@@ -780,7 +829,7 @@ So that I can ensure security and reliability
 
     // Ensure Fibonacci and within limits
     const fibonacci = [1, 2, 3, 5, 8, 13];
-    return fibonacci.find(f => f >= Math.max(1, estimate)) || 13;
+    return fibonacci.find((f) => f >= Math.max(1, estimate)) || 13;
   }
 
   inferPriority(issue) {
@@ -841,14 +890,13 @@ ${issue.title}
         }
 
         executionResults.push(result);
-
       } catch (error) {
         failed++;
         console.log(`   ❌ Error executing ${action.type}:`, error.message);
         executionResults.push({
           success: false,
           action,
-          error: error.message
+          error: error.message,
         });
       }
     }
@@ -859,7 +907,9 @@ ${issue.title}
     console.log(`   📊 Execution Summary:`);
     console.log(`      Successfully updated: ${updated}`);
     console.log(`      Failed: ${failed}`);
-    console.log(`      Success rate: ${Math.round((updated / this.results.actions.length) * 100)}%\n`);
+    console.log(
+      `      Success rate: ${Math.round((updated / this.results.actions.length) * 100)}%\n`,
+    );
 
     return executionResults;
   }
@@ -898,7 +948,7 @@ ${issue.title}
     // });
 
     // Mock implementation
-    const issue = this.results.issues.find(i => i.id === action.issueId);
+    const issue = this.results.issues.find((i) => i.id === action.issueId);
     if (issue) {
       issue[action.field] = action.newValue;
     }
@@ -907,7 +957,7 @@ ${issue.title}
       success: true,
       action,
       oldValue: action.oldValue,
-      newValue: action.newValue
+      newValue: action.newValue,
     };
   }
 
@@ -928,7 +978,7 @@ ${issue.title}
       success: true,
       action,
       primary: action.primary,
-      secondary: action.secondary
+      secondary: action.secondary,
     };
   }
 
@@ -941,7 +991,7 @@ ${issue.title}
     return {
       success: true,
       action,
-      flagged: action.issues
+      flagged: action.issues,
     };
   }
 
@@ -954,15 +1004,19 @@ ${issue.title}
     const followupTasks = [];
 
     // Create tasks for manual review items
-    const manualReviewCount = this.results.actions.filter(a => a.confidence < 0.7).length;
+    const manualReviewCount = this.results.actions.filter((a) => a.confidence < 0.7).length;
     if (manualReviewCount > 0) {
-      const task = this.taskTemplates.generateStandardizedTask({
-        type: 'manual-review',
-        description: `${manualReviewCount} Linear issues require manual review for standardization`,
-        priority: 'MEDIUM'
-      }, 'improvement', {
-        component: 'Project Management'
-      });
+      const task = this.taskTemplates.generateStandardizedTask(
+        {
+          type: 'manual-review',
+          description: `${manualReviewCount} Linear issues require manual review for standardization`,
+          priority: 'MEDIUM',
+        },
+        'improvement',
+        {
+          component: 'Project Management',
+        },
+      );
 
       followupTasks.push(task);
     }
@@ -970,13 +1024,17 @@ ${issue.title}
     // Create tasks for duplicate resolution
     const duplicateCount = this.results.duplicates.length;
     if (duplicateCount > 0) {
-      const task = this.taskTemplates.generateStandardizedTask({
-        type: 'duplicate-resolution',
-        description: `${duplicateCount} potential duplicate issues need resolution`,
-        priority: 'MEDIUM'
-      }, 'improvement', {
-        component: 'Project Management'
-      });
+      const task = this.taskTemplates.generateStandardizedTask(
+        {
+          type: 'duplicate-resolution',
+          description: `${duplicateCount} potential duplicate issues need resolution`,
+          priority: 'MEDIUM',
+        },
+        'improvement',
+        {
+          component: 'Project Management',
+        },
+      );
 
       followupTasks.push(task);
     }
@@ -995,8 +1053,11 @@ ${issue.title}
     const violationsFixed = this.results.standardization.updated;
     const afterViolations = Math.max(0, this.results.audit.violationsFound - violationsFixed);
 
-    this.results.compliance.afterRate = Math.round(((totalIssues - afterViolations) / totalIssues) * 100);
-    this.results.compliance.improvement = this.results.compliance.afterRate - this.results.compliance.beforeRate;
+    this.results.compliance.afterRate = Math.round(
+      ((totalIssues - afterViolations) / totalIssues) * 100,
+    );
+    this.results.compliance.improvement =
+      this.results.compliance.afterRate - this.results.compliance.beforeRate;
 
     return {
       summary: {
@@ -1006,11 +1067,11 @@ ${issue.title}
         improvement: this.results.compliance.improvement,
         violationsFixed,
         duplicatesFound: this.results.audit.duplicatesFound,
-        standardizationActions: this.results.actions.length
+        standardizationActions: this.results.actions.length,
       },
       compliance: this.results.compliance,
       audit: this.results.audit,
-      standardization: this.results.standardization
+      standardization: this.results.standardization,
     };
   }
 
@@ -1024,7 +1085,9 @@ ${issue.title}
     console.log(`   Compliance Before: ${report.summary.beforeCompliance}%`);
     console.log(`   Compliance After: ${report.summary.afterCompliance}%`);
     console.log(`   Improvement: +${report.summary.improvement}%`);
-    console.log(`   Actions ${dryRun ? 'Planned' : 'Executed'}: ${report.summary.standardizationActions}`);
+    console.log(
+      `   Actions ${dryRun ? 'Planned' : 'Executed'}: ${report.summary.standardizationActions}`,
+    );
     console.log(`   Duplicates Found: ${report.summary.duplicatesFound}`);
     console.log('===========================================\n');
 
@@ -1033,7 +1096,9 @@ ${issue.title}
       console.log('   Run with --dry-run=false to execute changes\n');
     } else {
       console.log('✅ STANDARDIZATION COMPLETE');
-      console.log(`   ${report.summary.improvement > 0 ? '📈' : '📊'} Compliance improved by ${report.summary.improvement}%\n`);
+      console.log(
+        `   ${report.summary.improvement > 0 ? '📈' : '📊'} Compliance improved by ${report.summary.improvement}%\n`,
+      );
     }
   }
 
@@ -1051,7 +1116,7 @@ ${issue.title}
         labels: [],
         state: 'Todo',
         team: project,
-        createdAt: '2024-01-15T10:00:00Z'
+        createdAt: '2024-01-15T10:00:00Z',
       },
       {
         id: this.generateTaskId(taskPrefix, 2),
@@ -1071,7 +1136,7 @@ So that I can ensure security and reliability
         labels: ['testing', 'coverage', 'p1-high', 'security'],
         state: 'Todo',
         team: project,
-        createdAt: '2024-01-16T10:00:00Z'
+        createdAt: '2024-01-16T10:00:00Z',
       },
       {
         id: this.generateTaskId(taskPrefix, 3),
@@ -1082,7 +1147,7 @@ So that I can ensure security and reliability
         labels: ['bug'],
         state: 'In Progress',
         team: project,
-        createdAt: '2024-01-17T10:00:00Z'
+        createdAt: '2024-01-17T10:00:00Z',
       },
       {
         id: this.generateTaskId(taskPrefix, 4),
@@ -1093,8 +1158,8 @@ So that I can ensure security and reliability
         labels: ['bug', 'security'],
         state: 'Todo',
         team: project,
-        createdAt: '2024-01-18T10:00:00Z'
-      }
+        createdAt: '2024-01-18T10:00:00Z',
+      },
     ];
   }
 }
@@ -1112,7 +1177,7 @@ if (require.main === module) {
       updateMode: 'conservative',
       duplicateHandling: 'merge',
       scope: 'all',
-      createTasks: false
+      createTasks: false,
     };
 
     // Parse arguments
@@ -1157,7 +1222,6 @@ if (require.main === module) {
         console.log('⚠️  Compliance did not improve');
         process.exit(1);
       }
-
     } catch (error) {
       console.error('❌ Journey failed:', error);
       process.exit(1);

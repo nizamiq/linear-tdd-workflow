@@ -40,6 +40,7 @@ node .claude/setup.js
 ```
 
 **Setup Process:**
+
 1. **Project Detection** - Automatically detects this is a new project
 2. **Language Selection** - Choose your primary language(s):
    - JavaScript only
@@ -83,6 +84,7 @@ my-new-project/
 #### JavaScript/TypeScript Projects
 
 **Generated `package.json`:**
+
 ```json
 {
   "name": "my-new-project",
@@ -116,6 +118,7 @@ my-new-project/
 ```
 
 **Jest Configuration:**
+
 - Coverage threshold: 80% (lines, functions, branches, statements)
 - Test patterns: `**/*.test.{js,ts}`, `**/*.spec.{js,ts}`
 - Setup for TypeScript with ts-jest
@@ -123,6 +126,7 @@ my-new-project/
 #### Python Projects
 
 **Generated `pyproject.toml`:**
+
 ```toml
 [build-system]
 requires = ["poetry-core"]
@@ -171,6 +175,7 @@ The system enforces Test-Driven Development from day one.
 #### Create Your First Test (RED Phase)
 
 **JavaScript/TypeScript:**
+
 ```bash
 # Create initial failing test
 cat > tests/unit/calculator.test.ts << 'EOF'
@@ -186,6 +191,7 @@ EOF
 ```
 
 **Python:**
+
 ```bash
 # Create initial failing test
 cat > tests/test_calculator.py << 'EOF'
@@ -209,6 +215,7 @@ pytest    # For Python
 #### Implement Minimal Code (GREEN Phase)
 
 **JavaScript/TypeScript:**
+
 ```bash
 mkdir -p src
 cat > src/calculator.ts << 'EOF'
@@ -221,6 +228,7 @@ EOF
 ```
 
 **Python:**
+
 ```bash
 mkdir -p src
 cat > src/calculator.py << 'EOF'
@@ -358,6 +366,7 @@ node .claude/setup.js --template react-ts
 ```
 
 Generates:
+
 - React + TypeScript configuration
 - Jest + React Testing Library
 - ESLint + Prettier for React
@@ -371,6 +380,7 @@ node .claude/setup.js --template express-ts
 ```
 
 Generates:
+
 - Express.js with TypeScript
 - API testing with Supertest
 - Swagger/OpenAPI documentation
@@ -384,6 +394,7 @@ node .claude/setup.js --template fastapi
 ```
 
 Generates:
+
 - FastAPI with async support
 - Pytest with async testing
 - Pydantic models
@@ -397,6 +408,7 @@ node .claude/setup.js --template cli
 ```
 
 Generates:
+
 - Commander.js (Node.js) or Click (Python)
 - CLI testing patterns
 - Distribution packaging
@@ -429,6 +441,7 @@ make ci-test
 ```
 
 Expected output:
+
 - ✅ All tests pass
 - ✅ Code coverage ≥80%
 - ✅ Linting passes
@@ -448,6 +461,7 @@ Expected output:
 ### Common Issues
 
 **Setup fails with dependency errors:**
+
 ```bash
 # Check Node.js version
 node --version  # Should be ≥18.0.0
@@ -460,6 +474,7 @@ node .claude/setup.js
 ```
 
 **Tests not running:**
+
 ```bash
 # Diagnose issues
 make doctor
@@ -469,6 +484,7 @@ make validate-tdd
 ```
 
 **Agent system not responding:**
+
 ```bash
 # Check agent status
 make agents-status

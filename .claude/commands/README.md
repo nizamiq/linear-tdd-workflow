@@ -6,18 +6,19 @@ This directory contains the **focused command palette** for the Linear TDD Workf
 
 ## Core Commands (Journey-Aligned)
 
-| Command | Purpose | Journey | Entry Point | SLA |
-|---------|---------|---------|-------------|-----|
-| `/assess` | Code quality scan → Linear tasks | JR-2 | `make assess` | ≤12min |
-| `/fix` | TDD fix implementation | JR-3 | `make fix TASK=XXX` | ≤30min |
-| `/recover` | CI/CD pipeline recovery | JR-4 | `make recover` | ≤10min |
-| `/learn` | Pattern mining from PRs | JR-5 | `make learn` | Weekly |
-| `/release` | Production deployment | JR-6 | `make release` | ≤2hr |
-| `/status` | Current workflow status | - | `make status` | Real-time |
+| Command    | Purpose                          | Journey | Entry Point         | SLA       |
+| ---------- | -------------------------------- | ------- | ------------------- | --------- |
+| `/assess`  | Code quality scan → Linear tasks | JR-2    | `make assess`       | ≤12min    |
+| `/fix`     | TDD fix implementation           | JR-3    | `make fix TASK=XXX` | ≤30min    |
+| `/recover` | CI/CD pipeline recovery          | JR-4    | `make recover`      | ≤10min    |
+| `/learn`   | Pattern mining from PRs          | JR-5    | `make learn`        | Weekly    |
+| `/release` | Production deployment            | JR-6    | `make release`      | ≤2hr      |
+| `/status`  | Current workflow status          | -       | `make status`       | Real-time |
 
 ## Why Only 6 Commands?
 
 **Focus over Features** - These 6 commands cover the entire TDD + Linear workflow:
+
 1. **Assess** quality issues
 2. **Fix** them with TDD
 3. **Recover** from failures
@@ -45,6 +46,7 @@ cat .claude/commands/journey-assess.md
 Each command has multiple entry points for flexibility:
 
 ### Makefile (Recommended)
+
 ```bash
 make assess              # Cleanest syntax
 make fix TASK=CLEAN-123
@@ -52,12 +54,14 @@ make recover
 ```
 
 ### Direct Journey Execution
+
 ```bash
 node .claude/journeys/jr2-assessment.js
 node .claude/journeys/jr3-fix-pack.js --task-id CLEAN-123
 ```
 
 ### Agent Invocation
+
 ```bash
 npm run agent:invoke AUDITOR:assess-code
 npm run agent:invoke EXECUTOR:implement-fix -- --task-id CLEAN-123
@@ -66,6 +70,7 @@ npm run agent:invoke EXECUTOR:implement-fix -- --task-id CLEAN-123
 ## Command Documentation
 
 Each command has comprehensive documentation:
+
 - `journey-assess.md` - Assessment details
 - `journey-fix.md` - TDD fix process
 - `journey-recover.md` - Pipeline recovery
@@ -76,6 +81,7 @@ Each command has comprehensive documentation:
 ## Integration with Claude Code
 
 Claude Code can discover and execute these commands via:
+
 1. **Slash commands** - `/assess`, `/fix CLEAN-123`, etc.
 2. **Make targets** - `make assess`, `make fix TASK=XXX`
 3. **Direct scripts** - Entry points in each command file
@@ -83,6 +89,7 @@ Claude Code can discover and execute these commands via:
 ## Linear Integration
 
 All commands integrate with Linear.app:
+
 - `/assess` → Creates CLEAN-XXX issues
 - `/fix` → Updates task status
 - `/recover` → Creates INCIDENT-XXX
@@ -93,6 +100,7 @@ All commands integrate with Linear.app:
 ## TDD Enforcement
 
 The `/fix` command enforces strict TDD:
+
 1. **RED** - Write failing test first
 2. **GREEN** - Minimal code to pass
 3. **REFACTOR** - Improve with tests passing
@@ -123,13 +131,13 @@ No exceptions. Every fix follows this cycle.
 
 ## Performance SLAs
 
-| Operation | Target | Actual |
-|-----------|--------|--------|
-| Assessment | ≤12min | ~8min |
-| Fix (simple) | ≤15min | ~12min |
+| Operation     | Target | Actual |
+| ------------- | ------ | ------ |
+| Assessment    | ≤12min | ~8min  |
+| Fix (simple)  | ≤15min | ~12min |
 | Fix (complex) | ≤30min | ~25min |
-| Recovery | ≤10min | ~7min |
-| Release | ≤2hr | ~90min |
+| Recovery      | ≤10min | ~7min  |
+| Release       | ≤2hr   | ~90min |
 
 ## Notes
 

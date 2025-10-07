@@ -54,7 +54,7 @@ class AgentStatusMonitor {
 
     try {
       const files = await fs.readdir(this.agentsDir);
-      const agentFiles = files.filter(f => f.endsWith('.md'));
+      const agentFiles = files.filter((f) => f.endsWith('.md'));
 
       for (const file of agentFiles) {
         const agentPath = path.join(this.agentsDir, file);
@@ -99,18 +99,19 @@ class AgentStatusMonitor {
   async displaySpecializedAgents(agents) {
     console.log(chalk.bold.cyan('\n🔧 Specialized Agents (PARALLELIZABLE)\n'));
 
-    const specializedAgents = Array.from(agents.keys())
-      .filter(name => !['auditor', 'executor', 'guardian', 'strategist', 'scholar'].includes(name));
+    const specializedAgents = Array.from(agents.keys()).filter(
+      (name) => !['auditor', 'executor', 'guardian', 'strategist', 'scholar'].includes(name),
+    );
 
     // Group by domain
     const domains = {
-      'Testing': ['tester', 'validator'],
-      'Quality': ['analyzer', 'optimizer', 'cleaner', 'reviewer'],
-      'Infrastructure': ['deployer', 'monitor', 'migrator'],
-      'Architecture': ['architect', 'refactorer', 'researcher'],
-      'Security': ['securityguard'],
-      'Documentation': ['documenter'],
-      'Integration': ['integrator']
+      Testing: ['tester', 'validator'],
+      Quality: ['analyzer', 'optimizer', 'cleaner', 'reviewer'],
+      Infrastructure: ['deployer', 'monitor', 'migrator'],
+      Architecture: ['architect', 'refactorer', 'researcher'],
+      Security: ['securityguard'],
+      Documentation: ['documenter'],
+      Integration: ['integrator'],
     };
 
     for (const [domain, agentList] of Object.entries(domains)) {
@@ -143,8 +144,8 @@ class AgentStatusMonitor {
 
     console.log(
       `${icon} ${chalk.bold(name)} ` +
-      `${hasConfig} Config ${hasFIL} FIL ${hasConcurrency} Concurrency ` +
-      `${slaStatus.icon} SLA`
+        `${hasConfig} Config ${hasFIL} FIL ${hasConcurrency} Concurrency ` +
+        `${slaStatus.icon} SLA`,
     );
 
     // Details
@@ -176,7 +177,7 @@ class AgentStatusMonitor {
 
     return {
       icon: mockCompliance ? '✅' : '⚠️',
-      status: mockCompliance ? 'compliant' : 'warning'
+      status: mockCompliance ? 'compliant' : 'warning',
     };
   }
 
@@ -186,8 +187,13 @@ class AgentStatusMonitor {
   async displaySystemHealth(agents) {
     console.log(chalk.bold.green('\n🏥 System Health Overview\n'));
 
-    const coreAgentsConfigured = ['auditor', 'executor', 'guardian', 'strategist', 'scholar']
-      .filter(name => agents.has(name)).length;
+    const coreAgentsConfigured = [
+      'auditor',
+      'executor',
+      'guardian',
+      'strategist',
+      'scholar',
+    ].filter((name) => agents.has(name)).length;
 
     const totalAgentsConfigured = agents.size;
 
@@ -198,7 +204,7 @@ class AgentStatusMonitor {
       'Parallel Execution': '✅ Available',
       'FIL Enforcement': '✅ Active',
       'Coverage Threshold': '≥80% diff coverage',
-      'Mutation Testing': '≥30% threshold'
+      'Mutation Testing': '≥30% threshold',
     };
 
     for (const [metric, value] of Object.entries(healthMetrics)) {
@@ -220,7 +226,7 @@ class AgentStatusMonitor {
       'Rollback Rate': '✅ 0.2% (target: ≤0.3%)',
       'Auto-recovery': '✅ 92% (target: ≥90%)',
       'Coverage Compliance': '✅ 89% PRs (target: ≥80%)',
-      'Mutation Score': '⚠️ 28% avg (target: ≥30%)'
+      'Mutation Score': '⚠️ 28% avg (target: ≥30%)',
     };
 
     for (const [metric, value] of Object.entries(metrics)) {
@@ -240,7 +246,7 @@ class AgentStatusMonitor {
       'Active Workers': '7/50 slots used',
       'Path Locks': '3 files locked',
       'Queue Depth': '2 tasks waiting',
-      'Conflict Resolution': 'queue strategy active'
+      'Conflict Resolution': 'queue strategy active',
     };
 
     for (const [item, status] of Object.entries(concurrencyData)) {
@@ -252,10 +258,10 @@ class AgentStatusMonitor {
     const mockLocks = [
       'src/utils.js → EXECUTOR (Fix Pack CLEAN-123)',
       'tests/integration/ → VALIDATOR (Coverage check)',
-      'package.json → SECURITYGUARD (Dependency scan)'
+      'package.json → SECURITYGUARD (Dependency scan)',
     ];
 
-    mockLocks.forEach(lock => {
+    mockLocks.forEach((lock) => {
       console.log(`    🔒 ${lock}`);
     });
   }
@@ -265,8 +271,9 @@ class AgentStatusMonitor {
    */
   async quickHealthCheck() {
     const agents = await this.loadAllAgents();
-    const coreCount = ['auditor', 'executor', 'guardian', 'strategist', 'scholar']
-      .filter(name => agents.has(name)).length;
+    const coreCount = ['auditor', 'executor', 'guardian', 'strategist', 'scholar'].filter((name) =>
+      agents.has(name),
+    ).length;
 
     if (coreCount === 5) {
       console.log(chalk.green('✅ All core agents configured'));
@@ -282,7 +289,7 @@ class AgentStatusMonitor {
 if (require.main === module) {
   const monitor = new AgentStatusMonitor();
 
-  const [,, command] = process.argv;
+  const [, , command] = process.argv;
 
   switch (command) {
     case 'quick':
@@ -291,11 +298,10 @@ if (require.main === module) {
 
     case 'dashboard':
     default:
-      monitor.displayStatus()
-        .catch(error => {
-          console.error(chalk.red(`Status check failed: ${error.message}`));
-          process.exit(1);
-        });
+      monitor.displayStatus().catch((error) => {
+        console.error(chalk.red(`Status check failed: ${error.message}`));
+        process.exit(1);
+      });
       break;
   }
 }

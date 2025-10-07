@@ -16,7 +16,7 @@ function parseArgs() {
   const options = {
     timeRange: '7d',
     minSuccessRate: 0.9,
-    output: 'patterns.json'
+    output: 'patterns.json',
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -54,7 +54,7 @@ function main() {
     patterns: [],
     overall_success_rate: 0,
     efficiency_metrics: {},
-    note: 'This is a stub implementation. Pattern learning will be implemented in a future release.'
+    note: 'This is a stub implementation. Pattern learning will be implemented in a future release.',
   };
 
   // Write stub output

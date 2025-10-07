@@ -15,22 +15,27 @@ The Linear TDD Workflow System now implements **all major Anthropic best practic
 ## Phase 1: Foundation (Loop Controls & Safety)
 
 ### Hooks System (`.claude/hooks.json`)
+
 **Purpose**: Deterministic quality enforcement without agent memory
 
 **Capabilities**:
+
 - Pre-tool-use hooks: Quality gates before git commits (lint + typecheck + tests)
 - Post-tool-use hooks: Auto-format after code writes
 - On-file-write hooks: Language-specific formatting (Python: ruff, JS/TS: prettier)
 
 **Benefits**:
+
 - Zero reliance on agent memory
 - Guaranteed quality gates
 - Instant feedback on violations
 
 ### Loop Controls (5 Core Agents)
+
 **Agents Enhanced**: STRATEGIST, AUDITOR, EXECUTOR, GUARDIAN, SCHOLAR
 
 **Control Mechanisms**:
+
 - **Iteration Limits**: Prevent runaway loops (3-20 iterations based on complexity)
 - **Time Caps**: SLA enforcement (600s - 3600s based on task)
 - **Cost Limits**: Token budget protection (100k - 500k tokens)
@@ -38,6 +43,7 @@ The Linear TDD Workflow System now implements **all major Anthropic best practic
 - **Ground Truth Checks**: Tool output verification vs agent estimation
 
 **Example - EXECUTOR**:
+
 ```yaml
 loop_controls:
   max_iterations: 5
@@ -45,7 +51,7 @@ loop_controls:
   tdd_cycle_enforcement: true
   ground_truth_checks:
     - tool: Bash
-      command: "npm test"
+      command: 'npm test'
       verify: exit_code_equals_0
   workflow_phases:
     - phase: RED
@@ -57,6 +63,7 @@ loop_controls:
 ```
 
 ### Success Criteria (`.claude/agents/success-criteria.yaml`)
+
 **Comprehensive metrics for all 22 agents**:
 
 - **Quantitative metrics**: Targets, units, measurements
@@ -65,32 +72,35 @@ loop_controls:
 - **Verification protocol**: "Ground truth over estimation"
 
 **Example Metrics**:
+
 ```yaml
 EXECUTOR:
   quantitative:
     - metric: test_coverage_diff
       target: 80
       unit: percent
-      measurement: "new_covered_lines / new_total_lines"
+      measurement: 'new_covered_lines / new_total_lines'
     - metric: mutation_score
       target: 30
       unit: percent
 ```
 
 ### Model Optimization
+
 **Cost-optimized model selection across all 22 agents**:
 
-| Model | Agents | Use Case | Cost Impact |
-|-------|--------|----------|-------------|
-| haiku | 3 | Simple/deterministic (LINTER, TYPECHECKER, VALIDATOR) | 75% reduction |
-| sonnet | 15 | Balanced tasks (most agents) | Baseline |
-| opus | 4 | Complex/critical (EXECUTOR, CODE-REVIEWER, DB-OPTIMIZER, K8S-ARCHITECT) | Premium |
+| Model  | Agents | Use Case                                                                | Cost Impact   |
+| ------ | ------ | ----------------------------------------------------------------------- | ------------- |
+| haiku  | 3      | Simple/deterministic (LINTER, TYPECHECKER, VALIDATOR)                   | 75% reduction |
+| sonnet | 15     | Balanced tasks (most agents)                                            | Baseline      |
+| opus   | 4      | Complex/critical (EXECUTOR, CODE-REVIEWER, DB-OPTIMIZER, K8S-ARCHITECT) | Premium       |
 
 **Projected Savings**: 35-40% cost reduction on simple tasks
 
 ## Phase 2: Workflow Simplification
 
 ### The Simplest Approach Principle
+
 ```
 Direct Tool Call → Workflow → Autonomous Agent
    (best)           (good)       (necessary)
@@ -99,30 +109,35 @@ Direct Tool Call → Workflow → Autonomous Agent
 ### 6 Deterministic Workflows Created
 
 #### 1. TDD Cycle (`tdd-cycle.yaml`)
+
 - Enforces RED→GREEN→REFACTOR with validation gates
 - Max attempts per phase (RED: 2, GREEN: 3, REFACTOR: 2)
 - Ground truth verification via test exit codes
 - SLA: 5 minutes
 
 #### 2. Lint and Format (`lint-and-format.yaml`)
+
 - Auto-detect language, run appropriate tools
 - Python: ruff, JS/TS: prettier/eslint
 - Syntax validation after changes
 - SLA: 1 minute
 
 #### 3. Type Check (`type-check.yaml`)
+
 - Incremental by default (changed files only)
 - TypeScript: tsc, Python: mypy
 - Escalates to experts for >10 errors
 - SLA: 2 minutes
 
 #### 4. PR Review Checklist (`pr-review-checklist.yaml`)
+
 - Automated validation: tests, coverage, linting, type checking
 - Security: vulnerability scan, secret detection
 - Documentation: PR description completeness
 - SLA: 5 minutes
 
 #### 5. Deployment Gates (`deployment-gates.yaml`)
+
 - Pre-flight: CI status, branch protection, coverage
 - Security: vulnerability scan, dependency audit
 - Operational: rollback plan, monitoring, backups
@@ -130,6 +145,7 @@ Direct Tool Call → Workflow → Autonomous Agent
 - SLA: 10 minutes
 
 #### 6. Fix Pack Generation (`fix-pack-generation.yaml`)
+
 - Load assessment JSON, filter FIL-0/1 issues
 - Group related issues (<300 LOC combined)
 - Generate specs with acceptance criteria
@@ -137,6 +153,7 @@ Direct Tool Call → Workflow → Autonomous Agent
 - SLA: 5 minutes
 
 ### Workflow Benefits
+
 **Cost**: 75-80% reduction vs agents
 **Speed**: 10x faster (direct tool execution)
 **Reliability**: 100% consistent behavior
@@ -147,6 +164,7 @@ Direct Tool Call → Workflow → Autonomous Agent
 **Purpose**: Self-correcting implementations before human review
 
 **Pattern**:
+
 ```
 1. GENERATOR: Create TDD cycle implementation
 2. CRITIC: Validate against comprehensive rubric
@@ -155,12 +173,14 @@ Direct Tool Call → Workflow → Autonomous Agent
 ```
 
 **Quality Rubric** (16 criteria across 4 categories):
+
 - **Clean Code**: SRP, naming, DRY, complexity ≤10
 - **Test Quality**: Isolation, assertions, edge cases, reliability
 - **TDD Adherence**: Test-first, minimal implementation, no premature optimization
 - **Coverage Metrics**: Diff ≥80%, branch coverage, mutation ≥30%
 
 **Example Iteration**:
+
 ```python
 # Iteration 1: Basic implementation (75% quality)
 def calculate_tax(income):
@@ -183,6 +203,7 @@ def calculate_tax(income):
 ```
 
 **Benefits**:
+
 - Faster feedback (seconds vs hours)
 - Higher quality (consistent rubric)
 - Reduced review burden
@@ -197,6 +218,7 @@ def calculate_tax(income):
 **Iterate**: Self-correct on failures (max 2 retries)
 
 **Tool Selection Matrix**:
+
 ```yaml
 file_operations:
   read_single_file: Read
@@ -211,6 +233,7 @@ code_analysis:
 ```
 
 **Clear Instructions Example**:
+
 ```yaml
 # ✓ Good
 Bash:
@@ -224,6 +247,7 @@ Bash:
 ```
 
 **Iteration Strategy**:
+
 ```
 Attempt 1: Grep("function\\s+\\w+", path="src/")
 Error: Invalid regex
@@ -236,11 +260,13 @@ Success: 47 matches
 ### Multi-Pass Review Strategy (CODE-REVIEWER)
 
 **Pass 1: Automated Analysis** (2-3 min)
+
 - Security scan (Semgrep, npm audit)
 - Quality scan (linters, type checkers)
 - Test scan (coverage, presence, naming)
 
 **Pass 2: Contextual Analysis** (5-7 min)
+
 - Read PR description
 - Analyze changed files
 - Check related code
@@ -248,6 +274,7 @@ Success: 47 matches
 - Assess architecture
 
 **Pass 3: Deep Review** (8-12 min)
+
 - Performance analysis (bottlenecks, N+1, leaks)
 - Security deep dive (logic flaws, race conditions)
 - Error handling validation
@@ -255,6 +282,7 @@ Success: 47 matches
 - Team learning opportunities
 
 **Constructive Feedback Framework**:
+
 ```markdown
 ## [Category]: [Specific Issue]
 
@@ -278,11 +306,13 @@ Success: 47 matches
 **4 Orchestration Phases**:
 
 #### 1. Decomposition
+
 Break complex requests into independent, parallelizable sub-tasks
 
 **Example**:
+
 ```yaml
-Request: "Assess codebase and implement top 5 fixes"
+Request: 'Assess codebase and implement top 5 fixes'
 
 Sub-tasks:
   - AUDITOR: assess (parallel, no deps)
@@ -292,27 +322,34 @@ Sub-tasks:
 ```
 
 #### 2. Worker Selection
+
 Choose optimal agents based on:
+
 - Capability matching
 - Cost-performance tradeoffs
 - Model complexity (haiku → sonnet → opus)
 - Workflow vs agent preference
 
 #### 3. Parallel Execution
+
 Launch independent workers concurrently:
+
 - Max 10 workers simultaneously
 - Respect token budget per phase
 - Handle worker failures gracefully
 - Implement backpressure if needed
 
 #### 4. Result Aggregation
+
 Synthesize worker outputs:
+
 - Collect all results
 - Validate completeness
 - Check consistency
 - Provide comprehensive evidence
 
 **Example Orchestration**:
+
 ```markdown
 ## Orchestration Summary
 
@@ -329,6 +366,7 @@ Phase 4: CODE-REVIEWER validated (20 min)
 ```
 
 **Benefits**:
+
 - **Efficiency**: 5-10x faster through parallelization
 - **Reliability**: Isolated failures, clear dependencies
 - **Scalability**: Linear scaling with workers
@@ -338,25 +376,27 @@ Phase 4: CODE-REVIEWER validated (20 min)
 
 ### Before vs After
 
-| Aspect | Before | After | Improvement |
-|--------|--------|-------|-------------|
-| Simple task cost | $X | $0.25X | 75% reduction |
-| Simple task speed | 60s | 6s | 10x faster |
-| Consistency | Variable | 100% | Deterministic |
-| Quality threshold | Unclear | ≥95% | Enforced |
-| Parallel execution | Manual | Automated | 5-10x throughput |
-| Self-correction | Manual review | Automated | Instant feedback |
-| Tool use clarity | Implicit | Explicit (ACI) | Fewer errors |
+| Aspect             | Before        | After          | Improvement      |
+| ------------------ | ------------- | -------------- | ---------------- |
+| Simple task cost   | $X            | $0.25X         | 75% reduction    |
+| Simple task speed  | 60s           | 6s             | 10x faster       |
+| Consistency        | Variable      | 100%           | Deterministic    |
+| Quality threshold  | Unclear       | ≥95%           | Enforced         |
+| Parallel execution | Manual        | Automated      | 5-10x throughput |
+| Self-correction    | Manual review | Automated      | Instant feedback |
+| Tool use clarity   | Implicit      | Explicit (ACI) | Fewer errors     |
 
 ### Architecture Evolution
 
 **Before**:
+
 ```
 User Request → Agent → Agent → Agent → Result
 (sequential, no controls, variable quality)
 ```
 
 **After**:
+
 ```
 User Request
     ↓
@@ -379,18 +419,21 @@ Evidence-Based Output (≥95% quality)
 ## Implementation Checklist
 
 ### Phase 1: Foundation ✅
+
 - [x] Hooks system for deterministic enforcement
 - [x] Loop controls on 5 core agents
 - [x] Success criteria documentation
 - [x] Model optimization (22 agents)
 
 ### Phase 2: Workflows ✅
+
 - [x] 6 workflow YAML specifications
 - [x] Comprehensive workflow documentation
 - [x] Generator-critic pattern in EXECUTOR
 - [x] Workflow decision matrix
 
 ### Phase 3: Advanced Patterns ✅
+
 - [x] ACI protocol (AUDITOR, CODE-REVIEWER)
 - [x] Multi-pass review strategy (CODE-REVIEWER)
 - [x] Orchestrator-workers pattern (STRATEGIST)
@@ -399,44 +442,55 @@ Evidence-Based Output (≥95% quality)
 ## Anthropic Principles Applied
 
 ### 1. Simplest Approach ✅
+
 Tool → Workflow → Agent hierarchy enforced throughout system
 
 ### 2. Loop Controls ✅
+
 All agents have iteration limits, time caps, cost limits, checkpoints
 
 ### 3. Ground Truth ✅
+
 All critical decisions verified via tool output, not estimation
 
 ### 4. Clear Instructions ✅
+
 ACI protocol enforces complete, unambiguous tool parameters
 
 ### 5. Generator-Critic ✅
+
 EXECUTOR implements self-correcting quality improvements
 
 ### 6. Orchestrator-Workers ✅
+
 STRATEGIST manages complex parallel workflows efficiently
 
 ### 7. Constructive Feedback ✅
+
 CODE-REVIEWER provides actionable, specific, educational reviews
 
 ## Metrics & Validation
 
 ### Cost Reduction
+
 - Simple tasks: **75% reduction** (workflows vs agents)
 - Model optimization: **35-40% reduction** overall
 - Combined: **~60% total cost reduction** projected
 
 ### Speed Improvement
+
 - Workflows: **10x faster** than agent reasoning
 - Parallel execution: **5-10x throughput** via orchestrator
 - Combined: **Up to 100x faster** on parallelizable workloads
 
 ### Quality Enhancement
+
 - Generator-critic: **≥95% quality threshold**
 - Ground truth: **100% verification** on critical decisions
 - Multi-pass review: **3-layer validation** (automated → contextual → deep)
 
 ### Reliability
+
 - Workflows: **100% consistent** behavior
 - Loop controls: **Zero runaway** scenarios
 - ACI protocol: **Max 2 retries** before escalation
@@ -444,6 +498,7 @@ CODE-REVIEWER provides actionable, specific, educational reviews
 ## Future Enhancements
 
 ### Phase 4 (Planned)
+
 - Workflow execution engine/CLI
 - DEBUGGER and DATA-SCIENTIST subagents
 - Automated workflow validation test suite
@@ -451,6 +506,7 @@ CODE-REVIEWER provides actionable, specific, educational reviews
 - Pattern catalog integration with SCHOLAR
 
 ### Long-term
+
 - Machine learning from orchestration patterns
 - Adaptive model selection based on task history
 - Dynamic worker scaling based on load

@@ -21,7 +21,7 @@ const colors = {
   cyan: (text) => `[36m${text}[0m`,
   white: (text) => `[37m${text}[0m`,
   gray: (text) => `[90m${text}[0m`,
-  bold: (text) => `[1m${text}[0m`
+  bold: (text) => `[1m${text}[0m`,
 };
 const McpQueueManager = require('./mcp-queue-manager');
 const AgentPool = require('./agent-pool');
@@ -36,7 +36,7 @@ class ConcurrencyOrchestrator extends EventEmitter {
       monitoringInterval: 10000, // 10 seconds
       statusDisplayInterval: 30000, // 30 seconds
       healthCheckInterval: 60000, // 1 minute
-      ...options
+      ...options,
     };
 
     // Initialize components
@@ -63,7 +63,7 @@ class ConcurrencyOrchestrator extends EventEmitter {
       failedTasks: 0,
       uptime: 0,
       throughput: 0, // tasks per minute
-      systemLoad: 0 // 0-1 scale
+      systemLoad: 0, // 0-1 scale
     };
 
     console.log(colors.bold.green('🎭 Concurrency Orchestrator initialized'));
@@ -79,18 +79,24 @@ class ConcurrencyOrchestrator extends EventEmitter {
         this.errorRecoveryManager.handleError('system_overload', {
           alertType: alert.type,
           value: alert.value,
-          threshold: alert.threshold
+          threshold: alert.threshold,
         });
       }
     });
 
     // Listen for circuit breaker events
     this.errorRecoveryManager.on('circuit-breaker-opened', (event) => {
-      console.log(colors.yellow(`🔌 Circuit breaker opened for ${event.serverName} - operations will be blocked`));
+      console.log(
+        colors.yellow(
+          `🔌 Circuit breaker opened for ${event.serverName} - operations will be blocked`,
+        ),
+      );
     });
 
     this.errorRecoveryManager.on('circuit-breaker-closed', (event) => {
-      console.log(colors.green(`🔌 Circuit breaker closed for ${event.serverName} - operations resumed`));
+      console.log(
+        colors.green(`🔌 Circuit breaker closed for ${event.serverName} - operations resumed`),
+      );
     });
 
     // Listen for health degradation
@@ -163,12 +169,13 @@ class ConcurrencyOrchestrator extends EventEmitter {
         duration,
         results,
         totalTasks: tasks.length,
-        successfulTasks: results.filter(r => !r.error).length
+        successfulTasks: results.filter((r) => !r.error).length,
       };
-
     } catch (error) {
       const duration = Date.now() - startTime;
-      console.log(colors.red(`❌ Workflow ${workflowId} failed after ${duration}ms: ${error.message}`));
+      console.log(
+        colors.red(`❌ Workflow ${workflowId} failed after ${duration}ms: ${error.message}`),
+      );
 
       throw error;
     }
@@ -188,7 +195,7 @@ class ConcurrencyOrchestrator extends EventEmitter {
           command: taskSpec.command,
           params: taskSpec.params,
           priority: taskSpec.priority || 'normal',
-          dependencies: taskSpec.dependencies || []
+          dependencies: taskSpec.dependencies || [],
         });
       }
     } else if (workflowSpec.type) {
@@ -210,8 +217,8 @@ class ConcurrencyOrchestrator extends EventEmitter {
           agentType: 'auditor',
           command: 'assess-code',
           params: { scope: params.scope || 'changed' },
-          priority: 'high'
-        }
+          priority: 'high',
+        },
       ],
 
       // Fix implementation workflow
@@ -220,22 +227,22 @@ class ConcurrencyOrchestrator extends EventEmitter {
           agentType: 'executor',
           command: 'implement-fix',
           params: { taskId: params.taskId, testFirst: true },
-          priority: 'high'
+          priority: 'high',
         },
         {
           agentType: 'tester',
           command: 'run-tests',
           params: { coverage: true },
           priority: 'normal',
-          dependencies: ['executor']
+          dependencies: ['executor'],
         },
         {
           agentType: 'reviewer',
           command: 'review-changes',
           params: { thorough: true },
           priority: 'normal',
-          dependencies: ['executor']
-        }
+          dependencies: ['executor'],
+        },
       ],
 
       // Comprehensive analysis workflow
@@ -244,20 +251,20 @@ class ConcurrencyOrchestrator extends EventEmitter {
           agentType: 'auditor',
           command: 'assess-code',
           params: { scope: 'full' },
-          priority: 'high'
+          priority: 'high',
         },
         {
           agentType: 'securityguard',
           command: 'security-scan',
           params: { deep: true },
-          priority: 'normal'
+          priority: 'normal',
         },
         {
           agentType: 'analyzer',
           command: 'complexity-analysis',
           params: { detailed: true },
-          priority: 'normal'
-        }
+          priority: 'normal',
+        },
       ],
 
       // Testing workflow
@@ -266,22 +273,22 @@ class ConcurrencyOrchestrator extends EventEmitter {
           agentType: 'tester',
           command: 'run-unit-tests',
           params: { coverage: true },
-          priority: 'high'
+          priority: 'high',
         },
         {
           agentType: 'tester',
           command: 'run-integration-tests',
           params: {},
-          priority: 'normal'
+          priority: 'normal',
         },
         {
           agentType: 'validator',
           command: 'validate-coverage',
           params: { threshold: 80 },
           priority: 'normal',
-          dependencies: ['tester']
-        }
-      ]
+          dependencies: ['tester'],
+        },
+      ],
     };
 
     return workflows[workflowType] || [];
@@ -308,11 +315,11 @@ class ConcurrencyOrchestrator extends EventEmitter {
   async executeParallel(tasks) {
     console.log(colors.blue(`🔀 Executing ${tasks.length} tasks in parallel`));
 
-    const taskPromises = tasks.map(task =>
-      this.agentPool.executeTask(task).catch(error => ({
+    const taskPromises = tasks.map((task) =>
+      this.agentPool.executeTask(task).catch((error) => ({
         error: error.message,
-        task: task
-      }))
+        task: task,
+      })),
     );
 
     return Promise.all(taskPromises);
@@ -333,7 +340,7 @@ class ConcurrencyOrchestrator extends EventEmitter {
       } catch (error) {
         results.push({
           error: error.message,
-          task: task
+          task: task,
         });
       }
     }
@@ -362,8 +369,8 @@ class ConcurrencyOrchestrator extends EventEmitter {
         if (completed.has(index)) continue;
 
         // Check if dependencies are satisfied
-        const dependenciesMet = (task.dependencies || []).every(dep =>
-          completed.has(tasks.findIndex(t => t.agentType === dep))
+        const dependenciesMet = (task.dependencies || []).every((dep) =>
+          completed.has(tasks.findIndex((t) => t.agentType === dep)),
         );
 
         if (dependenciesMet) {
@@ -387,8 +394,8 @@ class ConcurrencyOrchestrator extends EventEmitter {
             index,
             result: {
               error: error.message,
-              task: task
-            }
+              task: task,
+            },
           };
         }
       });
@@ -398,9 +405,7 @@ class ConcurrencyOrchestrator extends EventEmitter {
     }
 
     // Sort results by original task order
-    return results
-      .sort((a, b) => a.index - b.index)
-      .map(item => item.result);
+    return results.sort((a, b) => a.index - b.index).map((item) => item.result);
   }
 
   /**
@@ -433,11 +438,13 @@ class ConcurrencyOrchestrator extends EventEmitter {
     const mcpStatus = this.mcpQueueManager.getStatus();
 
     // Calculate system load (0-1 scale)
-    const agentUtilization = agentStatus.currentState.activeAgents / agentStatus.configuration.maxConcurrentAgents;
-    const mcpUtilization = Object.values(mcpStatus.activeCounts).reduce((sum, count, index) => {
-      const limit = Object.values(mcpStatus.serverLimits)[index];
-      return sum + (count / limit);
-    }, 0) / Object.keys(mcpStatus.serverLimits).length;
+    const agentUtilization =
+      agentStatus.currentState.activeAgents / agentStatus.configuration.maxConcurrentAgents;
+    const mcpUtilization =
+      Object.values(mcpStatus.activeCounts).reduce((sum, count, index) => {
+        const limit = Object.values(mcpStatus.serverLimits)[index];
+        return sum + count / limit;
+      }, 0) / Object.keys(mcpStatus.serverLimits).length;
 
     this.systemMetrics.systemLoad = Math.max(agentUtilization, mcpUtilization);
 
@@ -458,8 +465,8 @@ class ConcurrencyOrchestrator extends EventEmitter {
    */
   updateSystemMetrics(taskCount, results) {
     this.systemMetrics.totalTasks += taskCount;
-    this.systemMetrics.completedTasks += results.filter(r => !r.error).length;
-    this.systemMetrics.failedTasks += results.filter(r => r.error).length;
+    this.systemMetrics.completedTasks += results.filter((r) => !r.error).length;
+    this.systemMetrics.failedTasks += results.filter((r) => r.error).length;
   }
 
   /**
@@ -480,7 +487,9 @@ class ConcurrencyOrchestrator extends EventEmitter {
 
     // High response times
     if (mcpStatus.metrics.averageResponseTime > 1000) {
-      warnings.push(`High MCP response time: ${mcpStatus.metrics.averageResponseTime.toFixed(0)}ms`);
+      warnings.push(
+        `High MCP response time: ${mcpStatus.metrics.averageResponseTime.toFixed(0)}ms`,
+      );
     }
 
     // Queue buildup
@@ -491,7 +500,7 @@ class ConcurrencyOrchestrator extends EventEmitter {
 
     if (warnings.length > 0) {
       console.log(colors.yellow('\n⚠️  Health Check Warnings:'));
-      warnings.forEach(warning => console.log(colors.yellow(`   - ${warning}`)));
+      warnings.forEach((warning) => console.log(colors.yellow(`   - ${warning}`)));
       console.log();
     }
 
@@ -499,7 +508,7 @@ class ConcurrencyOrchestrator extends EventEmitter {
     this.emit('health', {
       healthy: warnings.length === 0,
       warnings,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
   }
 
@@ -516,7 +525,9 @@ class ConcurrencyOrchestrator extends EventEmitter {
 
     console.log(colors.white(`Uptime:             ${uptimeMinutes} minutes`));
     console.log(colors.white(`System Load:        ${loadPercentage}%`));
-    console.log(colors.white(`Throughput:         ${this.systemMetrics.throughput.toFixed(1)} tasks/min`));
+    console.log(
+      colors.white(`Throughput:         ${this.systemMetrics.throughput.toFixed(1)} tasks/min`),
+    );
     console.log(colors.white(`Total Tasks:        ${this.systemMetrics.totalTasks}`));
 
     // Component status
@@ -559,14 +570,11 @@ class ConcurrencyOrchestrator extends EventEmitter {
     this.performanceMonitor.stop();
 
     // Clear monitoring timers
-    this.monitoringTimers.forEach(timer => clearInterval(timer));
+    this.monitoringTimers.forEach((timer) => clearInterval(timer));
     this.monitoringTimers = [];
 
     // Shutdown components
-    await Promise.all([
-      this.agentPool.shutdown(timeout),
-      this.mcpQueueManager.shutdown(timeout)
-    ]);
+    await Promise.all([this.agentPool.shutdown(timeout), this.mcpQueueManager.shutdown(timeout)]);
 
     console.log(colors.green('✅ Concurrency Orchestrator shutdown complete'));
 
@@ -590,13 +598,13 @@ class ConcurrencyOrchestrator extends EventEmitter {
         isRunning: this.isRunning,
         uptime: this.systemMetrics.uptime,
         systemLoad: this.systemMetrics.systemLoad,
-        throughput: this.systemMetrics.throughput
+        throughput: this.systemMetrics.throughput,
       },
       agentPool: this.agentPool.getStatus(),
       mcpQueueManager: this.mcpQueueManager.getStatus(),
       systemMetrics: this.systemMetrics,
       performanceMetrics: this.performanceMonitor.getMetricsSummary(),
-      errorRecovery: this.errorRecoveryManager.getErrorStats()
+      errorRecovery: this.errorRecoveryManager.getErrorStats(),
     };
   }
 

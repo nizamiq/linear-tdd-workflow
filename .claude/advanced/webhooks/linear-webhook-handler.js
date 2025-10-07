@@ -39,7 +39,7 @@ class LinearWebhookHandler {
 
       const isValid = crypto.timingSafeEqual(
         Buffer.from(expectedSignature, 'hex'),
-        Buffer.from(providedSignature, 'hex')
+        Buffer.from(providedSignature, 'hex'),
       );
 
       if (!isValid) {
@@ -47,7 +47,6 @@ class LinearWebhookHandler {
       }
 
       return isValid;
-
     } catch (error) {
       console.error('❌ Webhook signature verification failed:', error.message);
       return false;
@@ -63,7 +62,7 @@ class LinearWebhookHandler {
       return {
         success: false,
         error: 'Invalid signature',
-        status: 401
+        status: 401,
       };
     }
 
@@ -83,23 +82,22 @@ class LinearWebhookHandler {
         return {
           success: true,
           eventType: eventKey,
-          result
+          result,
         };
       } else {
         console.log(`ℹ️ No handler for webhook event: ${eventKey}`);
         return {
           success: true,
           eventType: eventKey,
-          message: 'No handler registered for this event type'
+          message: 'No handler registered for this event type',
         };
       }
-
     } catch (error) {
       console.error('❌ Webhook processing failed:', error.message);
       return {
         success: false,
         error: error.message,
-        status: 500
+        status: 500,
       };
     }
   }
@@ -147,7 +145,8 @@ class LinearWebhookHandler {
     await this.notifyAgentsOfNewIssue(issueData);
 
     // Check if issue requires immediate agent attention
-    if (issueData.priority <= 2) { // High or urgent priority
+    if (issueData.priority <= 2) {
+      // High or urgent priority
       await this.triggerHighPriorityResponse(issueData);
     }
 
@@ -155,7 +154,10 @@ class LinearWebhookHandler {
       processed: true,
       issueId: issueData.id,
       identifier: issueData.identifier,
-      actions: ['notified_agents', issueData.priority <= 2 ? 'triggered_high_priority' : null].filter(Boolean)
+      actions: [
+        'notified_agents',
+        issueData.priority <= 2 ? 'triggered_high_priority' : null,
+      ].filter(Boolean),
     };
   }
 
@@ -194,7 +196,7 @@ class LinearWebhookHandler {
       processed: true,
       issueId: issueData.id,
       identifier: issueData.identifier,
-      changes: Object.keys(webhookData.data)
+      changes: Object.keys(webhookData.data),
     };
   }
 
@@ -211,7 +213,7 @@ class LinearWebhookHandler {
       processed: true,
       issueId: issueData.id,
       identifier: issueData.identifier,
-      action: 'cleanup_completed'
+      action: 'cleanup_completed',
     };
   }
 
@@ -243,7 +245,7 @@ class LinearWebhookHandler {
       commentId: commentData.id,
       issueId: commentData.issue?.id,
       agentMentions,
-      commands
+      commands,
     };
   }
 
@@ -261,7 +263,7 @@ class LinearWebhookHandler {
     return {
       processed: true,
       projectId: projectData.id,
-      projectName: projectData.name
+      projectName: projectData.name,
     };
   }
 
@@ -279,7 +281,7 @@ class LinearWebhookHandler {
     return {
       processed: true,
       teamId: teamData.id,
-      teamName: teamData.name
+      teamName: teamData.name,
     };
   }
 
@@ -308,17 +310,21 @@ class LinearWebhookHandler {
     const agents = [];
 
     // AUDITOR for code quality issues
-    if (issueData.labels?.some(label => ['bug', 'code-quality', 'performance'].includes(label.name))) {
+    if (
+      issueData.labels?.some((label) => ['bug', 'code-quality', 'performance'].includes(label.name))
+    ) {
       agents.push('AUDITOR');
     }
 
     // EXECUTOR for implementation tasks
-    if (issueData.labels?.some(label => ['enhancement', 'feature', 'fix'].includes(label.name))) {
+    if (issueData.labels?.some((label) => ['enhancement', 'feature', 'fix'].includes(label.name))) {
       agents.push('EXECUTOR');
     }
 
     // GUARDIAN for security and monitoring issues
-    if (issueData.labels?.some(label => ['security', 'monitoring', 'incident'].includes(label.name))) {
+    if (
+      issueData.labels?.some((label) => ['security', 'monitoring', 'incident'].includes(label.name))
+    ) {
       agents.push('GUARDIAN');
     }
 
@@ -348,7 +354,7 @@ class LinearWebhookHandler {
     return {
       triggered: true,
       priority: issueData.priority,
-      responseTime: 'immediate'
+      responseTime: 'immediate',
     };
   }
 
@@ -371,7 +377,7 @@ class LinearWebhookHandler {
     return {
       stateChanged: true,
       newState: newState.name,
-      issueId: issueData.id
+      issueId: issueData.id,
     };
   }
 
@@ -379,7 +385,9 @@ class LinearWebhookHandler {
    * Handle issue assignment change
    */
   async handleIssueAssignmentChange(issueData, newAssignee) {
-    console.log(`👤 Issue ${issueData.identifier} assigned to: ${newAssignee?.name || 'unassigned'}`);
+    console.log(
+      `👤 Issue ${issueData.identifier} assigned to: ${newAssignee?.name || 'unassigned'}`,
+    );
 
     if (newAssignee) {
       await this.notifyAgentOfAssignment(newAssignee, issueData);
@@ -388,7 +396,7 @@ class LinearWebhookHandler {
     return {
       assignmentChanged: true,
       newAssignee: newAssignee?.name,
-      issueId: issueData.id
+      issueId: issueData.id,
     };
   }
 
@@ -406,7 +414,7 @@ class LinearWebhookHandler {
     return {
       priorityChanged: true,
       newPriority,
-      issueId: issueData.id
+      issueId: issueData.id,
     };
   }
 
@@ -416,7 +424,7 @@ class LinearWebhookHandler {
   extractAgentMentions(text) {
     const agentPattern = /@(AUDITOR|EXECUTOR|GUARDIAN|SCHOLAR|STRATEGIST|ANALYZER|RESEARCHER)/gi;
     const matches = text.match(agentPattern) || [];
-    return matches.map(match => match.replace('@', '').toUpperCase());
+    return matches.map((match) => match.replace('@', '').toUpperCase());
   }
 
   /**
@@ -430,7 +438,7 @@ class LinearWebhookHandler {
     while ((match = commandPattern.exec(text)) !== null) {
       commands.push({
         command: match[1],
-        args: match[2]?.trim().split(/\s+/) || []
+        args: match[2]?.trim().split(/\s+/) || [],
       });
     }
 
@@ -507,8 +515,8 @@ class LinearWebhookHandler {
       config: {
         webhookUrl: this.config.webhookUrl,
         hasSecret: !!this.webhookSecret,
-        mockMode: this.config.mockMode
-      }
+        mockMode: this.config.mockMode,
+      },
     };
   }
 }

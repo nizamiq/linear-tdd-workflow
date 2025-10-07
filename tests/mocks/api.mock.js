@@ -1,29 +1,29 @@
 class ApiMock {
   constructor() {
     this.responses = {
-  "get": {
-    "status": "success",
-    "data": []
-  },
-  "post": {
-    "status": "success",
-    "data": {
-      "id": 1
-    }
-  },
-  "put": {
-    "status": "success",
-    "data": {
-      "updated": true
-    }
-  },
-  "delete": {
-    "status": "success",
-    "data": {
-      "deleted": true
-    }
-  }
-};
+      get: {
+        status: 'success',
+        data: [],
+      },
+      post: {
+        status: 'success',
+        data: {
+          id: 1,
+        },
+      },
+      put: {
+        status: 'success',
+        data: {
+          updated: true,
+        },
+      },
+      delete: {
+        status: 'success',
+        data: {
+          deleted: true,
+        },
+      },
+    };
     this.callHistory = [];
   }
 

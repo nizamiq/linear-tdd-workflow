@@ -33,6 +33,7 @@ For each command/agent you're migrating:
 ### Step 1: Analyze Your Agent/Command
 
 **Questions to Ask:**
+
 1. Does it write files?
 2. Does it create git commits or branches?
 3. Does it create PRs?
@@ -40,6 +41,7 @@ For each command/agent you're migrating:
 5. Does it modify any persistent state?
 
 **Decision:**
+
 - **Any YES** → Use Direct Execution pattern
 - **All NO** → Use Orchestrator-Workers (if parallel analysis) or Direct (if simple)
 
@@ -53,9 +55,9 @@ For each command/agent you're migrating:
 ---
 name: fix
 agent: EXECUTOR
-execution_mode: DIRECT  # ⚠️ CRITICAL: Runs in main context
-subprocess_usage: NONE  # No subprocesses for state changes
-usage: "/fix <TASK-ID> [--branch=<branch-name>]"
+execution_mode: DIRECT # ⚠️ CRITICAL: Runs in main context
+subprocess_usage: NONE # No subprocesses for state changes
+usage: '/fix <TASK-ID> [--branch=<branch-name>]'
 parameters:
   - name: TASK-ID
     description: The Linear task ID
@@ -70,9 +72,9 @@ parameters:
 ---
 name: status
 agent: STRATEGIST
-execution_mode: ORCHESTRATOR  # May spawn parallel workers
-subprocess_usage: READ_ONLY_ANALYSIS  # Subprocesses fetch data
-usage: "/status [--detailed]"
+execution_mode: ORCHESTRATOR # May spawn parallel workers
+subprocess_usage: READ_ONLY_ANALYSIS # Subprocesses fetch data
+usage: '/status [--detailed]'
 parameters:
   - name: detailed
     description: Include detailed metrics
@@ -87,9 +89,9 @@ parameters:
 ---
 name: release
 agent: STRATEGIST
-execution_mode: DIRECT  # Must run in main context
-subprocess_usage: VALIDATION_THEN_ACTION  # Read-only validation, then action
-usage: "/release <version>"
+execution_mode: DIRECT # Must run in main context
+subprocess_usage: VALIDATION_THEN_ACTION # Read-only validation, then action
+usage: '/release <version>'
 parameters:
   - name: version
     description: Version number
@@ -108,11 +110,13 @@ parameters:
 ## ⚠️ IMPORTANT: Direct Execution Required
 
 This command performs **STATE-CHANGING operations** and must run in main context:
+
 - **Analysis phase** may use subprocesses (read-only analysis)
 - **Action phase** MUST run in main context (creates files/commits/PRs)
 - **NO subprocess writes** - all state changes in main context
 
 **Action phase operations (MUST be in main context):**
+
 - ⚠️ Creating files
 - ⚠️ Making git commits
 - ⚠️ Creating PRs
@@ -120,8 +124,10 @@ This command performs **STATE-CHANGING operations** and must run in main context
 
 **Architecture:**
 ```
+
 Main Context (AGENT)
-  └─> Main Context: Execute actions (files, git, PRs, Linear)
+└─> Main Context: Execute actions (files, git, PRs, Linear)
+
 ```
 
 **Rule:** ALL state-changing operations must execute in main context.
@@ -133,17 +139,20 @@ Main Context (AGENT)
 ## ⚠️ IMPORTANT: Read-Only Analysis Pattern
 
 This command performs **READ-ONLY operations** using parallel workers:
+
 - **Main agent** orchestrates workflow and displays results
 - **Worker subprocesses** fetch data and calculate metrics in parallel
 - **NO writes** - purely analytical command
 
 **Safe subprocess operations (READ-ONLY):**
+
 - ✅ Querying APIs
 - ✅ Reading files
 - ✅ Calculating metrics
 - ✅ Generating reports
 
 **Must happen in main context:**
+
 - ⚠️ Displaying results (if file output)
 - ⚠️ Storing data (if caching)
 
@@ -156,16 +165,19 @@ This command performs **READ-ONLY operations** using parallel workers:
 ## ⚠️ IMPORTANT: Validation-Then-Action Pattern
 
 This command uses a **two-phase approach**:
+
 - **Phase 1 (Validation)**: Subprocess checks prerequisites (read-only)
 - **Phase 2 (Action)**: Main context performs state changes
 
 **Validation phase (safe for subprocess):**
+
 - ✅ Running tests
 - ✅ Checking coverage
 - ✅ Validating configuration
 - ✅ Querying APIs
 
 **Action phase (MUST be in main context):**
+
 - ⚠️ Creating branches
 - ⚠️ Writing files
 - ⚠️ Making commits
@@ -173,9 +185,11 @@ This command uses a **two-phase approach**:
 
 **Architecture:**
 ```
+
 Main Context (AGENT)
-  ├─> Subprocess: Validate prerequisites → Return validation results
-  └─> Main Context: Execute actions using validation results
+├─> Subprocess: Validate prerequisites → Return validation results
+└─> Main Context: Execute actions using validation results
+
 ```
 
 **Rule:** Validation can be delegated, ACTIONS must be in main context.
@@ -187,7 +201,7 @@ Main Context (AGENT)
 
 **Template:**
 
-```markdown
+````markdown
 ## Ground Truth Verification (Mandatory)
 
 After completing [operation], [AGENT] **MUST** verify using actual tool calls:
@@ -198,12 +212,16 @@ After completing [operation], [AGENT] **MUST** verify using actual tool calls:
    ```bash
    [actual verification command]
    ```
-   Expected: [specific output]
+````
+
+Expected: [specific output]
 
 2. **Verify [Thing 2]:**
+
    ```bash
    [actual verification command]
    ```
+
    Expected: [specific output]
 
 3. **Verify [Thing 3]:**
@@ -225,7 +243,8 @@ Actual: [what tool output shows]
 ```
 
 **Rule:** NEVER report success without verified evidence.
-```
+
+````
 
 **Example Verification Commands:**
 
@@ -307,8 +326,9 @@ If your agent is invoked via subprocess (Task tool), it must detect this and cha
     ]
   }
 }
-```
-```
+````
+
+````
 
 ---
 
@@ -328,11 +348,11 @@ usage: "/custom-assess [--scope=<directory>]"
 # Custom Assessment
 
 Performs code quality assessment and creates Linear tasks.
-```
+````
 
 **After (Migrated):**
 
-```yaml
+````yaml
 ---
 name: custom-assess
 agent: CUSTOM-AUDITOR
@@ -370,15 +390,17 @@ After assessment, CUSTOM-AUDITOR **MUST** verify:
 1. **Verify Linear Tasks Created:**
    ```bash
    mcp__linear__search_issues "identifier:CLEAN"
-   ```
-   Expected: Tasks visible in Linear
+````
+
+Expected: Tasks visible in Linear
 
 2. **Verify Assessment Report:**
    ```bash
    ls -la assessments/report-*.json
    ```
    Expected: Report file exists with findings
-```
+
+````
 
 ---
 
@@ -396,11 +418,11 @@ usage: "/hotfix <issue>"
 # Quick Hotfix
 
 Implements urgent fixes quickly.
-```
+````
 
 **After:**
 
-```yaml
+````yaml
 ---
 name: hotfix
 agent: QUICK-FIXER
@@ -431,14 +453,16 @@ After hotfix, QUICK-FIXER **MUST** verify:
 1. **Verify Branch Created:**
    ```bash
    git branch --list hotfix/*
-   ```
+````
 
 2. **Verify Commits Made:**
+
    ```bash
    git log --oneline -3
    ```
 
 3. **Verify PR Created:**
+
    ```bash
    gh pr list --state open | grep hotfix
    ```
@@ -449,7 +473,8 @@ After hotfix, QUICK-FIXER **MUST** verify:
    ```
 
 If ANY verification fails → DO NOT report success.
-```
+
+````
 
 ---
 
@@ -460,16 +485,21 @@ If ANY verification fails → DO NOT report success.
 **Wrong:**
 ```markdown
 I created the PR and committed the changes.
-```
+````
 
 **Right:**
-```markdown
+
+````markdown
 Let me verify the PR was created:
+
 ```bash
 gh pr list --state open
 ```
+````
+
 ✅ PR #123 confirmed: https://github.com/user/repo/pull/123
-```
+
+````
 
 ---
 
@@ -479,9 +509,10 @@ gh pr list --state open
 ```yaml
 execution_mode: ORCHESTRATOR
 subprocess_usage: READ_ONLY_ANALYSIS  # But then creates Linear tasks in subprocess
-```
+````
 
 **Right:**
+
 ```yaml
 execution_mode: ORCHESTRATOR
 subprocess_usage: READ_ONLY_ANALYSIS
@@ -493,6 +524,7 @@ subprocess_usage: READ_ONLY_ANALYSIS
 ### ❌ Mistake 3: Missing YAML Frontmatter
 
 **Wrong:**
+
 ```yaml
 ---
 name: mycommand
@@ -501,6 +533,7 @@ agent: MYAGENT
 ```
 
 **Right:**
+
 ```yaml
 ---
 name: mycommand
@@ -557,6 +590,7 @@ node .claude/scripts/validate-subprocess-patterns.js --command=/mycommand
 ```
 
 This will check:
+
 - ✅ YAML frontmatter present
 - ✅ Execution mode specified
 - ✅ Subprocess warning section present
@@ -567,11 +601,13 @@ This will check:
 ## Getting Help
 
 **Documentation:**
+
 - Full Guide: `.claude/docs/SUBPROCESS-BEST-PRACTICES.md`
 - Quick Reference: `.claude/docs/SUBPROCESS-QUICK-REFERENCE.md`
 - Examples: `.claude/commands/fix.md`, `.claude/commands/cycle.md`
 
 **Common Issues:**
+
 - Subprocess isolation: See best practices guide
 - Ground truth verification: See verification template
 - Pattern selection: See decision tree in best practices
@@ -581,6 +617,7 @@ This will check:
 ## Summary
 
 **Migration Steps:**
+
 1. Analyze agent/command for state changes
 2. Choose execution pattern
 3. Add YAML frontmatter
@@ -596,6 +633,7 @@ This will check:
 ---
 
 **Migration Checklist Completed?**
+
 - [ ] YAML frontmatter with execution metadata
 - [ ] Subprocess warning section
 - [ ] Ground truth verification (if state-changing)

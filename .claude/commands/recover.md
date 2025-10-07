@@ -2,9 +2,9 @@
 name: recover
 description: Auto-recover broken CI/CD pipeline
 agent: GUARDIAN
-execution_mode: DIRECT  # ⚠️ CRITICAL: GUARDIAN runs in main context for state changes
-subprocess_usage: ANALYSIS_THEN_ACTION  # Read-only analysis, then direct action in main context
-usage: "/recover [--auto-revert] [--force]"
+execution_mode: DIRECT # ⚠️ CRITICAL: GUARDIAN runs in main context for state changes
+subprocess_usage: ANALYSIS_THEN_ACTION # Read-only analysis, then direct action in main context
+usage: '/recover [--auto-revert] [--force]'
 parameters:
   - name: auto-revert
     description: Automatically revert if recovery fails
@@ -23,17 +23,20 @@ Automatically detect and recover from CI/CD pipeline failures using the GUARDIAN
 ## ⚠️ IMPORTANT: Direct Execution Required
 
 This command performs **STATE-CHANGING operations** and must run in main context:
+
 - **Analysis phase** may use subprocesses to parse logs (read-only)
 - **Recovery phase** MUST run in main context (writes git commits, PRs)
 - **NO subprocess writes** - all git operations in main context
 
 **Analysis phase (safe for subprocess):**
+
 - ✅ Reading CI/CD logs
 - ✅ Analyzing failure patterns
 - ✅ Identifying root causes
 - ✅ Generating recovery plans
 
 **Recovery phase (MUST be in main context):**
+
 - ⚠️ Creating revert commits
 - ⚠️ Quarantining flaky tests (file modifications)
 - ⚠️ Creating revert PRs
@@ -41,6 +44,7 @@ This command performs **STATE-CHANGING operations** and must run in main context
 - ⚠️ Updating pipeline configuration
 
 **Architecture:**
+
 ```
 Main Context (GUARDIAN)
   ├─> Subprocess: Analyze logs (read-only) → Return findings
@@ -50,16 +54,20 @@ Main Context (GUARDIAN)
 **Rule:** Analysis can be delegated, ACTIONS must be in main context.
 
 ## Usage
+
 ```
 /recover [--auto-revert] [--create-incident]
 ```
 
 ## Parameters
+
 - `--auto-revert`: Automatically create revert PR if recovery fails (default: false)
 - `--create-incident`: Create INCIDENT-XXX in Linear for tracking (default: true)
 
 ## What This Command Does
+
 The GUARDIAN agent will:
+
 1. Analyze CI/CD logs and failure patterns
 2. Identify root cause of pipeline failure
 3. Apply known recovery playbooks
@@ -68,6 +76,7 @@ The GUARDIAN agent will:
 6. Generate incident reports with lessons learned
 
 ## Expected Output
+
 - **Recovery Report**: Detailed analysis of failure and recovery actions
 - **Revert PR**: If auto-revert enabled and needed
 - **Flaky Test Quarantine**: Disabled tests with documentation
@@ -75,6 +84,7 @@ The GUARDIAN agent will:
 - **Recovery Timeline**: Detection → Recovery metrics
 
 ## Examples
+
 ```bash
 # Standard pipeline recovery
 /recover
@@ -87,12 +97,14 @@ The GUARDIAN agent will:
 ```
 
 ## Recovery Strategies
+
 - **Test Failures**: Quarantine flaky tests, retry deterministic failures
 - **Build Failures**: Fix dependencies, clear caches, retry builds
 - **Deployment Failures**: Rollback, fix configuration, retry deployment
 - **Performance Issues**: Resource optimization, scaling adjustments
 
 ## SLAs
+
 - Detection: ≤5 minutes
 - Recovery: ≤10 minutes (p95)
 - Revert creation: ≤2 minutes
@@ -105,28 +117,36 @@ After completing recovery, GUARDIAN **MUST** verify actions persisted using actu
 ### Required Verification Steps:
 
 1. **Verify Revert Commit Created (if applicable):**
+
    ```bash
    git log --oneline -5 | grep -i revert
    ```
+
    Expected: Revert commit appears in git log
 
 2. **Verify Revert PR Created (if applicable):**
+
    ```bash
    gh pr list --state open | grep -i revert
    ```
+
    Expected: PR number and URL visible
 
 3. **Verify Linear Incident Created:**
+
    ```bash
    # Use Linear MCP to verify incident task exists
    mcp__linear__search_issues "identifier:INCIDENT"
    ```
+
    Expected: INCIDENT-XXX task visible in Linear
 
 4. **Verify Pipeline Status Improved:**
+
    ```bash
    gh run list --limit 1 --json conclusion
    ```
+
    Expected: Latest run shows "success" or at least better than before
 
 5. **Verify Quarantined Tests (if applicable):**

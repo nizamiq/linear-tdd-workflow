@@ -15,7 +15,7 @@ describe.skip('Lightweight E2E Workflow Tests', () => {
     totalTests: 0,
     passed: 0,
     failed: 0,
-    memoryPeaks: []
+    memoryPeaks: [],
   };
 
   beforeAll(() => {
@@ -31,7 +31,9 @@ describe.skip('Lightweight E2E Workflow Tests', () => {
 
   afterAll(() => {
     const maxMemory = Math.max(...testResults.memoryPeaks);
-    console.log(`\n📊 Memory Report: Peak ${maxMemory}MB, Tests: ${testResults.passed}/${testResults.totalTests}`);
+    console.log(
+      `\n📊 Memory Report: Peak ${maxMemory}MB, Tests: ${testResults.passed}/${testResults.totalTests}`,
+    );
   });
 
   test('Core Workflow: AUDITOR assessment', async () => {
@@ -73,7 +75,9 @@ describe.skip('Lightweight E2E Workflow Tests', () => {
   test('Core Workflow: RESEARCHER architecture', async () => {
     testResults.totalTests++;
 
-    const result = await router.invoke('RESEARCHER', 'analyze-architecture', { focus: 'structure' });
+    const result = await router.invoke('RESEARCHER', 'analyze-architecture', {
+      focus: 'structure',
+    });
 
     expect(result.analyzed).toBe(true);
     expect(result.success).toBe(true);
@@ -126,6 +130,6 @@ function getMemoryUsage() {
   return {
     heapUsed: Math.round(usage.heapUsed / 1024 / 1024),
     heapTotal: Math.round(usage.heapTotal / 1024 / 1024),
-    external: Math.round(usage.external / 1024 / 1024)
+    external: Math.round(usage.external / 1024 / 1024),
   };
 }

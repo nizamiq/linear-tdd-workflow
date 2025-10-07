@@ -11,13 +11,14 @@
 [![Installation](https://img.shields.io/badge/Install-Drop--in-purple.svg)](#installation-strategy)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-*Last Updated: October 2025 | Version: 1.4.0*
+_Last Updated: October 2025 | Version: 1.4.0_
 
 ## What is Linear TDD Workflow System?
 
 An autonomous code quality management system that uses 23 specialized AI agents to continuously assess, improve, and maintain your codebase. The system enforces strict Test-Driven Development practices with **real coverage validation** and **production-ready deployment pipelines**.
 
 ### Key Benefits
+
 - **50% faster** Mean Time to Recovery (MTTR)
 - **30-35% improvement** in PR cycle time
 - **≥80% diff coverage** enforcement on all changes
@@ -51,6 +52,7 @@ The Linear TDD Workflow System is designed as a **drop-in enhancement** for any 
 3. **Configure and use** - Set up your Linear API key and start using
 
 ### Directory Structure
+
 ```
 ~/code/                          # Your development directory
 ├── linear-tdd-workflow/         # This repository
@@ -142,11 +144,13 @@ When creating custom agents or workflows, be aware of **subprocess isolation**:
 **The Issue:** Agents spawned via subprocess cannot persist state changes (file writes, git commits, PR creation) to your actual workspace.
 
 **The Solution:** Follow documented execution patterns:
+
 - **Direct Execution** - For commands that modify state (files, git, PRs, Linear)
 - **Orchestrator-Workers** - For parallel read-only analysis
 - **Validation-Then-Action** - For hybrid workflows
 
 **Documentation:**
+
 - 📖 **Best Practices Guide**: `.claude/docs/SUBPROCESS-BEST-PRACTICES.md`
 - 📝 **Quick Reference**: `.claude/docs/SUBPROCESS-QUICK-REFERENCE.md`
 - 🚶 **Migration Guide**: `.claude/docs/MIGRATION-SUBPROCESS-PATTERNS.md`
@@ -168,17 +172,18 @@ When you install the Linear TDD Workflow System into a project:
 
 ### What Gets Installed
 
-| Component | Purpose | Location |
-|-----------|---------|----------|
-| `.claude/` directory | Agent system, journeys, and core logic | Project root |
-| `Makefile` | Universal command interface | Project root |
-| `CLAUDE.md` | Instructions for Claude Code AI | Project root |
-| Enhanced scripts | Workflow commands in package.json | Existing file |
-| `.env` template | Configuration for Linear and GitHub | Project root |
+| Component            | Purpose                                | Location      |
+| -------------------- | -------------------------------------- | ------------- |
+| `.claude/` directory | Agent system, journeys, and core logic | Project root  |
+| `Makefile`           | Universal command interface            | Project root  |
+| `CLAUDE.md`          | Instructions for Claude Code AI        | Project root  |
+| Enhanced scripts     | Workflow commands in package.json      | Existing file |
+| `.env` template      | Configuration for Linear and GitHub    | Project root  |
 
 ### After Installation
 
 Your project gains:
+
 - **20 specialized AI agents** ready for autonomous operation
 - **6 autonomous journeys** for complete workflows
 - **Universal commands** that work regardless of language
@@ -196,6 +201,7 @@ Every change follows the mandatory TDD cycle:
 3. **[REFACTOR]** - Improve with test safety
 
 **Quality Gates:**
+
 - Diff coverage ≥80% on changed lines
 - Mutation testing ≥30% on changed files
 - CI automatically blocks non-compliant PRs
@@ -204,25 +210,25 @@ Every change follows the mandatory TDD cycle:
 
 Pre-approved, low-risk improvements that agents implement autonomously:
 
-| Fix Type | Description | Example |
-|----------|-------------|---------|
-| **Linting** | Auto-fix style violations | ESLint, Prettier, Black |
-| **Dead Code** | Remove unused code | Unused imports, variables |
-| **Documentation** | Add missing docs | JSDoc, docstrings |
-| **Refactoring** | Simplify code | Extract constants, rename |
-| **Dependencies** | Update packages | Non-breaking patches |
-| **Tests** | Add test scaffolds | Basic test structure |
+| Fix Type          | Description               | Example                   |
+| ----------------- | ------------------------- | ------------------------- |
+| **Linting**       | Auto-fix style violations | ESLint, Prettier, Black   |
+| **Dead Code**     | Remove unused code        | Unused imports, variables |
+| **Documentation** | Add missing docs          | JSDoc, docstrings         |
+| **Refactoring**   | Simplify code             | Extract constants, rename |
+| **Dependencies**  | Update packages           | Non-breaking patches      |
+| **Tests**         | Add test scaffolds        | Basic test structure      |
 
 **Constraints:** Max 300 LOC per PR • 80% coverage required • Full rollback plan
 
 ### Feature Impact Level (FIL) Classification
 
-| Level | Impact | Examples | Approval |
-|-------|--------|----------|----------|
-| **FIL-0** | None | Formatting, comments | Auto |
-| **FIL-1** | Low | Variable rename, constants | Auto |
-| **FIL-2** | Medium | New utilities, configs | Tech Lead |
-| **FIL-3** | High | APIs, migrations, UI | Tech Lead + Product |
+| Level     | Impact | Examples                   | Approval            |
+| --------- | ------ | -------------------------- | ------------------- |
+| **FIL-0** | None   | Formatting, comments       | Auto                |
+| **FIL-1** | Low    | Variable rename, constants | Auto                |
+| **FIL-2** | Medium | New utilities, configs     | Tech Lead           |
+| **FIL-3** | High   | APIs, migrations, UI       | Tech Lead + Product |
 
 ## 🏗️ Architecture Overview
 
@@ -245,6 +251,7 @@ Linear.app (Task Management)
 ```
 
 **Core Agents:**
+
 - **AUDITOR** - Continuous code quality assessment
 - **EXECUTOR** - Fix Pack implementation engine
 - **GUARDIAN** - Pipeline monitoring & recovery
@@ -365,37 +372,41 @@ PROJECT_TYPE=javascript  # or: typescript, python, polyglot
 
 ### Performance Targets
 
-| Operation | Target | Notes |
-|-----------|--------|-------|
-| Code Assessment | ≤12min | 150k LOC JS/TS |
-| Python Assessment | ≤15min | 150k LOC |
-| Fix Implementation | ≤15min | Average |
-| Pipeline Recovery | ≤10min | Auto-recovery |
-| Linear Sync | ≤2s | Update latency |
+| Operation          | Target | Notes          |
+| ------------------ | ------ | -------------- |
+| Code Assessment    | ≤12min | 150k LOC JS/TS |
+| Python Assessment  | ≤15min | 150k LOC       |
+| Fix Implementation | ≤15min | Average        |
+| Pipeline Recovery  | ≤10min | Auto-recovery  |
+| Linear Sync        | ≤2s    | Update latency |
 
 ## 📚 Documentation
 
 ### For Claude Code AI Navigation
 
 **Critical References for AI Agents:**
+
 - [Agent System Reference](.claude/agents/CLAUDE.md) - Complete agent specifications and MCP tool matrix
 - [Agent Selection Guide](.claude/agents/AGENT-SELECTION-GUIDE.md) - Decision trees for choosing the right agent
 - [Linear Operations Guide](.claude/agents/LINEAR-OPERATIONS-GUIDE.md) - Who manages Linear tasks
 - [Project Instructions](CLAUDE.md) - Essential commands and workflows
 
 ### Essential Guides
+
 - [Getting Started](docs/getting-started/README.md) - Complete setup guide
 - [Installation Guide](docs/INSTALLATION-TROUBLESHOOTING.md) - Detailed installation help
 - [AI Development Protocol](docs/ai-development-protocol.md) - TDD methodology
 - [Linear Integration](docs/linear-setup.md) - Task management setup
 
 ### Core Documentation
+
 - [TDD Protocol](docs/WORKFLOW-TDD-PROTOCOL.md) - Test-Driven Development requirements
 - [Clean Code Assessment](docs/WORKFLOW-CLEAN-CODE-ASSESSMENT.md) - Quality standards
 - [GitFlow Integration](docs/INTEGRATION-GITFLOW.md) - Branching strategy
 - [Architecture Guide](docs/ARCHITECTURE-AGENTS.md) - System architecture
 
 ### References
+
 - [API Documentation](docs/api-reference/) - Complete API specs
 - [Documentation Index](docs/REFERENCE-MASTER.md) - Complete documentation map
 - [FAQ](docs/reference/faq.md) - Frequently asked questions

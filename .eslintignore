@@ -10,6 +10,12 @@ claude_scaffold/
 
 # E2E test runners (standalone scripts, not Jest tests)
 tests/e2e/comprehensive-workflow-e2e.js
+tests/e2e/workflow-e2e.test.js
+tests/e2e/lightweight-e2e.test.js
+
+# Skipped test files (pending v1.5.0 infrastructure)
+tests/unit/webhook-security.test.js
+tests/auth.test.js
 
 # Test utilities and mocks (using relaxed JS patterns)
 tests/mocks/

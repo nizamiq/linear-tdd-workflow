@@ -2,8 +2,8 @@
 name: docs
 description: Documentation validation, generation, and maintenance operations
 agent: DOC-KEEPER
-execution_mode: DIRECT  # DOC-KEEPER runs in main context for file operations
-subprocess_usage: VALIDATION_THEN_ACTION  # Read-only validation, then direct file writes in main context
+execution_mode: DIRECT # DOC-KEEPER runs in main context for file operations
+subprocess_usage: VALIDATION_THEN_ACTION # Read-only validation, then direct file writes in main context
 category: documentation
 ---
 
@@ -14,17 +14,20 @@ Invokes the DOC-KEEPER agent for documentation validation, generation, and maint
 ## ⚠️ IMPORTANT: Direct Execution for File Operations
 
 This command performs **FILE-MODIFYING operations** and must run in main context:
+
 - **Validation phase** may use subprocesses to check links (read-only)
 - **Generation/fix phase** MUST run in main context (writes documentation files)
 - **NO subprocess writes** - all file operations in main context
 
 **Validation phase (safe for subprocess):**
+
 - ✅ Reading documentation files
 - ✅ Checking internal/external links
 - ✅ Analyzing code examples
 - ✅ Calculating coverage metrics
 
 **Write operations (MUST be in main context):**
+
 - ⚠️ Generating documentation files
 - ⚠️ Fixing broken links
 - ⚠️ Updating cross-references
@@ -42,14 +45,17 @@ This command performs **FILE-MODIFYING operations** and must run in main context
 ## Operations
 
 ### validate
+
 Validate documentation for accuracy, broken links, and code examples.
 
 **Usage**:
+
 ```bash
 /docs validate [--scope=<scope>] [--fix]
 ```
 
 **Options**:
+
 - `--scope=all` - Validate all documentation (default)
 - `--scope=links` - Only validate links
 - `--scope=examples` - Only validate code examples
@@ -57,6 +63,7 @@ Validate documentation for accuracy, broken links, and code examples.
 - `--fix` - Automatically fix simple issues
 
 **Examples**:
+
 ```bash
 # Validate all documentation
 /docs validate
@@ -69,6 +76,7 @@ Validate documentation for accuracy, broken links, and code examples.
 ```
 
 **What It Does**:
+
 1. Scans all markdown files in the project
 2. Validates links (internal and external)
 3. Tests code examples for correctness
@@ -77,6 +85,7 @@ Validate documentation for accuracy, broken links, and code examples.
 6. Auto-fixes simple issues if --fix is specified
 
 **Output**:
+
 ```
 📊 Documentation Validation Report
 
@@ -99,14 +108,17 @@ Validate documentation for accuracy, broken links, and code examples.
 ---
 
 ### generate
+
 Generate documentation from code, workflows, or patterns.
 
 **Usage**:
+
 ```bash
 /docs generate <type> [--output=<path>]
 ```
 
 **Types**:
+
 - `api` - Generate API reference from agent specifications
 - `tutorial` - Generate tutorial from workflow YAML
 - `changelog` - Generate changelog from git commits
@@ -114,6 +126,7 @@ Generate documentation from code, workflows, or patterns.
 - `glossary` - Generate glossary from terminology
 
 **Examples**:
+
 ```bash
 # Generate API documentation for all agents
 /docs generate api
@@ -129,6 +142,7 @@ Generate documentation from code, workflows, or patterns.
 ```
 
 **What It Does**:
+
 1. Parses source files (agent specs, workflows, commits)
 2. Extracts relevant information
 3. Applies documentation templates
@@ -137,6 +151,7 @@ Generate documentation from code, workflows, or patterns.
 6. Creates or updates target files
 
 **Output**:
+
 ```
 📝 Documentation Generated
 
@@ -160,19 +175,23 @@ Cross-references updated:
 ---
 
 ### audit
+
 Perform comprehensive documentation quality audit.
 
 **Usage**:
+
 ```bash
 /docs audit [--comprehensive] [--report=<format>]
 ```
 
 **Options**:
+
 - `--comprehensive` - Full audit including metrics and analysis
 - `--report=json` - Export report as JSON (default: markdown)
 - `--report=html` - Export report as HTML
 
 **Examples**:
+
 ```bash
 # Quick audit
 /docs audit
@@ -182,6 +201,7 @@ Perform comprehensive documentation quality audit.
 ```
 
 **What It Does**:
+
 1. Runs all validation checks
 2. Analyzes documentation coverage
 3. Checks freshness and staleness
@@ -190,6 +210,7 @@ Perform comprehensive documentation quality audit.
 6. Generates comprehensive report
 
 **Output**:
+
 ```
 📊 Documentation Audit Report
 
@@ -224,20 +245,24 @@ Full report: docs/audit-report-2025-01-15.html
 ---
 
 ### update
+
 Update specific documentation based on code changes.
 
 **Usage**:
+
 ```bash
 /docs update <target> [--auto-commit]
 ```
 
 **Targets**:
+
 - `agent:<name>` - Update specific agent documentation
 - `workflow:<name>` - Update specific workflow documentation
 - `changelog` - Update changelog with recent changes
 - `all` - Update all documentation
 
 **Examples**:
+
 ```bash
 # Update specific agent documentation
 /docs update agent:executor
@@ -253,6 +278,7 @@ Update specific documentation based on code changes.
 ```
 
 **What It Does**:
+
 1. Detects changes in code/specifications
 2. Updates corresponding documentation
 3. Validates changes don't break links
@@ -260,6 +286,7 @@ Update specific documentation based on code changes.
 5. Optionally creates git commit
 
 **Output**:
+
 ```
 📝 Documentation Updated
 
@@ -280,14 +307,17 @@ Validation:
 ---
 
 ### coverage
+
 Analyze documentation coverage for features, commands, and errors.
 
 **Usage**:
+
 ```bash
 /docs coverage [--type=<type>] [--threshold=<percent>]
 ```
 
 **Options**:
+
 - `--type=features` - Check feature documentation coverage
 - `--type=commands` - Check command documentation coverage
 - `--type=errors` - Check error code documentation coverage
@@ -295,6 +325,7 @@ Analyze documentation coverage for features, commands, and errors.
 - `--threshold=95` - Minimum acceptable coverage (default: 95%)
 
 **Examples**:
+
 ```bash
 # Check all coverage
 /docs coverage
@@ -307,6 +338,7 @@ Analyze documentation coverage for features, commands, and errors.
 ```
 
 **What It Does**:
+
 1. Scans codebase for features/commands/errors
 2. Checks if each item is documented
 3. Calculates coverage percentages
@@ -314,6 +346,7 @@ Analyze documentation coverage for features, commands, and errors.
 5. Creates Linear tasks for missing docs
 
 **Output**:
+
 ```
 📊 Documentation Coverage Report
 
@@ -352,14 +385,17 @@ Overall Coverage: 87% (target: 95%)
 ---
 
 ### fix
+
 Fix documentation issues automatically.
 
 **Usage**:
+
 ```bash
 /docs fix <issue-type> [--dry-run]
 ```
 
 **Issue Types**:
+
 - `broken-links` - Fix broken internal links
 - `formatting` - Fix markdown formatting issues
 - `examples` - Fix code example syntax
@@ -367,6 +403,7 @@ Fix documentation issues automatically.
 - `all` - Fix all auto-fixable issues
 
 **Examples**:
+
 ```bash
 # Fix broken links (dry run first)
 /docs fix broken-links --dry-run
@@ -379,6 +416,7 @@ Fix documentation issues automatically.
 ```
 
 **What It Does**:
+
 1. Identifies fixable issues
 2. Shows planned changes (if --dry-run)
 3. Applies automated fixes
@@ -386,6 +424,7 @@ Fix documentation issues automatically.
 5. Creates git commit with changes
 
 **Output**:
+
 ```
 🔧 Documentation Fixes Applied
 
@@ -412,20 +451,24 @@ Validation:
 ---
 
 ### search
+
 Search documentation for specific content or patterns.
 
 **Usage**:
+
 ```bash
 /docs search "<query>" [--scope=<scope>]
 ```
 
 **Options**:
+
 - `--scope=all` - Search all documentation (default)
 - `--scope=user` - Search user documentation only
 - `--scope=api` - Search API reference only
 - `--scope=agents` - Search agent specifications only
 
 **Examples**:
+
 ```bash
 # Search for "TDD cycle"
 /docs search "TDD cycle"
@@ -438,6 +481,7 @@ Search documentation for specific content or patterns.
 ```
 
 **What It Does**:
+
 1. Searches all specified documentation
 2. Returns ranked results
 3. Shows context around matches
@@ -445,6 +489,7 @@ Search documentation for specific content or patterns.
 5. Suggests related documentation
 
 **Output**:
+
 ```
 🔍 Documentation Search Results for "TDD cycle"
 
@@ -479,6 +524,7 @@ Related Documentation:
 ## Common Workflows
 
 ### Daily Documentation Validation
+
 ```bash
 # Quick validation of all docs
 /docs validate
@@ -491,6 +537,7 @@ git add -A && git commit -m "docs: daily validation fixes"
 ```
 
 ### After Code Changes
+
 ```bash
 # Update affected documentation
 /docs update all
@@ -503,6 +550,7 @@ git add -A && git commit -m "docs: daily validation fixes"
 ```
 
 ### Before Release
+
 ```bash
 # Comprehensive audit
 /docs audit --comprehensive
@@ -518,6 +566,7 @@ git add -A && git commit -m "docs: daily validation fixes"
 ```
 
 ### Monthly Review
+
 ```bash
 # Full audit with report
 /docs audit --comprehensive --report=html
@@ -534,6 +583,7 @@ git add -A && git commit -m "docs: daily validation fixes"
 ### Works Well With
 
 **`/assess`** - Document quality issues found during code assessment
+
 ```bash
 # Assess code quality
 /assess
@@ -543,6 +593,7 @@ git add -A && git commit -m "docs: daily validation fixes"
 ```
 
 **`/fix`** - Document fixes implemented
+
 ```bash
 # Implement fix
 /fix TASK-123
@@ -552,6 +603,7 @@ git add -A && git commit -m "docs: daily validation fixes"
 ```
 
 **`/learn`** - Document patterns discovered
+
 ```bash
 # Extract patterns
 /learn

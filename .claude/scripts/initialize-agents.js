@@ -18,13 +18,14 @@ class AgentInitializer {
   }
 
   log(message, type = 'info') {
-    const emoji = {
-      info: '📝',
-      success: '✅',
-      warning: '⚠️',
-      error: '❌',
-      agent: '🤖'
-    }[type] || '📝';
+    const emoji =
+      {
+        info: '📝',
+        success: '✅',
+        warning: '⚠️',
+        error: '❌',
+        agent: '🤖',
+      }[type] || '📝';
 
     console.log(`${emoji} ${message}`);
   }
@@ -38,121 +39,149 @@ class AgentInitializer {
       STRATEGIST: {
         role: 'Multi-Agent Orchestrator',
         capabilities: ['workflow-orchestration', 'multi-agent-coordination', 'linear-management'],
-        priority: 1
+        priority: 1,
       },
       AUDITOR: {
         role: 'Code Quality Assessment & Standards Enforcer',
-        capabilities: ['clean-code-principles', 'solid-architecture-analysis', 'technical-debt-detection'],
-        priority: 2
+        capabilities: [
+          'clean-code-principles',
+          'solid-architecture-analysis',
+          'technical-debt-detection',
+        ],
+        priority: 2,
       },
       EXECUTOR: {
         role: 'TDD Implementation Engine',
-        capabilities: ['strict-tdd-enforcement', 'red-green-refactor-cycle', 'fix-pack-implementation'],
-        priority: 2
+        capabilities: [
+          'strict-tdd-enforcement',
+          'red-green-refactor-cycle',
+          'fix-pack-implementation',
+        ],
+        priority: 2,
       },
       GUARDIAN: {
         role: 'CI/CD Pipeline Recovery Specialist',
         capabilities: ['pipeline-recovery', 'ci-cd-monitoring', 'deployment-safety'],
-        priority: 2
+        priority: 2,
       },
       SCHOLAR: {
         role: 'Learning & Pattern Recognition Engine',
         capabilities: ['pattern-recognition', 'success-analysis', 'knowledge-extraction'],
-        priority: 3
+        priority: 3,
       },
       PLANNER: {
         role: 'Cycle Planning Orchestrator',
         capabilities: ['cycle-planning', 'sprint-orchestration', 'capacity-planning'],
-        priority: 2
+        priority: 2,
       },
 
       // Development Specialists (3)
       'DJANGO-PRO': {
         role: 'Django Framework & Architecture Expert',
         capabilities: ['django-5x-async-views', 'django-rest-framework', 'celery-task-processing'],
-        priority: 3
+        priority: 3,
       },
       'PYTHON-PRO': {
         role: 'Modern Python Development Expert',
         capabilities: ['python-312-features', 'async-await-mastery', 'uv-package-management'],
-        priority: 3
+        priority: 3,
       },
       'TYPESCRIPT-PRO': {
         role: 'TypeScript & Type Safety Expert',
-        capabilities: ['typescript-5x-features', 'react-nextjs-architecture', 'type-safe-api-design'],
-        priority: 3
+        capabilities: [
+          'typescript-5x-features',
+          'react-nextjs-architecture',
+          'type-safe-api-design',
+        ],
+        priority: 3,
       },
 
       // Infrastructure & Deployment (4)
       'KUBERNETES-ARCHITECT': {
         role: 'Cloud-Native Infrastructure Expert',
         capabilities: ['kubernetes-orchestration', 'gitops-workflows', 'multi-cloud-architecture'],
-        priority: 3
+        priority: 3,
       },
       'DEPLOYMENT-ENGINEER': {
         role: 'CI/CD Pipeline & Deployment Expert',
-        capabilities: ['github-actions-mastery', 'progressive-delivery', 'zero-downtime-deployments'],
-        priority: 3
+        capabilities: [
+          'github-actions-mastery',
+          'progressive-delivery',
+          'zero-downtime-deployments',
+        ],
+        priority: 3,
       },
       'DATABASE-OPTIMIZER': {
         role: 'PostgreSQL Performance Expert',
-        capabilities: ['postgresql-query-optimization', 'django-orm-optimization', 'n-plus-one-resolution'],
-        priority: 3
+        capabilities: [
+          'postgresql-query-optimization',
+          'django-orm-optimization',
+          'n-plus-one-resolution',
+        ],
+        priority: 3,
       },
       'OBSERVABILITY-ENGINEER': {
         role: 'Observability & Monitoring Expert',
         capabilities: ['opentelemetry-implementation', 'prometheus-metrics', 'distributed-tracing'],
-        priority: 3
+        priority: 3,
       },
 
       // Quality Engineering (7)
       'CODE-REVIEWER': {
         role: 'Elite Code Review Expert',
-        capabilities: ['ai-powered-code-analysis', 'security-vulnerability-detection', 'production-reliability'],
-        priority: 3
+        capabilities: [
+          'ai-powered-code-analysis',
+          'security-vulnerability-detection',
+          'production-reliability',
+        ],
+        priority: 3,
       },
       'TEST-AUTOMATOR': {
         role: 'Test Automation Excellence Expert',
         capabilities: ['strict-tdd-enforcement', 'ai-powered-test-generation', 'mutation-testing'],
-        priority: 3
+        priority: 3,
       },
       'LEGACY-MODERNIZER': {
         role: 'Legacy Code Modernization Specialist',
-        capabilities: ['legacy-code-refactoring', 'framework-migration', 'technical-debt-reduction'],
-        priority: 4
+        capabilities: [
+          'legacy-code-refactoring',
+          'framework-migration',
+          'technical-debt-reduction',
+        ],
+        priority: 4,
       },
       TESTER: {
         role: 'Test-First Engineering Specialist',
         capabilities: ['test-creation', 'tdd-enforcement', 'test-automation'],
-        priority: 3
+        priority: 3,
       },
       VALIDATOR: {
         role: 'Quality Gate Enforcement',
         capabilities: ['quality-validation', 'deployment-readiness', 'acceptance-testing'],
-        priority: 3
+        priority: 3,
       },
       LINTER: {
         role: 'Code Style & Format Enforcement',
         capabilities: ['code-formatting', 'style-enforcement', 'autofix-generation'],
-        priority: 4
+        priority: 4,
       },
       TYPECHECKER: {
         role: 'Type Safety Validation',
         capabilities: ['type-checking', 'static-analysis', 'typescript-validation'],
-        priority: 4
+        priority: 4,
       },
 
       // Security & Routing (2)
       SECURITY: {
         role: 'Security & Vulnerability Scanner',
         capabilities: ['security-scanning', 'vulnerability-detection', 'dependency-auditing'],
-        priority: 2
+        priority: 2,
       },
       ROUTER: {
         role: 'Request Routing',
         capabilities: ['request-routing', 'agent-selection', 'task-distribution'],
-        priority: 5
-      }
+        priority: 5,
+      },
     };
   }
 
@@ -163,17 +192,17 @@ class AgentInitializer {
     const checks = [
       { name: 'Role defined', valid: !!spec.role },
       { name: 'Capabilities listed', valid: spec.capabilities && spec.capabilities.length > 0 },
-      { name: 'Priority set', valid: spec.priority >= 1 && spec.priority <= 5 }
+      { name: 'Priority set', valid: spec.priority >= 1 && spec.priority <= 5 },
     ];
 
-    const valid = checks.every(check => check.valid);
+    const valid = checks.every((check) => check.valid);
 
     return {
       agent: agentName,
       valid,
       checks,
       capabilities: spec.capabilities?.length || 0,
-      priority: spec.priority
+      priority: spec.priority,
     };
   }
 
@@ -185,11 +214,14 @@ class AgentInitializer {
       { name: 'Memory-safe router', path: '.claude/scripts/core/memory-safe-router.js' },
       { name: 'TDD gate enforcer', path: '.claude/git-hooks/tdd-gate-enforcer.js' },
       { name: 'Linear MCP integration', path: '.claude/integrations/linear-mcp-integration.js' },
-      { name: 'Agent Linear integration', path: '.claude/integrations/agent-linear-integration.js' },
-      { name: 'Webhook handler', path: '.claude/webhooks/linear-webhook-handler.js' }
+      {
+        name: 'Agent Linear integration',
+        path: '.claude/integrations/agent-linear-integration.js',
+      },
+      { name: 'Webhook handler', path: '.claude/webhooks/linear-webhook-handler.js' },
     ];
 
-    const results = dependencies.map(dep => {
+    const results = dependencies.map((dep) => {
       const exists = fs.existsSync(path.join(this.projectRoot, dep.path));
       return { ...dep, exists };
     });
@@ -217,7 +249,7 @@ class AgentInitializer {
     const tests = [
       { name: 'Memory-safe router', test: this.testMemorySafeRouter.bind(this) },
       { name: 'Linear MCP connection', test: this.testLinearMCP.bind(this) },
-      { name: 'Agent coordination', test: this.testAgentCoordination.bind(this) }
+      { name: 'Agent coordination', test: this.testAgentCoordination.bind(this) },
     ];
 
     const results = [];
@@ -255,27 +287,28 @@ class AgentInitializer {
    */
   generateStatusReport() {
     const agentCount = Object.keys(this.agentSpecs).length;
-    const validAgents = this.initResults.filter(r => r.valid).length;
+    const validAgents = this.initResults.filter((r) => r.valid).length;
     const dependencies = this.checkDependencies();
-    const validDeps = dependencies.filter(d => d.exists).length;
+    const validDeps = dependencies.filter((d) => d.exists).length;
 
     return {
       agents: {
         total: agentCount,
         valid: validAgents,
-        success_rate: Math.round((validAgents / agentCount) * 100)
+        success_rate: Math.round((validAgents / agentCount) * 100),
       },
       dependencies: {
         total: dependencies.length,
         valid: validDeps,
-        success_rate: Math.round((validDeps / dependencies.length) * 100)
+        success_rate: Math.round((validDeps / dependencies.length) * 100),
       },
       categories: {
         core: ['STRATEGIST', 'AUDITOR', 'EXECUTOR', 'GUARDIAN', 'SCHOLAR'].length,
         technical: ['ANALYZER', 'TESTER', 'VALIDATOR', 'REFACTORER', 'RESEARCHER'].length,
         infrastructure: ['DEPLOYER', 'INTEGRATOR', 'MONITOR', 'SECURITYGUARD'].length,
-        specialized: ['MIGRATOR', 'OPTIMIZER', 'DOCUMENTER', 'ARCHITECT', 'CLEANER', 'REVIEWER'].length
-      }
+        specialized: ['MIGRATOR', 'OPTIMIZER', 'DOCUMENTER', 'ARCHITECT', 'CLEANER', 'REVIEWER']
+          .length,
+      },
     };
   }
 
@@ -301,7 +334,7 @@ class AgentInitializer {
       // Check dependencies
       this.log('🔍 Checking system dependencies...', 'info');
       const dependencies = this.checkDependencies();
-      dependencies.forEach(dep => {
+      dependencies.forEach((dep) => {
         if (dep.exists) {
           this.log(`✓ ${dep.name}`, 'success');
         } else {
@@ -312,7 +345,7 @@ class AgentInitializer {
       // Test communication
       this.log('📡 Testing agent communication...', 'info');
       const commTests = await this.testAgentCommunication();
-      commTests.forEach(test => {
+      commTests.forEach((test) => {
         if (test.success) {
           this.log(`✓ ${test.name}`, 'success');
         } else {
@@ -324,11 +357,21 @@ class AgentInitializer {
       const report = this.generateStatusReport();
 
       this.log('📊 Agent Initialization Summary:', 'info');
-      this.log(`   Agents: ${report.agents.valid}/${report.agents.total} (${report.agents.success_rate}%)`, 'info');
-      this.log(`   Dependencies: ${report.dependencies.valid}/${report.dependencies.total} (${report.dependencies.success_rate}%)`, 'info');
-      this.log(`   Categories: Core(${report.categories.core}) Technical(${report.categories.technical}) Infrastructure(${report.categories.infrastructure}) Specialized(${report.categories.specialized})`, 'info');
+      this.log(
+        `   Agents: ${report.agents.valid}/${report.agents.total} (${report.agents.success_rate}%)`,
+        'info',
+      );
+      this.log(
+        `   Dependencies: ${report.dependencies.valid}/${report.dependencies.total} (${report.dependencies.success_rate}%)`,
+        'info',
+      );
+      this.log(
+        `   Categories: Core(${report.categories.core}) Technical(${report.categories.technical}) Infrastructure(${report.categories.infrastructure}) Specialized(${report.categories.specialized})`,
+        'info',
+      );
 
-      const overallSuccess = report.agents.success_rate >= 90 && report.dependencies.success_rate >= 80;
+      const overallSuccess =
+        report.agents.success_rate >= 90 && report.dependencies.success_rate >= 80;
 
       if (overallSuccess) {
         this.log('🎉 Agent initialization completed successfully!', 'success');
@@ -339,11 +382,10 @@ class AgentInitializer {
       return {
         success: overallSuccess,
         report,
-        validAgents: this.initResults.filter(r => r.valid),
+        validAgents: this.initResults.filter((r) => r.valid),
         dependencies,
-        communicationTests: commTests
+        communicationTests: commTests,
       };
-
     } catch (error) {
       this.log(`Agent initialization failed: ${error.message}`, 'error');
       return { success: false, error: error.message };
@@ -354,11 +396,12 @@ class AgentInitializer {
 // Run if called directly
 if (require.main === module) {
   const initializer = new AgentInitializer();
-  initializer.initialize()
-    .then(result => {
+  initializer
+    .initialize()
+    .then((result) => {
       process.exit(result.success ? 0 : 1);
     })
-    .catch(error => {
+    .catch((error) => {
       console.error('💥 Agent initialization crashed:', error.message);
       process.exit(1);
     });

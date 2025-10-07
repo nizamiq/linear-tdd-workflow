@@ -12,29 +12,32 @@
 
 ## Quick Decision Matrix
 
-| Does the agent need to... | Execution Pattern | Subprocess OK? |
-|----------------------------|-------------------|----------------|
-| Write files | Direct Execution | ❌ NO |
-| Create git commits | Direct Execution | ❌ NO |
-| Create PRs | Direct Execution | ❌ NO |
-| Create/update Linear tasks | Direct Execution | ❌ NO |
-| Read files | Orchestrator-Workers | ✅ YES |
-| Analyze code | Orchestrator-Workers | ✅ YES |
-| Calculate metrics | Orchestrator-Workers | ✅ YES |
-| Query APIs (read-only) | Orchestrator-Workers | ✅ YES |
+| Does the agent need to...  | Execution Pattern    | Subprocess OK? |
+| -------------------------- | -------------------- | -------------- |
+| Write files                | Direct Execution     | ❌ NO          |
+| Create git commits         | Direct Execution     | ❌ NO          |
+| Create PRs                 | Direct Execution     | ❌ NO          |
+| Create/update Linear tasks | Direct Execution     | ❌ NO          |
+| Read files                 | Orchestrator-Workers | ✅ YES         |
+| Analyze code               | Orchestrator-Workers | ✅ YES         |
+| Calculate metrics          | Orchestrator-Workers | ✅ YES         |
+| Query APIs (read-only)     | Orchestrator-Workers | ✅ YES         |
 
 ---
 
 ## 3 Execution Patterns
 
 ### 1. Direct Execution (for state changes)
+
 ```yaml
 execution_mode: DIRECT
 subprocess_usage: NONE
 ```
+
 **Use for:** `/fix`, `/recover`, `/release`, `/docs fix`
 
 **Example:**
+
 ```
 User → EXECUTOR in main context → File writes persist ✅
 ```
@@ -42,13 +45,16 @@ User → EXECUTOR in main context → File writes persist ✅
 ---
 
 ### 2. Orchestrator-Workers (for parallel read-only)
+
 ```yaml
 execution_mode: ORCHESTRATOR
 subprocess_usage: READ_ONLY_ANALYSIS
 ```
+
 **Use for:** `/cycle`, `/assess`, `/learn`, `/status`
 
 **Example:**
+
 ```
 Main Context → Subprocesses fetch data → Main context acts on data ✅
 ```
@@ -56,13 +62,16 @@ Main Context → Subprocesses fetch data → Main context acts on data ✅
 ---
 
 ### 3. Validation-Then-Action (hybrid)
+
 ```yaml
 execution_mode: DIRECT
 subprocess_usage: VALIDATION_THEN_ACTION
 ```
+
 **Use for:** `/release`, `/recover`, `/docs validate`
 
 **Example:**
+
 ```
 Subprocess validates → Main context takes action ✅
 ```

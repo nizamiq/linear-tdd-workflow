@@ -15,7 +15,7 @@ function parseArgs() {
   const args = process.argv.slice(2);
   const options = {
     patterns: 'validated-patterns.json',
-    knowledgeBase: '.claude/knowledge/patterns.json'
+    knowledgeBase: '.claude/knowledge/patterns.json',
   };
 
   for (let i = 0; i < args.length; i++) {
@@ -58,8 +58,8 @@ function main() {
     statistics: {
       total_patterns: 0,
       successful_applications: 0,
-      avg_confidence: 0
-    }
+      avg_confidence: 0,
+    },
   };
 
   if (fs.existsSync(kbPath)) {

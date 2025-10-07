@@ -26,18 +26,21 @@ The Claude Agentic Workflow System integrates deeply with CI/CD pipelines to pro
 ### Integration Benefits
 
 **Automated Quality Enforcement:**
+
 - **Quality Gates**: Enforced TDD compliance, coverage thresholds, and code quality standards
 - **Security Scanning**: Automated vulnerability detection and remediation
 - **Performance Validation**: Automated performance regression detection
 - **Dependency Checking**: Automated security and license compliance
 
 **Intelligent Pipeline Protection:**
+
 - **Failure Prediction**: Proactive identification of potential pipeline issues
 - **Auto-Recovery**: Intelligent recovery strategies for common failure patterns
 - **Resource Optimization**: Dynamic resource allocation and optimization
 - **Rollback Management**: Automated rollback on critical failures
 
 **Comprehensive Monitoring:**
+
 - **Real-time Metrics**: Pipeline performance and health monitoring
 - **SLA Tracking**: Automated SLA compliance monitoring and alerting
 - **Trend Analysis**: Historical analysis and predictive insights
@@ -255,13 +258,13 @@ npm run agent:invoke GUARDIAN:predict-failures
 
 #### Failure Categories
 
-| Category | Description | Auto-Recovery | Escalation |
-|----------|-------------|---------------|------------|
-| **Transient** | Network timeouts, resource limits | ✅ Automatic | None |
-| **Environment** | Dependency issues, config problems | ✅ Automatic | Low |
-| **Code Quality** | Test failures, linting errors | ❌ Manual | Medium |
-| **Security** | Vulnerability detection | ❌ Manual | High |
-| **Infrastructure** | Platform issues, outages | ⚠️ Limited | High |
+| Category           | Description                        | Auto-Recovery | Escalation |
+| ------------------ | ---------------------------------- | ------------- | ---------- |
+| **Transient**      | Network timeouts, resource limits  | ✅ Automatic  | None       |
+| **Environment**    | Dependency issues, config problems | ✅ Automatic  | Low        |
+| **Code Quality**   | Test failures, linting errors      | ❌ Manual     | Medium     |
+| **Security**       | Vulnerability detection            | ❌ Manual     | High       |
+| **Infrastructure** | Platform issues, outages           | ⚠️ Limited    | High       |
 
 ### Auto-Recovery Strategies
 
@@ -592,8 +595,8 @@ stages:
   - deployment-readiness
 
 variables:
-  NODE_VERSION: "18"
-  CLAUDE_MODE: "ci"
+  NODE_VERSION: '18'
+  CLAUDE_MODE: 'ci'
   CLAUDE_LINEAR_TEAM_ID: $CLAUDE_LINEAR_TEAM_ID
   CLAUDE_LINEAR_API_KEY: $CLAUDE_LINEAR_API_KEY
 
@@ -1081,13 +1084,13 @@ npm run agent:invoke ANALYZER:pipeline-bottlenecks
 
 ### Key Performance Indicators
 
-| Metric | Target | Warning | Critical |
-|--------|--------|---------|----------|
-| **Pipeline Success Rate** | ≥95% | <90% | <85% |
-| **Average Build Time** | ≤10min | >15min | >20min |
-| **Recovery Success Rate** | ≥90% | <80% | <70% |
-| **Quality Gate Pass Rate** | ≥98% | <95% | <90% |
-| **Security Scan Time** | ≤2min | >3min | >5min |
+| Metric                     | Target | Warning | Critical |
+| -------------------------- | ------ | ------- | -------- |
+| **Pipeline Success Rate**  | ≥95%   | <90%    | <85%     |
+| **Average Build Time**     | ≤10min | >15min  | >20min   |
+| **Recovery Success Rate**  | ≥90%   | <80%    | <70%     |
+| **Quality Gate Pass Rate** | ≥98%   | <95%    | <90%     |
+| **Security Scan Time**     | ≤2min  | >3min   | >5min    |
 
 ### Performance Optimization
 
@@ -1293,6 +1296,7 @@ npm run pipeline:profile -- --build-id 12345
 **The CI/CD integration transforms your pipeline from a basic automation tool into an intelligent, self-healing development workflow. With GUARDIAN protection and agent coordination, achieve >95% pipeline success rates while maintaining the highest quality standards! 🚀**
 
 **For additional CI/CD integration help:**
+
 - [User Guide](USER-GUIDE.md) - Complete system overview
 - [Agent Overview](AGENT-OVERVIEW.md) - Understanding GUARDIAN agent
 - [Configuration](CONFIGURATION.md) - Pipeline configuration details

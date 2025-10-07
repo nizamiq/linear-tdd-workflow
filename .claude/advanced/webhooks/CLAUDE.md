@@ -7,8 +7,10 @@ This directory contains webhook handlers that receive and process events from ex
 ## Available Webhooks
 
 ### Linear Webhook Handler (`linear-webhook-handler.js`)
+
 **Purpose:** Processes Linear.app webhook events
 **Handles:**
+
 - Issue created/updated/deleted
 - Comment added
 - Status changed
@@ -16,6 +18,7 @@ This directory contains webhook handlers that receive and process events from ex
 - Project updates
 
 **Event Processing:**
+
 ```javascript
 // Webhook receives Linear event
 {
@@ -30,8 +33,10 @@ This directory contains webhook handlers that receive and process events from ex
 ```
 
 ### Webhook Server (`webhook-server.js`)
+
 **Purpose:** HTTP server for receiving webhooks
 **Features:**
+
 - Express server on configurable port
 - Signature validation
 - Event routing
@@ -39,6 +44,7 @@ This directory contains webhook handlers that receive and process events from ex
 - Retry logic
 
 **Starting the Server:**
+
 ```bash
 # Start webhook server
 node .claude/webhooks/webhook-server.js
@@ -55,59 +61,59 @@ DEBUG=true node .claude/webhooks/webhook-server.js
 ### Linear Events
 
 #### Issue Events
+
 ```javascript
 // Issue Created
 onIssueCreated: (issue) => {
   // Notify EXECUTOR if assigned
   // Update local tracking
   // Start timer for SLA
-}
+};
 
 // Issue Updated
 onIssueUpdated: (issue, changes) => {
   // Sync status changes
   // Update assignments
   // Log progress
-}
+};
 
 // Issue Completed
 onIssueCompleted: (issue) => {
   // Trigger validation
   // Update metrics
   // Learn patterns
-}
+};
 ```
 
 #### Comment Events
+
 ```javascript
 // Comment Added
 onCommentAdded: (comment) => {
   // Parse for commands (@execute, @validate)
   // Notify mentioned agents
   // Update context
-}
+};
 ```
 
 ## Webhook Security
 
 ### Signature Validation
+
 All webhooks must be validated:
+
 ```javascript
 function validateWebhookSignature(payload, signature) {
-  const expectedSig = crypto
-    .createHmac('sha256', WEBHOOK_SECRET)
-    .update(payload)
-    .digest('hex');
+  const expectedSig = crypto.createHmac('sha256', WEBHOOK_SECRET).update(payload).digest('hex');
 
-  return crypto.timingSafeEqual(
-    Buffer.from(signature),
-    Buffer.from(expectedSig)
-  );
+  return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSig));
 }
 ```
 
 ### IP Whitelisting (Optional)
+
 Configure allowed IPs in settings:
+
 ```json
 {
   "webhooks": {
@@ -119,6 +125,7 @@ Configure allowed IPs in settings:
 ## Configuration
 
 ### Environment Variables
+
 ```bash
 # Required for webhooks
 LINEAR_WEBHOOK_SECRET=your-webhook-secret
@@ -130,12 +137,14 @@ WEBHOOK_TIMEOUT=30000
 ```
 
 ### Linear Webhook Setup
+
 1. Go to Linear Settings → API → Webhooks
 2. Add webhook URL: `https://your-domain/webhooks/linear`
 3. Select events to receive
 4. Copy webhook secret to `.env`
 
 ### Settings
+
 ```json
 {
   "webhooks": {
@@ -143,11 +152,7 @@ WEBHOOK_TIMEOUT=30000
     "port": 3000,
     "retryAttempts": 3,
     "retryDelay": 1000,
-    "eventTypes": [
-      "Issue.create",
-      "Issue.update",
-      "Comment.create"
-    ]
+    "eventTypes": ["Issue.create", "Issue.update", "Comment.create"]
   }
 }
 ```
@@ -156,16 +161,18 @@ WEBHOOK_TIMEOUT=30000
 
 ### Automatic Responses
 
-| Event | Trigger | Action |
-|-------|---------|--------|
-| Issue created with "bug" label | Immediate | AUDITOR scans related code |
-| Issue assigned to EXECUTOR | On assignment | Start fix implementation |
-| PR linked to issue | On link | VALIDATOR reviews code |
-| Issue moved to "Done" | Status change | Trigger validation |
-| Comment mentions @fix | On comment | EXECUTOR implements fix |
+| Event                          | Trigger       | Action                     |
+| ------------------------------ | ------------- | -------------------------- |
+| Issue created with "bug" label | Immediate     | AUDITOR scans related code |
+| Issue assigned to EXECUTOR     | On assignment | Start fix implementation   |
+| PR linked to issue             | On link       | VALIDATOR reviews code     |
+| Issue moved to "Done"          | Status change | Trigger validation         |
+| Comment mentions @fix          | On comment    | EXECUTOR implements fix    |
 
 ### Agent Notifications
+
 Webhooks notify agents based on patterns:
+
 ```javascript
 // Route to appropriate agent
 if (issue.labels.includes('clean-code')) {
@@ -178,6 +185,7 @@ if (issue.labels.includes('clean-code')) {
 ## Running Webhook Server
 
 ### Development
+
 ```bash
 # Run with nodemon for auto-reload
 npx nodemon .claude/webhooks/webhook-server.js
@@ -188,6 +196,7 @@ ngrok http 3000
 ```
 
 ### Production
+
 ```bash
 # Run with PM2
 pm2 start .claude/webhooks/webhook-server.js --name webhook-server
@@ -199,7 +208,9 @@ systemctl start linear-webhooks
 ## Error Handling
 
 ### Retry Logic
+
 Failed webhook processing is retried:
+
 ```javascript
 async function processWithRetry(event, maxAttempts = 3) {
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
@@ -214,20 +225,23 @@ async function processWithRetry(event, maxAttempts = 3) {
 ```
 
 ### Dead Letter Queue
+
 Failed events are stored for manual processing:
+
 ```javascript
 // Store failed events
 await storeFailedEvent({
   event,
   error: error.message,
   attempts: maxAttempts,
-  timestamp: Date.now()
+  timestamp: Date.now(),
 });
 ```
 
 ## Testing Webhooks
 
 ### Local Testing
+
 ```bash
 # Send test webhook
 curl -X POST http://localhost:3000/webhooks/linear \
@@ -237,6 +251,7 @@ curl -X POST http://localhost:3000/webhooks/linear \
 ```
 
 ### Webhook Tester
+
 ```bash
 # Use webhook testing tool
 node .claude/webhooks/test-webhook.js --event issue.created
@@ -245,13 +260,16 @@ node .claude/webhooks/test-webhook.js --event issue.created
 ## Monitoring
 
 ### Health Check
+
 ```bash
 # Check webhook server health
 curl http://localhost:3000/health
 ```
 
 ### Metrics
+
 Webhook server tracks:
+
 - Events received
 - Processing time
 - Success/failure rate
@@ -267,21 +285,23 @@ Webhook server tracks:
 
 ## Quick Reference
 
-| Webhook | Endpoint | Events |
-|---------|----------|--------|
-| Linear | /webhooks/linear | Issues, Comments |
-| GitHub | /webhooks/github | PRs, Commits |
-| Custom | /webhooks/custom | User-defined |
+| Webhook | Endpoint         | Events           |
+| ------- | ---------------- | ---------------- |
+| Linear  | /webhooks/linear | Issues, Comments |
+| GitHub  | /webhooks/github | PRs, Commits     |
+| Custom  | /webhooks/custom | User-defined     |
 
 ## Troubleshooting
 
 ### Webhook Not Receiving Events
+
 1. Check webhook URL is accessible
 2. Verify signature secret matches
 3. Check firewall/proxy settings
 4. Review Linear webhook logs
 
 ### Processing Errors
+
 ```bash
 # Check webhook logs
 tail -f .claude/logs/webhooks.log

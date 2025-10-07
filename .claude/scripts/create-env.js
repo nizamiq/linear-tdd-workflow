@@ -16,12 +16,13 @@ class EnvironmentSetup {
   }
 
   log(message, type = 'info') {
-    const emoji = {
-      info: '📝',
-      success: '✅',
-      warning: '⚠️',
-      error: '❌'
-    }[type] || '📝';
+    const emoji =
+      {
+        info: '📝',
+        success: '✅',
+        warning: '⚠️',
+        error: '❌',
+      }[type] || '📝';
 
     console.log(`${emoji} ${message}`);
   }
@@ -99,10 +100,10 @@ ERROR_REPORTING=true
       'reports/architecture',
       'reports/refactoring',
       'coverage',
-      'docs/api'
+      'docs/api',
     ];
 
-    directories.forEach(dir => {
+    directories.forEach((dir) => {
       const dirPath = path.join(this.projectRoot, dir);
       if (!fs.existsSync(dirPath)) {
         fs.mkdirSync(dirPath, { recursive: true });
@@ -129,40 +130,40 @@ ERROR_REPORTING=true
       allowSkippedTests: false,
       testTimeout: 30000,
       excludePatterns: [
-        "node_modules/**",
-        "coverage/**",
-        "*.min.js",
-        "dist/**",
-        "build/**",
-        "__pycache__/**",
-        "*.pyc"
+        'node_modules/**',
+        'coverage/**',
+        '*.min.js',
+        'dist/**',
+        'build/**',
+        '__pycache__/**',
+        '*.pyc',
       ],
       testPatterns: [
-        "**/*.test.js",
-        "**/*.spec.js",
-        "**/*.test.ts",
-        "**/*.spec.ts",
-        "**/test_*.py",
-        "tests/**/*.py"
+        '**/*.test.js',
+        '**/*.spec.js',
+        '**/*.test.ts',
+        '**/*.spec.ts',
+        '**/test_*.py',
+        'tests/**/*.py',
       ],
       hooks: {
         preCommit: {
           enabled: true,
           runTests: true,
           checkCoverage: true,
-          enforcePhases: true
+          enforcePhases: true,
         },
         prePush: {
           enabled: true,
           runFullTestSuite: true,
-          checkOverallCoverage: true
+          checkOverallCoverage: true,
         },
         commitMsg: {
           enabled: true,
           enforceConventionalCommits: false,
-          blockTodoFixme: true
-        }
-      }
+          blockTodoFixme: true,
+        },
+      },
     };
 
     fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
@@ -198,12 +199,12 @@ ERROR_REPORTING=true
       { name: '.env file', path: '.env' },
       { name: 'TDD config', path: '.claude/config/tdd-config.json' },
       { name: 'Config directory', path: '.claude/config' },
-      { name: 'Git hooks', path: '.git/hooks/pre-commit' }
+      { name: 'Git hooks', path: '.git/hooks/pre-commit' },
     ];
 
     let allValid = true;
 
-    checks.forEach(check => {
+    checks.forEach((check) => {
       const fullPath = path.join(this.projectRoot, check.path);
       if (fs.existsSync(fullPath)) {
         this.log(`✓ ${check.name}`, 'success');
@@ -250,7 +251,6 @@ ERROR_REPORTING=true
       }
 
       return isValid;
-
     } catch (error) {
       this.log(`Setup failed: ${error.message}`, 'error');
       return false;
@@ -261,11 +261,12 @@ ERROR_REPORTING=true
 // Run if called directly
 if (require.main === module) {
   const setup = new EnvironmentSetup();
-  setup.setup()
-    .then(success => {
+  setup
+    .setup()
+    .then((success) => {
       process.exit(success ? 0 : 1);
     })
-    .catch(error => {
+    .catch((error) => {
       console.error('💥 Environment setup crashed:', error.message);
       process.exit(1);
     });

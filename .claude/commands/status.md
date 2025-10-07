@@ -2,9 +2,9 @@
 name: status
 description: Get current workflow and Linear status
 agent: STRATEGIST
-execution_mode: ORCHESTRATOR  # May spawn parallel metric collection workers
-subprocess_usage: READ_ONLY_ANALYSIS  # Subprocesses fetch metrics, main context displays status
-usage: "/status [--detailed] [--format=<json|table>]"
+execution_mode: ORCHESTRATOR # May spawn parallel metric collection workers
+subprocess_usage: READ_ONLY_ANALYSIS # Subprocesses fetch metrics, main context displays status
+usage: '/status [--detailed] [--format=<json|table>]'
 parameters:
   - name: detailed
     description: Include detailed agent and task information
@@ -24,11 +24,13 @@ Get comprehensive status of the current workflow, Linear tasks, and agent activi
 ## ⚠️ IMPORTANT: Read-Only Status Query
 
 This command performs **READ-ONLY queries** and does NOT make state changes:
+
 - **Main agent (STRATEGIST)** orchestrates data collection and display
 - **Worker subprocesses** fetch metrics from Linear, GitHub, CI/CD in parallel
 - **NO writes** - purely informational command
 
 **Safe operations (READ-ONLY):**
+
 - ✅ Querying Linear API for task status
 - ✅ Fetching GitHub PR status
 - ✅ Reading CI/CD pipeline results
@@ -36,6 +38,7 @@ This command performs **READ-ONLY queries** and does NOT make state changes:
 - ✅ Displaying status reports
 
 **Prohibited operations (none expected):**
+
 - ❌ Updating Linear tasks
 - ❌ Creating branches or PRs
 - ❌ Modifying any files
@@ -44,16 +47,20 @@ This command performs **READ-ONLY queries** and does NOT make state changes:
 **Rule:** This command only READS state, never WRITES.
 
 ## Usage
+
 ```
 /status [--detailed] [--format=<text|json>]
 ```
 
 ## Parameters
+
 - `--detailed`: Include detailed metrics and agent status (default: false)
 - `--format`: Output format (default: text)
 
 ## What This Command Does
+
 The STRATEGIST agent will:
+
 1. Query Linear for current sprint status
 2. Check active agent operations
 3. Review quality metrics and trends
@@ -62,6 +69,7 @@ The STRATEGIST agent will:
 6. Provide velocity and performance metrics
 
 ## Expected Output
+
 - **Sprint Status**: Current sprint progress and burndown
 - **Active Tasks**: Linear tasks in progress with assignees
 - **Quality Metrics**: Coverage, mutation scores, technical debt
@@ -70,6 +78,7 @@ The STRATEGIST agent will:
 - **Performance Trends**: Velocity, efficiency, quality trends
 
 ## Examples
+
 ```bash
 # Quick status overview
 /status
@@ -82,6 +91,7 @@ The STRATEGIST agent will:
 ```
 
 ## Status Categories
+
 - **Linear Integration**: Tasks, sprints, velocity
 - **Code Quality**: Coverage, linting, type safety
 - **Pipeline Status**: Build, test, deployment health
@@ -89,6 +99,7 @@ The STRATEGIST agent will:
 - **Team Performance**: Efficiency metrics, pattern reuse
 
 ## Key Metrics
+
 - Sprint velocity and burndown
 - Test coverage percentage
 - Pipeline success rate

@@ -25,7 +25,7 @@ class ReleaseJourney {
       branch: null,
       uat: null,
       deployment: null,
-      rollback: null
+      rollback: null,
     };
   }
 
@@ -75,7 +75,6 @@ class ReleaseJourney {
 
       console.log('✅ Release successfully completed!');
       return this.results;
-
     } catch (error) {
       console.error('❌ Release failed:', error.message);
       await this.executeRollback();
@@ -90,7 +89,7 @@ class ReleaseJourney {
     console.log('\n📦 Preparing release...');
 
     // Determine version
-    this.version = version || await this.determineVersion();
+    this.version = version || (await this.determineVersion());
     console.log(`   📌 Version: ${this.version}`);
 
     // Create release branch
@@ -143,7 +142,6 @@ class ReleaseJourney {
         parts[2] = (parseInt(parts[2]) + 1).toString();
         return parts.join('.');
       }
-
     } catch {}
 
     return '0.1.0'; // Default
@@ -182,13 +180,14 @@ class ReleaseJourney {
 
     try {
       // Get commits since last tag
-      const lastTag = execSync('git describe --tags --abbrev=0 2>/dev/null || echo ""', { encoding: 'utf8' }).trim();
+      const lastTag = execSync('git describe --tags --abbrev=0 2>/dev/null || echo ""', {
+        encoding: 'utf8',
+      }).trim();
       const range = lastTag ? `${lastTag}..HEAD` : 'HEAD';
 
-      const commits = execSync(
-        `git log ${range} --pretty=format:'- %s (%h)' --no-merges`,
-        { encoding: 'utf8' }
-      );
+      const commits = execSync(`git log ${range} --pretty=format:'- %s (%h)' --no-merges`, {
+        encoding: 'utf8',
+      });
 
       const changelog = `# Release ${this.version}
 
@@ -214,7 +213,6 @@ None
       await fs.writeFile(changelogPath, changelog);
 
       console.log(`   ✅ Changelog created`);
-
     } catch (error) {
       console.warn('   ⚠️ Changelog generation failed:', error.message);
     }
@@ -234,7 +232,7 @@ None
       dependencies: await this.checkDependencies(),
       documentation: await this.checkDocumentation(),
       configuration: await this.checkConfiguration(),
-      backups: await this.checkBackups()
+      backups: await this.checkBackups(),
     };
 
     // Display checklist
@@ -246,13 +244,13 @@ None
 
     // Check if all critical items pass
     const criticalItems = ['tests', 'security', 'backups'];
-    const criticalPassed = criticalItems.every(item => this.checklist[item].passed);
+    const criticalPassed = criticalItems.every((item) => this.checklist[item].passed);
 
     if (!criticalPassed) {
       console.log('\n   ❌ Critical checks failed!');
       const failures = criticalItems
-        .filter(item => !this.checklist[item].passed)
-        .map(item => `- ${item}: ${this.checklist[item].message}`);
+        .filter((item) => !this.checklist[item].passed)
+        .map((item) => `- ${item}: ${this.checklist[item].message}`);
 
       throw new Error(`Critical checks failed:\n${failures.join('\n')}`);
     }
@@ -265,17 +263,16 @@ None
    */
   async checkCodeReview() {
     try {
-      const prs = execSync(
-        `gh pr list --state merged --limit 10 --json reviewDecision`,
-        { encoding: 'utf8' }
-      );
+      const prs = execSync(`gh pr list --state merged --limit 10 --json reviewDecision`, {
+        encoding: 'utf8',
+      });
 
       const parsed = JSON.parse(prs);
-      const approved = parsed.filter(pr => pr.reviewDecision === 'APPROVED');
+      const approved = parsed.filter((pr) => pr.reviewDecision === 'APPROVED');
 
       return {
         passed: approved.length === parsed.length,
-        message: `${approved.length}/${parsed.length} PRs approved`
+        message: `${approved.length}/${parsed.length} PRs approved`,
       };
     } catch {
       return { passed: true, message: 'Review check skipped' };
@@ -292,7 +289,6 @@ None
 
       execSync(cmd, { encoding: 'utf8', stdio: 'pipe' });
       return { passed: true, message: 'All tests passing' };
-
     } catch {
       return { passed: false, message: 'Test failures detected' };
     }
@@ -308,7 +304,7 @@ None
 
       return {
         passed,
-        message: `Coverage: ${coverage}% (target: 80%)`
+        message: `Coverage: ${coverage}% (target: 80%)`,
       };
     } catch {
       return { passed: true, message: 'Coverage check skipped' };
@@ -326,14 +322,14 @@ None
         const result = JSON.parse(audit);
 
         return {
-          passed: result.metadata.vulnerabilities.high === 0 &&
-                  result.metadata.vulnerabilities.critical === 0,
-          message: `No critical/high vulnerabilities`
+          passed:
+            result.metadata.vulnerabilities.high === 0 &&
+            result.metadata.vulnerabilities.critical === 0,
+          message: `No critical/high vulnerabilities`,
         };
       }
 
       return { passed: true, message: 'Security check passed' };
-
     } catch {
       return { passed: true, message: 'Security check skipped' };
     }
@@ -355,7 +351,7 @@ None
 
     return {
       passed: hasReadme && hasChangelog,
-      message: 'Documentation present'
+      message: 'Documentation present',
     };
   }
 
@@ -375,7 +371,7 @@ None
 
     return {
       passed: backupExists,
-      message: 'Backup verified'
+      message: 'Backup verified',
     };
   }
 
@@ -392,17 +388,17 @@ None
         'Core feature workflow',
         'Data import/export',
         'Performance under load',
-        'Error handling'
+        'Error handling',
       ],
       duration: '2 hours',
-      participants: ['Product Owner', 'QA Team', 'Key Users']
+      participants: ['Product Owner', 'QA Team', 'Key Users'],
     };
 
     // Generate UAT checklist
     const uatChecklist = `# UAT Checklist for v${this.version}
 
 ## Test Scenarios
-${uatPlan.scenarios.map(s => `- [ ] ${s}`).join('\n')}
+${uatPlan.scenarios.map((s) => `- [ ] ${s}`).join('\n')}
 
 ## Acceptance Criteria
 - [ ] All critical paths tested
@@ -434,15 +430,13 @@ ${uatPlan.scenarios.map(s => `- [ ] ${s}`).join('\n')}
     console.log('\n🔐 HUMAN GATE: UAT Approval Required');
     console.log('=====================================');
 
-    const approved = await this.promptUser(
-      'Has UAT been completed and approved? (yes/no): '
-    );
+    const approved = await this.promptUser('Has UAT been completed and approved? (yes/no): ');
 
     if (approved.toLowerCase() === 'yes') {
       this.approvals.uat = {
         approved: true,
         timestamp: new Date().toISOString(),
-        approver: 'User'
+        approver: 'User',
       };
 
       console.log('   ✅ UAT approved');
@@ -464,7 +458,7 @@ ${uatPlan.scenarios.map(s => `- [ ] ${s}`).join('\n')}
       environment: 'staging',
       version: this.version,
       timestamp: new Date().toISOString(),
-      status: 'success'
+      status: 'success',
     };
 
     console.log('   📦 Building application...');
@@ -489,7 +483,7 @@ ${uatPlan.scenarios.map(s => `- [ ] ${s}`).join('\n')}
       stagingTests: await this.runStagingTests(),
       performanceCheck: await this.checkPerformance(),
       securityScan: await this.runSecurityScan(),
-      rollbackPlan: await this.validateRollbackPlan()
+      rollbackPlan: await this.validateRollbackPlan(),
     };
 
     console.log('\n   📋 Production Readiness:');
@@ -498,7 +492,7 @@ ${uatPlan.scenarios.map(s => `- [ ] ${s}`).join('\n')}
       console.log(`      ${icon} ${check}: ${result.message}`);
     }
 
-    const allPassed = Object.values(validations).every(v => v.passed);
+    const allPassed = Object.values(validations).every((v) => v.passed);
 
     if (!allPassed) {
       throw new Error('Production readiness checks failed');
@@ -517,17 +511,19 @@ ${uatPlan.scenarios.map(s => `- [ ] ${s}`).join('\n')}
     console.log('\nRelease Summary:');
     console.log(`   Version: ${this.version}`);
     console.log(`   UAT: ${this.approvals.uat ? 'Approved' : 'Pending'}`);
-    console.log(`   Checklist: ${Object.values(this.checklist).filter(c => c.passed).length}/${Object.keys(this.checklist).length} passed`);
+    console.log(
+      `   Checklist: ${Object.values(this.checklist).filter((c) => c.passed).length}/${Object.keys(this.checklist).length} passed`,
+    );
 
     const decision = await this.promptUser(
-      '\nFinal decision - proceed with production deployment? (go/no-go): '
+      '\nFinal decision - proceed with production deployment? (go/no-go): ',
     );
 
     if (decision.toLowerCase() === 'go') {
       this.approvals.production = {
         approved: true,
         timestamp: new Date().toISOString(),
-        approver: 'User'
+        approver: 'User',
       };
 
       console.log('   ✅ Go decision received');
@@ -557,7 +553,9 @@ ${uatPlan.scenarios.map(s => `- [ ] ${s}`).join('\n')}
     // Merge to main
     try {
       execSync('git checkout main', { stdio: 'ignore' });
-      execSync(`git merge --no-ff ${this.releaseBranch} -m "Release v${this.version}"`, { stdio: 'ignore' });
+      execSync(`git merge --no-ff ${this.releaseBranch} -m "Release v${this.version}"`, {
+        stdio: 'ignore',
+      });
       execSync(`git tag -a v${this.version} -m "Release v${this.version}"`, { stdio: 'ignore' });
       execSync('git push origin main --tags', { stdio: 'ignore' });
     } catch (e) {
@@ -572,7 +570,7 @@ ${uatPlan.scenarios.map(s => `- [ ] ${s}`).join('\n')}
       environment: 'production',
       version: this.version,
       timestamp: new Date().toISOString(),
-      status: 'success'
+      status: 'success',
     };
   }
 
@@ -587,7 +585,7 @@ ${uatPlan.scenarios.map(s => `- [ ] ${s}`).join('\n')}
       { name: 'Smoke tests', passed: true },
       { name: 'Performance metrics', passed: true },
       { name: 'Error monitoring', passed: true },
-      { name: 'User traffic', passed: true }
+      { name: 'User traffic', passed: true },
     ];
 
     for (const check of checks) {
@@ -596,7 +594,7 @@ ${uatPlan.scenarios.map(s => `- [ ] ${s}`).join('\n')}
       console.log(`   ${icon} ${check.name}`);
     }
 
-    const allPassed = checks.every(c => c.passed);
+    const allPassed = checks.every((c) => c.passed);
 
     if (!allPassed) {
       console.log('\n   ⚠️ Post-deployment issues detected!');
@@ -631,14 +629,10 @@ ${uatPlan.scenarios.map(s => `- [ ] ${s}`).join('\n')}
       approvals: this.approvals,
       deployment: this.results.deployment,
       duration: this.calculateDuration(),
-      notes: `Release v${this.version} successfully deployed to production`
+      notes: `Release v${this.version} successfully deployed to production`,
     };
 
-    const reportPath = path.join(
-      this.projectRoot,
-      'releases',
-      `release-${this.version}.json`
-    );
+    const reportPath = path.join(this.projectRoot, 'releases', `release-${this.version}.json`);
 
     await this.ensureDirectory(path.dirname(reportPath));
     await fs.writeFile(reportPath, JSON.stringify(report, null, 2));
@@ -662,10 +656,9 @@ ${uatPlan.scenarios.map(s => `- [ ] ${s}`).join('\n')}
 
     try {
       // Revert to previous tag
-      const previousTag = execSync(
-        'git describe --tags --abbrev=0 HEAD~1',
-        { encoding: 'utf8' }
-      ).trim();
+      const previousTag = execSync('git describe --tags --abbrev=0 HEAD~1', {
+        encoding: 'utf8',
+      }).trim();
 
       console.log(`   📌 Rolling back to: ${previousTag}`);
 
@@ -677,9 +670,8 @@ ${uatPlan.scenarios.map(s => `- [ ] ${s}`).join('\n')}
       this.results.rollback = {
         executed: true,
         targetVersion: previousTag,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
-
     } catch (error) {
       console.error('   ❌ Rollback failed:', error.message);
       console.log('   ⚠️ Manual intervention required!');
@@ -692,8 +684,7 @@ ${uatPlan.scenarios.map(s => `- [ ] ${s}`).join('\n')}
     if (await this.fileExists('package.json')) {
       return 'javascript';
     }
-    if (await this.fileExists('requirements.txt') ||
-        await this.fileExists('pyproject.toml')) {
+    if ((await this.fileExists('requirements.txt')) || (await this.fileExists('pyproject.toml'))) {
       return 'python';
     }
     return 'javascript';
@@ -717,13 +708,19 @@ ${uatPlan.scenarios.map(s => `- [ ] ${s}`).join('\n')}
       const projectType = await this.detectProjectType();
 
       if (projectType === 'javascript') {
-        const output = execSync('npm test -- --coverage | grep "All files"', { encoding: 'utf8', stdio: 'pipe' });
+        const output = execSync('npm test -- --coverage | grep "All files"', {
+          encoding: 'utf8',
+          stdio: 'pipe',
+        });
         const match = output.match(/(\d+(?:\.\d+)?)\s*%/);
         return match ? parseFloat(match[1]) : 0;
       }
 
       if (projectType === 'python') {
-        const output = execSync('pytest --cov --cov-report=term | grep TOTAL', { encoding: 'utf8', stdio: 'pipe' });
+        const output = execSync('pytest --cov --cov-report=term | grep TOTAL', {
+          encoding: 'utf8',
+          stdio: 'pipe',
+        });
         const match = output.match(/(\d+)%/);
         return match ? parseInt(match[1]) : 0;
       }
@@ -753,17 +750,17 @@ ${uatPlan.scenarios.map(s => `- [ ] ${s}`).join('\n')}
   }
 
   async sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   async promptUser(question) {
     const rl = readline.createInterface({
       input: process.stdin,
-      output: process.stdout
+      output: process.stdout,
     });
 
-    return new Promise(resolve => {
-      rl.question(question, answer => {
+    return new Promise((resolve) => {
+      rl.question(question, (answer) => {
         rl.close();
         resolve(answer);
       });

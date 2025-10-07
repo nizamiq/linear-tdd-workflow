@@ -29,24 +29,28 @@ The PLANNER agent orchestrates comprehensive sprint/cycle planning by coordinati
 ## Primary Functions
 
 ### 1. Cycle State Analysis
+
 - Analyze current cycle health and velocity
 - Assess backlog depth and composition
 - Map issue dependencies and blockers
 - Calculate team capacity and availability
 
 ### 2. Intelligent Planning
+
 - Score and prioritize issues using multi-factor algorithm
 - Balance technical debt vs features (30/70 ratio)
 - Optimize for velocity and risk mitigation
 - Ensure dependency resolution
 
 ### 3. Work Alignment
+
 - Create Claude Code work queues
 - Map issues to appropriate agents
 - Generate pre-implementation analysis
 - Validate test coverage requirements
 
 ### 4. Execution Readiness
+
 - Verify CI/CD pipeline health
 - Check environment configurations
 - Validate quality gates
@@ -55,6 +59,7 @@ The PLANNER agent orchestrates comprehensive sprint/cycle planning by coordinati
 ## Coordination Strategy
 
 PLANNER coordinates with:
+
 - **STRATEGIST**: Linear API operations and task management
 - **AUDITOR**: Technical debt assessment and prioritization
 - **SCHOLAR**: Historical pattern analysis for velocity
@@ -64,6 +69,7 @@ PLANNER coordinates with:
 ## Planning Algorithm
 
 ### Issue Scoring Formula
+
 ```
 Score = (Business Value × 0.4) +
         (Technical Debt Impact × 0.3) +
@@ -72,6 +78,7 @@ Score = (Business Value × 0.4) +
 ```
 
 ### Capacity Calculation
+
 ```
 Available Capacity = Team Hours × Focus Factor (0.7) × Velocity Coefficient
 Required Capacity = Σ(Issue Estimates × Complexity Multiplier)
@@ -80,6 +87,7 @@ Required Capacity = Σ(Issue Estimates × Complexity Multiplier)
 ## Workflow Phases
 
 ### Phase 1: Analysis (10 min)
+
 ```javascript
 // Gather cycle metrics
 const currentCycle = await linear.getCurrentCycle();
@@ -89,6 +97,7 @@ const blockers = await identifyBlockers();
 ```
 
 ### Phase 2: Planning (15 min)
+
 ```javascript
 // Score and select issues
 const scoredIssues = await scoreBacklog(backlog);
@@ -97,6 +106,7 @@ const balanced = await balanceComposition(selectedIssues);
 ```
 
 ### Phase 3: Alignment (10 min)
+
 ```javascript
 // Prepare work queues
 const workQueues = await createWorkQueues(selectedIssues);
@@ -105,6 +115,7 @@ const preAnalysis = await generatePreAnalysis(assignments);
 ```
 
 ### Phase 4: Validation (5 min)
+
 ```javascript
 // Readiness checks
 const pipelineHealth = await validatePipeline();
@@ -137,6 +148,7 @@ const report = await generateKickoffReport();
 ## Configuration
 
 Required environment variables:
+
 - `LINEAR_TEAM_ID`: Team identifier
 - `LINEAR_API_KEY`: API access token
 - `CYCLE_PLANNING_MODE`: auto|semi|manual
@@ -146,6 +158,7 @@ Required environment variables:
 ## Usage
 
 Invoked via `/cycle` slash command:
+
 ```bash
 /cycle plan      # Run full planning workflow
 /cycle status    # Current cycle health

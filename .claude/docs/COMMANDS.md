@@ -20,6 +20,7 @@ Complete reference for all CLI commands and agent invocations available in the C
 ### Core System Operations
 
 #### `npm run status`
+
 Display comprehensive system status and health metrics.
 
 ```bash
@@ -35,6 +36,7 @@ npm run status
 ```
 
 #### `npm run validate`
+
 Validate system configuration and dependencies.
 
 ```bash
@@ -47,6 +49,7 @@ npm run validate -- --fix        # Auto-fix issues where possible
 ```
 
 #### `npm run setup`
+
 Initialize or re-initialize the workflow system.
 
 ```bash
@@ -59,6 +62,7 @@ npm run setup -- --team          # Setup for team environment
 ```
 
 #### `npm run doctor`
+
 Comprehensive system diagnostics and health check.
 
 ```bash
@@ -77,6 +81,7 @@ npm run doctor
 ### Code Quality Assessment
 
 #### `npm run assess`
+
 Run comprehensive code quality assessment.
 
 ```bash
@@ -94,6 +99,7 @@ npm run assess -- --output file.json    # Save to file
 ```
 
 #### `npm run lint`
+
 Lint code with automatic fixing.
 
 ```bash
@@ -110,6 +116,7 @@ npm run lint -- --max-warnings 0 # Fail on any warnings
 ```
 
 #### `npm run format`
+
 Format code according to style guidelines.
 
 ```bash
@@ -125,6 +132,7 @@ npm run format -- --diff         # Show formatting changes
 ```
 
 #### `npm run typecheck`
+
 Run TypeScript type checking.
 
 ```bash
@@ -141,6 +149,7 @@ npm run typecheck -- --project tsconfig.build.json  # Specific config
 ### Test Execution
 
 #### `npm test`
+
 Run all tests with coverage.
 
 ```bash
@@ -158,6 +167,7 @@ npm test -- --coverage-json     # JSON coverage data
 ```
 
 #### `npm test:watch`
+
 Run tests in watch mode for TDD.
 
 ```bash
@@ -170,6 +180,7 @@ npm test:watch -- --testNamePattern="user"  # Filter tests
 ```
 
 #### `npm run test:mutation`
+
 Run mutation testing for critical paths.
 
 ```bash
@@ -184,6 +195,7 @@ npm run test:mutation -- --reporters html   # HTML report
 ### TDD Workflow Commands
 
 #### `npm run precommit`
+
 Run pre-commit quality checks.
 
 ```bash
@@ -198,6 +210,7 @@ npm run precommit
 ```
 
 #### `npm run validate-tdd`
+
 Validate TDD compliance for changes.
 
 ```bash
@@ -214,6 +227,7 @@ npm run validate-tdd -- --threshold 80      # Coverage threshold
 ### Core Agent Commands
 
 All agent commands follow the pattern:
+
 ```bash
 npm run agent:invoke <AGENT>:<COMMAND> -- [options]
 ```
@@ -420,6 +434,7 @@ npm run agent:invoke MONITOR:manage-alerts
 ### Linear Task Management
 
 #### `npm run linear:sync`
+
 Synchronize with Linear tasks and update status.
 
 ```bash
@@ -491,6 +506,7 @@ npm run validate:security-gate
 ### System Maintenance
 
 #### `npm run reset`
+
 Reset system to clean state.
 
 ```bash
@@ -504,6 +520,7 @@ npm run reset -- --full             # Full system reset
 ```
 
 #### `npm run rollback`
+
 Emergency rollback system.
 
 ```bash
@@ -518,6 +535,7 @@ npm run rollback -- --agent EXECUTOR      # Rollback specific agent changes
 ### Diagnostic Commands
 
 #### `npm run diagnose`
+
 Comprehensive system diagnostics.
 
 ```bash
@@ -551,6 +569,7 @@ npm run agent:invoke MONITOR:sla-compliance
 ### Build & Compilation
 
 #### `npm run build`
+
 Build the application.
 
 ```bash
@@ -589,6 +608,7 @@ npm run dev:hot
 ### Configuration Commands
 
 #### `npm run config`
+
 Configuration management utilities.
 
 ```bash
@@ -787,6 +807,7 @@ npm run logs:analyze
 ---
 
 **For additional help, see:**
+
 - [User Guide](USER-GUIDE.md) - Complete system overview
 - [Troubleshooting](TROUBLESHOOTING.md) - Problem resolution
 - [Configuration](CONFIGURATION.md) - System configuration
