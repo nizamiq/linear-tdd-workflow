@@ -14,7 +14,7 @@ jobs:
   classify:
     name: FIL Classification
     runs-on: ubuntu-latest
-    if: ${{ !startsWith(github.head_ref, 'release/') }}
+    if: ${{ !startsWith(github.head_ref, 'release/') && !startsWith(github.event.pull_request.head.ref, 'release/') }}
     outputs:
       fil_level: ${{ steps.classify.outputs.fil_level }}
       requires_approval: ${{ steps.classify.outputs.requires_approval }}
@@ -97,7 +97,7 @@ jobs:
   enforce:
     name: Enforce Policies
     needs: classify
-    if: ${{ !startsWith(github.head_ref, 'release/') }}
+    if: ${{ !startsWith(github.head_ref, 'release/') && !startsWith(github.event.pull_request.head.ref, 'release/') }}
     runs-on: ubuntu-latest
 
     steps:
@@ -185,7 +185,7 @@ jobs:
   audit:
     name: Audit Trail
     needs: [classify, enforce]
-    if: ${{ always() && !startsWith(github.head_ref, 'release/') }}
+    if: ${{ always() && !startsWith(github.head_ref, 'release/') && !startsWith(github.event.pull_request.head.ref, 'release/') }}
     runs-on: ubuntu-latest
 
     steps:
