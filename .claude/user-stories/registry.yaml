@@ -1,0 +1,61 @@
+# User Story Registry
+# Tracks implemented features and their E2E test coverage
+#
+# Feature Status Values:
+#   - implemented: Feature has working code AND passing E2E test (allows release)
+#   - partial: Feature has working code but NO E2E test (blocks release)
+#   - planned: Feature not yet implemented (doesn't block release)
+#
+# Format:
+#   feature-slug:
+#     name: "User-facing description"
+#     status: implemented|partial|planned
+#     e2e_test: "path/to/test.js::test-name" or null
+#     notes: "Optional implementation notes"
+
+features:
+  assess-code-quality:
+    name: "User can assess code quality via /assess command"
+    status: implemented
+    e2e_test: "tests/e2e/comprehensive-workflow-e2e.test.js::E2E-001"
+    notes: "Full AUDITOR → assessment → Linear task workflow"
+
+  create-linear-tasks:
+    name: "User can create Linear tasks from assessment via /linear command"
+    status: implemented
+    e2e_test: "tests/e2e/linear-integration.test.js::complete-workflow"
+    notes: "STRATEGIST delegation pattern with Linear MCP integration"
+
+  implement-tdd-fix:
+    name: "User can implement fix with TDD enforcement via /fix command"
+    status: partial
+    e2e_test: null
+    notes: "EXECUTOR agent exists but no E2E test covering full /fix workflow"
+
+  ci-recovery:
+    name: "User can auto-recover CI/CD failures via /recover command"
+    status: planned
+    e2e_test: null
+    notes: "GUARDIAN agent exists, needs E2E test for recovery workflow"
+
+  pattern-mining:
+    name: "User can extract patterns from successful PRs via /learn command"
+    status: planned
+    e2e_test: null
+    notes: "SCHOLAR agent exists, needs E2E test"
+
+  production-release:
+    name: "User can manage production releases via /release command"
+    status: partial
+    e2e_test: null
+    notes: "JR-6 journey exists but needs E2E test for full release workflow"
+
+  cycle-planning:
+    name: "User can plan sprints via /cycle command"
+    status: planned
+    e2e_test: null
+    notes: "PLANNER agent exists, needs E2E test"
+
+# Metadata
+registry_version: "1.0.0"
+last_updated: "2025-10-01"

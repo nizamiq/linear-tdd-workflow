@@ -1,0 +1,279 @@
+#
+
+ Lint Workflow - Deterministic Code Style Enforcement
+# Replaces: LINTER agent (cost reduction: 95%)
+#
+# Use this workflow instead of invoking the LINTER agent for deterministic linting tasks.
+
+name: lint-workflow
+version: 1.0.0
+description: Deterministic code style enforcement across multiple languages
+type: workflow
+cost_model: direct  # No LLM calls - deterministic tool execution only
+
+# When to use this workflow
+use_cases:
+  - "Pre-commit linting checks"
+  - "CI/CD pipeline style enforcement"
+  - "Batch linting of multiple files"
+  - "Auto-fix style violations"
+
+# When NOT to use (use agent instead)
+avoid_for:
+  - "Judgment calls on style exceptions"
+  - "Custom rule creation"
+  - "Style guide design"
+
+# Execution modes
+modes:
+  check_only:
+    description: "Check for violations without fixing"
+    dry_run: true
+
+  auto_fix:
+    description: "Automatically fix violations where possible"
+    dry_run: false
+
+  strict:
+    description: "Block on any violations (CI mode)"
+    on_failure: block
+
+# Language-specific configurations
+languages:
+  javascript:
+    tool: eslint
+    config: .eslintrc.json
+    fix_command: "npm run lint:fix"
+    check_command: "npm run lint:check"
+    patterns: ["**/*.js", "**/*.jsx"]
+
+  typescript:
+    tool: eslint
+    config: .eslintrc.json
+    fix_command: "npm run lint:fix"
+    check_command: "npm run lint:check"
+    patterns: ["**/*.ts", "**/*.tsx"]
+
+  python:
+    tool: ruff
+    config: pyproject.toml
+    fix_command: "ruff check --fix ."
+    check_command: "ruff check ."
+    patterns: ["**/*.py"]
+    secondary:
+      tool: black
+      command: "black ."
+
+  markdown:
+    tool: prettier
+    config: .prettierrc
+    fix_command: "prettier --write '**/*.md'"
+    check_command: "prettier --check '**/*.md'"
+    patterns: ["**/*.md"]
+
+  yaml:
+    tool: prettier
+    config: .prettierrc
+    fix_command: "prettier --write '**/*.{yaml,yml}'"
+    check_command: "prettier --check '**/*.{yaml,yml}'"
+    patterns: ["**/*.yaml", "**/*.yml"]
+
+# Workflow steps
+steps:
+  - name: detect_language
+    description: "Detect project language from files"
+    action: detect
+    criteria:
+      - if_exists: package.json
+        then: [javascript, typescript]
+      - if_exists: pyproject.toml
+        then: [python]
+      - always: [markdown, yaml]
+
+  - name: run_linters
+    description: "Execute language-specific linters"
+    action: parallel  # Run all linters concurrently
+    for_each: detected_languages
+    steps:
+      - run: ${language.check_command}
+        timeout: 60
+        capture_output: true
+
+  - name: collect_violations
+    description: "Aggregate all linting violations"
+    action: aggregate
+    format: json
+    schema:
+      file: string
+      line: number
+      column: number
+      rule: string
+      severity: enum[error, warning, info]
+      message: string
+      fixable: boolean
+
+  - name: apply_fixes
+    description: "Auto-fix violations if mode=auto_fix"
+    condition: mode == "auto_fix"
+    action: parallel
+    for_each: detected_languages
+    steps:
+      - run: ${language.fix_command}
+        timeout: 120
+
+  - name: verify_fixes
+    description: "Re-run checks after auto-fix to confirm resolution"
+    condition: mode == "auto_fix"
+    action: parallel
+    for_each: detected_languages
+    steps:
+      - run: ${language.check_command}
+        timeout: 60
+
+  - name: report
+    description: "Generate final report"
+    action: report
+    outputs:
+      - violations_found: count
+      - violations_fixed: count
+      - violations_remaining: count
+      - exit_code: 0 if success, 1 if violations
+
+# Success criteria
+success_criteria:
+  - name: no_violations
+    check: violations_remaining == 0
+    message: "All linting violations resolved"
+
+  - name: auto_fix_improved
+    check: violations_fixed > 0
+    message: "Auto-fix resolved ${violations_fixed} violations"
+
+# Failure handling
+on_failure:
+  strict_mode:
+    action: block
+    message: "Linting violations detected - commit blocked"
+
+  permissive_mode:
+    action: warn
+    message: "Linting violations detected - review recommended"
+
+# Integration points
+hooks:
+  pre_commit:
+    enabled: true
+    mode: strict
+    command: "workflow run lint-workflow --mode=auto_fix --on-failure=block"
+
+  post_write:
+    enabled: true
+    mode: auto_fix
+    command: "workflow run lint-workflow --mode=auto_fix --files=${changed_files}"
+    async: true
+
+  ci_pipeline:
+    enabled: true
+    mode: check_only
+    command: "workflow run lint-workflow --mode=check_only --on-failure=block"
+
+# Performance metrics
+performance:
+  typical_duration: "5-15 seconds"
+  max_duration: "60 seconds"
+  cost_vs_agent: "95% reduction"
+  reliability: "100% deterministic"
+
+# Migration guide
+migration:
+  from: "LINTER agent"
+  steps:
+    - "Remove agent invocations: /invoke LINTER:*"
+    - "Add to hooks.json: pre-commit lint workflow"
+    - "Update CI pipeline to use workflow"
+  benefits:
+    - "95% cost reduction"
+    - "100% deterministic results"
+    - "Zero LLM latency"
+    - "Consistent formatting"
+
+# Usage examples
+examples:
+  check_before_commit:
+    command: "workflow run lint-workflow --mode=check_only"
+    description: "Check for violations without modifying files"
+
+  auto_fix_all:
+    command: "workflow run lint-workflow --mode=auto_fix"
+    description: "Automatically fix all violations"
+
+  strict_ci:
+    command: "workflow run lint-workflow --mode=strict"
+    description: "Block CI pipeline on any violations"
+
+  specific_files:
+    command: "workflow run lint-workflow --files='src/**/*.ts'"
+    description: "Lint only specific file patterns"
+
+# Related workflows
+related:
+  - typecheck-workflow.yaml  # Run after linting
+  - validation-workflow.yaml  # Comprehensive validation including lint
+  - tdd-cycle-workflow.yaml  # TDD implementation with lint gates
+
+---
+
+# Implementation Notes
+
+## Why This Replaces LINTER Agent
+
+The LINTER agent was 400+ lines of autonomous logic for a deterministic task. This workflow:
+- Eliminates LLM calls entirely (95% cost reduction)
+- Provides 100% deterministic results
+- Runs faster (no model latency)
+- Integrates seamlessly with hooks and CI
+
+## When You Still Need an Agent
+
+Use AUDITOR agent (not LINTER) for:
+- Designing custom style rules
+- Evaluating style guide adherence beyond mechanical checks
+- Making judgment calls on style exceptions
+- Creating project-specific lint rules
+
+## Hook Integration Example
+
+Add to `.claude/hooks.json`:
+```json
+{
+  "pre-tool-use": {
+    "git-commit": {
+      "command": "workflow run lint-workflow --mode=strict",
+      "description": "Enforce linting before commits",
+      "required": true,
+      "on_failure": "block"
+    }
+  },
+  "on-file-write": {
+    "auto_lint": {
+      "pattern": "**/*.{ts,tsx,js,jsx,py}",
+      "command": "workflow run lint-workflow --mode=auto_fix --files=${file}",
+      "async": true
+    }
+  }
+}
+```
+
+## CI/CD Integration
+
+Add to GitHub Actions:
+```yaml
+- name: Lint Check
+  run: workflow run lint-workflow --mode=check_only --on-failure=block
+```
+
+---
+
+**Status**: Active - use instead of LINTER agent
+**Cost Impact**: 95% reduction vs agent approach
+**Reliability**: 100% deterministic

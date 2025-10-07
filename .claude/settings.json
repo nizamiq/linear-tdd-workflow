@@ -225,5 +225,66 @@
     "patternLearning": true,
     "autoRebase": true,
     "smartPrioritization": true
+  },
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/inject-linear-config.sh",
+            "timeout": 30,
+            "environment": {
+              "CLAUDE_PROJECT_ROOT": ".",
+              "CLAUDE_AGENTS_DIR": ".claude/agents",
+              "CLAUDE_QUEUE_DIR": ".claude/queue"
+            }
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/on-subagent-stop.sh",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/on-stop.sh",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  },
+  "queue": {
+    "enabled": true,
+    "file": ".claude/queue/enhancements.json",
+    "statuses": [
+      "BACKLOG",
+      "READY_FOR_DESIGN",
+      "READY_FOR_ARCH",
+      "READY_FOR_BUILD",
+      "READY_FOR_REVIEW",
+      "READY_FOR_TEST",
+      "READY_FOR_DEPLOY",
+      "DONE",
+      "BLOCKED",
+      "ON_HOLD"
+    ],
+    "autoUpdate": true,
+    "description": "Enhancement queue for multi-phase workflow tracking"
   }
 }
