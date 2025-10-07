@@ -9,11 +9,13 @@ The Linear TDD Workflow System leverages Claude Code's parallel subagent executi
 ### Parallel vs Sequential Execution
 
 **Sequential Execution** (default):
+
 - One task completes before the next begins
 - Simple but slow
 - Total time = Sum of all task times
 
 **Parallel Execution** (optimized):
+
 - Multiple tasks run concurrently
 - Fast and efficient
 - Total time = Longest single task time
@@ -30,12 +32,14 @@ The Linear TDD Workflow System leverages Claude Code's parallel subagent executi
 Each parallel subagent operates in complete isolation:
 
 ✅ **Safe for parallel execution:**
+
 - Reading different files
 - Analyzing separate directories
 - Running independent validations
 - Processing separate issues
 
 ❌ **NOT safe for parallel:**
+
 - Writing to the same file
 - Tasks with dependencies (A needs B's output)
 - Shared state modifications
@@ -50,6 +54,7 @@ Each parallel subagent operates in complete isolation:
 **Use Case**: Assess multiple directories independently
 
 **Implementation**:
+
 ```
 User: "Assess the entire codebase"
 
@@ -57,7 +62,7 @@ Agent: I'll assess 3 areas in parallel:
 [In ONE message, invoke Task tool 3 times]
 
 Task 1: Assess src/backend/** (10 min)
-Task 2: Assess src/frontend/** (10 min)  
+Task 2: Assess src/frontend/** (10 min)
 Task 3: Assess tests/** (10 min)
 
 Total time: ~10 minutes (vs 30 minutes sequential)
@@ -68,6 +73,7 @@ Total time: ~10 minutes (vs 30 minutes sequential)
 **Use Case**: Implement multiple independent fix packs
 
 **Implementation**:
+
 ```
 User: "Implement CLEAN-123 through CLEAN-127"
 
@@ -88,6 +94,7 @@ Total time: ~18 minutes (vs 69 minutes sequential)
 **Use Case**: Run different types of validation simultaneously
 
 **Implementation**:
+
 ```
 User: "Review PR #456"
 
@@ -107,6 +114,7 @@ Total time: ~8 minutes (vs 23 minutes sequential)
 **Use Case**: Process multiple files independently
 
 **Implementation**:
+
 ```
 User: "Refactor all 8 controller files"
 
@@ -125,11 +133,13 @@ Total time: ~15 minutes (vs 120 minutes sequential)
 ### Concurrency Limits
 
 **Claude Code Limits**:
+
 - Maximum 10 concurrent subagents
 - Each subagent gets isolated context
 - Total token budget shared across all subagents
 
 **Optimal Batching Strategy**:
+
 - For ≤10 tasks: Launch all in parallel (let Claude Code handle batching)
 - For >10 tasks: Let Claude Code decide batching automatically OR manually batch into groups
 - Prioritize critical-path tasks first
@@ -137,6 +147,7 @@ Total time: ~15 minutes (vs 120 minutes sequential)
 **Recommended Approach**: Don't specify batch sizes explicitly - Claude Code will intelligently batch and execute based on available resources.
 
 **Manual Batching (If Needed)**:
+
 ```
 For 25 tasks, Claude Code will automatically:
 - Determine optimal batch size (may use 10, 8, or adaptive sizing)
@@ -155,14 +166,17 @@ Batch 3: Tasks 21-25 (parallel)
 ### Task Granularity
 
 **Too Fine-Grained** (inefficient):
+
 - Overhead of launching subagent > task execution time
 - Example: Analyzing single 50-line file
 
 **Too Coarse-Grained** (no benefit):
+
 - Task cannot be parallelized
 - Example: Single large monolithic operation
 
 **Optimal Granularity**:
+
 - Task execution time: 5-30 minutes
 - Clear input/output boundaries
 - Minimal dependencies
@@ -174,16 +188,19 @@ Batch 3: Tasks 21-25 (parallel)
 ### Failure Strategies
 
 **Strategy 1: Fail-Fast**
+
 - Abort all parallel tasks on first failure
 - Use when tasks are interdependent
 - Quick feedback for critical errors
 
 **Strategy 2: Continue-On-Error**
+
 - Let all tasks complete, collect errors
 - Use when tasks are independent
 - Useful for batch operations
 
 **Strategy 3: Retry-Failed**
+
 - Identify failed tasks
 - Retry only failures in next batch
 - Use for transient errors
@@ -198,6 +215,7 @@ After parallel execution completes:
 4. **Merge Results**: Combine into final output
 
 **Example**:
+
 ```
 Launched 5 parallel fix implementations
 Results: 4 succeeded, 1 failed
@@ -219,6 +237,7 @@ Action: Retry CLEAN-125 with sequential execution for debugging
 ### 1. **Always Assess Parallelizability First**
 
 Before launching parallel tasks, ask:
+
 - Are tasks truly independent?
 - Do they share any resources?
 - Is there a natural ordering?
@@ -227,6 +246,7 @@ Before launching parallel tasks, ask:
 ### 2. **Provide Clear, Isolated Scopes**
 
 Each subagent prompt should:
+
 - Specify exact files/directories to process
 - Define clear success criteria
 - Include all necessary context
@@ -235,6 +255,7 @@ Each subagent prompt should:
 ### 3. **Design for Result Aggregation**
 
 Plan how you'll merge results:
+
 - Consistent output format across subagents
 - Clear success/failure indicators
 - Structured data for easy parsing
@@ -261,6 +282,7 @@ Plan how you'll merge results:
 ### Pitfall 1: Parallel File Writes
 
 **Problem**:
+
 ```
 Task 1: Edit src/utils.ts
 Task 2: Edit src/utils.ts
@@ -272,6 +294,7 @@ Result: Merge conflict!
 ### Pitfall 2: Dependent Tasks
 
 **Problem**:
+
 ```
 Task 1: Assess code (generates report)
 Task 2: Create fix packs (needs report)
@@ -283,6 +306,7 @@ Launched in parallel → Task 2 fails!
 ### Pitfall 3: Shared State
 
 **Problem**:
+
 ```
 Task 1: Update issue CLEAN-123
 Task 2: Update issue CLEAN-123
@@ -294,6 +318,7 @@ Result: Race condition!
 ### Pitfall 4: Resource Exhaustion
 
 **Problem**:
+
 ```
 Launch 10 agents, each analyzing 100k LOC
 Result: OOM or timeout
@@ -336,7 +361,7 @@ function detectFileConflicts(agentTasks) {
   const fileMap = new Map();
 
   agentTasks.forEach((task, agentId) => {
-    task.files.forEach(file => {
+    task.files.forEach((file) => {
       if (fileMap.has(file)) {
         console.error(`CONFLICT: ${file} assigned to both ${fileMap.get(file)} and ${agentId}`);
         return false;
@@ -351,8 +376,8 @@ function detectFileConflicts(agentTasks) {
 // Usage
 const tasks = [
   { agent: 'EXECUTOR-1', files: ['src/a.ts', 'src/b.ts'] },
-  { agent: 'EXECUTOR-2', files: ['src/c.ts', 'src/d.ts'] },  // ✓ No overlap
-  { agent: 'EXECUTOR-3', files: ['src/e.ts'] }
+  { agent: 'EXECUTOR-2', files: ['src/c.ts', 'src/d.ts'] }, // ✓ No overlap
+  { agent: 'EXECUTOR-3', files: ['src/e.ts'] },
 ];
 
 if (detectFileConflicts(tasks)) {
@@ -363,6 +388,7 @@ if (detectFileConflicts(tasks)) {
 ### Conflict Detection Checklist
 
 **Before Parallel Execution**:
+
 - [ ] List all files each agent will read
 - [ ] List all files each agent will write/edit
 - [ ] Check for write-write conflicts (same file modified by 2+ agents)
@@ -373,6 +399,7 @@ if (detectFileConflicts(tasks)) {
 **Conflict Resolution Strategies**:
 
 1. **File Separation** (Preferred)
+
    ```
    Agent 1: src/backend/**
    Agent 2: src/frontend/**
@@ -380,6 +407,7 @@ if (detectFileConflicts(tasks)) {
    ```
 
 2. **Sequential Execution**
+
    ```
    If conflict detected:
      Run Agent 1 → Complete
@@ -387,6 +415,7 @@ if (detectFileConflicts(tasks)) {
    ```
 
 3. **Git Worktrees** (Advanced)
+
    ```bash
    # Create isolated workspaces
    git worktree add ../workspace-1 -b agent-1
@@ -400,9 +429,9 @@ if (detectFileConflicts(tasks)) {
    ```yaml
    enhancements:
      fix-123:
-       locked_files: ["src/utils.ts"]
-       locked_by: "EXECUTOR-1"
-       expires: "2025-10-01T12:00:00Z"
+       locked_files: ['src/utils.ts']
+       locked_by: 'EXECUTOR-1'
+       expires: '2025-10-01T12:00:00Z'
    ```
 
 ### Detection Tools
@@ -443,12 +472,14 @@ Step 3: Launch parallel agents
 **Scenario**: Fix 5 issues across codebase
 
 **Naive Approach** (Risky):
+
 ```
 EXECUTOR-1: Fix CLEAN-123 (touches src/utils.ts)
 EXECUTOR-2: Fix CLEAN-124 (touches src/utils.ts)  ⚠️ CONFLICT
 ```
 
 **Safe Approach** (With Detection):
+
 ```
 Pre-flight check:
   - CLEAN-123 files: [src/utils.ts, src/api.ts]
@@ -485,6 +516,7 @@ done
 ### Pitfall 5: Sequential Dependencies in Parallel
 
 **Problem**:
+
 ```
 RED phase requires failing test
 GREEN phase requires passing test
@@ -502,18 +534,21 @@ Launched both in parallel → Violation of TDD!
 **Scenario 1: Codebase Assessment (150k LOC)**
 
 Sequential:
+
 - Backend (50k LOC): 15 min
 - Frontend (70k LOC): 18 min
 - Tests (30k LOC): 10 min
 - **Total: 43 minutes**
 
 Parallel (3 agents):
+
 - All three areas simultaneously
 - **Total: 18 minutes (2.4x faster)**
 
 **Scenario 2: Fix Pack Implementation (5 fixes)**
 
 Sequential:
+
 - CLEAN-123: 15 min
 - CLEAN-124: 12 min
 - CLEAN-125: 18 min
@@ -522,12 +557,14 @@ Sequential:
 - **Total: 69 minutes**
 
 Parallel (5 agents):
+
 - All five fixes simultaneously
 - **Total: 18 minutes (3.8x faster)**
 
 **Scenario 3: PR Review (Multiple Aspects)**
 
 Sequential:
+
 - Security audit: 8 min
 - Type checking: 5 min
 - Test coverage: 6 min
@@ -536,6 +573,7 @@ Sequential:
 - **Total: 30 minutes**
 
 Parallel (5 agents):
+
 - All checks simultaneously
 - **Total: 8 minutes (3.75x faster)**
 
@@ -563,6 +601,7 @@ Efficiency: 4/5 = 80%
 ### STRATEGIST Orchestration
 
 The STRATEGIST agent is responsible for:
+
 1. Decomposing complex requests into parallel tasks
 2. Launching appropriate worker agents
 3. Monitoring progress
@@ -572,6 +611,7 @@ The STRATEGIST agent is responsible for:
 ### Agent Selection for Parallel Execution
 
 **Best agents for parallel work:**
+
 - AUDITOR (code assessment)
 - EXECUTOR (fix implementation)
 - CODE-REVIEWER (PR reviews)
@@ -581,6 +621,7 @@ The STRATEGIST agent is responsible for:
 - SECURITY (security audits)
 
 **Sequential-only agents:**
+
 - STRATEGIST (orchestration)
 - GUARDIAN (recovery - needs full context)
 - SCHOLAR (learning - needs complete history)
@@ -592,7 +633,7 @@ The STRATEGIST agent is responsible for:
 ```
 Phase 1: Parallel Assessment (3 agents, 18 min)
   └─ Task 1: Backend assessment
-  └─ Task 2: Frontend assessment  
+  └─ Task 2: Frontend assessment
   └─ Task 3: Test coverage
 
 Phase 2: Sequential Planning (STRATEGIST, 3 min)
@@ -663,6 +704,7 @@ While subagents run in **isolated contexts with no shared state**, they can coor
 **Use Case**: Multiple agents need to report results to orchestrator without breaking isolation
 
 **Implementation**:
+
 ```
 STRATEGIST: I'll coordinate 5 parallel assessments using scratchpads
 
@@ -695,6 +737,7 @@ Step 3: Aggregate results after completion
 ### Scratchpad Output Format
 
 **Standardized JSON structure for aggregation**:
+
 ```json
 {
   "backend": {
@@ -749,11 +792,13 @@ Step 3: Aggregate results after completion
 **Important**: Claude Code provides **limited monitoring during execution**. You cannot see real-time progress of parallel subagents.
 
 **What You CAN Monitor**:
+
 - Initial launch confirmation (agents started)
 - Final completion status (all agents finished)
 - Aggregate results after completion
 
 **What You CANNOT Monitor**:
+
 - Real-time progress updates
 - Intermediate outputs during execution
 - Individual agent status while running
@@ -761,6 +806,7 @@ Step 3: Aggregate results after completion
 ### Debugging Strategies
 
 #### Strategy 1: Post-Execution Analysis
+
 ```
 After parallel execution completes:
 1. Review scratchpad outputs
@@ -770,6 +816,7 @@ After parallel execution completes:
 ```
 
 #### Strategy 2: Sequential Fallback
+
 ```
 If parallel execution fails mysteriously:
 1. Switch to sequential execution
@@ -779,6 +826,7 @@ If parallel execution fails mysteriously:
 ```
 
 #### Strategy 3: Smaller Batch Sizes
+
 ```
 If 10 agents = too many failures:
 1. Reduce to 5 agents per batch
@@ -787,6 +835,7 @@ If 10 agents = too many failures:
 ```
 
 #### Strategy 4: Scratchpad Logging
+
 ```
 Instruct each agent to log progress:
 - Start time
@@ -800,6 +849,7 @@ Aggregated logs provide execution visibility
 ### Common Debugging Scenarios
 
 **Scenario 1: Silent Failures**
+
 ```
 Problem: Some agents complete, others produce no output
 Diagnosis: Check scratchpad for partial results
@@ -807,6 +857,7 @@ Solution: Re-run failed tasks sequentially
 ```
 
 **Scenario 2: Timeout Issues**
+
 ```
 Problem: Parallel execution never completes
 Diagnosis: One or more agents hung/timed out
@@ -814,6 +865,7 @@ Solution: Reduce task complexity, increase timeout limits
 ```
 
 **Scenario 3: Inconsistent Results**
+
 ```
 Problem: Same parallel execution produces different results
 Diagnosis: Race condition or shared resource conflict
@@ -823,6 +875,7 @@ Solution: Review task independence, ensure no overlapping file writes
 ### Debugging Checklist
 
 Before launching parallel execution:
+
 - [ ] Tasks are truly independent (no dependencies)
 - [ ] No shared file writes across agents
 - [ ] Each agent has clear, isolated scope
@@ -856,6 +909,7 @@ Total: 35,000 tokens (3.5x base)
 ### Cost Optimization Strategies
 
 #### Strategy 1: Constrain Subagent Output
+
 ```
 Instruction to each subagent:
 "Return only structured JSON results, no explanatory text.
@@ -865,6 +919,7 @@ Result: 5 agents × 2000 tokens = 10,000 tokens (vs 25,000)
 ```
 
 #### Strategy 2: Use Cheaper Models for Simple Tasks
+
 ```
 Simple tasks (linting, formatting):
   Model: claude-3-haiku-20240307
@@ -876,6 +931,7 @@ Complex tasks (assessment, fix implementation):
 ```
 
 #### Strategy 3: Sequential Batching for Large Outputs
+
 ```
 Instead of 10 agents in parallel (10× output accumulation):
   Batch 1: 5 agents → Aggregate → Clear context
@@ -884,6 +940,7 @@ Result: 5× accumulation per batch (50% reduction)
 ```
 
 #### Strategy 4: Scratchpad Offloading
+
 ```
 Instead of returning full results in context:
 1. Subagents write detailed results to scratchpad
@@ -896,11 +953,13 @@ Context accumulation: 5 × 500 = 2,500 tokens (vs 25,000)
 ### Cost-Benefit Analysis
 
 **When Parallel Execution Is Worth the Cost**:
+
 - Time-sensitive operations (deployment, incident response)
 - High-value workflows (release preparation, security audits)
 - Large codebases where speed justifies cost
 
 **When Sequential Is Better**:
+
 - Budget-constrained environments
 - Low-priority batch operations
 - Tasks with large outputs per agent
@@ -909,12 +968,14 @@ Context accumulation: 5 × 500 = 2,500 tokens (vs 25,000)
 ### Monitoring Token Usage
 
 Track these metrics:
+
 - Tokens per subagent
 - Total context accumulation
 - Cost per parallel workflow
 - Efficiency ratio (speedup / cost increase)
 
 **Target Efficiency**: Speedup should exceed cost increase
+
 ```
 Good: 5x speedup with 3x cost = 1.67 efficiency ratio
 Poor: 2x speedup with 4x cost = 0.5 efficiency ratio
@@ -958,7 +1019,8 @@ If any unchecked: ⚠️ Consider sequential or hybrid approach
 ---
 
 **Last Updated**: 2025-10-01
-**Related Docs**: 
+**Related Docs**:
+
 - [Agent Overview](AGENT-OVERVIEW.md)
 - [STRATEGIST Agent](.claude/agents/strategist.md)
 - [Workflow Patterns](WORKFLOWS.md)

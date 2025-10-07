@@ -4,7 +4,7 @@
 
 The Linear TDD Workflow System includes a **hooks-based automation layer** that enables reliable workflow chaining, automated next-step suggestions, and production-grade orchestration.
 
-**Key Principle**: *"Chain subagents with hooks, not prompt glue, for reliable automation"*
+**Key Principle**: _"Chain subagents with hooks, not prompt glue, for reliable automation"_
 
 ---
 
@@ -16,6 +16,7 @@ The Linear TDD Workflow System includes a **hooks-based automation layer** that 
 - **`on-stop.sh`**: Triggers when main Claude Code session ends
 
 **Benefits**:
+
 1. **Reliable Automation**: More dependable than prompt-based chaining
 2. **Workflow Suggestions**: System suggests next steps automatically
 3. **Queue Management**: Tracks multi-phase workflows (BACKLOG → DONE)
@@ -61,6 +62,7 @@ Hooks are configured in `.claude/settings.json`:
 ```
 
 **Fields**:
+
 - `enabled`: Enable/disable hooks system
 - `onSubagentStop`: Path to subagent completion hook
 - `onStop`: Path to session end hook
@@ -74,6 +76,7 @@ Hooks are configured in `.claude/settings.json`:
 ### Purpose
 
 Executes after each subagent completes, providing:
+
 - Workflow suggestions based on agent type
 - Status updates to enhancement queue
 - Next-step commands
@@ -135,6 +138,7 @@ Suggested command:
 ### Purpose
 
 Executes when Claude Code session ends, providing:
+
 - Session summary (duration, exit reason)
 - Quick status check (PRs, uncommitted changes)
 - Next steps based on exit reason
@@ -312,6 +316,7 @@ graph LR
 ```
 
 **Hook Actions**:
+
 1. AUDITOR completes → Hook suggests `/fix CLEAN-123`
 2. EXECUTOR completes → Hook suggests `/invoke CODE-REVIEWER`
 3. CODE-REVIEWER completes → Hook suggests `gh pr merge`
@@ -327,6 +332,7 @@ graph LR
 ```
 
 **Hook Actions**:
+
 1. PLANNER completes → Hook suggests `/assess`
 2. AUDITOR creates tasks → Hook lists fix commands
 3. User runs fixes → Hooks track completion per task
@@ -342,6 +348,7 @@ graph LR
 ```
 
 **Hook Actions**:
+
 1. GUARDIAN completes → Hook checks recovery status
 2. Success → Hook suggests resuming development
 3. Failure → Hook suggests manual intervention with INCIDENT-XXX reference
@@ -423,13 +430,16 @@ ls -la .claude/hooks/
 ### Common Issues
 
 **Issue**: Hook not executing
+
 - **Solution**: Verify `hooks.enabled: true` in settings.json
 - **Solution**: Check file permissions (`chmod +x hook.sh`)
 
 **Issue**: Environment variables not set
+
 - **Solution**: Hooks receive variables from Claude Code - may not be available in manual testing
 
 **Issue**: Queue updates failing
+
 - **Solution**: Ensure `jq` is installed (`brew install jq` on macOS)
 
 ---
@@ -590,6 +600,7 @@ fi
 ### From Manual Orchestration
 
 **Before** (Manual):
+
 ```
 User: "Run assessment"
 AUDITOR: Completes
@@ -600,6 +611,7 @@ CODE-REVIEWER: Completes
 ```
 
 **After** (Hooks):
+
 ```
 User: "/assess"
 AUDITOR: Completes
@@ -613,6 +625,7 @@ CODE-REVIEWER: Completes
 ```
 
 **Benefits**:
+
 - Reduced cognitive load (system suggests next steps)
 - Consistent workflows (same suggestions every time)
 - Audit trail (queue tracks all transitions)

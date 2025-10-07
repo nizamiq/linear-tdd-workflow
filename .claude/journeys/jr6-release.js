@@ -393,7 +393,7 @@ None
       if (!result.passed) {
         console.log('\n❌ FUNCTIONAL RELEASE GATE BLOCKED RELEASE\n');
         console.log('Issues found:');
-        result.failures.forEach(failure => {
+        result.failures.forEach((failure) => {
           console.log(`  ❌ ${failure.feature}: ${failure.reason}`);
         });
         console.log('\nFix these issues and re-run release.');
@@ -403,7 +403,6 @@ None
       console.log(`\n✅ Functional readiness validated`);
       console.log(`   ${result.implementedCount} features with E2E coverage`);
       console.log(`   ${result.totalTests} E2E tests passing`);
-
     } catch (error) {
       if (error.message.includes('Functional release gate')) {
         throw error; // Re-throw gate failure

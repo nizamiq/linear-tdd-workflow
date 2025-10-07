@@ -41,11 +41,13 @@ mcp_servers:
 **Rationale**: Matches documented architecture where STRATEGIST is "EXCLUSIVE mediator for all Linear operations"
 
 **Changes**:
+
 - Removed `linear-server` from 4 agent YAML files (AUDITOR, EXECUTOR, GUARDIAN, CODE-REVIEWER)
 - Updated agent descriptions to clarify delegation pattern
 - Kept only STRATEGIST with Linear MCP access
 
 **Files Modified**:
+
 - `.claude/agents/auditor.md`
 - `.claude/agents/executor.md`
 - `.claude/agents/guardian.md`
@@ -60,36 +62,43 @@ mcp_servers:
 **Added**: 150+ lines of Linear MCP integration workflows including:
 
 - **Create Issue from AUDITOR Assessment**:
+
   ```javascript
-  await mcp__linear-server__create_issue({
-    team: process.env.LINEAR_TEAM_ID,
-    title: `Fix: ${issue.title}`,
-    description: `## Issue Details\n${issue.description}...`,
-    labels: ['code-quality', issue.severity.toLowerCase()],
-    priority: issue.severity === 'Critical' ? 1 : 2
-  });
+  (await mcp__linear) -
+    server__create_issue({
+      team: process.env.LINEAR_TEAM_ID,
+      title: `Fix: ${issue.title}`,
+      description: `## Issue Details\n${issue.description}...`,
+      labels: ['code-quality', issue.severity.toLowerCase()],
+      priority: issue.severity === 'Critical' ? 1 : 2,
+    });
   ```
 
 - **Update Issue Status During Workflow**:
+
   ```javascript
-  await mcp__linear-server__update_issue({
-    id: taskId,
-    state: 'In Progress',
-    assignee: 'me'
-  });
+  (await mcp__linear) -
+    server__update_issue({
+      id: taskId,
+      state: 'In Progress',
+      assignee: 'me',
+    });
   ```
 
 - **Create Incident for CI/CD Failure**:
+
   ```javascript
-  await mcp__linear-server__create_issue({
-    team: process.env.LINEAR_TEAM_ID,
-    title: `INCIDENT: ${failureType} - ${summary}`,
-    labels: ['incident', 'ci-cd', 'high-priority'],
-    priority: 1
-  });
+  (await mcp__linear) -
+    server__create_issue({
+      team: process.env.LINEAR_TEAM_ID,
+      title: `INCIDENT: ${failureType} - ${summary}`,
+      labels: ['incident', 'ci-cd', 'high-priority'],
+      priority: 1,
+    });
   ```
 
 - **Agent-to-Linear Handoff Pattern**:
+
   ```yaml
   Workflow: Assessment → Linear Task Creation
   Step 1: STRATEGIST invokes AUDITOR for code assessment
@@ -107,12 +116,14 @@ mcp_servers:
 **File**: `.claude/agents/auditor.md`
 
 **Changes**:
+
 - Updated DoD checklist: "Provide Linear task definitions" (not "Create Linear tasks")
 - Added `linear_tasks` output format documentation
 - Added explicit note: "You do NOT have Linear MCP access"
 - Clarified delegation to STRATEGIST
 
 **Output Format**:
+
 ```json
 {
   "linear_tasks": [
@@ -135,6 +146,7 @@ mcp_servers:
 **Purpose**: Fallback for CI/CD environments where MCP isn't available
 
 **Features**:
+
 - Reads assessment JSON with `linear_tasks` array
 - Creates Linear issues via GraphQL API
 - Handles rate limiting (200ms between requests)
@@ -142,6 +154,7 @@ mcp_servers:
 - Self-contained within `.claude` directory
 
 **Usage**:
+
 ```bash
 LINEAR_API_KEY="key" LINEAR_TEAM_ID="team" \
   .claude/scripts/linear/create-tasks-from-assessment.sh proposals/issues-2025-10-01.json
@@ -152,11 +165,13 @@ LINEAR_API_KEY="key" LINEAR_TEAM_ID="team" \
 **File**: `.claude/hooks/on-subagent-stop.sh`
 
 **Added**:
+
 - `suggest_linear_tasks()` function: Detects assessment files and suggests Linear task creation
 - Updated AUDITOR case: Automatically finds latest assessment and suggests STRATEGIST invocation
 - User guidance: Shows both MCP and script-based approaches
 
 **Output Example**:
+
 ```
 ✓ Assessment complete (180s)
 
@@ -177,6 +192,7 @@ Or use the helper script:
 **File**: `tests/e2e/linear-integration.test.js`
 
 **Test Coverage** (12 tests, all passing):
+
 - ✅ AUDITOR generates assessment with `linear_tasks` array
 - ✅ Task definitions include proper FIL classification
 - ✅ Linear script exists and is executable
@@ -191,6 +207,7 @@ Or use the helper script:
 - ✅ Complete workflow simulation
 
 **Test Results**:
+
 ```
 Test Suites: 1 passed, 1 total
 Tests:       12 passed, 12 total
@@ -200,6 +217,7 @@ Time:        0.37 s
 #### 6. Updated Documentation
 
 **Files Modified**:
+
 - `README.md` - Architecture section, troubleshooting
 - `CLAUDE.md` - Linear Task Management section
 - `.claude/scripts/linear/README.md` - New comprehensive guide
@@ -207,8 +225,10 @@ Time:        0.37 s
 **Key Documentation Updates**:
 
 1. **README.md - Architecture Section**:
+
    ```markdown
    **Linear Integration Model:**
+
    - STRATEGIST is the ONLY agent with `linear-server` MCP access
    - All other agents delegate Linear operations through STRATEGIST
    - AUDITOR/GUARDIAN/DOC-KEEPER provide task definitions → STRATEGIST creates issues
@@ -264,6 +284,7 @@ STRATEGIST (exclusive Linear MCP access)
 ## Files Changed Summary
 
 ### Modified Files (9)
+
 1. `.claude/agents/strategist.md` - Added 150+ lines of Linear MCP workflows
 2. `.claude/agents/auditor.md` - Updated DoD, added `linear_tasks` format, clarified delegation
 3. `.claude/agents/executor.md` - Removed `linear-server` from YAML
@@ -275,6 +296,7 @@ STRATEGIST (exclusive Linear MCP access)
 9. `.claude/mcp.json` - (no changes needed - already correct)
 
 ### Created Files (5)
+
 1. `.claude/scripts/linear/create-tasks-from-assessment.sh` - Bash script for task creation (executable)
 2. `.claude/scripts/linear/README.md` - Comprehensive Linear scripts documentation
 3. `tests/e2e/linear-integration.test.js` - E2E test suite (12 tests)
@@ -282,6 +304,7 @@ STRATEGIST (exclusive Linear MCP access)
 5. `.claude/queue/enhancements.json` - Enhancement tracking (created in Phase 5)
 
 ### Total Impact
+
 - **14 files** modified or created
 - **~2,500 lines** of code and documentation added
 - **12 E2E tests** passing
@@ -316,12 +339,14 @@ npm test -- tests/e2e/linear-integration.test.js
 **Test Scenario**: Complete AUDITOR → STRATEGIST → Linear flow
 
 1. **Setup**:
+
    ```bash
    export LINEAR_API_KEY="your-key"
    export LINEAR_TEAM_ID="your-team"
    ```
 
 2. **Run Assessment**:
+
    ```bash
    /assess
    ```
@@ -331,6 +356,7 @@ npm test -- tests/e2e/linear-integration.test.js
    - Verify hook suggests STRATEGIST invocation
 
 4. **Create Linear Tasks**:
+
    ```bash
    /invoke STRATEGIST:create-linear-tasks proposals/issues-TIMESTAMP.json
    ```
@@ -342,6 +368,7 @@ npm test -- tests/e2e/linear-integration.test.js
 ## Backward Compatibility
 
 ✅ **Fully backward compatible**:
+
 - Existing workflows continue to work
 - No breaking changes to agent APIs
 - New delegation pattern is additive only
@@ -362,12 +389,14 @@ npm test -- tests/e2e/linear-integration.test.js
 Follow standard setup:
 
 1. Set environment variables in `.env`:
+
    ```
    LINEAR_API_KEY=lin_api_xxxxx
    LINEAR_TEAM_ID=your-team-id
    ```
 
 2. Run assessment:
+
    ```bash
    /assess
    ```
@@ -408,6 +437,7 @@ Follow standard setup:
 ### Why Not Implemented Now
 
 Following Anthropic's "Building Effective Agents" guidance:
+
 - ✅ **Simplest solution first** - Delegation pattern solves the core issue
 - ✅ **User control** - Explicit STRATEGIST invocation prevents surprise task creation
 - ✅ **Debuggability** - Manual steps easier to troubleshoot than automation
@@ -469,6 +499,7 @@ The Linear integration happens BEFORE implementation, not during or after. Once 
 ## Conclusion
 
 The Linear integration issue has been **fully resolved** through:
+
 1. ✅ Fixed permission conflicts
 2. ✅ Implemented delegation pattern
 3. ✅ Added comprehensive testing

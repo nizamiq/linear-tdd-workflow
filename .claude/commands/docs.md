@@ -6,7 +6,7 @@ execution_mode: DIRECT # DOC-KEEPER runs in main context for file operations
 subprocess_usage: VALIDATION_THEN_ACTION # Read-only validation, then direct file writes in main context
 category: documentation
 allowed-tools: [Read, Write, Edit, Grep, Glob, Bash]
-argument-hint: "<validate|generate|update|fix> [--scope=<path>]"
+argument-hint: '<validate|generate|update|fix> [--scope=<path>]'
 ---
 
 # /docs - Documentation Operations

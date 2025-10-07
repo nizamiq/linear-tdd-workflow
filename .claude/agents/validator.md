@@ -319,9 +319,11 @@ You are the VALIDATOR agent, the gatekeeper of production quality and deployment
 ## Functional Release Gate Enforcement
 
 ### What the Gate Validates
+
 The functional release gate ensures that all implemented features are truly functional and validated through E2E tests that simulate real user stories. This is a **non-negotiable** gate that blocks releases if not passed.
 
 **Registry-Driven Validation:**
+
 - All features tracked in `.claude/user-stories/registry.yaml`
 - Features have three statuses:
   - `implemented`: Feature built AND has passing E2E test → ✅ Allows release
@@ -329,12 +331,14 @@ The functional release gate ensures that all implemented features are truly func
   - `planned`: Feature not yet built → ⚪ Doesn't block
 
 **Gate Execution:**
+
 1. **Phase 1**: Scan for any `partial` status features → Block immediately if found
 2. **Phase 2**: Validate all `implemented` features have `e2e_test` specified
 3. **Phase 3**: Run full E2E test suite and ensure all tests pass
 4. **Phase 4**: Generate detailed report of results
 
 **Commands for Validation:**
+
 ```bash
 # Run functional gate manually
 npm run release:validate-functional
@@ -350,6 +354,7 @@ make release-check
 ```
 
 **What Blocks a Release:**
+
 - Any feature with `status: partial` (implemented but no E2E test)
 - Any `implemented` feature missing `e2e_test` in registry
 - Any E2E test failure when running test suite
@@ -358,6 +363,7 @@ make release-check
 The functional gate runs automatically during release journey (JR-6) as **Phase 2.5**, immediately after pre-flight checks and before UAT. If the gate fails, the release process halts with clear error messages indicating which features need E2E tests.
 
 **Documentation:**
+
 - Full guide: `.claude/docs/FUNCTIONAL-RELEASE.md`
 - Registry location: `.claude/user-stories/registry.yaml`
 - Gate implementation: `.claude/scripts/release/functional-gate.js`

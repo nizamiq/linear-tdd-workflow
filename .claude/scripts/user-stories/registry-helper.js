@@ -66,7 +66,7 @@ class RegistryHelper {
       return;
     }
 
-    slugs.forEach(slug => {
+    slugs.forEach((slug) => {
       const feature = features[slug];
       const statusIcon = this.getStatusIcon(feature.status);
       const testStatus = feature.e2e_test ? '✅ E2E' : '❌ No E2E';
@@ -94,16 +94,17 @@ class RegistryHelper {
     if (!this.loadRegistry()) return;
 
     const features = this.registry.features || {};
-    const implemented = Object.values(features).filter(f => f.status === 'implemented');
-    const partial = Object.values(features).filter(f => f.status === 'partial');
-    const planned = Object.values(features).filter(f => f.status === 'planned');
+    const implemented = Object.values(features).filter((f) => f.status === 'implemented');
+    const partial = Object.values(features).filter((f) => f.status === 'partial');
+    const planned = Object.values(features).filter((f) => f.status === 'planned');
 
-    const implementedWithTests = implemented.filter(f => f.e2e_test);
-    const implementedWithoutTests = implemented.filter(f => !f.e2e_test);
+    const implementedWithTests = implemented.filter((f) => f.e2e_test);
+    const implementedWithoutTests = implemented.filter((f) => !f.e2e_test);
 
-    const coveragePercent = implemented.length > 0
-      ? Math.round((implementedWithTests.length / implemented.length) * 100)
-      : 0;
+    const coveragePercent =
+      implemented.length > 0
+        ? Math.round((implementedWithTests.length / implemented.length) * 100)
+        : 0;
 
     console.log('\n📊 User Story Coverage Report\n');
     console.log('═'.repeat(80));
@@ -114,8 +115,8 @@ class RegistryHelper {
 
     console.log(`\n⚠️  Partial Features (block release): ${partial.length}`);
     if (partial.length > 0) {
-      partial.forEach(f => {
-        const slug = Object.keys(features).find(k => features[k] === f);
+      partial.forEach((f) => {
+        const slug = Object.keys(features).find((k) => features[k] === f);
         console.log(`   - ${slug}`);
       });
     }
@@ -123,14 +124,18 @@ class RegistryHelper {
     console.log(`\n⏳ Planned Features: ${planned.length}`);
 
     console.log(`\n📈 E2E Coverage: ${coveragePercent}%`);
-    console.log(`   (${implementedWithTests.length}/${implemented.length} implemented features have E2E tests)`);
+    console.log(
+      `   (${implementedWithTests.length}/${implemented.length} implemented features have E2E tests)`,
+    );
 
     console.log('\n' + '═'.repeat(80));
 
     // Release readiness
     if (partial.length > 0 || implementedWithoutTests.length > 0) {
       console.log('\n❌ RELEASE BLOCKED');
-      console.log(`   ${partial.length + implementedWithoutTests.length} feature(s) need E2E tests`);
+      console.log(
+        `   ${partial.length + implementedWithoutTests.length} feature(s) need E2E tests`,
+      );
     } else if (implemented.length > 0) {
       console.log('\n✅ RELEASE READY');
       console.log(`   All implemented features have E2E test coverage`);
@@ -155,10 +160,12 @@ class RegistryHelper {
     }
 
     // Auto-generate slug from name if not provided
-    const featureSlug = slug || name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '');
+    const featureSlug =
+      slug ||
+      name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '');
 
     // Check if slug already exists
     if (this.registry.features[featureSlug]) {
@@ -180,7 +187,7 @@ class RegistryHelper {
       name,
       status: status || 'planned',
       e2e_test: test || null,
-      notes: notes || ''
+      notes: notes || '',
     };
 
     // Add to registry
@@ -238,11 +245,15 @@ class RegistryHelper {
 
       // Check for inconsistencies
       if (feature.status === 'implemented' && !feature.e2e_test) {
-        warnings.push(`Feature '${slug}': status is 'implemented' but no E2E test specified (should be 'partial')`);
+        warnings.push(
+          `Feature '${slug}': status is 'implemented' but no E2E test specified (should be 'partial')`,
+        );
       }
 
       if (feature.status === 'partial' && feature.e2e_test) {
-        warnings.push(`Feature '${slug}': status is 'partial' but E2E test is specified (should be 'implemented')`);
+        warnings.push(
+          `Feature '${slug}': status is 'partial' but E2E test is specified (should be 'implemented')`,
+        );
       }
 
       // Validate E2E test path format
@@ -259,12 +270,12 @@ class RegistryHelper {
       if (errors.length > 0) {
         console.log('❌ Validation FAILED\n');
         console.log('Errors:');
-        errors.forEach(err => console.log(`  - ${err}`));
+        errors.forEach((err) => console.log(`  - ${err}`));
       }
 
       if (warnings.length > 0) {
         console.log('\n⚠️  Warnings:');
-        warnings.forEach(warn => console.log(`  - ${warn}`));
+        warnings.forEach((warn) => console.log(`  - ${warn}`));
       }
     }
 
@@ -278,9 +289,9 @@ class RegistryHelper {
    */
   getStatusIcon(status) {
     const icons = {
-      'implemented': '✅',
-      'partial': '⚠️',
-      'planned': '⏳'
+      implemented: '✅',
+      partial: '⚠️',
+      planned: '⏳',
     };
     return icons[status] || '❓';
   }

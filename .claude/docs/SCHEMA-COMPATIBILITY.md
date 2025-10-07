@@ -15,6 +15,7 @@ This document explains how the Linear TDD Workflow System's agent and command sc
 Our system is **100% compatible** with official Claude Code agent and command schemas. All required fields are present, and our custom fields are additive enhancements that don't conflict with Claude Code's operation.
 
 **Compliance Status:**
+
 - ✅ All agents have required `name` and `description` fields
 - ✅ All agents use official `tools` array format
 - ✅ All agents use official `model` values (opus/sonnet/haiku/inherit)
@@ -32,10 +33,10 @@ We extend the official schema with custom fields that add powerful capabilities 
 
 ```yaml
 ---
-name: <string>          # Required - unique identifier
-description: <string>   # Required - when/how to use
-tools: [<string>]       # Optional - list of tools (inherits all if omitted)
-model: <string>         # Optional - opus|sonnet|haiku|inherit (default: sonnet)
+name: <string> # Required - unique identifier
+description: <string> # Required - when/how to use
+tools: [<string>] # Optional - list of tools (inherits all if omitted)
+model: <string> # Optional - opus|sonnet|haiku|inherit (default: sonnet)
 ---
 ```
 
@@ -46,24 +47,24 @@ model: <string>         # Optional - opus|sonnet|haiku|inherit (default: sonnet)
 ```yaml
 ---
 # === OFFICIAL FIELDS (REQUIRED) ===
-name: <string>                     # ✅ Official - Agent identifier
-description: <string>              # ✅ Official - Usage description
+name: <string> # ✅ Official - Agent identifier
+description: <string> # ✅ Official - Usage description
 model: <opus|sonnet|haiku|inherit> # ✅ Official - Model selection
-tools: [<string>]                  # ✅ Official - Tool access
+tools: [<string>] # ✅ Official - Tool access
 
 # === CUSTOM ENHANCEMENTS ===
-role: <string>                     # 🚀 Custom - Human-readable role description
-category: <string>                 # 🚀 Custom - Agent category (code-quality, testing, etc.)
-priority: <high|medium|low>        # 🚀 Custom - Execution priority
-capabilities: [<string>]           # 🚀 Custom - Detailed capability list
-mcp_servers: [<string>]            # 🚀 Custom - MCP server access
-loop_controls:                     # 🚀 Custom - Execution constraints
+role: <string> # 🚀 Custom - Human-readable role description
+category: <string> # 🚀 Custom - Agent category (code-quality, testing, etc.)
+priority: <high|medium|low> # 🚀 Custom - Execution priority
+capabilities: [<string>] # 🚀 Custom - Detailed capability list
+mcp_servers: [<string>] # 🚀 Custom - MCP server access
+loop_controls: # 🚀 Custom - Execution constraints
   max_iterations: <number>
   max_time_seconds: <number>
   max_cost_tokens: <number>
   success_criteria: [<string>]
   ground_truth_checks: [<object>]
-definition_of_done: [<object>]     # 🚀 Custom - Completion criteria
+definition_of_done: [<object>] # 🚀 Custom - Completion criteria
 ---
 ```
 
@@ -73,10 +74,10 @@ definition_of_done: [<object>]     # 🚀 Custom - Completion criteria
 
 ```yaml
 ---
-description: <string>          # Required - for invokability
-allowed-tools: [<string>]      # Optional - scoped permissions
-argument-hint: <string>        # Optional - autocomplete hints
-model: <string>                # Optional - model override
+description: <string> # Required - for invokability
+allowed-tools: [<string>] # Optional - scoped permissions
+argument-hint: <string> # Optional - autocomplete hints
+model: <string> # Optional - model override
 disable-model-invocation: bool # Optional - prevent auto-invocation
 ---
 ```
@@ -88,19 +89,19 @@ disable-model-invocation: bool # Optional - prevent auto-invocation
 ```yaml
 ---
 # === OFFICIAL FIELDS ===
-description: <string>                    # ✅ Official - Command description
-allowed-tools: [<string>]                # ✅ Official - Tool permissions
-argument-hint: <string>                  # ✅ Official - Autocomplete
-model: <string>                          # ✅ Official - Model override
+description: <string> # ✅ Official - Command description
+allowed-tools: [<string>] # ✅ Official - Tool permissions
+argument-hint: <string> # ✅ Official - Autocomplete
+model: <string> # ✅ Official - Model override
 
 # === CUSTOM ENHANCEMENTS ===
-name: <string>                           # 🚀 Custom - Command identifier
-agent: <string>                          # 🚀 Custom - Primary agent to invoke
-usage: <string>                          # 🚀 Custom - Usage syntax
-category: <string>                       # 🚀 Custom - Command category
-priority: <high|medium|low>              # 🚀 Custom - Execution priority
-parameters: [<object>]                   # 🚀 Custom - Structured parameters
-supporting_agents: [<string>]            # 🚀 Custom - Additional agents used
+name: <string> # 🚀 Custom - Command identifier
+agent: <string> # 🚀 Custom - Primary agent to invoke
+usage: <string> # 🚀 Custom - Usage syntax
+category: <string> # 🚀 Custom - Command category
+priority: <high|medium|low> # 🚀 Custom - Execution priority
+parameters: [<object>] # 🚀 Custom - Structured parameters
+supporting_agents: [<string>] # 🚀 Custom - Additional agents used
 ---
 ```
 
@@ -109,16 +110,20 @@ supporting_agents: [<string>]            # 🚀 Custom - Additional agents used
 ### Agent Fields
 
 #### `role` (string)
+
 **Purpose:** Human-readable description of agent's primary function
 **Example:** `"Workflow Orchestrator & Linear Mediator"`
 **Benefits:**
+
 - Improves documentation clarity
 - Helps users understand agent purpose
 - Complements technical `description` field
 
 #### `category` (string)
+
 **Purpose:** Organizational grouping for agents
 **Options:**
+
 - `orchestration` - STRATEGIST, PLANNER
 - `code-quality` - AUDITOR, CODE-REVIEWER, LINTER
 - `testing` - EXECUTOR, TESTER, TEST-AUTOMATOR
@@ -131,25 +136,31 @@ supporting_agents: [<string>]            # 🚀 Custom - Additional agents used
 - `learning` - SCHOLAR
 
 **Benefits:**
+
 - Enables category-based filtering
 - Improves agent discovery
 - Supports organizational structure
 
 #### `priority` (enum: high|medium|low)
+
 **Purpose:** Execution priority when multiple agents compete for resources
 **Examples:**
+
 - `high` - EXECUTOR (TDD enforcement), GUARDIAN (pipeline recovery)
 - `medium` - AUDITOR (assessment), PLANNER (planning)
 - `low` - SCHOLAR (learning), DOC-KEEPER (documentation)
 
 **Benefits:**
+
 - Resource allocation optimization
 - Critical path prioritization
 - SLA management
 
 #### `capabilities` (array of strings)
+
 **Purpose:** Detailed list of agent capabilities
 **Example:**
+
 ```yaml
 capabilities:
   - strict_tdd_enforcement
@@ -159,13 +170,16 @@ capabilities:
 ```
 
 **Benefits:**
+
 - Precise capability documentation
 - Agent selection optimization
 - Skill-based routing
 
 #### `mcp_servers` (array of strings)
+
 **Purpose:** MCP (Model Context Protocol) servers this agent can access
 **Examples:**
+
 - `linear-server` - STRATEGIST only (exclusive Linear access)
 - `context7` - Code understanding
 - `sequential-thinking` - Complex reasoning
@@ -173,45 +187,52 @@ capabilities:
 - `playwright` - E2E testing
 
 **Benefits:**
+
 - Explicit MCP permissions
 - Access control enforcement
 - Dependency documentation
 
 #### `loop_controls` (object)
+
 **Purpose:** Execution constraints and success criteria
 **Structure:**
+
 ```yaml
 loop_controls:
-  max_iterations: 5                    # Maximum execution loops
-  max_time_seconds: 900                # 15-minute timeout
-  max_cost_tokens: 200000              # Token budget
-  success_criteria:                    # Completion conditions
-    - "Tests pass (GREEN phase achieved)"
-    - "Coverage ≥80% diff coverage"
-  ground_truth_checks:                 # Validation steps
+  max_iterations: 5 # Maximum execution loops
+  max_time_seconds: 900 # 15-minute timeout
+  max_cost_tokens: 200000 # Token budget
+  success_criteria: # Completion conditions
+    - 'Tests pass (GREEN phase achieved)'
+    - 'Coverage ≥80% diff coverage'
+  ground_truth_checks: # Validation steps
     - tool: Bash
-      command: "npm test"
+      command: 'npm test'
       verify: exit_code_equals_0
 ```
 
 **Benefits:**
+
 - Cost control (token budgets)
 - Time bounds (SLA enforcement)
 - Quality gates (automated validation)
 - Ground truth verification
 
 #### `definition_of_done` (array of objects)
+
 **Purpose:** Structured completion checklist
 **Example:**
+
 ```yaml
 definition_of_done:
-  - task: "Review all changed files in the PR"
+  - task: 'Review all changed files in the PR'
     verification: "grep -r 'TODO' returns no results"
-  - task: "Security scan completed"
-    verification: "npm audit --production shows 0 vulnerabilities"
+  - task: 'Security scan completed'
+    verification: 'npm audit --production shows 0 vulnerabilities'
 ```
 
 **Benefits:**
+
 - Automated completion verification
 - Consistent quality standards
 - Audit trail
@@ -219,31 +240,39 @@ definition_of_done:
 ### Command Fields
 
 #### `name` (string)
+
 **Purpose:** Command identifier for invocation
 **Example:** `"assess"`, `"fix"`, `"cycle"`
 **Benefits:**
+
 - Clear command naming
 - Slash command mapping (`/assess`)
 
 #### `agent` (string)
+
 **Purpose:** Primary agent to invoke for this command
 **Example:** `"AUDITOR"`, `"EXECUTOR"`, `"PLANNER"`
 **Benefits:**
+
 - Explicit agent routing
 - Command-agent mapping documentation
 - Simplified invocation logic
 
 #### `usage` (string)
+
 **Purpose:** Command syntax with parameters
 **Example:** `"/fix <TASK-ID> [--branch=<branch-name>]"`
 **Benefits:**
+
 - Quick reference for users
 - Parameter documentation
 - Help text generation
 
 #### `parameters` (array of objects)
+
 **Purpose:** Structured parameter definitions
 **Structure:**
+
 ```yaml
 parameters:
   - name: TASK-ID
@@ -258,14 +287,17 @@ parameters:
 ```
 
 **Benefits:**
+
 - Type validation
 - Required/optional specification
 - Default value documentation
 - Auto-generated help text
 
 #### `supporting_agents` (array of strings)
+
 **Purpose:** Additional agents coordinated by this command
 **Example:**
+
 ```yaml
 supporting_agents:
   - STRATEGIST
@@ -275,6 +307,7 @@ supporting_agents:
 ```
 
 **Benefits:**
+
 - Multi-agent workflow documentation
 - Dependency tracking
 - Orchestration clarity
@@ -317,22 +350,25 @@ supporting_agents:
 If Anthropic adds official support for our custom fields:
 
 **Step 1:** Map our fields to official equivalents
+
 ```yaml
 # Current (custom)
-role: "Workflow Orchestrator"
+role: 'Workflow Orchestrator'
 capabilities: [workflow_orchestration, linear_management]
 
 # Future (if official)
-category: "orchestration"
+category: 'orchestration'
 tags: [workflow, linear, coordination]
 ```
 
 **Step 2:** Automated migration script
+
 ```bash
 ./scripts/migrate-schema.sh --from=custom --to=official
 ```
 
 **Step 3:** Validation
+
 ```bash
 npm run validate:schema
 ```
@@ -342,6 +378,7 @@ npm run validate:schema
 To use only official fields (for maximum portability):
 
 1. **Keep Only Required Fields:**
+
    ```yaml
    ---
    name: AUDITOR
@@ -352,6 +389,7 @@ To use only official fields (for maximum portability):
    ```
 
 2. **Remove All Custom Fields:**
+
    ```bash
    ./scripts/strip-custom-fields.sh --target=agents
    ./scripts/strip-custom-fields.sh --target=commands
@@ -441,12 +479,14 @@ npm run validate:custom-fields
 ## Version History
 
 ### 1.5.1 (2025-10-03)
+
 - ✅ Added official `allowed-tools` and `argument-hint` to all commands
 - ✅ Verified all agents match official schema
 - ✅ Documented custom field enhancements
 - ✅ Created SCHEMA-COMPATIBILITY.md
 
 ### 1.5.0 (2025-10-02)
+
 - Initial autonomous execution implementation
 - Custom `loop_controls` added to agents
 - Custom `parameters` added to commands
@@ -454,6 +494,7 @@ npm run validate:custom-fields
 ## Support
 
 For questions about schema compatibility:
+
 1. Check official Claude Code docs first
 2. Review this document for custom field usage
 3. See `.claude/docs/TROUBLESHOOTING.md` for common issues

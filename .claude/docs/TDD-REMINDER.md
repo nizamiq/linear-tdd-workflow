@@ -28,7 +28,7 @@ test('calculates tax for high income bracket', () => {
 ```javascript
 // Write the SIMPLEST code that makes the test pass
 function calculateTax(income) {
-  return income * 0.25;  // Minimal implementation
+  return income * 0.25; // Minimal implementation
 }
 // Now the test PASSES
 ```
@@ -56,11 +56,13 @@ function validateIncome(income) {
 ## Non-Negotiable Requirements
 
 ### Coverage Gates (BLOCKING)
+
 - **≥80% diff coverage** on all changed lines
 - **≥30% mutation score** (tests must actually validate behavior)
 - **NO production code** without a failing test first
 
 ### Quality Standards
+
 - All tests must pass before commit
 - Tests must be isolated (no dependencies between tests)
 - Tests must be fast (<1 second per test)
@@ -69,7 +71,9 @@ function validateIncome(income) {
 ## Why This Matters
 
 ### 1. **Tests as Documentation**
+
 Tests explain what the code should do better than comments:
+
 ```javascript
 // Instead of this comment:
 // This function calculates tax based on income
@@ -81,7 +85,9 @@ test('calculates 25% tax for income over $50k', () => {
 ```
 
 ### 2. **Confidence to Change Code**
+
 With comprehensive tests, you can refactor without fear:
+
 ```javascript
 // Before: Spaghetti code, afraid to touch
 function processOrder(order) {
@@ -99,12 +105,14 @@ function processOrder(order) {
 ```
 
 ### 3. **Better Design**
+
 TDD forces you to write testable code, which is usually better designed:
+
 ```javascript
 // ❌ Hard to test (tight coupling)
 class OrderProcessor {
   process() {
-    const db = new Database();  // Hardcoded dependency
+    const db = new Database(); // Hardcoded dependency
     db.save(this.order);
   }
 }
@@ -112,7 +120,7 @@ class OrderProcessor {
 // ✅ Easy to test (dependency injection)
 class OrderProcessor {
   constructor(database) {
-    this.database = database;  // Injected dependency
+    this.database = database; // Injected dependency
   }
 
   process() {
@@ -123,6 +131,7 @@ class OrderProcessor {
 ```
 
 ### 4. **Automatic High Coverage**
+
 TDD gives you ≥80% coverage for free because you can't write production code without a test.
 
 ## The EXECUTOR Agent Enforces This
@@ -141,30 +150,37 @@ When you run `/fix CLEAN-123`, the EXECUTOR agent will:
 ## Common Mistakes to Avoid
 
 ### ❌ Writing Tests After Code
+
 ```javascript
 // Wrong: Code first, then tests
-function calculateTax(income) { return income * 0.25; }
-test('tax calculation', () => { expect(calculateTax(100)).toBe(25); });
+function calculateTax(income) {
+  return income * 0.25;
+}
+test('tax calculation', () => {
+  expect(calculateTax(100)).toBe(25);
+});
 ```
 
 **Problem**: Test doesn't drive design, becomes an afterthought.
 
 ### ❌ Skipping RED Phase
+
 ```javascript
 // Wrong: Test passes immediately (no RED phase)
 test('returns empty array', () => {
-  expect([]).toEqual([]);  // This always passes!
+  expect([]).toEqual([]); // This always passes!
 });
 ```
 
 **Problem**: You didn't verify the test can fail, so it might not be testing anything.
 
 ### ❌ Over-Engineering in GREEN Phase
+
 ```javascript
 // Wrong: Adding features not covered by current test
 function calculateTax(income) {
-  if (income < 0) throw new Error('Invalid');  // Not tested yet!
-  if (income > 1000000) return income * 0.35;   // Not tested yet!
+  if (income < 0) throw new Error('Invalid'); // Not tested yet!
+  if (income > 1000000) return income * 0.35; // Not tested yet!
   return income * 0.25;
 }
 ```
@@ -172,10 +188,11 @@ function calculateTax(income) {
 **Problem**: Writing code without tests = untested code = bugs.
 
 ### ❌ Refactoring Without Passing Tests
+
 ```javascript
 // Wrong: Refactoring while tests are failing
 test('calculates tax', () => {
-  expect(calculateTax(100)).toBe(25);  // ❌ FAILING
+  expect(calculateTax(100)).toBe(25); // ❌ FAILING
 });
 
 // Don't refactor now! Fix the test first.
@@ -188,6 +205,7 @@ test('calculates tax', () => {
 ### Example 1: String Utility
 
 **[RED]** - Failing test:
+
 ```javascript
 test('capitalizes first letter of each word', () => {
   expect(capitalize('hello world')).toBe('Hello World');
@@ -196,22 +214,23 @@ test('capitalizes first letter of each word', () => {
 ```
 
 **[GREEN]** - Minimal code:
+
 ```javascript
 function capitalize(str) {
-  return str.split(' ')
-    .map(word => word[0].toUpperCase() + word.slice(1))
+  return str
+    .split(' ')
+    .map((word) => word[0].toUpperCase() + word.slice(1))
     .join(' ');
 }
 // ✅ PASSES
 ```
 
 **[REFACTOR]** - Improve:
+
 ```javascript
 function capitalize(str) {
   if (!str) return '';
-  return str.split(' ')
-    .map(capitalizeWord)
-    .join(' ');
+  return str.split(' ').map(capitalizeWord).join(' ');
 }
 
 function capitalizeWord(word) {
@@ -223,6 +242,7 @@ function capitalizeWord(word) {
 ### Example 2: API Client
 
 **[RED]** - Failing test:
+
 ```javascript
 test('fetches user by id', async () => {
   const api = new ApiClient();
@@ -233,6 +253,7 @@ test('fetches user by id', async () => {
 ```
 
 **[GREEN]** - Minimal code:
+
 ```javascript
 class ApiClient {
   async getUser(id) {
@@ -244,6 +265,7 @@ class ApiClient {
 ```
 
 **[REFACTOR]** - Improve:
+
 ```javascript
 class ApiClient {
   constructor(baseUrl = '/api') {

@@ -13,6 +13,7 @@ This file serves as the central registry for all slash commands in the Linear TD
 - **Usage**: Code scanning and quality analysis
 
 #### `/linear [<assessment-file>] [--dry-run] [--priority=<level>]`
+
 - **Agent**: STRATEGIST
 - **Description**: Create Linear tasks from assessment results
 - **Usage**: Linear task creation after `/assess`

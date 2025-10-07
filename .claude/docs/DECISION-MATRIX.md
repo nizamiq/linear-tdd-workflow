@@ -12,11 +12,13 @@ Direct Tool Call  →  Workflow  →  Autonomous Agent
 ```
 
 **Cost Impact**:
+
 - Direct call: ~1x baseline cost
 - Workflow: ~2-5x baseline cost
 - Agent: ~10-20x baseline cost
 
 **Reliability**:
+
 - Direct call: 100% deterministic
 - Workflow: 100% deterministic (if well-specified)
 - Agent: 70-95% (depends on task complexity)
@@ -42,6 +44,7 @@ Is the task deterministic with a known sequence of steps?
 ## Approach 1: Direct Tool Call (Simplest)
 
 **When to Use**:
+
 - Single, well-defined operation
 - No branching logic required
 - Deterministic output
@@ -50,6 +53,7 @@ Is the task deterministic with a known sequence of steps?
 **Examples**:
 
 ### ✅ Linting Code
+
 ```bash
 # GOOD: Direct tool call via hook
 pre-commit:
@@ -60,6 +64,7 @@ pre-commit:
 ```
 
 ### ✅ Type Checking
+
 ```bash
 # GOOD: Direct tool call in CI
 npm run typecheck
@@ -69,6 +74,7 @@ npm run typecheck
 ```
 
 ### ✅ Running Tests
+
 ```bash
 # GOOD: Direct command
 npm test
@@ -78,6 +84,7 @@ npm test
 ```
 
 ### ✅ Formatting Code
+
 ```bash
 # GOOD: Post-write hook
 on-file-write:
@@ -96,6 +103,7 @@ on-file-write:
 ## Approach 2: Workflow (Deterministic Orchestration)
 
 **When to Use**:
+
 - Multiple sequential steps
 - Clear branching logic
 - Deterministic decision points
@@ -108,6 +116,7 @@ on-file-write:
 **Use Case**: Multi-stage process where each step feeds the next
 
 **Example: TDD Cycle**
+
 ```yaml
 # .claude/workflows/tdd-cycle.yaml
 name: RED-GREEN-REFACTOR
@@ -135,6 +144,7 @@ steps:
 **Use Case**: Different paths based on objective criteria
 
 **Example: PR Review Routing**
+
 ```yaml
 # .claude/workflows/pr-review-router.yaml
 name: PR_REVIEW_ROUTING
@@ -156,6 +166,7 @@ conditions:
 **Use Case**: Multiple independent operations that can run concurrently
 
 **Example: Multi-Directory Assessment**
+
 ```yaml
 # .claude/workflows/parallel-assessment.yaml
 name: CODEBASE_ASSESSMENT
@@ -175,13 +186,14 @@ merge:
 **Use Case**: Main controller delegates to specialized workers
 
 **Example: Fix Pack Implementation**
+
 ```yaml
 # .claude/workflows/fix-pack-orchestration.yaml
 orchestrator: STRATEGIST
 workers:
-  - EXECUTOR  # Implements fixes
-  - CODE-REVIEWER  # Reviews quality
-  - TESTER  # Validates tests
+  - EXECUTOR # Implements fixes
+  - CODE-REVIEWER # Reviews quality
+  - TESTER # Validates tests
 coordination:
   type: sequential_with_gates
   gates:
@@ -198,6 +210,7 @@ coordination:
 **Use Case**: Generate solution, critique, improve until threshold met
 
 **Example: Code Implementation with Review**
+
 ```yaml
 # .claude/workflows/generator-critic.yaml
 generator: EXECUTOR
@@ -219,6 +232,7 @@ max_iterations: 3
 ## Approach 3: Autonomous Agent (Last Resort)
 
 **When to Use**:
+
 - Unpredictable task complexity
 - Requires adaptive planning
 - Needs judgment calls
@@ -227,7 +241,9 @@ max_iterations: 3
 **Examples**:
 
 ### ✅ Code Quality Assessment (AUDITOR)
+
 **Why Agent**:
+
 - Requires judgment on severity
 - Needs adaptive depth (shallow vs deep)
 - Must prioritize findings by business impact
@@ -239,7 +255,9 @@ max_iterations: 3
 ```
 
 ### ✅ Fix Implementation (EXECUTOR)
+
 **Why Agent**:
+
 - Creative problem-solving (multiple valid solutions)
 - Adaptive TDD cycle (might need multiple attempts)
 - Unknown complexity upfront
@@ -251,7 +269,9 @@ max_iterations: 3
 ```
 
 ### ✅ Pipeline Recovery (GUARDIAN)
+
 **Why Agent**:
+
 - Unpredictable failure modes
 - Requires root cause analysis
 - Adaptive fix strategies
@@ -263,7 +283,9 @@ max_iterations: 3
 ```
 
 ### ✅ Pattern Learning (SCHOLAR)
+
 **Why Agent**:
+
 - Requires pattern recognition
 - Needs synthesis from multiple PRs
 - Adaptive extraction (what patterns are worth capturing)
@@ -275,7 +297,9 @@ max_iterations: 3
 ```
 
 ### ❌ Simple Linting (Don't Use Agent)
+
 **Why NOT Agent**:
+
 - Deterministic rules
 - No judgment required
 - Known output format
@@ -290,17 +314,18 @@ max_iterations: 3
 
 ## Cost-Complexity-Quality Tradeoffs
 
-| Approach | Cost | Complexity | Speed | Quality Ceiling | Use When |
-|----------|------|------------|-------|-----------------|----------|
-| **Direct Call** | 1x | Low | Instant | 100% (deterministic) | Known single operation |
-| **Workflow** | 2-5x | Medium | Fast | 100% (if well-specified) | Multi-step deterministic |
-| **Agent** | 10-20x | High | Slow | 70-95% (varies) | Unpredictable/creative |
+| Approach        | Cost   | Complexity | Speed   | Quality Ceiling          | Use When                 |
+| --------------- | ------ | ---------- | ------- | ------------------------ | ------------------------ |
+| **Direct Call** | 1x     | Low        | Instant | 100% (deterministic)     | Known single operation   |
+| **Workflow**    | 2-5x   | Medium     | Fast    | 100% (if well-specified) | Multi-step deterministic |
+| **Agent**       | 10-20x | High       | Slow    | 70-95% (varies)          | Unpredictable/creative   |
 
 ---
 
 ## Real-World Scenarios
 
 ### Scenario 1: "Format all Python files"
+
 ```
 ❌ Agent approach: Invoke PYTHON-PRO agent
 ✅ Workflow approach: For each *.py file, run ruff format
@@ -310,6 +335,7 @@ Savings: 95% cost reduction
 ```
 
 ### Scenario 2: "Implement TDD fix for CLEAN-123"
+
 ```
 ❌ Direct call: Can't specify exact implementation upfront
 ❌ Simple workflow: Implementation requires creativity
@@ -319,6 +345,7 @@ Rationale: Unknown complexity, needs adaptive problem-solving
 ```
 
 ### Scenario 3: "Assess code quality and create Linear tasks"
+
 ```
 ❌ Direct call: Can't specify all issues upfront
 ✅ Hybrid workflow + agent:
@@ -329,6 +356,7 @@ Savings: 50% cost reduction by doing deterministic parts as workflow
 ```
 
 ### Scenario 4: "Run all tests and report failures"
+
 ```
 ❌ Agent approach: Invoke TESTER agent
 ✅✅ Direct call: npm test > test-results.json
@@ -337,6 +365,7 @@ Savings: 98% cost reduction
 ```
 
 ### Scenario 5: "Plan sprint cycle with velocity analysis"
+
 ```
 ❌ Direct call: Requires judgment on issue selection
 ⚠️ Simple workflow: Can do data gathering, but prioritization needs judgment
@@ -355,6 +384,7 @@ Savings: 60% cost reduction
 ## Migration Strategy
 
 ### Step 1: Identify Current Agent Usage
+
 ```bash
 # Find all agent invocations
 grep -r "/invoke" .claude/
@@ -362,19 +392,24 @@ grep -r "Task tool" .claude/agents/
 ```
 
 ### Step 2: Classify by Decision Matrix
+
 For each agent invocation, ask:
+
 1. Is this deterministic? → Workflow or direct call
 2. Does this need judgment? → Keep as agent
 3. Can this be a hook? → Move to hooks.json
 
 ### Step 3: Refactor Incrementally
+
 Priority order:
+
 1. **High-frequency, deterministic** → Direct calls/hooks (biggest savings)
 2. **Multi-step deterministic** → Workflows
 3. **Complex with some deterministic parts** → Hybrid (workflow + agent)
 4. **Truly unpredictable** → Keep as agent
 
 ### Example: LINTER Agent Migration
+
 ```yaml
 # BEFORE: .claude/agents/linter.md (400 lines)
 name: LINTER
@@ -383,10 +418,7 @@ tools: [Bash, Read, Edit]
 # ... 400 lines of agent logic
 
 # AFTER: .claude/hooks.json (5 lines)
-"pre-commit": {
-  "command": "npm run lint",
-  "on_failure": "block"
-}
+'pre-commit': { 'command': 'npm run lint', 'on_failure': 'block' }
 
 Cost reduction: 95%
 Reliability increase: 100% deterministic
