@@ -9,7 +9,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const yaml = require('yaml');
+const yaml = require('js-yaml');
 
 const PROJECT_ROOT = path.join(__dirname, '..');
 const AGENTS_DIR = path.join(PROJECT_ROOT, '.claude/agents');
