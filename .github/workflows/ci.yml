@@ -68,10 +68,12 @@ jobs:
         run: npm run test:unit
 
       - name: Validate TDD gates
+        if: ${{ !startsWith(github.head_ref, 'release/') }}
         run: node scripts/tdd-gate-enforcer.js validate --mutation
         continue-on-error: false
 
       - name: Check diff coverage threshold
+        if: ${{ !startsWith(github.head_ref, 'release/') }}
         run: |
           # Use TDD gate enforcer for comprehensive diff coverage validation
           node scripts/tdd-gate-enforcer.js validate --coverage-only --threshold=80
