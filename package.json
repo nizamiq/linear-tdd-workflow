@@ -1,6 +1,6 @@
 {
   "name": "linear-tdd-workflow",
-  "version": "1.4.0",
+  "version": "1.6.0",
   "description": "Linear TDD Workflow System - Autonomous Clean Code Development with Test-Driven Excellence",
   "main": "index.js",
   "scripts": {
