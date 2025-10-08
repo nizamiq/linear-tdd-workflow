@@ -1,0 +1,34 @@
+# WIP (Work-In-Progress) Limits Configuration
+# Controls how much parallel work the system can handle
+
+# Task type limits
+limits:
+  CLEAN: 5          # Code quality fixes
+  DOC: 3            # Documentation tasks
+  INCIDENT: 2       # Incidents (emergency fixes)
+  OPTIMIZATION: 3   # Performance tasks
+  FEATURE: 8        # Feature development tasks
+
+# Health score thresholds
+health:
+  minScore: 0.7     # Minimum health score for release (70%)
+  warningScore: 0.8 # Warning threshold (80%)
+
+# Aging rules (in days)
+aging:
+  staleDays: 7      # Tasks become stale after 7 days
+  criticalDays: 14  # Critical aging at 14 days
+  severeDays: 21    # Severe aging at 21 days (blocks release)
+
+# Description:
+# This file configures the Work-In-Progress limits for the system.
+#
+# - limits: Maximum concurrent tasks per type
+# - health: Health score thresholds for validation
+# - aging: Age thresholds for task escalation
+#
+# The functional release gate validates:
+# 1. WIP health score >= minScore (70%)
+# 2. No severely aged features (>21 days)
+# 3. WIP limits not exceeded
+# 4. Overall system readiness for release
