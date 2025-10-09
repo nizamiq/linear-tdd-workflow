@@ -1355,6 +1355,7 @@ Invoked via `/cycle` slash command:
 **EXECUTE THESE COMMANDS EXACTLY - NO DESCRIPTIONS, NO PLANNING, ONLY ACTION**
 
 ### IMMEDIATE ACTIONS:
+
 1. Get current active cycle from Linear MCP
 2. Get work items (Backlog/Todo/Ready) from Linear
 3. EXECUTE WORK DIRECTLY IN MAIN CONTEXT:
@@ -1364,6 +1365,7 @@ Invoked via `/cycle` slash command:
    - **DO** commit changes and create PRs in main context
 
 ### EXECUTION INSTRUCTIONS:
+
 ```
 # For each ready work item:
 1. Use Read/Edit/Bash tools directly to implement
@@ -1374,22 +1376,26 @@ Invoked via `/cycle` slash command:
 ```
 
 ### PROHIBITED ACTIONS:
+
 - ❌ DO NOT deploy subagents via Task tool for implementation work
 - ❌ DO NOT report "agents deployed" unless actually happened
 - ❌ DO NOT describe analytical work without performing it
 - ❌ DO NOT create progress reports without ground truth verification
 
 ### REPORTING RULES:
+
 - ONLY report actual Task tool results
 - NEVER report intentions or plans
 - NO fake progress like "systems are operational"
 - NO "cycle is LIVE" messages
 
 ### EXAMPLE CORRECT REPORTS:
+
 - "✅ executor completed CLEAN-123: PR #45 created, 92% coverage"
 - "✅ guardian fixed INCIDENT-567: Pipeline passing"
 
 ### EXAMPLE FORBIDDEN REPORTS:
+
 - ❌ "The cycle is now LIVE and all systems are operational!"
 - ❌ "Agents can begin working on their assigned tasks"
 - ❌ "Work queues are activated and ready"
@@ -1399,11 +1405,58 @@ Invoked via `/cycle` slash command:
 - ❌ "simulated progress reports"
 
 ### MANDATORY VERIFICATION:
+
 - ✅ Show actual Linear task IDs retrieved
 - ✅ Display real tool output for actions taken
 - ✅ Provide git commit hashes for any changes
 - ✅ Include actual test results
 - ✅ Verify PRs exist with real URLs
+
+## 🎯 EXECUTION CONTEXT DETECTION
+
+**CRITICAL: Detect your execution context before starting work**
+
+### For `/cycle plan` and `/cycle status` (ORCHESTRATOR mode):
+- You are orchestrating READ-ONLY analysis
+- You can spawn subprocesses for data collection
+- You make Linear updates in main context
+- Subprocesses MUST NOT make state changes
+
+### For `/cycle execute` (DIRECT mode):
+- You MUST perform work directly in main context
+- DO NOT spawn subprocesses for implementation work
+- Use Read/Write/Edit/Bash tools directly
+- Verify all changes persist with actual tool output
+
+### CONTEXT DETECTION PROTOCOL:
+
+```bash
+# Test if you're in main context:
+echo "planner-context-test-$(date +%s)" > /tmp/planner-context-test.txt
+ls -la /tmp/planner-context-test.txt
+# If file exists and persists, you're in main context
+```
+
+### WORK EXECUTION RULES:
+
+**MAIN CONTEXT ( `/cycle execute` ):**
+- ✅ Use tools directly to implement work
+- ✅ Create files and verify they exist
+- ✅ Make git commits and show hashes
+- ✅ Create PRs and provide URLs
+- ✅ Update Linear tasks directly
+
+**SUBPROCESS ( `/cycle plan` workers):**
+- ✅ Read data and return results
+- ✅ Analyze and calculate metrics
+- ❌ NO file writes or state changes
+- ❌ NO git operations
+- ❌ NO Linear task creation
+
+**ABSOLUTELY FORBIDDEN:**
+- ❌ Providing "instructions and plans" when you can do real work
+- ❌ Reporting "agents deployed" without actual tool output
+- ❌ Creating theoretical implementation guides
 
 ## Dependencies
 

@@ -2,7 +2,7 @@
 name: cycle
 description: Automated sprint/cycle planning and management using orchestrator-workers pattern
 agent: PLANNER
-execution_mode: ORCHESTRATOR # Main agent spawns READ-ONLY analysis workers
+execution_mode: CONTEXT_DEPENDENT # plan/status use ORCHESTRATOR, execute uses DIRECT
 usage: '/cycle [plan|status|execute|review]'
 parameters:
   - name: subcommand
@@ -16,6 +16,7 @@ supporting_agents:
   - AUDITOR
   - SCHOLAR
   - GUARDIAN
+  - EXECUTOR
 subprocess_usage: CONTEXT_DEPENDENT # ⚠️ plan/status use READ_ONLY, execute uses DIRECT
 ---
 
@@ -27,9 +28,9 @@ This command uses different execution patterns depending on the subcommand:
 
 ### For `/cycle plan` and `/cycle status` (Analysis Mode):
 
-Uses the **orchestrator-workers pattern** where:
+Uses the **ORCHESTRATOR mode** where:
 
-- **Main agent (PLANNER)** orchestrates workflow and makes decisions
+- **Main agent (PLANNER)** orchestrates workflow and makes decisions in main context
 - **Worker subprocesses** perform READ-ONLY analysis tasks (fetch data, calculate metrics)
 - **NO subprocess writes** - all Linear updates happen in main context
 
@@ -51,22 +52,32 @@ Uses the **orchestrator-workers pattern** where:
 
 ### For `/cycle execute` (Execution Mode):
 
-Uses **direct agent deployment** where:
+Uses **DIRECT mode** where:
 
-- **Main agent (PLANNER)** DELOYS subagents immediately via Task tool
-- **Subagents EXECUTE actual work** (implementation, validation, quality checks)
+- **Main agent (PLANNER)** performs work directly in main context
+- **NO subprocess deployment** - all work happens in main context where changes persist
+- **Direct tool usage** - Read, Write, Edit, Bash tools affect actual workspace
 - **Real work is performed** - files are modified, PRs are created, tasks are updated
 
-**Deploy subagents for:**
+**Critical for `/cycle execute`:**
 
-- ✅ executor agents: Implement features and fixes
-- ✅ guardian agents: CI/CD validation and monitoring
-- ✅ auditor agents: Quality checks and technical debt work
+- ✅ Use Read/Write/Edit tools directly to modify files
+- ✅ Use Bash commands directly to make git commits
+- ✅ Create PRs directly using available tools
+- ✅ Update Linear tasks directly with MCP
+- ✅ Verify work persists with actual tool output
+
+**ABSOLUTELY FORBIDDEN for `/cycle execute`:**
+
+- ❌ DO NOT use Task tool to spawn subagents for implementation work
+- ❌ DO NOT provide "instructions and plans" instead of actual work
+- ❌ DO NOT report "agents deployed" without real tool output
+- ❌ DO NOT create theoretical implementation guides
 
 **KEY DISTINCTION:**
 
-- `/cycle plan` = Analyze and plan (READ-ONLY workers)
-- `/cycle execute` = Deploy and execute (ACTIVE subagents)
+- `/cycle plan` = Analyze and plan (READ-ONLY subprocess workers)
+- `/cycle execute` = Direct execution in main context (NO subprocesses for work)
 
 ## Overview
 
@@ -77,12 +88,22 @@ Comprehensive cycle planning automation that analyzes backlog, calculates capaci
 When user invokes `/cycle [subcommand]`:
 
 1. **Read command parameters** from user input
-2. **Invoke PLANNER agent immediately** via Task tool with the subcommand
-3. **PLANNER reads execution instructions** from its agent file and executes autonomously
-4. **Wait for PLANNER results** and present to user
+2. **DETERMINE EXECUTION MODE** based on subcommand:
+   - `/cycle plan` or `/cycle status` → Use **ORCHESTRATOR mode**
+   - `/cycle execute` → Use **DIRECT mode**
+   - `/cycle review` → Use **ORCHESTRATOR mode**
+3. **EXECUTE ACCORDINGLY**:
+   - **ORCHESTRATOR mode**: Invoke PLANNER agent via Task tool (spawns READ-ONLY workers)
+   - **DIRECT mode**: Claude Code executes work directly using available tools
+4. **Wait for results** and present to user
 5. **Handle approval gates** only for Linear operations
 
-**DO NOT ask for permission** - PLANNER has full execution instructions.
+**CRITICAL for `/cycle execute`:**
+- DO NOT invoke PLANNER via Task tool (would create subprocess)
+- Claude Code must execute work DIRECTLY using Read/Write/Edit/Bash tools
+- Follow the DIRECT execution instructions in the PLANNER agent file
+
+**DO NOT ask for permission** - Execute according to the determined mode.
 
 ## Usage
 
@@ -158,6 +179,7 @@ Deploy subagents that can persist work to the user's workspace:
 **CRITICAL**: Subagents run in main context where their work persists, NOT in isolated subprocesses.
 
 **ABSOLUTELY FORBIDDEN**:
+
 - ❌ Reporting "analyses and simulations"
 - ❌ Describing work without showing actual tool output
 - ❌ Saying "agents were deployed" without actual Task tool results
