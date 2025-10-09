@@ -21,11 +21,15 @@ subprocess_usage: READ_ONLY_ANALYSIS # ⚠️ Subprocesses do NOT make state cha
 
 # /cycle - Sprint/Cycle Planning Command
 
-## ⚠️ IMPORTANT: Subprocess Architecture
+## ⚠️ IMPORTANT: Execution Patterns by Subcommand
 
-This command uses the **orchestrator-workers pattern** where:
+This command uses different execution patterns depending on the subcommand:
 
-- **Main agent (YOU)** orchestrates workflow and makes decisions
+### For `/cycle plan` and `/cycle status` (Analysis Mode):
+
+Uses the **orchestrator-workers pattern** where:
+
+- **Main agent (PLANNER)** orchestrates workflow and makes decisions
 - **Worker subprocesses** perform READ-ONLY analysis tasks (fetch data, calculate metrics)
 - **NO subprocess writes** - all Linear updates happen in main context
 
@@ -45,9 +49,40 @@ This command uses the **orchestrator-workers pattern** where:
 
 **Rule:** Subprocesses return DATA, main context makes CHANGES.
 
+### For `/cycle execute` (Execution Mode):
+
+Uses **direct agent deployment** where:
+
+- **Main agent (PLANNER)** DELOYS subagents immediately via Task tool
+- **Subagents EXECUTE actual work** (implementation, validation, quality checks)
+- **Real work is performed** - files are modified, PRs are created, tasks are updated
+
+**Deploy subagents for:**
+
+- ✅ executor agents: Implement features and fixes
+- ✅ guardian agents: CI/CD validation and monitoring
+- ✅ auditor agents: Quality checks and technical debt work
+
+**KEY DISTINCTION:**
+
+- `/cycle plan` = Analyze and plan (READ-ONLY workers)
+- `/cycle execute` = Deploy and execute (ACTIVE subagents)
+
 ## Overview
 
 Comprehensive cycle planning automation that analyzes backlog, calculates capacity, selects optimal work items, and prepares the team for sprint execution.
+
+## 🤖 Execution Instructions for Claude Code
+
+When user invokes `/cycle [subcommand]`:
+
+1. **Read command parameters** from user input
+2. **Invoke PLANNER agent immediately** via Task tool with the subcommand
+3. **PLANNER reads execution instructions** from its agent file and executes autonomously
+4. **Wait for PLANNER results** and present to user
+5. **Handle approval gates** only for Linear operations
+
+**DO NOT ask for permission** - PLANNER has full execution instructions.
 
 ## Usage
 
@@ -103,12 +138,18 @@ Quick health check of current cycle:
 
 ### `/cycle execute`
 
-Begin cycle execution:
+**ACTUAL EXECUTION - NOT REPORT GENERATION**
 
-- Activate work queues for agents
-- Initialize tracking dashboards
-- Set up monitoring alerts
-- Start daily standup automation
+Deploy subagents immediately to begin implementing the planned cycle work:
+
+1. **Deploy executor subagents** to implement selected tasks
+2. **Deploy guardian subagents** for CI/CD validation and monitoring
+3. **Deploy auditor subagents** for quality checks and technical debt management
+4. **Activate real work queues** - not theoretical planning
+5. **Begin immediate implementation** of selected Linear tasks via Task tool
+6. **Track actual progress** and report completed work, not intentions
+
+**KEY DISTINCTION**: This subcommand DOES work, it doesn't DESCRIBE work.
 
 ### `/cycle review`
 

@@ -697,6 +697,54 @@ node scripts/generate-changelog.js \
 - Validate content before writing
 - Update cross-references after writing
 
+## Output Format
+
+Documentation operations always include:
+
+- **Documentation Summary**: Description of documentation work performed
+- **Quality Assessment**: Validation results and compliance metrics
+- **Content Updates**: New or modified documentation with locations
+- **Cross-Reference Updates**: Links and navigation improvements
+- **User Impact Assessment**: Expected benefits and usage improvements
+- **Linear Progress Updates**: Documentation task tracking
+
+### Linear Progress Updates
+
+For documentation validation and updates, include progress updates:
+
+```json
+{
+  "linear_update": {
+    "task_id": "DOC-XXX",
+    "action": "start_work|update_progress|complete_docs|block_task",
+    "status": "Todo|In Progress|Blocked|Done",
+    "comment": "Validating Layer 2 system documentation - Found 8 broken links and 3 outdated command references",
+    "evidence": {
+      "phase": "SCAN|VALIDATE|UPDATE|REVIEW",
+      "documentation_layer": "L1|L2|L3|L4",
+      "files_validated": 15,
+      "issues_found": 12,
+      "broken_links": 3,
+      "outdated_content": 5,
+      "quality_score": 85,
+      "pages_updated": 7
+    }
+  }
+}
+```
+
+Use specific actions:
+- `start_work` - When documentation validation or update begins
+- `update_progress` - During validation, content creation, or review phases
+- `complete_docs` - When documentation work completed and validated
+- `block_task` - If content missing or requires input from other agents
+
+Layer-specific progress:
+- **Layer 1** (Core): `.claude/CLAUDE.md`, `.claude/README.md`
+- **Layer 2** (System): Agent specs, commands, workflows
+- **Layer 3** (User): Getting started guides, tutorials
+- **Layer 4** (Workflow): Workflow documentation and guides
+
 ### Edit Tool
 
 **Primary Uses**:

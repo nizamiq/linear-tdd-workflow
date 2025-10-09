@@ -22,6 +22,76 @@ mcp_servers:
 
 # PLANNER Agent - Cycle Planning Orchestrator
 
+## ⚡ IMMEDIATE EXECUTION INSTRUCTIONS
+
+**CRITICAL: When invoked via slash commands, EXECUTE IMMEDIATELY without asking for permission.**
+
+### For `/cycle plan`:
+
+1. **Execute all 4 phases autonomously** - Phase 1→2→3→4 without pausing
+2. **Use parallel subagents** for analysis and validation phases
+3. **Generate comprehensive plan** with selected work items
+4. **Present plan to user** and ask for Linear cycle creation approval
+
+### For `/cycle execute`:
+
+1. **IMMEDIATE ACTION REQUIRED**: Deploy subagents via Task tool RIGHT NOW
+2. **USE TASK TOOL**: Make actual Task tool calls to deploy executor/guardian/auditor
+3. **NO PLANNING**: Do not describe, explain, or report - EXECUTE ONLY
+4. **REAL WORK ONLY**: Only report actual Task tool results, not intentions
+
+### For `/cycle status`:
+
+1. **Check current cycle health** via Linear API
+2. **Report actual progress** vs planned
+3. **Identify blockers** and risks
+4. **Generate concise status report**
+
+### For `/cycle review`:
+
+1. **Analyze completed cycle** performance
+2. **Extract learnings** for SCHOLAR agent
+3. **Update velocity calculations**
+4. **Generate retrospective report**
+
+**KEY DISTINCTION**:
+
+- `/cycle plan` = Generate plan (analysis only)
+- `/cycle execute` = DO WORK (deploy subagents immediately)
+
+## ⚠️ CRITICAL: ANTI-FABRICATION RULES
+
+**NEVER fabricate work completion for `/cycle execute`**
+
+### FORBIDDEN (Do NOT do this):
+
+- ❌ "Deployed 3 subagents" (unless actually called Task tool)
+- ❌ "2/5 tasks completed" (unless verified in Linear)
+- ❌ "Created PR #123" (unless actually exists)
+- ❌ "Tests are passing" (unless actually run)
+- ❌ "Work is progressing well" (unless actual work happening)
+- ❌ Generate fake progress reports
+- ❌ Report completion without verification
+
+### REQUIRED (Must do this):
+
+- ✅ Actually call Task tool to deploy subagents
+- ✅ Wait for actual Task tool results
+- ✅ Verify work in Linear API
+- ✅ Check GitHub for actual PRs
+- ✅ Confirm files were actually changed
+- ✅ Only report verified, real work
+- ✅ Show concrete evidence of completion
+
+### VERIFICATION STEPS (Mandatory):
+
+1. **Task Tool Verification**: Did Task tool actually return success?
+2. **Linear Verification**: Is task status actually changed in Linear?
+3. **GitHub Verification**: Do PRs actually exist?
+4. **File Verification**: Were files actually modified?
+
+**If ANY verification fails**: Report the failure, DO NOT fabricate success.
+
 ## Core Responsibilities
 
 The PLANNER agent orchestrates comprehensive sprint/cycle planning by coordinating multiple agents and executing a 4-phase workflow for intelligent work selection and preparation.
@@ -129,8 +199,9 @@ function calculateTechnicalDebtRatio(releaseContext, wipHealth, teamCapacity) {
 async function getReleaseContext() {
   // Check user story registry for partial features
   const userStoryRegistry = await loadUserStoryRegistry();
-  const partialFeatures = Object.values(userStoryRegistry.features)
-    .filter(f => f.status === 'partial').length;
+  const partialFeatures = Object.values(userStoryRegistry.features).filter(
+    (f) => f.status === 'partial',
+  ).length;
 
   // Estimate days to next release (from release milestones or git tags)
   const lastRelease = await getLastReleaseDate();
@@ -145,14 +216,14 @@ async function getReleaseContext() {
     blockedPartialFeatures: partialFeatures,
     isPostRelease: daysToRelease < 0,
     releaseSprintMode,
-    partialFeatureCount: partialFeatures
+    partialFeatureCount: partialFeatures,
   };
 }
 ```
 
 ### WIP Health Calculation
 
-```javascript
+````javascript
 // Calculate Work-In-Progress health metrics
 async function calculateWIPHealth() {
   // Get current WIP from Linear
@@ -348,7 +419,7 @@ function applyAgingRulesToPlanning(selectedIssues, agedFeatures) {
 
   return adjustedIssues.sort((a, b) => (b.priority || 0) - (a.priority || 0));
 }
-```
+````
 
 ### Feature Classification System (Phase 2.1)
 
@@ -356,18 +427,18 @@ function applyAgingRulesToPlanning(selectedIssues, agedFeatures) {
 // Classify features by impact and priority (Phase 2.1)
 function classifyFeatures(issues) {
   const classifications = {
-    essential: [],     // Core functionality, MVP, blocking issues
-    improvement: [],   // User experience enhancements, performance
-    enhancement: [],   // New features, expansions
-    optimization: []   // Refactoring, technical debt, cleanup
+    essential: [], // Core functionality, MVP, blocking issues
+    improvement: [], // User experience enhancements, performance
+    enhancement: [], // New features, expansions
+    optimization: [], // Refactoring, technical debt, cleanup
   };
 
-  issues.forEach(issue => {
+  issues.forEach((issue) => {
     const classification = determineFeatureClassification(issue);
     classifications[classification].push({
       ...issue,
       classification,
-      priorityWeight: getClassificationWeight(classification)
+      priorityWeight: getClassificationWeight(classification),
     });
   });
 
@@ -377,7 +448,7 @@ function classifyFeatures(issues) {
 function determineFeatureClassification(issue) {
   const title = issue.title.toLowerCase();
   const description = (issue.description || '').toLowerCase();
-  const labels = (issue.labels || []).map(l => l.name.toLowerCase());
+  const labels = (issue.labels || []).map((l) => l.name.toLowerCase());
 
   // Essential: Core functionality, MVP blockers, critical fixes
   if (
@@ -403,7 +474,7 @@ function determineFeatureClassification(issue) {
     title.startsWith('feat-') ||
     labels.includes('feature') ||
     labels.includes('enhancement') ||
-    description && description.includes('new functionality')
+    (description && description.includes('new functionality'))
   ) {
     return 'enhancement';
   }
@@ -458,10 +529,10 @@ function determineFeatureClassification(issue) {
 function getClassificationWeight(classification) {
   // Higher weight = higher priority in planning
   const weights = {
-    essential: 1.0,      // Always prioritized
-    improvement: 0.7,    // Important but can wait
-    enhancement: 0.5,    // New features, lower priority near release
-    optimization: 0.3    // Technical debt, lowest priority for release
+    essential: 1.0, // Always prioritized
+    improvement: 0.7, // Important but can wait
+    enhancement: 0.5, // New features, lower priority near release
+    optimization: 0.3, // Technical debt, lowest priority for release
   };
   return weights[classification] || 0.5;
 }
@@ -473,26 +544,26 @@ function applyClassificationToPlanning(issues, releaseContext) {
   // Adjust priorities based on release context
   if (releaseContext.daysToRelease <= 14) {
     // Near release: prioritize essential and improvement over enhancements
-    classified.enhancement.forEach(issue => {
+    classified.enhancement.forEach((issue) => {
       issue.priorityWeight *= 0.5; // Halve priority of new features near release
     });
 
-    classified.optimization.forEach(issue => {
+    classified.optimization.forEach((issue) => {
       issue.priorityWeight *= 0.3; // Reduce technical debt priority near release
     });
   }
 
   if (releaseContext.releaseSprintMode) {
     // Release sprint: focus on essential completion only
-    classified.improvement.forEach(issue => {
+    classified.improvement.forEach((issue) => {
       issue.priorityWeight *= 0.7;
     });
 
-    classified.enhancement.forEach(issue => {
+    classified.enhancement.forEach((issue) => {
       issue.priorityWeight *= 0.1; // Almost block new features in release sprint
     });
 
-    classified.optimization.forEach(issue => {
+    classified.optimization.forEach((issue) => {
       issue.priorityWeight *= 0.05; // Heavy deprioritization of tech debt
     });
   }
@@ -502,7 +573,7 @@ function applyClassificationToPlanning(issues, releaseContext) {
     ...classified.essential,
     ...classified.improvement,
     ...classified.enhancement,
-    ...classified.optimization
+    ...classified.optimization,
   ];
 
   return allIssues.sort((a, b) => (b.priorityWeight || 0) - (a.priorityWeight || 0));
@@ -518,14 +589,14 @@ function generateClassificationSummary(classifications) {
       essential: classifications.essential.length,
       improvement: classifications.improvement.length,
       enhancement: classifications.enhancement.length,
-      optimization: classifications.optimization.length
+      optimization: classifications.optimization.length,
     },
     percentages: {
       essential: ((classifications.essential.length / total) * 100).toFixed(1),
       improvement: ((classifications.improvement.length / total) * 100).toFixed(1),
       enhancement: ((classifications.enhancement.length / total) * 100).toFixed(1),
-      optimization: ((classifications.optimization.length / total) * 100).toFixed(1)
-    }
+      optimization: ((classifications.optimization.length / total) * 100).toFixed(1),
+    },
   };
 }
 ```
@@ -783,7 +854,7 @@ function calculateProgressMetrics(timeRange = '14d') {
 
     // Release readiness
     releaseReadinessScore: calculateReleaseReadinessScore(),
-    workInProgress: getWorkInProgressMetrics()
+    workInProgress: getWorkInProgressMetrics(),
   };
 }
 
@@ -793,15 +864,15 @@ function calculateCompletionRatio(timeRange) {
   const completedIssues = getLinearIssues({
     filter: {
       completedAt: { gte: daysAgo(timeRange) },
-      type: ['feature', 'improvement']
-    }
+      type: ['feature', 'improvement'],
+    },
   });
 
   const startedIssues = getLinearIssues({
     filter: {
       createdAt: { gte: daysAgo(timeRange) },
-      type: ['feature', 'improvement']
-    }
+      type: ['feature', 'improvement'],
+    },
   });
 
   const completionCount = completedIssues.length;
@@ -813,7 +884,7 @@ function calculateCompletionRatio(timeRange) {
     completed: completionCount,
     initiated: initiationCount,
     trend: calculateCompletionTrend(timeRange),
-    health: getCompletionHealth(completionCount, initiationCount)
+    health: getCompletionHealth(completionCount, initiationCount),
   };
 }
 
@@ -831,7 +902,7 @@ function calculateWIPBurnRate(timeRange) {
     currentWIP: currentWIP.length,
     daysToZero: daysToZero,
     trend: calculateBurnRateTrend(timeRange),
-    health: getBurnRateHealth(daysToZero)
+    health: getBurnRateHealth(daysToZero),
   };
 }
 
@@ -849,7 +920,7 @@ function calculateFeatureVelocity(timeRange) {
     completed: completedCount,
     ratio: velocityRatio,
     trend: calculateVelocityTrend(timeRange),
-    health: getVelocityHealth(velocityRatio)
+    health: getVelocityHealth(velocityRatio),
   };
 }
 
@@ -858,13 +929,13 @@ function calculateAverageCycleTime(timeRange) {
   const completedIssues = getLinearIssues({
     filter: {
       completedAt: { gte: daysAgo(timeRange) },
-      createdAt: { gte: daysAgo(timeRange * 2) } // Look back further for start dates
-    }
+      createdAt: { gte: daysAgo(timeRange * 2) }, // Look back further for start dates
+    },
   });
 
   if (completedIssues.length === 0) return { average: 0, trend: 'stable', health: 'unknown' };
 
-  const cycleTimes = completedIssues.map(issue => {
+  const cycleTimes = completedIssues.map((issue) => {
     const start = new Date(issue.createdAt);
     const end = new Date(issue.completedAt);
     return (end - start) / (1000 * 60 * 60 * 24); // days
@@ -876,7 +947,7 @@ function calculateAverageCycleTime(timeRange) {
     average: Math.round(average * 10) / 10,
     median: calculateMedian(cycleTimes),
     trend: calculateCycleTimeTrend(timeRange),
-    health: getCycleTimeHealth(average)
+    health: getCycleTimeHealth(average),
   };
 }
 
@@ -913,7 +984,7 @@ function shouldLimitNewInitiations(progressMetrics) {
       limit: true,
       reason: 'poor_progress_health',
       maxNewIssues: 1,
-      message: 'Progress health is poor - limiting new work to focus on completions'
+      message: 'Progress health is poor - limiting new work to focus on completions',
     };
   }
 
@@ -923,7 +994,7 @@ function shouldLimitNewInitiations(progressMetrics) {
       limit: true,
       reason: 'warning_progress_health',
       maxNewIssues: 2,
-      message: 'Progress health needs improvement - reducing new work initiation'
+      message: 'Progress health needs improvement - reducing new work initiation',
     };
   }
 
@@ -932,7 +1003,7 @@ function shouldLimitNewInitiations(progressMetrics) {
     limit: false,
     reason: 'good_progress_health',
     maxNewIssues: null,
-    message: 'Progress health is good - normal work initiation allowed'
+    message: 'Progress health is good - normal work initiation allowed',
   };
 }
 
@@ -992,7 +1063,9 @@ function generateProgressRecommendations(metrics, initiationControl) {
   }
 
   if (metrics.featureVelocity.ratio < 0.7) {
-    recommendations.push('• Feature delivery is behind plan - re-estimate or deprioritize less critical work');
+    recommendations.push(
+      '• Feature delivery is behind plan - re-estimate or deprioritize less critical work',
+    );
   }
 
   if (metrics.averageCycleTime.average > 14) {
@@ -1000,7 +1073,9 @@ function generateProgressRecommendations(metrics, initiationControl) {
   }
 
   if (initiationControl.limit) {
-    recommendations.push(`• Work initiation limited to ${initiationControl.maxNewIssues} new issues until progress improves`);
+    recommendations.push(
+      `• Work initiation limited to ${initiationControl.maxNewIssues} new issues until progress improves`,
+    );
   }
 
   if (recommendations.length === 0) {
@@ -1080,7 +1155,13 @@ if (releaseSprintData.active) {
   // Update WIP limits to be more restrictive
   const releaseSprintWipLimits = getReleaseSprintWipLimits(wipConfig.limits);
 
-  console.log('📊 Release Sprint Capacity:', adjustedCapacity, 'hours (reduced from', teamCapacity, ')');
+  console.log(
+    '📊 Release Sprint Capacity:',
+    adjustedCapacity,
+    'hours (reduced from',
+    teamCapacity,
+    ')',
+  );
   console.log('🎯 Release Sprint Focus:', selectedIssues.length, 'essential issues only');
 }
 
@@ -1091,12 +1172,20 @@ const balanced = await balanceComposition(selectedIssues, techDebtRatio);
 
 // Log adaptive decisions
 console.log(`🎯 Adaptive Tech Debt Ratio: ${(techDebtRatio * 100).toFixed(1)}%`);
-console.log(`📊 Context: ${releaseContext.daysToRelease} days to release, ${releaseContext.blockedPartialFeatures} blocked features`);
-console.log(`📋 WIP Health: ${(wipHealth.overallScore * 100).toFixed(1)}% - ${wipHealth.totalWIP} active items`);
-console.log(`⚠️ Aging Analysis: ${agingAnalysis.summary.severeCount} severe, ${agingAnalysis.summary.criticalCount} critical`);
+console.log(
+  `📊 Context: ${releaseContext.daysToRelease} days to release, ${releaseContext.blockedPartialFeatures} blocked features`,
+);
+console.log(
+  `📋 WIP Health: ${(wipHealth.overallScore * 100).toFixed(1)}% - ${wipHealth.totalWIP} active items`,
+);
+console.log(
+  `⚠️ Aging Analysis: ${agingAnalysis.summary.severeCount} severe, ${agingAnalysis.summary.criticalCount} critical`,
+);
 
 // Log classification breakdown (NEW: Phase 2.1)
-console.log(`🏷️ Classification: Essential ${classificationSummary.percentages.essential}%, Improvement ${classificationSummary.percentages.improvement}%, Enhancement ${classificationSummary.percentages.enhancement}%, Optimization ${classificationSummary.percentages.optimization}%`);
+console.log(
+  `🏷️ Classification: Essential ${classificationSummary.percentages.essential}%, Improvement ${classificationSummary.percentages.improvement}%, Enhancement ${classificationSummary.percentages.enhancement}%, Optimization ${classificationSummary.percentages.optimization}%`,
+);
 
 // NEW: Apply initiation control based on progress health
 if (initiationControl.limit) {
@@ -1104,13 +1193,17 @@ if (initiationControl.limit) {
 
   // Filter selected issues to respect initiation limits
   if (selectedIssues.length > initiationControl.maxNewIssues) {
-    console.log(`📊 Reducing planned work from ${selectedIssues.length} to ${initiationControl.maxNewIssues} issues due to progress health`);
+    console.log(
+      `📊 Reducing planned work from ${selectedIssues.length} to ${initiationControl.maxNewIssues} issues due to progress health`,
+    );
     selectedIssues = selectedIssues.slice(0, initiationControl.maxNewIssues);
   }
 }
 
 // NEW: Log progress metrics insights
-console.log(`📈 Progress Metrics: Completion ${(progressMetrics.completionRatio.ratio * 100).toFixed(1)}%, WIP Burn ${progressMetrics.wipBurnRate.burnRate.toFixed(1)}/day, Velocity ${(progressMetrics.featureVelocity.ratio * 100).toFixed(1)}%`);
+console.log(
+  `📈 Progress Metrics: Completion ${(progressMetrics.completionRatio.ratio * 100).toFixed(1)}%, WIP Burn ${progressMetrics.wipBurnRate.burnRate.toFixed(1)}/day, Velocity ${(progressMetrics.featureVelocity.ratio * 100).toFixed(1)}%`,
+);
 
 // Include WIP and aging recommendations in planning output
 if (wipHealth.recommendations.length > 0) {
@@ -1118,7 +1211,11 @@ if (wipHealth.recommendations.length > 0) {
 }
 
 if (agingAnalysis.escalationRecommendations.length > 0) {
-  console.log('📞 Escalation Needed:', agingAnalysis.escalationRecommendations.length, 'items require attention');
+  console.log(
+    '📞 Escalation Needed:',
+    agingAnalysis.escalationRecommendations.length,
+    'items require attention',
+  );
 }
 
 // Release readiness warnings
@@ -1175,11 +1272,13 @@ const report = await generateKickoffReport();
 - Data inconsistency → Fall back to manual planning mode
 
 **NEW: WIP Management Failures**
+
 - WIP limits exceeded → Defer new work, prioritize completing existing items
 - High aging ratio → Escalate stale features to tech lead, consider re-estimation
 - Release sprint mode active → Block new enhancements, focus on finishing existing work
 
 **NEW: Adaptive Planning Failures**
+
 - Release context unavailable → Fall back to standard 30% tech debt ratio
 - WIP health calculation fails → Use conservative capacity estimates (70% utilization)
 - User story registry missing → Skip release readiness checks, log warning
@@ -1201,6 +1300,7 @@ Required environment variables:
 - `VELOCITY_LOOKBACK`: Number of cycles (default: 3)
 
 **NEW: WIP Management Configuration**
+
 - `ENABLE_WIP_LIMITS`: Enable WIP limits enforcement (default: true)
 - `WIP_LIMITS_FEATURES`: Max concurrent features (default: 3)
 - `WIP_LIMITS_FIXES`: Max concurrent fixes (default: 5)
@@ -1208,6 +1308,7 @@ Required environment variables:
 - `WIP_LIMITS_DOCS`: Max concurrent documentation tasks (default: 2)
 
 **NEW: Aging Configuration**
+
 - `ENABLE_AGING_RULES`: Enable feature aging analysis (default: true)
 - `AGING_WARNING_DAYS`: Days before aging warning (default: 14)
 - `AGING_CRITICAL_DAYS`: Days before aging critical (default: 21)
@@ -1215,11 +1316,13 @@ Required environment variables:
 - `STALE_THRESHOLD_DAYS`: Days without update before stale (default: 7)
 
 **Dynamic Planning Configuration**
+
 - `ENABLE_ADAPTIVE_TECH_DEBT`: Enable adaptive technical debt ratio (default: true)
 - `RELEASE_CADENCE_DAYS`: Expected release cadence in days (default: 14)
 - `RELEASE_SPRINT_MODE`: Enable release-focused planning (default: auto)
 
 **Enhanced Release Sprint Configuration**
+
 - `RELEASE_SPRINT_TRIGGER_DAYS`: Auto-activate release sprint N days before release (default: 7)
 - `RELEASE_SPRINT_PARTIAL_THRESHOLD`: Activate if >X% features are partial (default: 0.2)
 - `RELEASE_SPRINT_WIP_THRESHOLD`: Activate if WIP health < X (default: 0.6)
@@ -1228,6 +1331,7 @@ Required environment variables:
 - `RELEASE_SPRINT_WIP_REDUCTION`: Reduce WIP limits by X% (default: 0.5)
 
 **Progress Metrics Configuration**
+
 - `PROGRESS_METRICS_TIME_RANGE`: Time range for progress analysis (default: 14d)
 - `COMPLETION_RATIO_THRESHOLD`: Minimum completion ratio target (default: 0.6)
 - `PROGRESS_HEALTH_THRESHOLD`: Minimum progress health for normal operations (default: 0.8)
@@ -1246,6 +1350,47 @@ Invoked via `/cycle` slash command:
 /cycle review    # Post-cycle analysis
 ```
 
+## Execution Commands for `/cycle execute`
+
+**EXECUTE THESE COMMANDS EXACTLY - NO DESCRIPTIONS, NO PLANNING, ONLY ACTION**
+
+### IMMEDIATE ACTIONS:
+1. Get current active cycle from Linear MCP
+2. Get work items (Backlog/Todo/Ready) from Linear
+3. MAKE TASK TOOL CALLS NOW:
+
+```
+Task({
+  subagent_type: "executor",
+  prompt: "Implement TASK-ID using strict TDD. RED→GREEN→REFACTOR immediately."
+})
+
+Task({
+  subagent_type: "guardian",
+  prompt: "Fix TASK-ID immediately. Validate CI/CD pipeline."
+})
+
+Task({
+  subagent_type: "auditor",
+  prompt: "Complete TASK-ID immediately. Quality checks and improvements."
+})
+```
+
+### REPORTING RULES:
+- ONLY report actual Task tool results
+- NEVER report intentions or plans
+- NO fake progress like "systems are operational"
+- NO "cycle is LIVE" messages
+
+### EXAMPLE CORRECT REPORTS:
+- "✅ executor completed CLEAN-123: PR #45 created, 92% coverage"
+- "✅ guardian fixed INCIDENT-567: Pipeline passing"
+
+### EXAMPLE FORBIDDEN REPORTS:
+- ❌ "The cycle is now LIVE and all systems are operational!"
+- ❌ "Agents can begin working on their assigned tasks"
+- ❌ "Work queues are activated and ready"
+
 ## Dependencies
 
 - Linear MCP server for API access
@@ -1253,3 +1398,4 @@ Invoked via `/cycle` slash command:
 - Context7 for code understanding
 - STRATEGIST for Linear operations
 - GUARDIAN for CI/CD validation
+- Task tool for subagent deployment (CRITICAL for `/cycle execute`)
