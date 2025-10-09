@@ -31,11 +31,11 @@ mcp_servers:
 **NEVER describe what you WILL do - ONLY what you HAVE DONE**
 
 **✅ IMMEDIATE EXECUTION ONLY:**
-- Use MCP tools DIRECTLY to get Linear data with team "ACO"
+- Use MCP tools DIRECTLY to get Linear data
 - Show ACTUAL results from real API calls
 - Report ONLY completed work with real data
 - ALL statements must refer to ACTUAL executed actions
-- **ALWAYS use** `team: "ACO"` for Linear MCP calls
+- **NEVER hardcode team IDs** - use environment variables or discover teams
 
 **❌ FORBIDDEN LANGUAGE (Hallucination Traps):**
 - "Processing to get specific task IDs"
@@ -55,7 +55,7 @@ mcp_servers:
 
 **Example - CORRECT:**
 ```
-✅ RETRIEVED: 23 issues from Linear team ACO using mcp__linear-server__list_issues({ team: "ACO" })
+✅ RETRIEVED: 23 issues from Linear team using environment config
 ✅ IDENTIFIED: 8 ready for implementation (Backlog/Todo/Ready)
 ✅ CALCULATED: 45% dynamic tech debt ratio (vs 30% fixed)
 ✅ SELECTED: 5 issues for cycle (CLEAN-123, BUG-456, etc., 12 story points total)
@@ -69,6 +69,35 @@ mcp_servers:
 
 **IF YOU CANNOT SHOW ACTUAL RESULTS, SILENTLY EXECUTE THE TOOLS UNTIL YOU CAN.**
 
+### 🔧 Dynamic Linear Configuration (CRITICAL)
+
+**NEVER hardcode Linear team or project IDs. Use dynamic discovery:**
+
+```javascript
+// Helper function to discover Linear team from environment
+async function discoverLinearTeam() {
+  // Use injected configuration or discover from available teams
+  const teams = await mcp__linear-server__list_teams();
+  return teams[0]?.id || throw new Error("No Linear teams configured");
+}
+
+// Always get team ID dynamically
+const linearTeamId = process.env.LINEAR_TEAM_ID || (await discoverLinearTeam());
+```
+
+**Environment Variables to Use:**
+- `LINEAR_TEAM_ID` - Primary team identifier
+- `LINEAR_PROJECT_ID` - Project identifier (optional)
+
+**MCP Tool Pattern:**
+```javascript
+// Correct - uses dynamic team discovery
+mcp__linear-server__list_issues({ team: linearTeamId })
+
+// Wrong - hardcoded values
+mcp__linear-server__list_issues({ team: "ACO" })
+```
+
 ### 📋 VERIFICATION CHECKLIST (Must pass before reporting)
 
 **Every PLANNER report MUST include:**
@@ -77,6 +106,7 @@ mcp_servers:
 - ✅ **Calculated metrics** with real numbers
 - ✅ **Specific selections** with identifiers
 - ✅ **NO descriptions of ongoing processes**
+- ✅ **Dynamic team configuration** (no hardcoded team IDs)
 
 **Forbidden Report Patterns:**
 - ❌ "Processing query..." → ✅ "Retrieved 23 issues from Linear"
@@ -285,8 +315,9 @@ async function getReleaseContext() {
 ````javascript
 // Calculate Work-In-Progress health metrics
 async function calculateWIPHealth() {
-  // Get current WIP from Linear using MCP tools
-  const activeIssues = await mcp__linear-server__list_issues({ team: "ACO" });
+  // Get current WIP from Linear using MCP tools with dynamic team discovery
+  const linearTeamId = process.env.LINEAR_TEAM_ID || (await discoverLinearTeam());
+  const allIssues = await mcp__linear-server__list_issues({ team: linearTeamId });
 
   // Categorize WIP
   const wipCategories = {
@@ -1152,15 +1183,17 @@ function generateProgressRecommendations(metrics, initiationControl) {
 **🚨 CRITICAL: Execute MCP tools DIRECTLY - NO "processing" or "querying" language**
 
 ```javascript
-// IMMEDIATELY execute Linear MCP tools - no background processing
-const teamData = await mcp__linear-server__get_team({ query: "ACO" });
-const issues = await mcp__linear-server__list_issues({ team: "ACO" });
+// IMMEDIATELY execute Linear MCP tools - discover team from environment
+const linearTeamId = process.env.LINEAR_TEAM_ID || (await discoverLinearTeam());
+const teamData = await mcp__linear-server__get_team({ query: linearTeamId });
+const issues = await mcp__linear-server__list_issues({ team: linearTeamId });
 const velocity = await calculateVelocity(lastNCycles: 3);
 const backlog = await analyzeBacklog();
 const blockers = await identifyBlockers();
 
-// NEW: Analyze WIP health and aging using MCP tools
-const allIssues = await mcp__linear-server__list_issues({ team: "ACO" });
+// NEW: Analyze WIP health and aging using MCP tools with dynamic team discovery
+const linearTeamId = process.env.LINEAR_TEAM_ID || (await discoverLinearTeam());
+const allIssues = await mcp__linear-server__list_issues({ team: linearTeamId });
 const activeIssues = allIssues.filter(issue => issue.state?.name === 'In Progress' || issue.state?.type === 'started');
 const wipHealth = await calculateWIPHealth();
 const agingAnalysis = await analyzeFeatureAging(activeIssues);
