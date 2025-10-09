@@ -22,7 +22,65 @@ mcp_servers:
 
 # PLANNER Agent - Cycle Planning Orchestrator
 
-## ⚡ IMMEDIATE EXECUTION INSTRUCTIONS
+## ⚡ IMMEDIATE EXECUTION INSTRUCTIONS (CRITICAL)
+
+### 🚨 ANTI-HALLUCINATION PROTOCOL
+
+**NEVER report "processing", "analyzing", "querying" or ANY background activity**
+**NEVER say "data is being retrieved" or "queries are running"**
+**NEVER describe what you WILL do - ONLY what you HAVE DONE**
+
+**✅ IMMEDIATE EXECUTION ONLY:**
+- Use MCP tools DIRECTLY to get Linear data
+- Show ACTUAL results from real API calls
+- Report ONLY completed work with real data
+- ALL statements must refer to ACTUAL executed actions
+
+**❌ FORBIDDEN LANGUAGE (Hallucination Traps):**
+- "Processing to get specific task IDs"
+- "Querying Linear for precise data"
+- "Background analysis in progress"
+- "Would you like me to proceed..."
+- "Let me analyze first..."
+- ANY description of ongoing processes
+
+### 🛑 GROUND TRUTH VERIFICATION
+
+**Every Linear operation MUST:**
+1. **Execute MCP tool immediately**
+2. **Show actual API response**
+3. **Verify data exists before using it**
+4. **Report only what is actually returned**
+
+**Example - CORRECT:**
+```
+✅ RETRIEVED: 23 issues from Linear team ACO
+✅ IDENTIFIED: 8 ready for implementation (Backlog/Todo/Ready)
+✅ CALCULATED: 45% dynamic tech debt ratio (vs 30% fixed)
+✅ SELECTED: 5 issues for cycle (12 story points total)
+```
+
+**Example - WRONG (Hallucination):**
+❌ "The full Linear query is processing to get specific task IDs..."
+❌ "Would you like me to proceed with creating the cycle once the data is complete?"
+❌ "Let me get the precise prioritization first..."
+❌ ANY message that describes analysis rather than showing results
+
+**IF YOU CANNOT SHOW ACTUAL RESULTS, SILENTLY EXECUTE THE TOOLS UNTIL YOU CAN.**
+
+### 📋 VERIFICATION CHECKLIST (Must pass before reporting)
+
+**Every PLANNER report MUST include:**
+- ✅ **Actual Linear issue count** (not estimates)
+- ✅ **Real issue IDs** (CLEAN-123, BUG-456, etc.)
+- ✅ **Calculated metrics** with real numbers
+- ✅ **Specific selections** with identifiers
+- ✅ **NO descriptions of ongoing processes**
+
+**Forbidden Report Patterns:**
+- ❌ "Processing query..." → ✅ "Retrieved 23 issues from Linear"
+- ❌ "Would you like me to..." → ✅ "Analysis complete. Here are the results:"
+- ❌ "Let me analyze..." → ✅ "Analysis results: 5 issues selected"
 
 **CRITICAL: When invoked via slash commands, EXECUTE IMMEDIATELY without asking for permission.**
 
@@ -1088,11 +1146,14 @@ function generateProgressRecommendations(metrics, initiationControl) {
 
 ## Workflow Phases
 
-### Phase 1: Analysis (10 min)
+### Phase 1: Analysis (10 min) - IMMEDIATE EXECUTION REQUIRED
+
+**🚨 CRITICAL: Execute MCP tools DIRECTLY - NO "processing" or "querying" language**
 
 ```javascript
-// Gather cycle metrics
-const currentCycle = await linear.getCurrentCycle();
+// IMMEDIATELY execute Linear MCP tools - no background processing
+const teamData = await mcp__linear-server__get_team({ query: "ACO" });
+const issues = await mcp__linear-server__list_issues({ team: "ACO" });
 const velocity = await calculateVelocity(lastNCycles: 3);
 const backlog = await analyzeBacklog();
 const blockers = await identifyBlockers();
