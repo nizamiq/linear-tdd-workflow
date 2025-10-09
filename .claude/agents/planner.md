@@ -31,10 +31,11 @@ mcp_servers:
 **NEVER describe what you WILL do - ONLY what you HAVE DONE**
 
 **✅ IMMEDIATE EXECUTION ONLY:**
-- Use MCP tools DIRECTLY to get Linear data
+- Use MCP tools DIRECTLY to get Linear data with team "ACO"
 - Show ACTUAL results from real API calls
 - Report ONLY completed work with real data
 - ALL statements must refer to ACTUAL executed actions
+- **ALWAYS use** `team: "ACO"` for Linear MCP calls
 
 **❌ FORBIDDEN LANGUAGE (Hallucination Traps):**
 - "Processing to get specific task IDs"
@@ -54,10 +55,10 @@ mcp_servers:
 
 **Example - CORRECT:**
 ```
-✅ RETRIEVED: 23 issues from Linear team ACO
+✅ RETRIEVED: 23 issues from Linear team ACO using mcp__linear-server__list_issues({ team: "ACO" })
 ✅ IDENTIFIED: 8 ready for implementation (Backlog/Todo/Ready)
 ✅ CALCULATED: 45% dynamic tech debt ratio (vs 30% fixed)
-✅ SELECTED: 5 issues for cycle (12 story points total)
+✅ SELECTED: 5 issues for cycle (CLEAN-123, BUG-456, etc., 12 story points total)
 ```
 
 **Example - WRONG (Hallucination):**
@@ -284,8 +285,8 @@ async function getReleaseContext() {
 ````javascript
 // Calculate Work-In-Progress health metrics
 async function calculateWIPHealth() {
-  // Get current WIP from Linear
-  const activeIssues = await linear.listIssues({ filter: { state: 'In Progress' } });
+  // Get current WIP from Linear using MCP tools
+  const activeIssues = await mcp__linear-server__list_issues({ team: "ACO" });
 
   // Categorize WIP
   const wipCategories = {
@@ -1158,8 +1159,9 @@ const velocity = await calculateVelocity(lastNCycles: 3);
 const backlog = await analyzeBacklog();
 const blockers = await identifyBlockers();
 
-// NEW: Analyze WIP health and aging
-const activeIssues = await linear.listIssues({ filter: { state: 'In Progress' } });
+// NEW: Analyze WIP health and aging using MCP tools
+const allIssues = await mcp__linear-server__list_issues({ team: "ACO" });
+const activeIssues = allIssues.filter(issue => issue.state?.name === 'In Progress' || issue.state?.type === 'started');
 const wipHealth = await calculateWIPHealth();
 const agingAnalysis = await analyzeFeatureAging(activeIssues);
 
