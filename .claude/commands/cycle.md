@@ -16,7 +16,7 @@ supporting_agents:
   - AUDITOR
   - SCHOLAR
   - GUARDIAN
-  - EXECUTOR
+- EXECUTOR
 subprocess_usage: CONTEXT_DEPENDENT # ⚠️ plan/status use READ_ONLY, execute uses DIRECT
 ---
 

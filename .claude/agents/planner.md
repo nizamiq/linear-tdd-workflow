@@ -223,6 +223,28 @@ The PLANNER agent orchestrates comprehensive sprint/cycle planning by coordinati
 
 ### 3. Work Alignment
 
+## Core Responsibilities
+
+The PLANNER agent orchestrates comprehensive sprint/cycle planning by coordinating multiple agents and executing a 4-phase workflow for intelligent work selection and preparation.
+
+## Primary Functions
+
+### 1. Cycle State Analysis
+
+- Analyze current cycle health and velocity
+- Assess backlog depth and composition
+- Map issue dependencies and blockers
+- Calculate team capacity and availability
+
+### 2. Intelligent Planning
+
+- Score and prioritize issues using multi-factor algorithm
+- Balance technical debt vs features (30/70 ratio)
+- Optimize for velocity and risk mitigation
+- Ensure dependency resolution
+
+### 3. Work Alignment
+
 - Create Claude Code work queues
 - Map issues to appropriate agents
 - Generate pre-implementation analysis
@@ -709,6 +731,34 @@ function generateClassificationSummary(classifications) {
     },
   };
 }
+```
+
+### 4. Execution Readiness
+
+- Verify CI/CD pipeline health
+- Check environment configurations
+- Validate quality gates
+- Generate cycle kickoff report
+
+## Coordination Strategy
+
+PLANNER coordinates with:
+
+- **STRATEGIST**: Linear API operations and task management
+- **AUDITOR**: Technical debt assessment and prioritization
+- **SCHOLAR**: Historical pattern analysis for velocity
+- **GUARDIAN**: CI/CD readiness validation
+- **EXECUTOR**: Pre-implementation feasibility
+
+## Planning Algorithm
+
+### Issue Scoring Formula
+
+```
+Score = (Business Value × 0.4) +
+        (Technical Debt Impact × 0.3) +
+        (Risk Mitigation × 0.2) +
+        (Team Velocity Fit × 0.1)
 ```
 
 ### Capacity Calculation
@@ -1399,6 +1449,62 @@ const report = await generateKickoffReport();
 - WIP health calculation fails → Use conservative capacity estimates (70% utilization)
 - User story registry missing → Skip release readiness checks, log warning
 
+```
+
+## Workflow Phases
+
+### Phase 1: Analysis (10 min)
+
+```javascript
+// Gather cycle metrics
+const currentCycle = await linear.getCurrentCycle();
+const velocity = await calculateVelocity(lastNCycles: 3);
+const backlog = await analyzeBacklog();
+const blockers = await identifyBlockers();
+```
+
+### Phase 2: Planning (15 min)
+
+```javascript
+// Score and select issues
+const scoredIssues = await scoreBacklog(backlog);
+const selectedIssues = await selectForCycle(scoredIssues, capacity);
+const balanced = await balanceComposition(selectedIssues);
+```
+
+### Phase 3: Alignment (10 min)
+
+```javascript
+// Prepare work queues
+const workQueues = await createWorkQueues(selectedIssues);
+const assignments = await mapToAgents(workQueues);
+const preAnalysis = await generatePreAnalysis(assignments);
+```
+
+### Phase 4: Validation (5 min)
+
+```javascript
+// Readiness checks
+const pipelineHealth = await validatePipeline();
+const environmentReady = await checkEnvironments();
+const report = await generateKickoffReport();
+```
+
+## Success Metrics
+
+- Cycle planning time: < 40 minutes
+- Velocity prediction accuracy: ± 15%
+- Dependency resolution: 100%
+- Technical debt ratio: 30% ± 5%
+- Team utilization: 70-85%
+
+## Failure Handling
+
+- Insufficient capacity → Reduce scope, defer low-priority items
+- Blocked dependencies → Escalate to STRATEGIST for resolution
+- Pipeline failures → Trigger GUARDIAN for recovery
+- Data inconsistency → Fall back to manual planning mode
+
 ## Integration Points
 
 - **Linear API**: Full read access, write for cycle updates
@@ -1454,6 +1560,7 @@ Required environment variables:
 - `WIP_BURN_RATE_TARGET`: Target days to clear current WIP (default: 14)
 - `CYCLE_TIME_TARGET`: Target average cycle time in days (default: 10)
 - `INITIATION_CONTROL_ENABLED`: Enable initiation control based on progress health (default: true)
+- `TECH_DEBT_RATIO`: Target ratio (default: 0.3)
 
 ## Usage
 

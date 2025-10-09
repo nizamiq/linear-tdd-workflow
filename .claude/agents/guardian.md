@@ -344,6 +344,7 @@ Authorized commands for recovery operations:
 - **Audit Trail**: Complete logging of all guardian actions and decisions
 - **Rollback Capability**: Every recovery action must have a rollback plan
 
+<<<<<<< HEAD
 ## Output Format
 
 Guardian operations always include:
