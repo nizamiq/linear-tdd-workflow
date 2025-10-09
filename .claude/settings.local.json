@@ -38,7 +38,8 @@
       "Bash(gh run view:*)",
       "Bash(test:*)",
       "Read(//home/cnross/.claude/**)",
-      "Bash(npm test:*)"
+      "Bash(npm test:*)",
+      "WebSearch"
     ],
     "deny": [],
     "ask": []

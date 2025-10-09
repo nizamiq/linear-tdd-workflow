@@ -16,7 +16,7 @@ supporting_agents:
   - AUDITOR
   - SCHOLAR
   - GUARDIAN
-subprocess_usage: READ_ONLY_ANALYSIS # ⚠️ Subprocesses do NOT make state changes
+subprocess_usage: CONTEXT_DEPENDENT # ⚠️ plan/status use READ_ONLY, execute uses DIRECT
 ---
 
 # /cycle - Sprint/Cycle Planning Command
@@ -138,18 +138,29 @@ Quick health check of current cycle:
 
 ### `/cycle execute`
 
-**ACTUAL EXECUTION - NOT REPORT GENERATION**
+**DEPLOY SUBAGENTS IN MAIN CONTEXT - NOT SUBPROCESSES**
 
-Deploy subagents immediately to begin implementing the planned cycle work:
+Deploy subagents that can persist work to the user's workspace:
 
-1. **Deploy executor subagents** to implement selected tasks
-2. **Deploy guardian subagents** for CI/CD validation and monitoring
-3. **Deploy auditor subagents** for quality checks and technical debt management
-4. **Activate real work queues** - not theoretical planning
-5. **Begin immediate implementation** of selected Linear tasks via Task tool
-6. **Track actual progress** and report completed work, not intentions
+1. **Retrieve current cycle** from Linear MCP
+2. **Identify ready work items** (Backlog/Todo/Ready status)
+3. **DEPLOY SUBAGENTS via Task tool** to execute work:
+   - Use `Task({ subagent_type: "executor", ... })` for fixes
+   - Use `Task({ subagent_type: "guardian", ... })` for CI/CD
+   - Use `Task({ subagent_type: "auditor", ... })` for quality checks
+4. **VERIFY subagent work** by checking actual tool output:
+   - Files were actually created/modified
+   - Git commits have real hashes
+   - Tests actually pass/fail
+   - Linear tasks actually updated
+5. **REPORT ONLY VERIFIED WORK** - no simulations or analyses
 
-**KEY DISTINCTION**: This subcommand DOES work, it doesn't DESCRIBE work.
+**CRITICAL**: Subagents run in main context where their work persists, NOT in isolated subprocesses.
+
+**ABSOLUTELY FORBIDDEN**:
+- ❌ Reporting "analyses and simulations"
+- ❌ Describing work without showing actual tool output
+- ❌ Saying "agents were deployed" without actual Task tool results
 
 ### `/cycle review`
 

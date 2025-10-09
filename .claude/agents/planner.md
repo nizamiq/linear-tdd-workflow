@@ -1357,24 +1357,27 @@ Invoked via `/cycle` slash command:
 ### IMMEDIATE ACTIONS:
 1. Get current active cycle from Linear MCP
 2. Get work items (Backlog/Todo/Ready) from Linear
-3. MAKE TASK TOOL CALLS NOW:
+3. EXECUTE WORK DIRECTLY IN MAIN CONTEXT:
+   - **DO NOT** use Task tool to spawn subprocesses (they won't persist work)
+   - **DO** perform work directly using available tools (Read, Write, Edit, Bash)
+   - **DO** verify each action with actual tool output
+   - **DO** commit changes and create PRs in main context
 
+### EXECUTION INSTRUCTIONS:
 ```
-Task({
-  subagent_type: "executor",
-  prompt: "Implement TASK-ID using strict TDD. RED→GREEN→REFACTOR immediately."
-})
-
-Task({
-  subagent_type: "guardian",
-  prompt: "Fix TASK-ID immediately. Validate CI/CD pipeline."
-})
-
-Task({
-  subagent_type: "auditor",
-  prompt: "Complete TASK-ID immediately. Quality checks and improvements."
-})
+# For each ready work item:
+1. Use Read/Edit/Bash tools directly to implement
+2. Verify changes persist with git status/log
+3. Run tests to verify implementation
+4. Commit changes with proper TDD labels
+5. Create PRs and link to Linear tasks
 ```
+
+### PROHIBITED ACTIONS:
+- ❌ DO NOT deploy subagents via Task tool for implementation work
+- ❌ DO NOT report "agents deployed" unless actually happened
+- ❌ DO NOT describe analytical work without performing it
+- ❌ DO NOT create progress reports without ground truth verification
 
 ### REPORTING RULES:
 - ONLY report actual Task tool results
@@ -1390,6 +1393,17 @@ Task({
 - ❌ "The cycle is now LIVE and all systems are operational!"
 - ❌ "Agents can begin working on their assigned tasks"
 - ❌ "Work queues are activated and ready"
+- ❌ "agent-generated analyses and simulations"
+- ❌ "theoretical planning results"
+- ❌ "hypothetical task completion"
+- ❌ "simulated progress reports"
+
+### MANDATORY VERIFICATION:
+- ✅ Show actual Linear task IDs retrieved
+- ✅ Display real tool output for actions taken
+- ✅ Provide git commit hashes for any changes
+- ✅ Include actual test results
+- ✅ Verify PRs exist with real URLs
 
 ## Dependencies
 
