@@ -2,7 +2,7 @@
 name: cycle
 description: Automated sprint/cycle planning and management using orchestrator-workers pattern
 agent: PLANNER
-execution_mode: CONTEXT_DEPENDENT # plan/status use ORCHESTRATOR, execute uses DIRECT
+execution_mode: CONTEXT_DEPENDENT # plan/status use READ_ONLY subagents, execute uses WRITE subagents
 usage: '/cycle [plan|status|execute|review]'
 parameters:
   - name: subcommand
@@ -17,7 +17,7 @@ supporting_agents:
   - SCHOLAR
   - GUARDIAN
 - EXECUTOR
-subprocess_usage: CONTEXT_DEPENDENT # ⚠️ plan/status use READ_ONLY, execute uses DIRECT
+subagent_usage: CONTEXT_DEPENDENT # ⚠️ plan/status use READ_ONLY subagents, execute uses WRITE subagents
 ---
 
 # /cycle - Sprint/Cycle Planning Command
@@ -28,27 +28,28 @@ This command uses different execution patterns depending on the subcommand:
 
 ### For `/cycle plan` and `/cycle status` (Analysis Mode):
 
-Uses the **ORCHESTRATOR mode** where:
+Uses **READ-ONLY subagents** where:
 
-- **Main agent (PLANNER)** orchestrates workflow and makes decisions in main context
-- **Worker subprocesses** perform READ-ONLY analysis tasks (fetch data, calculate metrics)
-- **NO subprocess writes** - all Linear updates happen in main context
+- **Main agent (PLANNER)** orchestrates workflow and makes decisions
+- **Worker subagents** perform READ-ONLY analysis tasks via Task tool
+- **Subagents fetch and analyze data** - return results to orchestrator
+- **PLANNER makes all state changes** in main context (Linear updates, etc.)
 
-**Safe subprocess usage (READ-ONLY):**
+**Subagent responsibilities (READ-ONLY):**
 
-- ✅ Fetching Linear issues and cycles
-- ✅ Analyzing git history
-- ✅ Calculating metrics and scoring
-- ✅ Generating recommendations
+- ✅ Fetching Linear issues and cycles (read operations)
+- ✅ Analyzing git history (read operations)
+- ✅ Calculating metrics and scoring (analysis)
+- ✅ Generating recommendations (analysis)
 
-**Prohibited in subprocesses (WRITE operations):**
+**Reserved for main context (WRITE operations):**
 
-- ❌ Creating Linear cycles
-- ❌ Updating issue states
-- ❌ Making git commits
-- ❌ Creating PRs
+- ❌ Creating Linear cycles (orchestrator does this)
+- ❌ Updating issue states (orchestrator does this)
+- ❌ Making git commits (not needed for analysis)
+- ❌ Creating PRs (not needed for analysis)
 
-**Rule:** Subprocesses return DATA, main context makes CHANGES.
+**Rule:** Worker subagents return DATA, orchestrator makes CHANGES.
 
 ## Overview
 
@@ -108,9 +109,9 @@ Quick health check of current cycle:
 
 ### `/cycle execute`
 
-**DEPLOY SUBAGENTS IN MAIN CONTEXT - NOT SUBPROCESSES**
+**DEPLOY WRITE-ENABLED SUBAGENTS**
 
-Deploy subagents that can persist work to the user's workspace:
+Deploy subagents with full write permissions to execute cycle work:
 
 1. **Retrieve current cycle** from Linear MCP
 2. **Identify ready work items** (Backlog/Todo/Ready status)
@@ -125,7 +126,7 @@ Deploy subagents that can persist work to the user's workspace:
    - Linear tasks actually updated
 5. **REPORT ONLY VERIFIED WORK** - no simulations or analyses
 
-**CRITICAL**: Subagents run in main context where their work persists, NOT in isolated subprocesses.
+**CRITICAL**: These subagents have full write permissions. Their changes persist to the user's workspace.
 
 **ABSOLUTELY FORBIDDEN**:
 
