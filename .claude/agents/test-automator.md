@@ -29,7 +29,6 @@ tools:
 mcp_servers:
   - context7
   - sequential-thinking
-  - linear-server
 ---
 
 # TEST-AUTOMATOR - Test Automation & TDD Excellence Expert

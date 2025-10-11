@@ -18,7 +18,6 @@ tools:
   - Bash
 mcp_servers:
   - context7
-  - linear-server
   - sequential-thinking
 loop_controls:
   max_iterations: 15

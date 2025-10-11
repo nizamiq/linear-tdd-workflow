@@ -60,7 +60,6 @@ tools:
 mcp_servers:
   - context7
   - sequential-thinking
-  - linear-server
 loop_controls:
   max_iterations: 3
   max_time_seconds: 720
@@ -1059,7 +1058,8 @@ Result: Success - 47 matches found
 
 - **context7**: Deep code understanding and pattern analysis
 - **sequential-thinking**: Complex reasoning for assessment decisions
-- **linear-server**: Create CLEAN-XXX tasks for identified issues
+
+**Note:** AUDITOR does not have direct Linear access. Generate task definitions in `proposals/issues-*.json` format and delegate to STRATEGIST for Linear task creation.
 
 ### Concurrency
 

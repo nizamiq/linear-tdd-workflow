@@ -44,7 +44,6 @@ tools:
   - Grep
 mcp_servers:
   - kubernetes
-  - linear-server
 ---
 
 # OBSERVABILITY-ENGINEER - Observability & Monitoring Expert

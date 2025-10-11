@@ -40,7 +40,6 @@ tools:
 mcp_servers:
   - context7
   - kubernetes
-  - linear-server
 ---
 
 # DEPLOYMENT-ENGINEER - CI/CD Pipeline & Deployment Automation Expert

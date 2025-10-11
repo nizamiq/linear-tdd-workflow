@@ -14,7 +14,6 @@ tools:
   - Bash
 mcp_servers:
   - playwright
-  - linear-server
 ---
 
 # VALIDATOR - Professional Quality Gate & Deployment Readiness Enforcer

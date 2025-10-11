@@ -42,7 +42,6 @@ tools:
   - Grep
 mcp_servers:
   - context7
-  - linear-server
 ---
 
 # DJANGO-PRO - Django Framework & Architecture Expert

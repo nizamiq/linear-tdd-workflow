@@ -15,7 +15,6 @@ tools:
   - Glob
 mcp_servers:
   - sequential-thinking
-  - linear-server
 loop_controls:
   max_iterations: 20
   max_time_seconds: 3600

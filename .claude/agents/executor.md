@@ -32,7 +32,6 @@ tools:
   - Bash
 mcp_servers:
   - context7
-  - linear-server
 loop_controls:
   max_iterations: 5
   max_time_seconds: 900
@@ -872,6 +871,8 @@ Authorized commands for development workflow:
 ### MCP Server Integration
 
 - **context7**: Use for deep code understanding and pattern analysis
+
+**Note:** EXECUTOR does not have direct Linear access. Provide structured `linear_update` output in your responses for STRATEGIST to update Linear tasks.
 
 ## Metrics & Tracking
 

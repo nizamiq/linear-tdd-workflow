@@ -38,7 +38,6 @@ tools:
 mcp_servers:
   - context7
   - sequential-thinking
-  - linear-server
 ---
 
 # DATABASE-OPTIMIZER - PostgreSQL Performance & Optimization Expert
