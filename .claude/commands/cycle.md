@@ -50,60 +50,9 @@ Uses the **ORCHESTRATOR mode** where:
 
 **Rule:** Subprocesses return DATA, main context makes CHANGES.
 
-### For `/cycle execute` (Execution Mode):
-
-Uses **DIRECT mode** where:
-
-- **Main agent (PLANNER)** performs work directly in main context
-- **NO subprocess deployment** - all work happens in main context where changes persist
-- **Direct tool usage** - Read, Write, Edit, Bash tools affect actual workspace
-- **Real work is performed** - files are modified, PRs are created, tasks are updated
-
-**Critical for `/cycle execute`:**
-
-- ✅ Use Read/Write/Edit tools directly to modify files
-- ✅ Use Bash commands directly to make git commits
-- ✅ Create PRs directly using available tools
-- ✅ Update Linear tasks directly with MCP
-- ✅ Verify work persists with actual tool output
-
-**ABSOLUTELY FORBIDDEN for `/cycle execute`:**
-
-- ❌ DO NOT use Task tool to spawn subagents for implementation work
-- ❌ DO NOT provide "instructions and plans" instead of actual work
-- ❌ DO NOT report "agents deployed" without real tool output
-- ❌ DO NOT create theoretical implementation guides
-
-**KEY DISTINCTION:**
-
-- `/cycle plan` = Analyze and plan (READ-ONLY subprocess workers)
-- `/cycle execute` = Direct execution in main context (NO subprocesses for work)
-
 ## Overview
 
 Comprehensive cycle planning automation that analyzes backlog, calculates capacity, selects optimal work items, and prepares the team for sprint execution.
-
-## 🤖 Execution Instructions for Claude Code
-
-When user invokes `/cycle [subcommand]`:
-
-1. **Read command parameters** from user input
-2. **DETERMINE EXECUTION MODE** based on subcommand:
-   - `/cycle plan` or `/cycle status` → Use **ORCHESTRATOR mode**
-   - `/cycle execute` → Use **DIRECT mode**
-   - `/cycle review` → Use **ORCHESTRATOR mode**
-3. **EXECUTE ACCORDINGLY**:
-   - **ORCHESTRATOR mode**: Invoke PLANNER agent via Task tool (spawns READ-ONLY workers)
-   - **DIRECT mode**: Claude Code executes work directly using available tools
-4. **Wait for results** and present to user
-5. **Handle approval gates** only for Linear operations
-
-**CRITICAL for `/cycle execute`:**
-- DO NOT invoke PLANNER via Task tool (would create subprocess)
-- Claude Code must execute work DIRECTLY using Read/Write/Edit/Bash tools
-- Follow the DIRECT execution instructions in the PLANNER agent file
-
-**DO NOT ask for permission** - Execute according to the determined mode.
 
 ## Usage
 
