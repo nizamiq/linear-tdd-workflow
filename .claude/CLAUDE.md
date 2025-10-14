@@ -453,11 +453,20 @@ Specialists:
 
 ### Linear Task Management
 
-**STRATEGIST is the EXCLUSIVE Linear MCP manager.**
+**STRATEGIST is the PRIMARY Linear MCP manager, with PLANNER having limited access for cycle operations.**
 
 **Permission Model:**
 
-- **STRATEGIST**: ONLY agent with `linear-server` MCP access
+- **STRATEGIST**: Full Linear MCP access for all task management operations
+  - Creates/updates/queries any Linear tasks
+  - Manages issue status, assignments, labels
+  - Links PRs to issues via GitHub CLI
+  - Handles CLEAN-XXX, DOC-XXX, INCIDENT-XXX tasks
+- **PLANNER**: Limited Linear MCP access ONLY for cycle planning workflow
+  - Creates Linear cycles during `/cycle plan` (Phase 4.5)
+  - Adds issues to cycles using `mcp__linear-server__update_issue()`
+  - Uses dynamic team discovery via `LINEAR_TEAM_ID` or `discoverLinearTeam()`
+  - Rate-limited batch processing (5 issues/batch, 200ms delays)
 - **AUDITOR**: Generates task definitions → delegates to STRATEGIST
 - **DOC-KEEPER**: Generates doc tasks → delegates to STRATEGIST
 - **GUARDIAN**: Reports incidents → STRATEGIST creates INCIDENT-XXX
@@ -471,7 +480,15 @@ Specialists:
 3. STRATEGIST reads output and creates Linear tasks via MCP
 4. User receives Linear task IDs
 
-**When in doubt about Linear operations, use STRATEGIST.**
+**Special Case - Cycle Planning:**
+
+1. User runs `/cycle plan`
+2. PLANNER analyzes backlog and generates capacity-based plan (Phases 1-4)
+3. PLANNER presents plan with approval gate (Phase 4.5)
+4. On approval, PLANNER creates Linear cycle and adds issues
+5. PLANNER returns cycle ID and URL
+
+**When in doubt about Linear operations, use STRATEGIST. For cycle planning, use PLANNER.**
 
 ### Key Workflows
 
@@ -671,6 +688,282 @@ When working with agents:
 **Agent specs:** `.claude/agents/`
 **Commands:** `.claude/commands/`
 **Journeys:** `.claude/journeys/`
+
+## Troubleshooting Cycle Commands
+
+### `/cycle plan` Issues
+
+**Problem: PLANNER doesn't create Linear cycle**
+
+**Symptoms:**
+- Plan generated but no cycle created in Linear.app
+- "Would you like me to create this cycle?" prompt never appears
+- No approval gate shown
+
+**Root Cause:**
+- Missing Phase 4.5 approval gate
+- PLANNER not configured with Linear MCP access
+
+**Solution:**
+1. Verify Phase 4.5 exists in `.claude/commands/cycle.md`:
+   ```bash
+   grep -A 5 "Phase 4.5" .claude/commands/cycle.md
+   ```
+2. Check PLANNER has `createLinearCycle()` function in `.claude/agents/planner.md`:
+   ```bash
+   grep -A 10 "createLinearCycle" .claude/agents/planner.md
+   ```
+3. Ensure `LINEAR_TEAM_ID` is set:
+   ```bash
+   echo $LINEAR_TEAM_ID  # Should show your team ID (e.g., "ACO")
+   ```
+4. Verify Linear MCP server is configured in `.claude/mcp.json`:
+   ```bash
+   cat .claude/mcp.json | grep linear-server
+   ```
+
+**Problem: Partial success - cycle created but issues not added**
+
+**Symptoms:**
+- Cycle exists in Linear.app
+- Some or all issues not added to cycle
+- Error messages like "Failed to add issue XXX"
+
+**Root Cause:**
+- API rate limiting
+- Invalid issue IDs
+- Permission issues
+
+**Solution:**
+1. Check batch size and delay settings (should be 5 issues/batch, 200ms delay)
+2. Verify all issue IDs exist in Linear:
+   ```bash
+   # Use Linear MCP to check issue
+   mcp linear-server get_issue --id=ISSUE-123
+   ```
+3. Check PLANNER has permission to update issues
+4. Review error logs for specific failure reasons
+
+**Problem: Dynamic team discovery fails**
+
+**Symptoms:**
+- Error: "Could not discover Linear team"
+- Cycle creation fails with team ID error
+
+**Root Cause:**
+- `LINEAR_TEAM_ID` not set
+- Linear API credentials missing
+- `discoverLinearTeam()` function missing
+
+**Solution:**
+1. Set `LINEAR_TEAM_ID` explicitly:
+   ```bash
+   export LINEAR_TEAM_ID=ACO  # Replace with your team ID
+   ```
+2. Verify Linear API key is configured
+3. Check `discoverLinearTeam()` function exists in planner.md
+
+### `/cycle execute` Issues
+
+**Problem: Subagents don't persist work**
+
+**Symptoms:**
+- Subagent reports "work complete" but no actual changes
+- No git commits exist
+- No PRs created
+- Tests not modified
+
+**Root Cause:**
+- Vague subagent instructions
+- Subagent analyzing instead of executing
+- No verification phase (Phase 5)
+
+**Solution:**
+1. Verify explicit execution instructions in `.claude/commands/cycle.md`:
+   ```bash
+   grep -A 20 "IMMEDIATE EXECUTION" .claude/commands/cycle.md
+   ```
+2. Check for "DO NOT analyze - EXECUTE IMMEDIATELY" directive
+3. Ensure Phase 5 verification exists:
+   ```bash
+   grep -A 10 "Phase 5: Verification" .claude/commands/cycle.md
+   ```
+4. Run manual verification:
+   ```bash
+   # Check for commits
+   git log --oneline -5
+
+   # Check for modified files
+   git status
+
+   # Check for PRs
+   gh pr list
+   ```
+
+**Problem: Verification phase reports false positives**
+
+**Symptoms:**
+- Verification says "work complete" but files unchanged
+- No git commits found during verification
+- PR checks fail
+
+**Root Cause:**
+- Missing `verifySubagentWork()` function
+- No ground truth checks
+- Verification relying on subagent reports instead of actual output
+
+**Solution:**
+1. Verify `verifySubagentWork()` exists in `.claude/agents/planner.md`:
+   ```bash
+   grep -A 30 "verifySubagentWork" .claude/agents/planner.md
+   ```
+2. Check function uses ground truth verification:
+   - `git status --porcelain` for file changes
+   - `git log` for commits
+   - `gh pr view` for PRs
+   - Linear MCP for task status
+3. Ensure function returns verification report with boolean flags
+4. Review verification report output for accuracy
+
+**Problem: Subagents fail with "no write permission"**
+
+**Symptoms:**
+- Error: "Cannot write to file"
+- Subagent reports permission denied
+- Changes not saved
+
+**Root Cause:**
+- Subagent not using Write/Edit tools
+- File permissions issue
+- Incorrect file paths
+
+**Solution:**
+1. Check execution instructions specify Write/Edit/Bash tools
+2. Verify file paths are absolute:
+   ```bash
+   pwd  # Check current directory
+   ```
+3. Check file permissions:
+   ```bash
+   ls -la path/to/file
+   ```
+4. Ensure subagent has explicit instruction to use tools
+
+**Problem: TDD cycle not enforced during execution**
+
+**Symptoms:**
+- Production code written before tests
+- No RED phase verification
+- Coverage gates not checked
+
+**Root Cause:**
+- EXECUTOR not invoked for implementation
+- TDD instructions missing from subagent prompt
+
+**Solution:**
+1. Use EXECUTOR agent for fix implementation:
+   ```bash
+   /fix CLEAN-123  # Uses EXECUTOR with TDD enforcement
+   ```
+2. If using custom subagents, add TDD instructions:
+   ```
+   MANDATORY TDD CYCLE:
+   1. Write failing test (RED)
+   2. Minimal code to pass (GREEN)
+   3. Refactor with tests passing (REFACTOR)
+   ```
+3. Add coverage verification to Phase 5:
+   ```bash
+   npm test -- --coverage --changedSince=HEAD~1
+   ```
+
+### Common Configuration Issues
+
+**Problem: Environment variables not loaded**
+
+**Symptoms:**
+- `LINEAR_TEAM_ID` undefined
+- `LINEAR_PROJECT_ID` undefined
+- Cycle creation uses wrong team
+
+**Solution:**
+```bash
+# Check current values
+echo $LINEAR_TEAM_ID
+echo $LINEAR_PROJECT_ID
+
+# Set in current session
+export LINEAR_TEAM_ID=ACO
+export LINEAR_PROJECT_ID=your-project-id
+
+# Set permanently in ~/.zshrc or ~/.bashrc
+echo 'export LINEAR_TEAM_ID=ACO' >> ~/.zshrc
+source ~/.zshrc
+```
+
+**Problem: MCP server not responding**
+
+**Symptoms:**
+- Linear commands timeout
+- "MCP server unreachable" error
+- Cycle creation fails
+
+**Solution:**
+```bash
+# Check MCP configuration
+cat .claude/mcp.json
+
+# Test Linear MCP
+mcp linear-server get_team --id=$LINEAR_TEAM_ID
+
+# Restart Claude Code if needed
+```
+
+### Quick Diagnostic Commands
+
+```bash
+# Check cycle plan implementation
+grep -r "Phase 4.5" .claude/commands/cycle.md
+
+# Check cycle execute implementation
+grep -r "Phase 5" .claude/commands/cycle.md
+
+# Verify PLANNER functions
+grep -A 5 "createLinearCycle\|verifySubagentWork" .claude/agents/planner.md
+
+# Check environment
+env | grep LINEAR
+
+# Test E2E tests
+npm test tests/e2e/cycle-plan.test.js
+npm test tests/e2e/cycle-execute.test.js
+
+# View recent test reports
+cat tests/e2e/results/cycle-plan-e2e-report.json
+cat tests/e2e/results/cycle-execute-e2e-report.json
+```
+
+### Getting Help
+
+If issues persist after troubleshooting:
+
+1. **Check E2E test results** for specific failures:
+   ```bash
+   npm test:e2e -- --verbose
+   ```
+
+2. **Review implementation docs**:
+   - `.claude/docs/CYCLE-COMMAND-FIXES.md` - Complete implementation details
+   - `.claude/agents/planner.md` - PLANNER agent specification
+   - `.claude/commands/cycle.md` - Cycle command specification
+
+3. **Run diagnostic commands** above to identify root cause
+
+4. **File issue** with:
+   - Error messages
+   - Test results
+   - Configuration values (sanitize sensitive data)
+   - Output from diagnostic commands
 
 ## Quick Reference
 
