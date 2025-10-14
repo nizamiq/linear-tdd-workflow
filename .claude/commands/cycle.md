@@ -98,6 +98,25 @@ Executes the complete 4-phase planning workflow:
 - Quality gate verification
 - Kickoff report generation
 
+**Phase 4.5: Linear Cycle Creation (Approval Gate)**
+
+After generating the plan, PLANNER will:
+
+1. **Present Plan** to user with selected work items, capacity analysis, and technical debt ratio
+2. **ASK FOR APPROVAL**: "Would you like me to create this cycle in Linear?"
+3. **On approval**:
+   - Create Linear cycle using `mcp__linear-server__create_cycle()`
+   - Add selected issues to cycle using `mcp__linear-server__update_issue()`
+   - Return cycle ID and Linear URL
+4. **On rejection**: Save plan to file for manual review
+
+**Implementation Notes:**
+
+- Use environment variable `LINEAR_TEAM_ID` or dynamic team discovery
+- Create cycle first, then add issues one by one
+- If failure occurs, report partial success with cycle ID
+- Batch issue updates (5 at a time) with 200ms delays between batches
+
 ### `/cycle status`
 
 Quick health check of current cycle:
@@ -115,16 +134,82 @@ Deploy subagents with full write permissions to execute cycle work:
 
 1. **Retrieve current cycle** from Linear MCP
 2. **Identify ready work items** (Backlog/Todo/Ready status)
-3. **DEPLOY SUBAGENTS via Task tool** to execute work:
-   - Use `Task({ subagent_type: "executor", ... })` for fixes
-   - Use `Task({ subagent_type: "guardian", ... })` for CI/CD
-   - Use `Task({ subagent_type: "auditor", ... })` for quality checks
+3. **DEPLOY SUBAGENTS via Task tool** with **EXPLICIT EXECUTION INSTRUCTIONS**:
+
+**Subagent Invocation Pattern (CORRECT):**
+
+```javascript
+// CORRECT: Explicit write instructions for EXECUTOR
+Task({
+  subagent_type: "executor",
+  description: "Implement CLEAN-123",
+  prompt: `
+    IMMEDIATE EXECUTION REQUIRED:
+
+    1. Read Linear task CLEAN-123 details
+    2. Create feature branch: feature/CLEAN-123-description
+    3. Write failing test (RED phase)
+    4. Implement minimal code (GREEN phase)
+    5. Refactor (REFACTOR phase)
+    6. Commit with actual git commands
+    7. Create PR with gh cli
+    8. Return PR URL and commit hashes
+
+    DO NOT analyze or plan - EXECUTE IMMEDIATELY.
+    Use Write/Edit/Bash tools to make actual changes.
+    Verify all changes with git status, test output.
+  `
+});
+
+// WRONG: Vague analysis-focused prompt
+Task({
+  subagent_type: "executor",
+  description: "Fix CLEAN-123",
+  prompt: "Analyze and implement the fix for CLEAN-123"  // ❌ TOO VAGUE
+});
+```
+
 4. **VERIFY subagent work** by checking actual tool output:
-   - Files were actually created/modified
-   - Git commits have real hashes
-   - Tests actually pass/fail
-   - Linear tasks actually updated
-5. **REPORT ONLY VERIFIED WORK** - no simulations or analyses
+   - Files were actually created/modified (`git status`)
+   - Git commits have real hashes (`git log --oneline -3`)
+   - PRs actually exist (`gh pr view <number> --json url`)
+   - Linear tasks actually updated (Linear MCP query)
+   - Tests actually pass (`npm test`)
+
+5. **REPORT ONLY VERIFIED WORK** with concrete evidence:
+
+**Example Verified Report:**
+
+```
+✅ VERIFIED WORK COMPLETION
+
+Task CLEAN-123:
+- Commit: a1b2c3d (verified via git log)
+- PR: #456 (verified via gh pr view)
+- Linear: In Progress (verified via Linear MCP)
+- Files: src/auth.ts modified (verified via git diff)
+- Tests: 15 passing (verified via npm test)
+
+Task CLEAN-124:
+- Commit: e4f5g6h
+- PR: #457
+- Linear: In Progress
+- Files: src/api.ts modified
+- Tests: 8 passing
+```
+
+**Phase 5: Verification (MANDATORY)**
+
+After subagent deployment:
+
+1. **Wait for subagents to complete** (collect Task tool results)
+2. **Verify actual work happened:**
+   - Run `git log` to show new commits
+   - Run `git status` to show clean working directory
+   - Run `gh pr list` to show new PRs
+   - Query Linear MCP to show tasks updated to "In Progress"
+3. **Report ONLY verified work** with actual evidence
+4. **Flag failures** if verification fails
 
 **CRITICAL**: These subagents have full write permissions. Their changes persist to the user's workspace.
 
@@ -133,6 +218,7 @@ Deploy subagents with full write permissions to execute cycle work:
 - ❌ Reporting "analyses and simulations"
 - ❌ Describing work without showing actual tool output
 - ❌ Saying "agents were deployed" without actual Task tool results
+- ❌ Claiming work is done without git/PR/Linear verification
 
 ### `/cycle review`
 
