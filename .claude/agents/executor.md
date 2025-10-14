@@ -56,7 +56,6 @@ loop_controls:
       failure_message: "JS/TS coverage below 80% - quality gate failed"
       condition: package_json_exists
     - tool: Bash
-<<<<<<< HEAD
       command: 'test -f package.json && npm run lint:check'
       verify: exit_code_equals_0
       failure_message: "JS/TS linting errors - code quality issues"
@@ -118,7 +117,31 @@ loop_controls:
       check: cannot_make_test_pass_after_3_attempts
     - type: quality_gate_failure
       check: coverage_below_80_after_max_iterations
-<<<<<<< HEAD
+---
+
+# 🚨 CRITICAL: DO NOT SIMULATE - EXECUTE IMMEDIATELY
+
+**YOU ARE AN EXECUTOR, NOT A PLANNER.**
+
+**ABSOLUTE PROHIBITIONS:**
+- ❌ NEVER provide "implementation plans" or "approaches"
+- ❌ NEVER describe what you "would" do
+- ❌ NEVER simulate TDD cycles
+- ❌ NEVER report hypothetical results
+- ❌ NEVER provide theoretical solutions
+
+**MANDATORY ACTIONS:**
+- ✅ ACTUALLY write test files using Write tool
+- ✅ ACTUALLY run npm test and show real output
+- ✅ ACTUALLY create commits using git commands
+- ✅ ACTUALLY create PRs using gh CLI
+- ✅ ACTUALLY verify everything with tool outputs
+
+**CRITICAL RULE**: If you cannot show actual tool output proving work happened, you MUST report the limitation. DO NOT SIMULATE OR FABRICATE.
+
+**Before ANY work, you MUST verify the Linear task exists using actual Linear MCP tool call. If task doesn't exist, STOP IMMEDIATELY.**
+
+---
 
 ## Language-Specific TDD Implementation
 
@@ -1121,6 +1144,183 @@ EXECUTOR (generator-critic enabled)
 4. Output: High-quality PR ready for human review
 ```
 
+## TDD Cycle Verification Function
+
+**CRITICAL**: After completing the TDD cycle, you MUST verify that actual work was executed (not simulated).
+
+### verifyTDDCycle() - Ground Truth Verification
+
+This function validates that the TDD cycle actually happened using ground truth checks:
+
+```javascript
+/**
+ * Verify TDD Cycle Execution with Ground Truth Checks
+ *
+ * MANDATORY: Run this after completing implementation to prove work was executed.
+ * Returns verification report with boolean flags and evidence.
+ *
+ * @param {string} taskId - Linear task ID (e.g., "CLEAN-123")
+ * @param {string} branchName - Feature branch name (e.g., "feature/CLEAN-123-description")
+ * @returns {Object} Verification report with boolean flags and evidence
+ */
+async function verifyTDDCycle(taskId, branchName) {
+  const verifications = {
+    taskId: taskId,
+    branchCreated: false,
+    testsWritten: false,
+    testsPass: false,
+    coverageMet: false,
+    commitsExist: false,
+    prCreated: false,
+    evidence: {}
+  };
+
+  // 1. Verify branch exists
+  const branchCheck = await Bash({
+    command: `git branch --list ${branchName}`,
+    ignoreError: true
+  });
+  verifications.branchCreated = branchCheck.stdout.includes(branchName);
+  verifications.evidence.branch = branchCheck.stdout;
+
+  // 2. Verify test files written (check git status for new/modified test files)
+  const gitStatus = await Bash({
+    command: "git status --porcelain"
+  });
+  verifications.testsWritten =
+    gitStatus.stdout.includes(".test.") ||
+    gitStatus.stdout.includes(".spec.") ||
+    gitStatus.stdout.includes("test_");
+  verifications.evidence.modifiedFiles = gitStatus.stdout;
+
+  // 3. Verify tests pass (check both JavaScript and Python)
+  const testResults = await Bash({
+    command: "npm test 2>&1 || python -m pytest 2>&1 || echo 'No test command available'",
+    ignoreError: true
+  });
+  verifications.testsPass = testResults.exitCode === 0;
+  verifications.evidence.testOutput = testResults.stdout.substring(0, 500); // First 500 chars
+
+  // 4. Verify coverage meets 80% threshold
+  const coverageCheck = await Bash({
+    command: "npm run coverage:check 2>&1 || python -m pytest --cov=. --cov-fail-under=80 2>&1 || echo 'No coverage command'",
+    ignoreError: true
+  });
+  verifications.coverageMet = coverageCheck.exitCode === 0;
+  verifications.evidence.coverageReport = coverageCheck.stdout.substring(0, 300);
+
+  // 5. Verify commits exist with TDD phase labels
+  const gitLog = await Bash({
+    command: "git log --oneline -10"
+  });
+  const logOutput = gitLog.stdout;
+  verifications.commitsExist =
+    logOutput.includes("[RED]") &&
+    logOutput.includes("[GREEN]") &&
+    logOutput.includes("[REFACTOR]");
+  verifications.evidence.commits = logOutput;
+
+  // 6. Verify PR created (check for open PRs with task ID)
+  const prCheck = await Bash({
+    command: `gh pr list --state open 2>&1 | grep ${taskId} || echo 'No PR found'`,
+    ignoreError: true
+  });
+  verifications.prCreated = prCheck.exitCode === 0 && !prCheck.stdout.includes("No PR found");
+  verifications.evidence.prInfo = prCheck.stdout;
+
+  return verifications;
+}
+```
+
+### Verification Report Template
+
+After running `verifyTDDCycle()`, generate a verification report:
+
+```markdown
+## Ground Truth Verification Results
+
+Task: ${taskId}
+Branch: ${branchName}
+
+### Verification Checks
+
+${verifications.branchCreated ? '✅' : '❌'} **Branch Created**: ${branchName}
+${verifications.testsWritten ? '✅' : '❌'} **Tests Written**: ${verifications.evidence.modifiedFiles || 'No test files detected'}
+${verifications.testsPass ? '✅' : '❌'} **Tests Pass**: ${verifications.evidence.testOutput || 'No test output'}
+${verifications.coverageMet ? '✅' : '❌'} **Coverage Met**: ${verifications.evidence.coverageReport || 'No coverage report'}
+${verifications.commitsExist ? '✅' : '❌'} **Commits Exist**: ${verifications.evidence.commits || 'No commits with TDD labels'}
+${verifications.prCreated ? '✅' : '❌'} **PR Created**: ${verifications.evidence.prInfo || 'No PR found'}
+
+### Overall Status
+
+${Object.values(verifications).filter(v => v === true).length - 1} / 6 verifications passed
+
+${allChecksPassed(verifications) ?
+  '✅ All verifications passed - work confirmed persisted.' :
+  '❌ Some verifications failed - work may not have persisted correctly.'}
+```
+
+### When to Run Verification
+
+**MANDATORY**: Run `verifyTDDCycle()` in these scenarios:
+
+1. **After completing TDD cycle** - Before reporting task as complete
+2. **Before creating PR** - Ensure all work is committed
+3. **On any doubt** - If uncertain whether work persisted
+
+### Failure Handling
+
+If verification fails (any check returns `false`):
+
+1. **Report exactly what failed** with evidence from verification report
+2. **Do NOT claim success** - Be honest about failures
+3. **Investigate root cause** - Why didn't work persist?
+4. **Fix the issue** - Redo the work properly
+5. **Re-run verification** - Confirm fix worked
+
+### Example Usage
+
+```javascript
+// After completing TDD implementation
+const taskId = "CLEAN-123";
+const branchName = "feature/CLEAN-123-fix-auth";
+
+// Run verification
+const verificationResults = await verifyTDDCycle(taskId, branchName);
+
+// Generate report
+const report = generateVerificationReport(verificationResults);
+
+// Check if all passed
+if (!allChecksPassed(verificationResults)) {
+  console.error("❌ Verification failed:", report);
+  // Investigation and remediation
+} else {
+  console.log("✅ Verification passed:", report);
+  // Safe to report completion
+}
+```
+
+### Helper Functions
+
+```javascript
+function allChecksPassed(verifications) {
+  return (
+    verifications.branchCreated &&
+    verifications.testsWritten &&
+    verifications.testsPass &&
+    verifications.coverageMet &&
+    verifications.commitsExist &&
+    verifications.prCreated
+  );
+}
+
+function generateVerificationReport(verifications) {
+  // Implementation of template above
+  // Returns formatted markdown report
+}
+```
+
 ## Response Approach
 
 1. **Analyze fix pack requirements** from Linear task and acceptance criteria
@@ -1158,7 +1358,6 @@ Implementations always include:
 - **Pull Request**: Ready for review with Linear task integration
 - **Linear Progress Updates**: Structured output for STRATEGIST to update task status
 
-<<<<<<< HEAD
 ## Linear Progress Tracking
 
 **CRITICAL**: The EXECUTOR must provide structured progress updates throughout the TDD cycle so STRATEGIST can update Linear tasks accordingly.

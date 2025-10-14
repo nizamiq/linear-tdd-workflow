@@ -64,7 +64,199 @@ When you invoke `/fix CLEAN-123`, Claude Code **becomes EXECUTOR** and performs 
 4. **Validate quality gates** (≥80% diff coverage)
 5. **Commit changes** (to your actual git repository)
 6. **Create PR** (in your actual GitHub repo)
-7. **Verify all changes persisted** (ground truth checks)
+7. **Verify all changes persisted** (ground truth checks via Phase 6)
+
+## Phase 6: Verification (MANDATORY)
+
+After completing the TDD cycle and creating the PR, EXECUTOR **MUST** run comprehensive ground truth verification to ensure all work actually persisted.
+
+### Why This Phase Exists
+
+This phase prevents the EXECUTOR from reporting "implementation complete" when work was only simulated or analyzed but not actually executed. It uses ground truth checks (actual tool outputs) to verify real work happened.
+
+### Verification Process
+
+**Step 1: Run verifyTDDCycle() Function**
+
+EXECUTOR must execute the `verifyTDDCycle()` function (defined in `.claude/agents/executor.md`) with actual Bash tool calls:
+
+```javascript
+const taskId = "CLEAN-123";  // From command parameter
+const branchName = "feature/CLEAN-123-description";  // Actual branch name
+
+const verificationResults = await verifyTDDCycle(taskId, branchName);
+```
+
+**Step 2: Check All Verification Flags**
+
+The function returns a verification object with 6 boolean flags:
+
+```javascript
+{
+  taskId: "CLEAN-123",
+  branchCreated: true/false,      // Branch exists in git
+  testsWritten: true/false,       // Test files modified
+  testsPass: true/false,          // npm test exit code 0
+  coverageMet: true/false,        // Coverage ≥80%
+  commitsExist: true/false,       // RED, GREEN, REFACTOR commits exist
+  prCreated: true/false,          // PR exists with task ID
+  evidence: {
+    branch: "...",
+    modifiedFiles: "...",
+    testOutput: "...",
+    coverageReport: "...",
+    commits: "...",
+    prInfo: "..."
+  }
+}
+```
+
+**Step 3: Generate Verification Report**
+
+Format the results into a clear report showing what succeeded and what failed:
+
+```markdown
+## Ground Truth Verification Results
+
+Task: CLEAN-123
+Branch: feature/CLEAN-123-fix-auth
+
+### Verification Checks
+
+✅ **Branch Created**: feature/CLEAN-123-fix-auth
+✅ **Tests Written**: tests/unit/auth.test.ts (modified)
+✅ **Tests Pass**: npm test (16/16 passing)
+✅ **Coverage Met**: 85% (threshold: 80%)
+✅ **Commits Exist**:
+   - a1b2c3d [RED] Add failing test for token expiration
+   - e4f5g6h [GREEN] Implement token refresh logic
+   - i7j8k9l [REFACTOR] Extract validation to separate function
+✅ **PR Created**: https://github.com/repo/pull/123
+
+**Overall Status**: 6/6 verifications passed ✅
+
+All verifications passed - work confirmed persisted.
+```
+
+### Handling Verification Failures
+
+If **ANY** verification fails, EXECUTOR **MUST**:
+
+1. **Report exactly what failed** with evidence:
+
+   ```markdown
+   ❌ VERIFICATION FAILED
+
+   Task: CLEAN-123
+
+   Failed Checks:
+   - ❌ Tests Pass: npm test exited with code 1 (3/16 failing)
+   - ❌ Coverage Met: 72% (need 80%)
+
+   Evidence:
+   - Test output: "FAIL src/auth.test.ts - token_refresh_throws_on_expired"
+   - Coverage report: "Line coverage: 72.3%"
+
+   **CANNOT REPORT COMPLETION** - Implementation incomplete
+   ```
+
+2. **Do NOT claim success** - Be honest about the failure
+
+3. **Create INCIDENT task** (optional but recommended):
+   ```
+   Title: EXECUTOR verification failed for CLEAN-123
+   Description: TDD cycle completed but verification checks failed.
+   Failed: Tests passing, Coverage threshold
+   ```
+
+4. **Investigate and fix** - Redo the work properly, then re-run verification
+
+### Success Criteria
+
+**ONLY report task completion if ALL 6 verification flags are TRUE:**
+
+```javascript
+if (allChecksPassed(verificationResults)) {
+  // Safe to report completion
+  reportTaskComplete(taskId, verificationResults);
+} else {
+  // Report failure with details
+  reportVerificationFailure(taskId, verificationResults);
+}
+```
+
+### Verification Commands (For Reference)
+
+The `verifyTDDCycle()` function runs these actual Bash commands:
+
+```bash
+# 1. Branch verification
+git branch --list ${branchName}
+
+# 2. Test files verification
+git status --porcelain
+
+# 3. Tests passing verification
+npm test || python -m pytest
+
+# 4. Coverage verification
+npm run coverage:check || python -m pytest --cov=. --cov-fail-under=80
+
+# 5. Commits verification
+git log --oneline -10
+
+# 6. PR verification
+gh pr list --state open | grep ${taskId}
+```
+
+All commands must succeed and produce expected output for verification to pass.
+
+### Integration with Linear
+
+If verification passes, include verification report in Linear task update:
+
+```json
+{
+  "linear_update": {
+    "task_id": "CLEAN-123",
+    "action": "complete_task",
+    "status": "Done",
+    "comment": "✅ Task completed successfully\n\n[Verification Report]\n\n6/6 verifications passed",
+    "evidence": {
+      "verification_report": "...",
+      "pr_url": "..."
+    }
+  }
+}
+```
+
+If verification fails, update Linear to Blocked:
+
+```json
+{
+  "linear_update": {
+    "task_id": "CLEAN-123",
+    "action": "block_task",
+    "status": "Blocked",
+    "comment": "❌ Verification failed\n\n[Failed Checks]\n- Tests: 3/16 failing\n- Coverage: 72% (need 80%)",
+    "evidence": {
+      "verification_failures": ["tests_pass", "coverage_met"]
+    }
+  }
+}
+```
+
+### When NOT to Skip Verification
+
+Verification is **MANDATORY** and **CANNOT BE SKIPPED** for:
+
+- ✅ All `/fix` command invocations
+- ✅ Any TDD cycle completion
+- ✅ Before reporting task complete
+- ✅ Before creating PR
+- ✅ When any doubt exists about work persistence
+
+**There are NO exceptions to this rule.**
 
 ## Expected Output
 
