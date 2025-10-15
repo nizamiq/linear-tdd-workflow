@@ -2,56 +2,6 @@
 
 This is the comprehensive reference for Claude Code when working with projects using the Linear TDD Workflow System.
 
-## ⚠️ IMPORTANT: System vs Project Distinction
-
-**THIS REPOSITORY (`linear-tdd-workflow`) IS THE SYSTEM ITSELF.**
-
-This codebase contains:
-- The Linear TDD Workflow System source code
-- Agent definitions, commands, workflows
-- System documentation and tests
-- The framework that gets installed in other projects
-
-**When working in THIS repository:**
-- You are maintaining/developing the LINEAR TDD WORKFLOW SYSTEM
-- Changes affect the system's capabilities and features
-- Documentation under `.claude/docs/` is ABOUT THE SYSTEM
-- Tests validate the SYSTEM's functionality
-
-**When this system is INSTALLED in another project:**
-- The `.claude/` directory is copied to that project
-- The system MANAGES that project's codebase
-- The system enforces TDD, creates Linear tasks, etc.
-- Documentation under that project's `docs/` is ABOUT THAT PROJECT
-
-**DO NOT CONFUSE:**
-- ❌ System documentation (`.claude/docs/`) with project documentation (`docs/`)
-- ❌ System tests (`tests/e2e/executor-real-work.test.js`) with project tests
-- ❌ System files (agent definitions) with project files (application code)
-- ❌ Improving the system itself with using the system on a project
-
-**Example:**
-```
-THIS REPO (linear-tdd-workflow):
-  .claude/              ← System definition (agents, commands)
-  tests/e2e/            ← System tests
-  scripts/              ← System utilities
-  docs/                 ← System documentation (NOT about user projects)
-
-ANOTHER PROJECT (my-app):
-  .claude/              ← Installed system (copied from above)
-  src/                  ← Project code (managed BY the system)
-  tests/                ← Project tests (managed BY the system)
-  docs/                 ← Project documentation (NOT system docs)
-```
-
-**When asked to work on "the project":**
-1. Ask: "Do you mean the Linear TDD Workflow System itself, or a project using the system?"
-2. If unclear, check the working directory and file paths
-3. Clarify before making assumptions
-
----
-
 ## 🚀 System Overview
 
 You are working in a project with the **Linear TDD Workflow System** installed - a multi-agent autonomous code quality management system that enforces strict Test-Driven Development and functional release practices.

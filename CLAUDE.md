@@ -2,9 +2,86 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## 🚀 IMPORTANT: Autonomous Workflow System Detected
+## ⚠️ CRITICAL: THIS REPOSITORY IS THE SYSTEM ITSELF
 
-This project has the **Linear TDD Workflow System** installed. You have access to powerful autonomous capabilities:
+**You are working in the LINEAR TDD WORKFLOW SYSTEM source repository.**
+
+This is NOT a project using the system - this IS the system.
+
+### What This Means
+
+**This codebase contains:**
+- The Linear TDD Workflow System source code
+- Agent definitions (`.claude/agents/*.md`)
+- Command specifications (`.claude/commands/*.md`)
+- Workflow definitions (`.claude/journeys/*.md`)
+- System documentation (`.claude/docs/`)
+- System tests (`tests/e2e/`)
+- The framework that gets installed in other projects
+
+**When you work here, you are:**
+- ✅ Developing/maintaining THE SYSTEM itself
+- ✅ Improving agent capabilities and workflows
+- ✅ Updating system documentation and tests
+- ✅ Building features that will be used BY other projects
+- ❌ NOT working on an application using the system
+
+**DO NOT CONFUSE:**
+- ❌ System documentation (`.claude/docs/`) with project docs
+- ❌ System tests (`tests/e2e/executor-real-work.test.js`) with project tests
+- ❌ Agent definitions (system files) with application code
+- ❌ Improving the system with using the system
+
+### Directory Structure
+
+```
+linear-tdd-workflow/ (THIS REPO - THE SYSTEM)
+├── .claude/
+│   ├── agents/          ← System agent definitions
+│   ├── commands/        ← System command specs
+│   ├── docs/            ← System documentation
+│   └── workflows/       ← System workflow definitions
+├── tests/e2e/           ← System E2E tests
+├── scripts/             ← System utilities
+└── docs/                ← System user documentation
+
+my-app/ (ANOTHER PROJECT - USES THE SYSTEM)
+├── .claude/             ← Installed system (copied from above)
+├── src/                 ← Application code (managed BY system)
+├── tests/               ← Application tests (managed BY system)
+└── docs/                ← Application documentation
+```
+
+### When Asked to "Work on the Project"
+
+**Always clarify:**
+1. "Do you mean the Linear TDD Workflow System itself (this repo)?"
+2. "Or a project that uses this system?"
+
+**If unclear, check:**
+- Working directory: `/Users/cnross/code/linear-tdd-workflow` = SYSTEM
+- File paths: `.claude/agents/executor.md` = SYSTEM FILE
+- Tests: `tests/e2e/executor-real-work.test.js` = SYSTEM TEST
+
+**Examples:**
+
+❌ **WRONG**: "Let me use `/assess` to scan this project's code quality"
+→ That would assess THE SYSTEM's code, not intended
+
+✅ **RIGHT**: "I'm updating the EXECUTOR agent definition to fix simulation issues"
+→ Correct - you're developing the system itself
+
+❌ **WRONG**: "Let me add a new feature to the application"
+→ This repo has no "application" - it IS the system
+
+✅ **RIGHT**: "I'm adding a new verification function to the system"
+→ Correct - you're enhancing system capabilities
+
+---
+
+## 🚀 System Capabilities Overview
+
+As the Linear TDD Workflow System source repository, you have access to powerful autonomous capabilities for development:
 
 ### Quick Discovery
 
