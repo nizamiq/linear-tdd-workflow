@@ -119,12 +119,322 @@ After generating the plan, PLANNER will:
 
 ### `/cycle status`
 
-Quick health check of current cycle:
+**Comprehensive cycle health check with work verification:**
 
-- Progress against planned work
-- Velocity tracking vs historical
-- Blocker and risk identification
-- Remaining capacity analysis
+#### Phase 1: Linear Cycle Data Collection
+
+1. **Query current cycle** from Linear MCP:
+   ```javascript
+   mcp__linear-server__list_cycles({ team: LINEAR_TEAM_ID, state: "started" })
+   ```
+
+2. **Fetch all cycle issues** with current status:
+   ```javascript
+   mcp__linear-server__list_issues({
+     team: LINEAR_TEAM_ID,
+     cycle: currentCycleId
+   })
+   ```
+
+3. **Categorize issues by status**:
+   - Backlog: Not started
+   - Todo: Planned but not started
+   - In Progress: Actively being worked on
+   - In Review: Awaiting review
+   - Done: Claimed as complete
+
+#### Phase 2: Work Completion Verification (MANDATORY)
+
+**CRITICAL**: Do NOT trust Linear status alone - verify actual work exists.
+
+For each issue marked "In Progress" or "Done", run ground truth verification:
+
+**Verification Function:**
+
+```javascript
+async function verifyCycleWork(issueId, issueStatus) {
+  const verifications = {
+    issueId: issueId,
+    status: issueStatus,
+    branchExists: false,
+    commitsExist: false,
+    prExists: false,
+    testsModified: false,
+    verified: false,
+    evidence: {}
+  };
+
+  // 1. Check for feature branch
+  const branchPattern = `*${issueId}*`;
+  const branchCheck = await Bash({
+    command: `git branch -a --list ${branchPattern}`,
+    ignoreError: true
+  });
+  verifications.branchExists = branchCheck.stdout.trim().length > 0;
+  verifications.evidence.branch = branchCheck.stdout;
+
+  // 2. Check for commits mentioning issue
+  const gitLog = await Bash({
+    command: `git log --all --oneline --grep="${issueId}" -10`,
+    ignoreError: true
+  });
+  verifications.commitsExist = gitLog.stdout.trim().length > 0;
+  verifications.evidence.commits = gitLog.stdout;
+
+  // 3. Check for PR with issue ID
+  const prCheck = await Bash({
+    command: `gh pr list --search "${issueId}" --state all --json number,title,state 2>&1`,
+    ignoreError: true
+  });
+  verifications.prExists = !prCheck.stdout.includes("no pull requests");
+  verifications.evidence.pr = prCheck.stdout;
+
+  // 4. Check for test modifications (if applicable)
+  if (verifications.commitsExist) {
+    const testChanges = await Bash({
+      command: `git log --all --oneline --grep="${issueId}" -- "*test*" "*spec*" -5`,
+      ignoreError: true
+    });
+    verifications.testsModified = testChanges.stdout.trim().length > 0;
+    verifications.evidence.tests = testChanges.stdout;
+  }
+
+  // Determine verification status
+  if (issueStatus === "Done") {
+    // Done tasks MUST have: commits, PR, and tests
+    verifications.verified =
+      verifications.commitsExist &&
+      verifications.prExists &&
+      verifications.testsModified;
+  } else if (issueStatus === "In Progress") {
+    // In Progress tasks MUST have: branch or commits
+    verifications.verified =
+      verifications.branchExists ||
+      verifications.commitsExist;
+  }
+
+  return verifications;
+}
+```
+
+**Verification Report:**
+
+For each issue, generate verification status:
+
+```markdown
+## Work Verification Results
+
+### Done Tasks
+
+✅ CLEAN-123: "Fix authentication bug"
+- Status: Done ✅
+- Branch: feature/CLEAN-123-fix-auth (verified)
+- Commits: 3 commits found (a1b2c3d, e4f5g6h, i7j8k9l)
+- PR: #456 (merged)
+- Tests: Modified auth.test.ts
+- **VERIFIED**: All evidence present ✅
+
+❌ CLEAN-124: "Update API documentation"
+- Status: Done ❌ (CLAIMED BUT NOT VERIFIED)
+- Branch: NOT FOUND ❌
+- Commits: NOT FOUND ❌
+- PR: NOT FOUND ❌
+- Tests: N/A
+- **UNVERIFIED**: No evidence of work ❌
+
+### In Progress Tasks
+
+✅ CLEAN-125: "Refactor data layer"
+- Status: In Progress ✅
+- Branch: feature/CLEAN-125-refactor (verified)
+- Commits: 1 commit found (partial)
+- PR: NOT YET
+- Tests: In progress
+- **VERIFIED**: Work started ✅
+
+⚠️ CLEAN-126: "Add error handling"
+- Status: In Progress ⚠️
+- Branch: NOT FOUND
+- Commits: NOT FOUND
+- PR: NOT FOUND
+- **UNVERIFIED**: No evidence of work started ⚠️
+```
+
+#### Phase 3: Status Report Generation
+
+Generate comprehensive status report including:
+
+**1. Progress Metrics:**
+- Completed (verified): X/Y issues
+- In Progress (verified): X/Y issues
+- Not Started: X issues
+- **Unverified claims**: X issues ❌
+
+**2. Velocity Tracking:**
+- Current velocity (verified points only)
+- Required velocity to complete
+- Historical velocity comparison
+- **Discrepancy**: Claimed vs verified points
+
+**3. Blocker Identification:**
+- External dependency blockers
+- Technical blockers (failing tests, etc.)
+- **Verification blockers**: Tasks claiming "Done" without evidence
+
+**4. Remaining Capacity:**
+- Days remaining in cycle
+- Points remaining (verified only)
+- Recommended actions
+
+**5. Health Score:**
+
+```
+Cycle Health: 78/100
+
+Breakdown:
+- Progress: 85/100 (on track)
+- Velocity: 75/100 (slightly behind)
+- Verification: 65/100 ⚠️ (3 unverified claims)
+- Blockers: 90/100 (minimal)
+```
+
+#### Phase 4: Alert Generation
+
+**Critical Alerts:**
+
+```
+🚨 CRITICAL: 2 tasks marked "Done" have NO verified work
+   - CLEAN-124: No branch, commits, or PR found
+   - CLEAN-127: No commits or tests found
+
+   Action required: Verify actual completion or update status
+
+⚠️ WARNING: 1 task marked "In Progress" has NO verified work
+   - CLEAN-126: No branch or commits found
+
+   Action recommended: Confirm work actually started
+```
+
+**Informational Alerts:**
+
+```
+ℹ️ INFO: Cycle 33% complete (verified)
+ℹ️ INFO: On track to complete 80% of planned work
+```
+
+#### Phase 5: Recommendations
+
+Based on verification results, provide actionable recommendations:
+
+**If unverified claims found:**
+
+```
+Recommendations:
+
+1. Review unverified "Done" tasks:
+   - CLEAN-124, CLEAN-127
+   - Update status to actual state
+   - Create evidence (commits, PRs, tests)
+
+2. Check stalled "In Progress" tasks:
+   - CLEAN-126 has no commits after 3 days
+   - May need reassignment or unblocking
+
+3. Adjust velocity calculations:
+   - Claimed: 87 points
+   - Verified: 65 points
+   - Use verified number for projections
+```
+
+**If all verified:**
+
+```
+Recommendations:
+
+1. ✅ All claims verified - excellent discipline
+2. Maintain current pace to complete 85% of work
+3. Consider pulling 2 stretch goals from backlog
+```
+
+### Status Report Output Format
+
+```markdown
+# Cycle Status Report - Day 5 of 10
+
+## Summary
+
+- **Cycle**: Sprint 2024.Q1.3
+- **Team**: ACO (ai-coders)
+- **Days Remaining**: 5
+- **Health Score**: 78/100 ⚠️
+
+## Progress (Verified)
+
+- ✅ Done (verified): 6/18 issues (33%, 52 points)
+- 🔄 In Progress (verified): 3/18 issues (17%, 28 points)
+- ⏸️ Not Started: 9/18 issues (50%, 80 points)
+- ❌ Unverified claims: 2 issues (CLEAN-124, CLEAN-127)
+
+## Velocity
+
+- **Current** (verified): 10.4 points/day
+- **Required**: 16.0 points/day
+- **Historical**: 12.3 points/day
+- **Gap**: Behind by 5.6 points/day ⚠️
+
+## Work Verification
+
+### ✅ Verified Done (6 issues)
+1. CLEAN-123: Auth bug fix (PR #456, 3 commits, tests ✅)
+2. CLEAN-125: API refactor (PR #457, 5 commits, tests ✅)
+3. CLEAN-128: Documentation (PR #458, 2 commits)
+4. CLEAN-130: Error handling (PR #459, 4 commits, tests ✅)
+5. CLEAN-131: Validation (PR #460, 2 commits, tests ✅)
+6. CLEAN-132: Cleanup (PR #461, 1 commit)
+
+### ❌ Unverified Claims (2 issues)
+1. CLEAN-124: Marked "Done" but NO evidence found ❌
+   - No branch, commits, or PR
+   - Status needs correction
+2. CLEAN-127: Marked "Done" but incomplete evidence ❌
+   - PR exists but no tests
+   - Coverage requirement not met
+
+### 🔄 Verified In Progress (3 issues)
+1. CLEAN-126: Branch exists, 2 commits, WIP
+2. CLEAN-129: Branch exists, 1 commit, WIP
+3. CLEAN-133: Branch exists, active work
+
+## Alerts
+
+🚨 **CRITICAL**: 2 unverified "Done" claims require investigation
+⚠️ **WARNING**: Behind pace by 5.6 points/day
+⚠️ **WARNING**: 3 issues at risk of missing cycle
+
+## Recommendations
+
+1. **Immediate**: Verify or correct status for CLEAN-124, CLEAN-127
+2. **Today**: Increase velocity to 18 points/day to catch up
+3. **Tomorrow**: Review blocked items for unblocking
+4. **This week**: Complete 3 in-progress items before starting new work
+
+## Next Review
+
+- **Scheduled**: Tomorrow at 9:00 AM
+- **Focus**: Velocity recovery and blocker resolution
+```
+
+### Integration with PLANNER Agent
+
+When `/cycle status` is invoked, PLANNER must:
+
+1. **Fetch cycle data** from Linear MCP
+2. **Run verification function** for all "In Progress" and "Done" tasks
+3. **Generate comprehensive report** with verification evidence
+4. **Flag unverified claims** prominently
+5. **Provide actionable recommendations**
+
+**CRITICAL RULE**: Never report a task as "Done" or "In Progress" without verification evidence. If verification fails, report the discrepancy and recommend investigation.
 
 ### `/cycle execute`
 
