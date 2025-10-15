@@ -31,6 +31,7 @@ make onboard
 - `/assess` - Scan code quality → Generate task definitions (AUDITOR)
 - `/linear` - Create Linear tasks from latest assessment (STRATEGIST)
 - `/fix <TASK-ID>` - Implement fix with TDD enforcement (EXECUTOR)
+- `/lint` - Intelligent linting with auto-detection (LINTER)
 - `/recover` - Auto-fix broken CI/CD pipeline (GUARDIAN)
 - `/learn` - Mine patterns from successful PRs (SCHOLAR)
 - `/release <version>` - Manage production deployment with functional gate (STRATEGIST)
@@ -57,6 +58,7 @@ make onboard
 # Via Makefile
 make assess                  # Code assessment
 make fix TASK=CLEAN-123      # TDD fix implementation
+make lint                    # Intelligent linting
 make recover                 # Pipeline recovery
 make release                 # Release management
 make status                  # System status
@@ -972,6 +974,7 @@ If issues persist after troubleshooting:
 | "Check my code"           | `/assess`                             | AUDITOR scans quality                           |
 | "Create Linear tasks"     | `/linear`                             | STRATEGIST creates tasks from assessment        |
 | "Fix CLEAN-123"           | `/fix CLEAN-123`                      | EXECUTOR implements with TDD                    |
+| "Lint my code"            | `/lint`                               | LINTER auto-detects and lints all file types    |
 | "Tests failing"           | `/recover`                            | GUARDIAN fixes pipeline                         |
 | "Deploy v1.2.0"           | `/release 1.2.0`                      | STRATEGIST manages release with functional gate |
 | "Plan sprint"             | `/cycle plan`                         | PLANNER capacity-based planning                 |

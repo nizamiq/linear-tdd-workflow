@@ -90,6 +90,47 @@ scripts/
 
 ## Root Scripts
 
+### Intelligent Linter (`intelligent-lint.sh`)
+
+**Purpose:** Auto-detects project type and runs appropriate modern linters
+**Features:**
+- Auto-detects languages: Python, JavaScript, TypeScript, Markdown, YAML, and others
+- Auto-detects frameworks: Django, FastAPI, Pydantic, React, Next.js, Vue, etc.
+- Runs modern linters: ruff, black, mypy, eslint, prettier, tsc, markdownlint, yamllint
+- Framework-specific rules automatically applied
+- Supports check and fix modes
+- Parallel execution for speed
+
+**Usage:**
+
+```bash
+# Lint entire project (check mode)
+./.claude/scripts/intelligent-lint.sh . check
+
+# Lint and auto-fix
+./.claude/scripts/intelligent-lint.sh . fix
+
+# Lint specific directory
+./.claude/scripts/intelligent-lint.sh src check
+
+# Via slash command
+/lint
+/lint --mode=fix
+/lint --scope=src/api
+```
+
+**Supported Languages:**
+- Python: ruff, black, mypy
+- JavaScript/TypeScript: eslint, prettier, tsc
+- Markdown: markdownlint, prettier
+- YAML: yamllint, prettier
+- Others detected with installation suggestions: Go, Rust, Java, Ruby, PHP, C/C++, Shell
+
+**Performance:**
+- Small projects (<100 files): 1-2s
+- Medium projects (100-500 files): 2-5s
+- Large projects (500-2000 files): 5-15s
+
 ### Initialize Agents (`initialize-agents.js`)
 
 **Purpose:** Sets up agent system
