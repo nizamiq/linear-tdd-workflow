@@ -280,86 +280,220 @@ Would you like me to create this cycle in Linear? (yes/no)
 ### verifySubagentWork() - Phase 5 Ground Truth Verification
 
 ```javascript
-// After deploying subagents, verify actual work
+// 🚨 CRITICAL: Ground Truth Verification - NO MORE FAKE COMPLETIONS
+// This function ONLY returns verified=true if ALL ground truth checks pass
 async function verifySubagentWork(taskResults) {
   const verifications = [];
 
   for (const result of taskResults) {
-    // Verify files were actually modified
-    const gitStatus = await Bash({ command: "git status --porcelain" });
+    let verified = true; // Start optimistic, prove with evidence
+    const evidence = {};
 
-    // Verify commits exist
-    const gitLog = await Bash({ command: "git log --oneline -3" });
-
-    // Verify PRs exist (if PR number provided)
-    let prCheck = null;
-    if (result.prNumber) {
-      prCheck = await Bash({
-        command: `gh pr view ${result.prNumber} --json url,state,title`,
-        ignoreError: true
+    // 1. Verify Git Status (GROUND TRUTH) - Check if files were actually modified
+    try {
+      const gitStatusResult = await Bash({
+        command: "git status --porcelain",
+        ignoreError: false
       });
+
+      evidence.gitStatus = gitStatusResult.stdout;
+
+      // CRITICAL: Check if files were actually modified
+      if (result.expectedFiles && result.expectedFiles.length > 0) {
+        const filesActuallyChanged = gitStatusResult.stdout.split('\n')
+          .filter(line => line.trim().length > 0)
+          .length;
+
+        if (filesActuallyChanged === 0) {
+          verified = false;
+          evidence.failureReason = `Expected file changes but git status shows: ${gitStatusResult.stdout}`;
+        }
+      }
+    } catch (error) {
+      verified = false;
+      evidence.gitError = `Git status check failed: ${error.message}`;
     }
 
-    // Verify Linear tasks updated
-    const linearTeamId = process.env.LINEAR_TEAM_ID || (await discoverLinearTeam());
-    let linearTask = null;
-    if (result.taskId) {
+    // 2. Verify Commits Actually Exist (GROUND TRUTH)
+    if (result.commitHash) {
       try {
-        linearTask = await mcp__linear-server__get_issue({ id: result.taskId });
+        const commitCheckResult = await Bash({
+          command: `git log --oneline -10 | grep "${result.commitHash}"`,
+          ignoreError: false
+        });
+
+        evidence.commitCheck = commitCheckResult.stdout;
+
+        if (commitCheckResult.exitCode !== 0 || !commitCheckResult.stdout.includes(result.commitHash)) {
+          verified = false;
+          evidence.commitFailure = `Commit ${result.commitHash} not found in git log`;
+        }
       } catch (error) {
-        console.log(`⚠️ Could not verify Linear task ${result.taskId}`);
+        verified = false;
+        evidence.commitError = `Commit verification failed: ${error.message}`;
       }
     }
 
-    // Verify tests pass
-    let testResults = null;
-    if (result.testCommand) {
-      testResults = await Bash({
-        command: result.testCommand || "npm test",
-        ignoreError: true
-      });
+    // 3. Verify PR Actually Exists (GROUND TRUTH)
+    if (result.prNumber) {
+      try {
+        const prCheckResult = await Bash({
+          command: `gh pr view ${result.prNumber} --json url,state,title`,
+          ignoreError: false
+        });
+
+        evidence.prCheck = prCheckResult.stdout;
+
+        if (prCheckResult.exitCode !== 0) {
+          verified = false;
+          evidence.prFailure = `PR #${result.prNumber} not found`;
+        }
+      } catch (error) {
+        verified = false;
+        evidence.prError = `PR verification failed: ${error.message}`;
+      }
+    }
+
+    // 4. Verify Linear Task Status (GROUND TRUTH)
+    if (result.taskId) {
+      try {
+        const linearTeamId = process.env.LINEAR_TEAM_ID || (await discoverLinearTeam());
+        const linearTaskResult = await mcp__linear-server__get_issue({
+          id: result.taskId
+        });
+
+        evidence.linearTask = linearTaskResult;
+
+        const expectedStates = ["In Progress", "Done", "Ready for Review"];
+        const actualState = linearTaskResult.state?.name;
+
+        if (!expectedStates.includes(actualState)) {
+          verified = false;
+          evidence.linearFailure = `Task ${result.taskId} status is '${actualState}', expected one of: ${expectedStates.join(', ')}`;
+        }
+      } catch (error) {
+        verified = false;
+        evidence.linearError = `Linear task verification failed: ${error.message}`;
+      }
+    }
+
+    // 5. Verify Tests Pass (GROUND TRUTH)
+    if (result.requiresTests) {
+      try {
+        const testResult = await Bash({
+          command: "npm test 2>&1",
+          ignoreError: false,
+          timeout: 60000 // 1 minute timeout
+        });
+
+        evidence.testOutput = testResult.stdout;
+        evidence.testExitCode = testResult.exitCode;
+
+        if (testResult.exitCode !== 0) {
+          verified = false;
+          evidence.testFailure = `Tests failed with exit code ${testResult.exitCode}`;
+        }
+      } catch (error) {
+        verified = false;
+        evidence.testError = `Test verification failed: ${error.message}`;
+      }
+    }
+
+    // 6. Verify File Contents (GROUND TRUTH)
+    if (result.expectedFileContents) {
+      for (const [filePath, expectedContent] of Object.entries(result.expectedFileContents)) {
+        try {
+          const fileContent = await Read({ file_path: filePath });
+
+          if (!fileContent.includes(expectedContent)) {
+            verified = false;
+            evidence.fileContentFailure = `File ${filePath} does not contain expected content: ${expectedContent}`;
+          }
+        } catch (error) {
+          verified = false;
+          evidence.fileError = `File verification failed for ${filePath}: ${error.message}`;
+        }
+      }
     }
 
     verifications.push({
       taskId: result.taskId,
-      filesModified: gitStatus.includes(result.expectedFiles) || gitStatus.length > 0,
-      commitExists: result.commitHash && gitLog.includes(result.commitHash),
-      prExists: prCheck && prCheck.success,
-      prUrl: prCheck?.data?.url,
-      linearUpdated: linearTask?.state?.name === "In Progress" || linearTask?.state?.type === "started",
-      testsPass: testResults?.exitCode === 0,
-      verified: true // Set to false if any critical check fails
+      verified: verified, // CRITICAL: Only true if ALL checks pass
+      evidence: evidence,
+      timestamp: new Date().toISOString()
     });
   }
 
   return verifications;
 }
 
-// Generate verification report
+// Generate verification report - CRITICAL: Report ONLY verified work
 function generateVerificationReport(verifications) {
+  const verifiedTasks = verifications.filter(v => v.verified);
+  const failedTasks = verifications.filter(v => !v.verified);
+
   console.log(`
-✅ VERIFIED WORK COMPLETION
-============================
+🔍 GROUND TRUTH VERIFICATION REPORT
+=====================================
+
+VERIFIED TASKS: ${verifiedTasks.length}/${verifications.length}
+FAILED VERIFICATIONS: ${failedTasks.length}/${verifications.length}
   `);
 
-  verifications.forEach(v => {
-    const status = v.verified ? '✅' : '❌';
+  // Report verified tasks
+  if (verifiedTasks.length > 0) {
     console.log(`
-${status} Task ${v.taskId}:
-- Commit: ${v.commitExists ? v.commitHash + ' (verified)' : '❌ Not found'}
-- PR: ${v.prExists ? v.prUrl + ' (verified)' : '❌ Not found'}
-- Linear: ${v.linearUpdated ? 'In Progress (verified)' : '❌ Not updated'}
-- Files: ${v.filesModified ? 'Modified (verified)' : '❌ No changes'}
-- Tests: ${v.testsPass ? 'Passing (verified)' : '⚠️ Not verified'}
-    `);
-  });
+✅ VERIFIED WORK (GROUND TRUTH CONFIRMED):
+`);
+    verifiedTasks.forEach(v => {
+      console.log(`
+✅ Task ${v.taskId} - VERIFIED
+Evidence: ${JSON.stringify(v.evidence, null, 2)}
+Timestamp: ${v.timestamp}
+      `);
+    });
+  }
 
-  const totalVerified = verifications.filter(v => v.verified).length;
+  // Report FAILED verifications with specific reasons
+  if (failedTasks.length > 0) {
+    console.log(`
+❌ FAILED VERIFICATIONS (NO GROUND TRUTH EVIDENCE):
+`);
+    failedTasks.forEach(v => {
+      console.log(`
+❌ Task ${v.taskId} - NOT VERIFIED
+Failure Reason: ${v.evidence.failureReason || v.evidence.commitFailure || v.evidence.prFailure || v.evidence.linearFailure || v.evidence.testFailure || 'Unknown verification failure'}
+Evidence: ${JSON.stringify(v.evidence, null, 2)}
+Timestamp: ${v.timestamp}
+      `);
+    });
+  }
+
+  // CRITICAL: Summary must reflect reality
+  if (failedTasks.length > 0) {
+    console.log(`
+🚨 CRITICAL: ${failedTasks.length} task(s) claimed completion but NO EVIDENCE FOUND
+These tasks cannot be marked as complete in Linear.
+
+RECOMMENDED ACTION:
+1. Investigate why verification failed
+2. Re-run the tasks if necessary
+3. Only mark tasks as complete when ground truth evidence exists
+    `);
+  }
+
   console.log(`
-Summary: ${totalVerified}/${verifications.length} tasks fully verified
+SUMMARY: ${verifiedTasks.length}/${verifications.length} tasks have ground truth evidence
+${failedTasks.length > 0 ? '⚠️ Some claims cannot be verified - manual investigation required' : '✅ All claims verified with ground truth evidence'}
   `);
 
-  return verifications;
+  return {
+    verified: verifiedTasks,
+    failed: failedTasks,
+    totalVerified: verifiedTasks.length,
+    totalFailed: failedTasks.length,
+    totalTasks: verifications.length
+  };
 }
 ```
 

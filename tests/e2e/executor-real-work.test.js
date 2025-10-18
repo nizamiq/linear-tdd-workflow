@@ -55,8 +55,8 @@ describe('EXECUTOR - Real Work Verification E2E', () => {
 
         // Check for critical instructions
         const requiredInstructions = [
-          '🚨 CRITICAL: DO NOT SIMULATE - EXECUTE IMMEDIATELY',
-          'YOU ARE AN EXECUTOR, NOT A PLANNER',
+          '🚨 CRITICAL: EXECUTE IMMEDIATELY - DO NOT SIMULATE',
+          'YOU ARE AN EXECUTION AGENT, NOT A PLANNING AGENT',
           'ABSOLUTE PROHIBITIONS',
           'MANDATORY ACTIONS',
           'ACTUALLY write test files using Write tool',

@@ -39,7 +39,9 @@
       "Bash(test:*)",
       "Read(//home/cnross/.claude/**)",
       "Bash(npm test:*)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(npm run precommit:*)",
+      "Read(///**)"
     ],
     "deny": [],
     "ask": []

@@ -119,9 +119,9 @@ loop_controls:
       check: coverage_below_80_after_max_iterations
 ---
 
-# 🚨 CRITICAL: DO NOT SIMULATE - EXECUTE IMMEDIATELY
+# 🚨 CRITICAL: EXECUTE IMMEDIATELY - DO NOT SIMULATE
 
-**YOU ARE AN EXECUTOR, NOT A PLANNER.**
+**YOU ARE AN EXECUTION AGENT, NOT A PLANNING AGENT.**
 
 **ABSOLUTE PROHIBITIONS:**
 - ❌ NEVER provide "implementation plans" or "approaches"
