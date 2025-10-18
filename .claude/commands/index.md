@@ -4,6 +4,26 @@ This file serves as the central registry for all slash commands in the Linear TD
 
 ## Available Slash Commands
 
+### Fast-Track Development Commands (NEW!)
+
+#### `/feature add "<description>" [--type=<api|ui|service|data>] [--tier=<fast|standard|critical>] [--with-tests]`
+
+- **Agent**: Feature Prototyping Engine
+- **Description**: Rapid feature prototyping with generated stubs and templates
+- **Usage**: Quick feature development without heavy overhead
+- **Examples**:
+  - `/feature add "user authentication API" --type=api`
+  - `/feature add "dashboard component" --type=ui --with-tests`
+
+#### `/ship "<description>" [--tier=<fast|standard|cautious>] [--with-rollback] [--validate=<tests|syntax>]`
+
+- **Agent**: Rapid Deployment Engine
+- **Description**: Instant deployment of low-risk features with minimal validation
+- **Usage**: Ship features immediately with built-in rollback safety
+- **Examples**:
+  - `/ship "fix navigation on mobile" --tier=fast`
+  - `/ship "add loading spinner" --tier=standard`
+
 ### Core Workflow Commands
 
 #### `/assess [--scope=<directory>] [--format=<json|markdown>] [--depth=<shallow|deep>]`

@@ -6,56 +6,130 @@
 #   - partial: Feature has working code but NO E2E test (blocks release)
 #   - planned: Feature not yet implemented (doesn't block release)
 #
+# Priority Values (NEW):
+#   - critical: Ship this week (Week 1-2)
+#   - high: Ship in next 2 weeks (Week 3-4)
+#   - medium: Ship in next month (Week 5-8)
+#   - low: Future consideration (Week 9+)
+#
 # Format:
 #   feature-slug:
 #     name: "User-facing description"
 #     status: implemented|partial|planned
+#     priority: critical|high|medium|low
+#     target_week: Week number for delivery
 #     e2e_test: "path/to/test.js::test-name" or null
 #     notes: "Optional implementation notes"
+#     user_impact: "How this helps users"
 
 features:
   assess-code-quality:
     name: "User can assess code quality via /assess command"
     status: implemented
+    priority: low
+    target_week: 0
     e2e_test: "tests/e2e/comprehensive-workflow-e2e.test.js::E2E-001"
     notes: "Full AUDITOR → assessment → Linear task workflow"
+    user_impact: "Identifies quality issues and creates actionable tasks"
 
   create-linear-tasks:
     name: "User can create Linear tasks from assessment via /linear command"
     status: implemented
+    priority: low
+    target_week: 0
     e2e_test: "tests/e2e/linear-integration.test.js::complete-workflow"
     notes: "STRATEGIST delegation pattern with Linear MCP integration"
+    user_impact: "Seamless task management integration with Linear"
 
   implement-tdd-fix:
     name: "User can implement fix with TDD enforcement via /fix command"
     status: partial
+    priority: critical
+    target_week: 1
     e2e_test: null
     notes: "EXECUTOR agent exists but no E2E test covering full /fix workflow"
+    user_impact: "Guaranteed quality fixes with automatic TDD compliance"
 
   ci-recovery:
     name: "User can auto-recover CI/CD failures via /recover command"
     status: planned
+    priority: high
+    target_week: 3
     e2e_test: null
     notes: "GUARDIAN agent exists, needs E2E test for recovery workflow"
+    user_impact: "Reduces CI/CD downtime from hours to minutes"
 
   pattern-mining:
     name: "User can extract patterns from successful PRs via /learn command"
     status: planned
+    priority: medium
+    target_week: 5
     e2e_test: null
     notes: "SCHOLAR agent exists, needs E2E test"
+    user_impact: "Learns from successful patterns to improve future development"
 
   production-release:
     name: "User can manage production releases via /release command"
     status: partial
+    priority: critical
+    target_week: 2
     e2e_test: null
     notes: "JR-6 journey exists but needs E2E test for full release workflow"
+    user_impact: "Safe, automated production deployments with rollback"
 
   cycle-planning:
     name: "User can plan sprints via /cycle command"
     status: planned
+    priority: high
+    target_week: 4
     e2e_test: null
     notes: "PLANNER agent exists, needs E2E test"
+    user_impact: "Data-driven sprint planning with capacity-based work selection"
+
+  quick-fix:
+    name: "User can make minor improvements without full TDD via /quick-fix command"
+    status: planned
+    priority: critical
+    target_week: 1
+    e2e_test: null
+    notes: "NEW: Fast-track for small changes, documentation fixes"
+    user_impact: "Enables rapid iterations for minor improvements"
+
+  feature-prototype:
+    name: "User can quickly prototype features via /feature command"
+    status: planned
+    priority: critical
+    target_week: 1
+    e2e_test: null
+    notes: "NEW: Rapid prototyping with generated stubs and templates"
+    user_impact: "Reduces feature development time from days to hours"
+
+  ship-fast:
+    name: "User can ship low-risk features immediately via /ship command"
+    status: planned
+    priority: critical
+    target_week: 1
+    e2e_test: null
+    notes: "NEW: Bypass heavy gates for low-risk changes"
+    user_impact: "Instant deployment of non-breaking improvements"
+
+# Velocity Metrics
+velocity_metrics:
+  features_shipped_this_week: 0
+  features_target_this_week: 3
+  avg_days_to_ship: 0
+  maintenance_hours_this_week: 0
+  maintenance_target_max: 4
+
+# Feature Pipeline
+critical_features_this_week:
+  - implement-tdd-fix
+  - production-release
+  - quick-fix
+  - feature-prototype
+  - ship-fast
 
 # Metadata
-registry_version: "1.0.0"
-last_updated: "2025-10-01"
+registry_version: "2.0.0"
+last_updated: "2025-10-18"
+focus_shift: "From maintenance (70%) to features (80%)"

@@ -41,7 +41,9 @@
       "Bash(npm test:*)",
       "WebSearch",
       "Bash(npm run precommit:*)",
-      "Read(///**)"
+      "Read(///**)",
+      "Bash(npm run lint:*)",
+      "Bash(npx eslint:*)"
     ],
     "deny": [],
     "ask": []

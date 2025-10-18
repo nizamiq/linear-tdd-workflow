@@ -191,7 +191,7 @@ describe('ANTI-HALLUCINATION-V2: Agent Execution Protocol Validation', () => {
 
         const agentsWithProtocols = ['executor.md', 'python-pro.md', 'django-pro.md', 'linter.md', 'code-reviewer.md'];
 
-        let violationsFound = [];
+        const violationsFound = [];
 
         agentsWithProtocols.forEach(file => {
           const filePath = path.join(agentDir, file);
@@ -239,7 +239,7 @@ describe('ANTI-HALLUCINATION-V2: Agent Execution Protocol Validation', () => {
         const agentDir = path.join(PROJECT_ROOT, '.claude/agents');
         const agentsWithProtocols = ['executor.md', 'python-pro.md', 'django-pro.md', 'linter.md', 'code-reviewer.md'];
 
-        let violationsFound = [];
+        const violationsFound = [];
 
         agentsWithProtocols.forEach(file => {
           const filePath = path.join(agentDir, file);
@@ -471,7 +471,7 @@ describe('ANTI-HALLUCINATION-V2: Agent Execution Protocol Validation', () => {
         const agentDir = path.join(PROJECT_ROOT, '.claude/agents');
         const criticalAgents = ['executor.md', 'python-pro.md', 'django-pro.md', 'linter.md', 'code-reviewer.md'];
 
-        let violationsFound = [];
+        const violationsFound = [];
 
         criticalAgents.forEach(file => {
           const filePath = path.join(agentDir, file);
@@ -516,7 +516,7 @@ describe('ANTI-HALLUCINATION-V2: Agent Execution Protocol Validation', () => {
         const agentDir = path.join(PROJECT_ROOT, '.claude/agents');
         const agentsWithMCP = ['executor.md', 'python-pro.md', 'django-pro.md', 'code-reviewer.md'];
 
-        let violationsFound = [];
+        const violationsFound = [];
 
         agentsWithMCP.forEach(file => {
           const filePath = path.join(agentDir, file);

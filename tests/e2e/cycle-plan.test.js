@@ -15,7 +15,7 @@ const path = require('path');
 const fs = require('fs').promises;
 
 describe('/cycle plan - Linear Cycle Creation E2E', () => {
-  let testResults = {
+  const testResults = {
     totalTests: 0,
     passed: 0,
     failed: 0,

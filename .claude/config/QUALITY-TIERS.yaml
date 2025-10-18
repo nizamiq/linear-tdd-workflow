@@ -1,0 +1,358 @@
+# Quality Tiers Configuration
+# Defines validation requirements for different types of work
+
+tiers:
+  fast-track:
+    description: "Rapid delivery for low-risk changes"
+    max_time: "10 minutes"
+    validation:
+      required:
+        - syntax_check
+        - basic_functionality
+      optional:
+        - lint_check
+        - format_check
+      forbidden:
+        - full_test_suite
+        - coverage_check
+        - integration_tests
+    use_cases:
+      - "Documentation updates"
+      - "CSS/style changes"
+      - "Text content changes"
+      - "Configuration updates"
+      - "Non-breaking utility functions"
+    examples:
+      - "Fix typo in README"
+      - "Update button color"
+      - "Add environment variable"
+      - "Update API documentation"
+
+  standard:
+    description: "Standard quality for most features and fixes"
+    max_time: "30 minutes"
+    validation:
+      required:
+        - syntax_check
+        - lint_check
+        - format_check
+        - unit_tests
+        - coverage_check
+      optional:
+        - integration_tests
+        - type_check
+      forbidden:
+        - full_regression_suite
+        - performance_tests
+        - security_scan
+    use_cases:
+      - "New features"
+      - "Bug fixes"
+      - "API endpoints"
+      - "UI components"
+      - "Service functions"
+    examples:
+      - "Add user authentication"
+      - "Create data export API"
+      - "Build dashboard component"
+      - "Fix null pointer exception"
+
+  critical:
+    description: "Comprehensive validation for critical changes"
+    max_time: "2 hours"
+    validation:
+      required:
+        - syntax_check
+        - lint_check
+        - format_check
+        - type_check
+        - unit_tests
+        - integration_tests
+        - coverage_check
+        - security_scan
+        - performance_tests
+      optional:
+        - full_regression_suite
+        - manual_review
+        - staging_deployment
+    use_cases:
+      - "Database migrations"
+      - "Authentication changes"
+      - "Payment processing"
+      - "Critical business logic"
+      - "System architecture changes"
+    examples:
+      - "Migrate user database schema"
+      - "Implement OAuth2 authentication"
+      - "Add payment processing"
+      - "Refactor core service architecture"
+
+validation_steps:
+  syntax_check:
+    description: "Check code syntax and basic compilation"
+    commands:
+      javascript: "npm run lint:check -- --quiet"
+      typescript: "npm run typecheck"
+      python: "python -m py_compile"
+    timeout: "30 seconds"
+
+  lint_check:
+    description: "Run linting tools for code quality"
+    commands:
+      javascript: "npm run lint:check"
+      python: "python -m flake8"
+    timeout: "60 seconds"
+
+  format_check:
+    description: "Verify code formatting"
+    commands:
+      javascript: "npm run format:check"
+      python: "python -m black --check"
+    timeout: "30 seconds"
+
+  unit_tests:
+    description: "Run unit tests for the specific feature"
+    commands:
+      javascript: "npm test -- --testPathPattern={feature}"
+      python: "python -m pytest tests/{feature}/"
+    coverage_target: "80%"
+    timeout: "5 minutes"
+
+  integration_tests:
+    description: "Test integration with other components"
+    commands:
+      javascript: "npm run test:integration -- --testPathPattern={feature}"
+      python: "python -m pytest tests/integration/{feature}/"
+    timeout: "10 minutes"
+
+  coverage_check:
+    description: "Verify test coverage meets requirements"
+    commands:
+      javascript: "npm run coverage:check"
+      python: "python -m pytest --cov={module} --cov-fail-under=80"
+    thresholds:
+      fast-track: "disabled"
+      standard: "80%"
+      critical: "90%"
+    timeout: "3 minutes"
+
+  type_check:
+    description: "Run static type checking"
+    commands:
+      typescript: "npm run typecheck"
+      python: "python -m mypy {module}"
+    timeout: "2 minutes"
+
+  security_scan:
+    description: "Run security vulnerability scan"
+    commands:
+      javascript: "npm audit --audit-level=high"
+      python: "python -m bandit -r {module}"
+    timeout: "3 minutes"
+
+  performance_tests:
+    description: "Run performance benchmarks"
+    commands:
+      javascript: "npm run test:performance"
+      python: "python -m pytest tests/performance/{feature}/"
+    timeout: "10 minutes"
+
+  basic_functionality:
+    description: "Quick manual verification of basic functionality"
+    steps:
+      - "Verify file exists and loads"
+      - "Check main function executes without errors"
+      - "Confirm expected output format"
+    timeout: "2 minutes"
+
+  full_regression_suite:
+    description: "Run entire test suite"
+    commands:
+      javascript: "npm test"
+      python: "python -m pytest"
+    timeout: "30 minutes"
+
+  manual_review:
+    description: "Manual code review by team member"
+    steps:
+      - "Create pull request"
+      - "Assign reviewer"
+      - "Wait for approval"
+      - "Address feedback"
+    timeout: "4 hours"
+
+  staging_deployment:
+    description: "Deploy to staging environment for testing"
+    steps:
+      - "Deploy to staging"
+      - "Run smoke tests"
+      - "Manual QA verification"
+      - "Performance validation"
+    timeout: "2 hours"
+
+auto_detection:
+  rules:
+    - pattern: "\\.md$"
+      tier: "fast-track"
+      reason: "Documentation files"
+
+    - pattern: "\\.css$|\\.scss$|\\.less$"
+      tier: "fast-track"
+      reason: "Style files"
+
+    - pattern: "package\\.json$|requirements\\.txt$|pyproject\\.toml$"
+      tier: "fast-track"
+      reason: "Configuration files"
+
+    - pattern: "test/|spec/"
+      tier: "standard"
+      reason: "Test files"
+
+    - pattern: "src/api/|routes/|controllers/"
+      tier: "standard"
+      reason: "API endpoints"
+
+    - pattern: "migrations/|schema/"
+      tier: "critical"
+      reason: "Database changes"
+
+    - pattern: "auth/|authentication/|security/"
+      tier: "critical"
+      reason: "Security sensitive"
+
+    - pattern: "payment/|billing/|stripe/"
+      tier: "critical"
+      reason: "Payment processing"
+
+decision_tree:
+  questions:
+    - question: "Does this change affect authentication or security?"
+      yes: "critical"
+      no:
+        - question: "Does this change the database schema?"
+          yes: "critical"
+          no:
+            - question: "Is this a new feature or bug fix?"
+              yes: "standard"
+              no:
+                - question: "Is this documentation, styling, or configuration?"
+                  yes: "fast-track"
+                  no: "standard"
+
+fallback_strategies:
+  fast-track:
+    - "Move to standard tier if validation fails"
+    - "Add manual testing step"
+    - "Create rollback plan"
+
+  standard:
+    - "Split into smaller fast-track changes"
+    - "Add more comprehensive tests"
+    - "Schedule code review"
+
+  critical:
+    - "Break into multiple standard-tier changes"
+    - "Create feature flag for gradual rollout"
+    - "Schedule maintenance window"
+
+monitoring:
+  fast-track:
+    post_deployment:
+      - "Basic health check"
+      - "Error rate monitoring"
+      - "User feedback collection"
+
+  standard:
+    post_deployment:
+      - "Performance monitoring"
+      - "Error tracking"
+      - "User metrics"
+      - "Rollback readiness"
+
+  critical:
+    post_deployment:
+      - "Comprehensive monitoring"
+      - "Performance baselines"
+      - "Security monitoring"
+      - "User impact tracking"
+      - "24/7 monitoring for first 48 hours"
+
+quality_gates:
+  pass_criteria:
+    fast-track:
+      - "No syntax errors"
+      - "Basic functionality works"
+      - "No critical errors"
+
+    standard:
+      - "All required validations pass"
+      - "Coverage target met"
+      - "No performance regression"
+
+    critical:
+      - "All validations pass"
+      - "Security scan clean"
+      - "Performance benchmarks met"
+      - "Manual approval received"
+
+  fail_actions:
+    auto_rollback:
+      - "Critical security issues found"
+      - "Performance degradation >50%"
+      - "Error rate >10%"
+
+    manual_intervention:
+      - "Test failures"
+      - "Coverage below threshold"
+      - "Type check errors"
+
+  notification:
+    slack_channel:
+      fast-track: "#deployments"
+      standard: "#deployments"
+      critical: "#critical-alerts"
+
+    email_recipients:
+      fast-track: "dev-team@company.com"
+      standard: "dev-team@company.com, qa-team@company.com"
+      critical: "all-hands@company.com, management@company.com"
+
+metrics:
+  track_per_tier:
+    fast-track:
+      - deployment_time
+      - rollback_rate
+      - user_impact_score
+
+    standard:
+      - test_execution_time
+      - coverage_percentage
+      - defect_escape_rate
+
+    critical:
+      - security_vulnerabilities_found
+      - performance_impact
+      - business_metrics_affected
+
+success_criteria:
+  fast_track_success:
+    deployment_time: "< 10 minutes"
+    rollback_rate: "< 2%"
+    user_impact: "Positive or neutral"
+
+  standard_success:
+    test_execution_time: "< 30 minutes"
+    coverage_percentage: "> 80%"
+    defect_escape_rate: "< 5%"
+
+  critical_success:
+    security_issues: "Zero high/critical"
+    performance_impact: "< 10%"
+    business_metrics: "No negative impact"
+
+---
+# Configuration metadata
+version: "1.0"
+last_updated: "2025-10-18"
+focus: "Balance speed with appropriate quality"
+philosophy: "Right-sized validation for each change type"
